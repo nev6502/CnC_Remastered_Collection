@@ -281,7 +281,7 @@ extern "C" __declspec(dllexport) int __cdecl CNC_Editor_Load_Map(
 	char command_line[_MAX_PATH];
 	sprintf(command_line, "-CD%s", content_directory);
 
-	DLL_Startup(command_line);
+	//DLL_Startup(command_line);
 
 	Scen.Scenario = scenario_index;
 	ScenarioDirType scen_dir;
@@ -349,7 +349,7 @@ extern "C" __declspec(dllexport) int __cdecl CNC_Editor_Load_Map_By_Scenario_Nam
 	char command_line[_MAX_PATH];
 	sprintf(command_line, "-CD%s", content_directory);
 
-	DLL_Startup(command_line);
+	//DLL_Startup(command_line);
 
 	snprintf(Scen.ScenarioName, _MAX_FNAME + _MAX_EXT, "%s.ini", scenario_name);
 
@@ -704,7 +704,7 @@ extern "C" __declspec(dllexport) int __cdecl CNC_Editor_Get_Scenario_Names(char*
 
 	char command_line[_MAX_PATH];
 	sprintf(command_line, "-CD%s", content_directory);
-	DLL_Startup(command_line);
+	//DLL_Startup(command_line);
 
 	char team_ids[] =
 	{

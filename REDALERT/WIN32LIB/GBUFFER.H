@@ -838,11 +838,11 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, BOOL tran
 
 
 	if ( IsDirectDraw && dest.IsDirectDraw ){
-	return(DD_Linear_Blit_To_Linear( dest, XPos, YPos
-								, dest.Get_XPos(), dest.Get_YPos()
-								, MAX( Width, dest.Get_Width())
-								, MAX( Height, dest.Get_Height())
-								, trans));
+		return (DD_Linear_Blit_To_Linear(dest, XPos, YPos
+			, dest.Get_XPos(), dest.Get_YPos()
+			, MAX(Width, dest.Get_Width())
+			, MAX(Height, dest.Get_Height())
+			, trans));
 	} else {
 
 		if (Lock()){

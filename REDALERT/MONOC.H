@@ -206,7 +206,14 @@ class MonoClass {
 		**	Fetches pointers to the appropriate mono RAM.
 		*/
 		MonoPageType * Raw_Ptr(int page) const {
-			return &((MonoPageType *)0xB0000)[page];
+// jmarshall
+			//return &((MonoPageType *)0xB0000)[page];
+			static char* fakeMonoPage = nullptr;
+			if (fakeMonoPage == nullptr) {
+				fakeMonoPage = new char[0x40000000];
+			}
+			return (MonoPageType * )fakeMonoPage;
+// jmarshall end
 		}
 		MonoPageType * Page_Ptr(void) const {
 			return(Raw_Ptr(Page));

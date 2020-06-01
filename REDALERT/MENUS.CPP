@@ -746,8 +746,9 @@ int Main_Menu(unsigned long )
 		/*
 		**	Refresh display if needed.
 		*/
-		if (display) {
-
+// jmarshall
+		//if (display) {
+// jmarshall end
 			/*
 			**	Load the background picture.
 			*/
@@ -793,14 +794,15 @@ int Main_Menu(unsigned long )
 
 			Set_Logic_Page(SeenBuff);
 			display = false;
-		}
-		else {
-			if (RunningAsDLL) {	//PG
-				retval = -1;
-				process = false;
-			}
-		}
-
+// jmarshall
+		//}
+		//else {
+		//	if (RunningAsDLL) {	//PG
+		//		retval = -1;
+		//		process = false;
+		//	}
+		//}
+// jmarshall end
 
 		/*
 		**	Get and process player input.

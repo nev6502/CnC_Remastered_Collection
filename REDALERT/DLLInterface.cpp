@@ -46,7 +46,7 @@
 /*
 ** Externs
 */
-extern int DLL_Startup(const char * command_line);
+//extern int DLL_Startup(const char * command_line);
 extern void Reallocate_Big_Shape_Buffer(void);
 extern bool ProgEndCalled;
 extern int Write_PCX_File(char* name, GraphicViewPortClass& pic, unsigned char* palette );
@@ -612,14 +612,14 @@ extern "C" __declspec(dllexport) unsigned int __cdecl CNC_Version(unsigned int v
 **************************************************************************************************/
 extern "C" __declspec(dllexport) void __cdecl CNC_Init(const char *command_line, CNC_Event_Callback_Type event_callback)
 {
-	DLLExportClass::Set_Content_Directory(NULL);
-		  
-	DLL_Startup(command_line);
-
-	// MBL 
-	DLLExportClass::Set_Event_Callback( event_callback );
-
-	DLLExportClass::Init();
+	//DLLExportClass::Set_Content_Directory(NULL);
+	//	  
+	//DLL_Startup(command_line);
+	//
+	//// MBL 
+	//DLLExportClass::Set_Event_Callback( event_callback );
+	//
+	//DLLExportClass::Init();
 }
 
 

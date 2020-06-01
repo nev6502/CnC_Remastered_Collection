@@ -412,26 +412,27 @@ void Check_Overlapped_Blit_Capability(void)
 	** Assume we can until we find out otherwise
 	*/
 	OverlappedVideoBlits = TRUE;
-
-	GraphicBufferClass test_buffer;
-
-	test_buffer.Init (64, 64, NULL, 0, (GBC_Enum)GBC_VIDEOMEM);
-
-	test_buffer.Clear();
-
-	/*
-	** Plot a pixel in the top left corner of the buffer.
-	*/
-	test_buffer.Put_Pixel(0, 0, 255);
-
-	/*
-	** Blit the buffer down by one line. If we end up with a vertical strip of pixel 255's then
-	** overlapped blits dont work
-	*/
-
-	test_buffer.Blit(test_buffer, 0, 0, 0, 1, test_buffer.Get_Width(), test_buffer.Get_Height()-1);
-
-	if (test_buffer.Get_Pixel (0 ,5) == 255) OverlappedVideoBlits = FALSE;
+// jmarshall
+	//GraphicBufferClass test_buffer;
+	//
+	//test_buffer.Init (64, 64, NULL, 0, (GBC_Enum)GBC_VIDEOMEM);
+	//
+	//test_buffer.Clear();
+	//
+	///*
+	//** Plot a pixel in the top left corner of the buffer.
+	//*/
+	//test_buffer.Put_Pixel(0, 0, 255);
+	//
+	///*
+	//** Blit the buffer down by one line. If we end up with a vertical strip of pixel 255's then
+	//** overlapped blits dont work
+	//*/
+	//
+	//test_buffer.Blit(test_buffer, 0, 0, 0, 1, test_buffer.Get_Width(), test_buffer.Get_Height()-1);
+	//
+	//if (test_buffer.Get_Pixel (0 ,5) == 255) OverlappedVideoBlits = FALSE;
+// jmarshall end
 }
 
 
@@ -450,9 +451,6 @@ void Check_Overlapped_Blit_Capability(void)
  *=============================================================================================*/
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel)
 {
-// ST - 1/3/2019 10:41AM
-	return TRUE;
-#if (0)
 	HRESULT result;
 	//
 	// If there is not currently a direct draw object then we need to define one.
@@ -462,12 +460,14 @@ BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel)
 		result = DirectDrawCreate(NULL, &DirectDrawObject, NULL);
 		Process_DD_Result(result, FALSE);
 		if (result == DD_OK){
+// jmarshall - removed fullscreen.
 			if (w==320){
-				result = DirectDrawObject->SetCooperativeLevel(hwnd, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWMODEX);
+				result = DirectDrawObject->SetCooperativeLevel(hwnd, DDSCL_EXCLUSIVE | DDSCL_ALLOWMODEX);
 			} else {
 				//MessageBox(MainWindow, "In Set_Video_Mode. About to call SetCooperativeLevel.","Note", MB_ICONEXCLAMATION|MB_OK);
-				result = DirectDrawObject->SetCooperativeLevel(hwnd, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN);
+				result = DirectDrawObject->SetCooperativeLevel(hwnd, DDSCL_EXCLUSIVE);
 			}
+// jmarshall end
 			Process_DD_Result(result, FALSE);
 		}else{
 			return (FALSE);
@@ -531,7 +531,6 @@ BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel)
 	//MessageBox(MainWindow, "In Set_Video_Mode. About to return success.","Note", MB_ICONEXCLAMATION|MB_OK);
 
 	return (TRUE);
-#endif
 }
 
 /***********************************************************************************************
@@ -636,34 +635,35 @@ unsigned Get_Video_Hardware_Capabilities(void)
 	video_capabilities.dwSize = sizeof(video_capabilities);
 	//MessageBox(MainWindow, "In Get_Video_Hardware_Capabilities. About to call GetCaps","Note", MB_ICONEXCLAMATION|MB_OK);
 	HRESULT result = DirectDrawObject->GetCaps (&video_capabilities, NULL);
-	if (result != DD_OK){
-		Process_DD_Result(result, FALSE);
-		return (0);
-	}
+// jmarshall
+	//if (result != DD_OK){
+	//	Process_DD_Result(result, FALSE);
+	//	return (0);
+	//}
 
 	/*
 	** Set flags to indicate the presence of the features we are interested in
 	*/
-	video = 0;
+	video = VIDEO_BLITTER | VIDEO_SYNC_PALETTE | VIDEO_BANK_SWITCHED | VIDEO_COLOR_FILL;
 
-	/* Hardware blits supported? */
-	if (video_capabilities.dwCaps & DDCAPS_BLT) 				video |= VIDEO_BLITTER;
-
-	/* Hardware blits asyncronous? */
-	if (video_capabilities.dwCaps & DDCAPS_BLTQUEUE) 		video |= VIDEO_BLITTER_ASYNC;
-
-	/* Can palette changes be synced to vertical refresh? */
-	if (video_capabilities.dwCaps & DDCAPS_PALETTEVSYNC) 	video |= VIDEO_SYNC_PALETTE;
-
-	/* Is the video cards memory bank switched? */
-	if (video_capabilities.dwCaps & DDCAPS_BANKSWITCHED) 	video |= VIDEO_BANK_SWITCHED;
-
-	/* Can the blitter do filled rectangles? */
-	if (video_capabilities.dwCaps & DDCAPS_BLTCOLORFILL)	video |= VIDEO_COLOR_FILL;
-
-	/* Is there no hardware assistance avaailable at all? */
-	if (video_capabilities.dwCaps & DDCAPS_NOHARDWARE) 	video |= VIDEO_NO_HARDWARE_ASSIST;
-
+	///* Hardware blits supported? */
+	//if (video_capabilities.dwCaps & DDCAPS_BLT) 				video |= VIDEO_BLITTER;
+	//
+	///* Hardware blits asyncronous? */
+	//if (video_capabilities.dwCaps & DDCAPS_BLTQUEUE) 		video |= VIDEO_BLITTER_ASYNC;
+	//
+	///* Can palette changes be synced to vertical refresh? */
+	//if (video_capabilities.dwCaps & DDCAPS_PALETTEVSYNC) 	video |= VIDEO_SYNC_PALETTE;
+	//
+	///* Is the video cards memory bank switched? */
+	//if (video_capabilities.dwCaps & DDCAPS_BANKSWITCHED) 	video |= VIDEO_BANK_SWITCHED;
+	//
+	///* Can the blitter do filled rectangles? */
+	//if (video_capabilities.dwCaps & DDCAPS_BLTCOLORFILL)	video |= VIDEO_COLOR_FILL;
+	//
+	///* Is there no hardware assistance avaailable at all? */
+	//if (video_capabilities.dwCaps & DDCAPS_NOHARDWARE) 	video |= VIDEO_NO_HARDWARE_ASSIST;
+// jmarshall end
 	//MessageBox(MainWindow, "In Get_Video_Hardware_Capabilities. About to return success.","Note", MB_ICONEXCLAMATION|MB_OK);
 	return (video);
 }

@@ -164,23 +164,15 @@ BOOL WINAPI DllMain(HINSTANCE instance, unsigned int fdwReason, void *lpvReserve
  * HISTORY:                                                                                    *
  *   03/20/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-#ifdef WIN32
-//int PASCAL WinMain(HINSTANCE, HINSTANCE, char *, int )
-//PG int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int command_show )
-int DLL_Startup(const char * command_line_in)
-
-#else	//WIN32
-int main(int argc, char * argv[])
-#endif	//WIN32
-
+int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int command_show )
 {
 #ifdef WIN32
 
-	RunningAsDLL = true;
-	int command_show = SW_HIDE;
-	HINSTANCE instance = ProgramInstance;
-	char command_line[1024];
-	strcpy(command_line, command_line_in);
+	RunningAsDLL = false;
+	//int command_show = SW_HIDE;
+	//HINSTANCE instance = ProgramInstance;
+	//char command_line[1024];
+	//strcpy(command_line, command_line_in);
 
 
 
@@ -572,17 +564,12 @@ int main(int argc, char * argv[])
 				ModeXBuff.Init( ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM));
 			} else {
 
-#if (1)	//ST - 1/3/2019 2:11PM
-
-				VisiblePage.Init(ScreenWidth, ScreenHeight, NULL, 0, (GBC_Enum)0);
-				HiddenPage.Init(ScreenWidth, ScreenHeight, NULL, 0, (GBC_Enum)0);
-
-#else
 				VisiblePage.Init( ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM));
 
 				/*
 				** Check that we really got a video memory page. Failure is fatal.
 				*/
+				DDSCAPS	surface_capabilities;
 				memset (&surface_capabilities, 0, sizeof(surface_capabilities));
 				VisiblePage.Get_DD_Surface()->GetCaps(&surface_capabilities);
 				if (surface_capabilities.dwCaps & DDSCAPS_SYSTEMMEMORY) {
@@ -633,7 +620,6 @@ int main(int argc, char * argv[])
 						VisiblePage.Attach_DD_Surface(&HiddenPage);
 					}
 				}
-#endif
 			}
 
 			ScreenHeight = 3072;
@@ -1133,8 +1119,10 @@ void Read_Setup_Options( RawFileClass *config_file )
 		*/
 		VideoBackBufferAllowed = ini.Get_Bool("Options", "VideoBackBuffer", true);
 		AllowHardwareBlitFills = ini.Get_Bool("Options", "HardwareFills", true);
-		ScreenHeight = ini.Get_Bool("Options", "Resolution", false) ? 3072 : 3072;
-
+// jmarshall
+		ScreenWidth = 640;
+		ScreenHeight = 400; //ini.Get_Bool("Options", "Resolution", false) ? 3072 : 3072;
+// jmarshall end
 		/*
 		** See if an alternative socket number has been specified
 		*/

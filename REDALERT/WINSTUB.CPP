@@ -160,8 +160,8 @@ void Check_For_Focus_Loss(void)
 
 
 extern bool InMovie;
-#if (0)//PG
-long FAR PASCAL _export Windows_Procedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+
+long FAR PASCAL Windows_Procedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
 {
 
 	int	low_param = LOWORD(wParam);
@@ -231,7 +231,7 @@ long FAR PASCAL _export Windows_Procedure(HWND hwnd, UINT message, UINT wParam, 
 			HiddenPage.Un_Init();
 			AllSurfaces.Release();
 			if (!InDebugger) Reset_Video_Mode();
-			Stop_Profiler();
+			//Stop_Profiler();
 			PostQuitMessage( 0 );
 
 			/*
@@ -245,18 +245,18 @@ long FAR PASCAL _export Windows_Procedure(HWND hwnd, UINT message, UINT wParam, 
 					break;
 
 				case 0:
-					Shutdown_Network();
+					//Shutdown_Network();
 #ifndef WINSOCK_IPX
 					if (Winsock.Get_Connected()) Winsock.Close();
 					/*
 					** Free the THIPX32 dll
 					*/
-					Unload_IPX_Dll();
+					//Unload_IPX_Dll();
 #endif	//WINSOCK_IPX
 					ExitProcess(0);
 					break;
 				case 3:
-					Shutdown_Network();
+					//Shutdown_Network();
 #ifndef WINSOCK_IPX
 					/*
 					** Call the function to disable the IPX callback as horrible things can
@@ -338,7 +338,6 @@ long FAR PASCAL _export Windows_Procedure(HWND hwnd, UINT message, UINT wParam, 
 
 	return DefWindowProc (hwnd, message, wParam, lParam);
 }
-#endif
 
 
 
@@ -432,10 +431,7 @@ void WWDebugString (char *string)
 
 void Create_Main_Window ( HANDLE instance , int command_show , int width , int height )
 
-{
-	MainWindow = NULL;
-	return;
-#if (0)//PG
+{	
 	HWND        	hwnd ;
 	WNDCLASS    	wndclass ;
 	//
@@ -446,8 +442,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	wndclass.lpfnWndProc   = Windows_Procedure ;
 	wndclass.cbClsExtra    = 0 ;
 	wndclass.cbWndExtra    = 0 ;
-	wndclass.hInstance     = instance ;
-	wndclass.hIcon         = LoadIcon (instance, MAKEINTRESOURCE(CC_ICON)) ;
+	wndclass.hInstance     = (HINSTANCE)instance ;
+	wndclass.hIcon         = LoadIcon ((HINSTANCE)instance, MAKEINTRESOURCE(CC_ICON)) ;
 	wndclass.hCursor       = NULL;
 	wndclass.hbrBackground = NULL;
 	wndclass.lpszMenuName  = WINDOW_NAME;	//NULL
@@ -468,16 +464,15 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 							0,
 							// Denzil 5/18/98 - Making window fullscreen prevents other apps
 							// from getting WM_PAINT messages
-							GetSystemMetrics(SM_CXSCREEN), //width,
-							GetSystemMetrics(SM_CYSCREEN), //height,
+// jmarshall
+							width, //width,
+							height, //height,
+// jmarshall end
 							// End Denzil
 							NULL,
 							NULL,
-							instance,
+							(HINSTANCE)instance,
 							NULL );
-// Denzil
-width = width; height = height;
-// End
 
 	ShowWindow (hwnd, command_show );
 	ShowCommand = command_show;
@@ -488,11 +483,11 @@ width = width; height = height;
 
 	CCFocusMessage = RegisterWindowMessage ("CC_GOT_FOCUS");
 
-	Audio_Focus_Loss_Function = &Focus_Loss;
+	//Audio_Focus_Loss_Function = &Focus_Loss;
 	Misc_Focus_Loss_Function = &Focus_Loss;
 	Misc_Focus_Restore_Function = &Focus_Restore;
 	Gbuffer_Focus_Loss_Function = &Focus_Loss;
-#endif
+
 }
 
 

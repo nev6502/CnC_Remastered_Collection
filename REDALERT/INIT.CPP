@@ -232,7 +232,6 @@ bool Init_Game(int , char * [])
 #if (0) //PG
 	Init_CDROM_Access();
 #endif
-
 	if (Special.IsFromInstall) {
 		Load_Prolog_Page();
 	}
@@ -3087,15 +3086,15 @@ static void Init_Bootstrap_Mixfiles(void)
 #endif
 
 #ifdef FIXIT_CSII	//	Ok. ajw
-	bool ok1;
+	//bool ok1;
  #if 0
 	new MFCD("HIRES1.MIX", &FastKey);
 	ok1 = MFCD::Cache("HIRES1.MIX");
 	assert(ok1);
  #else
-	new MFCD("LORES1.MIX", &FastKey);
-	ok1 = MFCD::Cache("LORES1.MIX");
-	assert(ok1);
+	//new MFCD("LORES1.MIX", &FastKey);
+	//ok1 = MFCD::Cache("LORES1.MIX");
+	//assert(ok1);
  #endif
 #endif
 
@@ -3118,7 +3117,7 @@ static void Init_Bootstrap_Mixfiles(void)
 	bool ok = MFCD::Cache("LOCAL.MIX");
 	assert(ok);
 
-#if 0
+#if 1
 	new MFCD("HIRES.MIX", &FastKey);
 	ok = MFCD::Cache("HIRES.MIX");
 	assert(ok);
@@ -3335,9 +3334,12 @@ static void Bootstrap(void)
 	**	Default palette initialization.
 	*/
 	// PG_TO_FIX. This doesn't seem right. ST - 5/9/2019
-	//memmove((unsigned char *)&GamePalette[0], (void *)MFCD::Retrieve("TEMPERAT.PAL"), 768L);
-	//WhitePalette[0] = BlackPalette[0];
-//	GamePalette.Set();
+	memmove((unsigned char *)&GamePalette[0], (void *)MFCD::Retrieve("TEMPERAT.PAL"), 768L);
+// jmarshall
+	memmove((unsigned char*)&CCPalette[0], (void*)MFCD::Retrieve("TEMPERAT.PAL"), 768L);
+// jmarshall end
+	WhitePalette[0] = BlackPalette[0];
+	GamePalette.Set();
 
 	/*
 	**	Initialize expansion files (if present). Expansion files must be located
