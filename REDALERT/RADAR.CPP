@@ -364,8 +364,6 @@ void RadarClass::Draw_It(bool forced)
 {
 	DisplayClass::Draw_It(forced);
 
-#if (0)	                               // Legacy radar rendering not used. ST - 2/26/2020 3:53PM
-
 	static char * _hiresradarnames[]={
 		"natoradr.shp",	//HOUSE_SPAIN,
 		"natoradr.shp",   //HOUSE_GREECE,
@@ -465,7 +463,7 @@ void RadarClass::Draw_It(bool forced)
 		}
 	}
 
-	if (IsRadarActivating || IsRadarDeactivating || IsRadarJammed) {
+	if (IsRadarActivating || IsRadarDeactivating /*|| IsRadarJammed*/) {
 		Radar_Anim();
 		Map.Repair.Draw_Me(true);
 		Map.Upgrade.Draw_Me(true);
@@ -627,7 +625,6 @@ void RadarClass::Draw_It(bool forced)
 
 	}
 	BEnd(BENCH_RADAR);
-#endif
 }
 
 
