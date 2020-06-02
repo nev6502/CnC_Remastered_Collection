@@ -622,8 +622,9 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 				}
 			}
 
-			ScreenHeight = 3072;
-
+// jmarshall
+			//ScreenHeight = 3072;
+// jmarshall end
 			if (VisiblePage.Get_Height() == 480) {
 				SeenBuff.Attach(&VisiblePage, 0, 40, 3072, 3072);
 				HidPage.Attach(&HiddenPage, 0, 40, 3072, 3072);

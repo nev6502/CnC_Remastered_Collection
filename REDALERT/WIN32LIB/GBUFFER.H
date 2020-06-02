@@ -1117,7 +1117,9 @@ inline void GraphicViewPortClass::Draw_Stamp(void const * icondata, int icon, in
    if (drewit == 0) {
 		if (Lock()){
 			UnCachedIconsDrawn++;
-			Buffer_Draw_Stamp_Clip(this, icondata, icon, x_pixel, y_pixel, remap, WindowList[clip_window][WINDOWX], WindowList[clip_window][WINDOWY], WindowList[clip_window][WINDOWWIDTH], WindowList[clip_window][WINDOWHEIGHT]);
+			extern int ScreenHeight, ScreenWidth;
+			if(y_pixel < ScreenHeight && x_pixel < ScreenWidth)
+				Buffer_Draw_Stamp_Clip(this, icondata, icon, x_pixel, y_pixel, remap, WindowList[clip_window][WINDOWX], WindowList[clip_window][WINDOWY], WindowList[clip_window][WINDOWWIDTH], WindowList[clip_window][WINDOWHEIGHT]);
 		}
    }
 	Unlock();
