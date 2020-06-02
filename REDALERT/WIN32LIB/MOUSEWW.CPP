@@ -698,23 +698,14 @@ void *Set_Mouse_Cursor(int hotx, int hoty, void *cursor)
 
 extern int DLLForceMouseX;
 extern int DLLForceMouseY;
-
+extern int mousex, mousey;
 
 int Get_Mouse_X(void)
 {
-	//if (DLLForceMouseX >= 0) {
-	//	return DLLForceMouseX;
-	//}
-	if (!_Mouse) return(0);
-	return(_Mouse->Get_Mouse_X());
+	return mousex;
 }
 
 int Get_Mouse_Y(void)
 {
-	//if (DLLForceMouseY >= 0) {
-	//	return DLLForceMouseY;
-	//}
-	
-	if (!_Mouse) return(0);
-	return(_Mouse->Get_Mouse_Y());
+	return mousey;
 }

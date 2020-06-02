@@ -84,6 +84,8 @@ GadgetClass * GadgetClass::Focused = 0;
 static RemapControlType _GreyScheme = {15};
 RemapControlType * GadgetClass::ColorScheme = &_GreyScheme;
 
+int mousex, mousey;
+
 
 /***********************************************************************************************
  * GadgetClass::GadgetClass -- Constructor for gadget object.                                  *
@@ -469,8 +471,7 @@ void GadgetClass::Draw_All(bool forced)
  * HISTORY:    01/03/1995 MML : Created.                                   *
  *=========================================================================*/
 KeyNumType GadgetClass::Input(void)
-{
-	int mousex, mousey;
+{	
 	KeyNumType key;
 	int forced = false;
 
@@ -544,6 +545,7 @@ KeyNumType GadgetClass::Input(void)
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					flags = LEFTPRESS;
+					key = KN_LMOUSE;
 				}
 				break;
 
@@ -588,26 +590,28 @@ KeyNumType GadgetClass::Input(void)
 	**	allows keyboard events to fall through normally even if the mouse is over a
 	**	gadget that is flagged for LEFTUP or RIGHTUP.
 	*/
-	if (!key) {
-
-		/*
-		**	Check for the mouse being held down. We can't use the normal input system
-		**	for this, so we must examine the actual current state of the mouse
-		**	buttons. As a side note, if we determine that the mouse button isn't being
-		**	held down, then we automatically know that it must be up -- set the flag
-		**	accordingly.
-		*/
-		if (Keyboard->Down(KN_LMOUSE)) {
-			flags |= LEFTHELD;
-		} else {
-			flags |= LEFTUP;
-		}
-		if (Keyboard->Down(KN_RMOUSE)) {
-			flags |= RIGHTHELD;
-		} else {
-			flags |= RIGHTUP;
-		}
-	}
+// jmarshall
+	//if (!key) {
+	//
+	//	/*
+	//	**	Check for the mouse being held down. We can't use the normal input system
+	//	**	for this, so we must examine the actual current state of the mouse
+	//	**	buttons. As a side note, if we determine that the mouse button isn't being
+	//	**	held down, then we automatically know that it must be up -- set the flag
+	//	**	accordingly.
+	//	*/
+	//	if (Keyboard->Down(KN_LMOUSE)) {
+	//		flags |= LEFTHELD;
+	//	} else {
+	//		flags |= LEFTUP;
+	//	}
+	//	if (Keyboard->Down(KN_RMOUSE)) {
+	//		flags |= RIGHTHELD;
+	//	} else {
+	//		flags |= RIGHTUP;
+	//	}
+	//}
+// jmarshall end
 
 	/*
 	**	If "sticky" processing is active, then only process the stuck gadget.
