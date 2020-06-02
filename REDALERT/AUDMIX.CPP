@@ -34,6 +34,9 @@ enum AudioBufferType_t {
 #define MAX_PRECACHE_AUDIO				512
 
 AudioBuffer_t precacheAudioTable[AUDIO_BUFFER_NUMTYPES][MAX_PRECACHE_AUDIO];
+AudioBuffer_t musicPrecacheAudioTable[MAX_PRECACHE_AUDIO];
+
+int currentMusicPlaying = -1;
 
 struct RIFF_Header {
 	char chunkID[4];
@@ -156,6 +159,22 @@ bool AudMix_IsEnabled(void) {
 
 /*
 =============
+AudMix_PlayMusic
+=============
+*/
+void AudMix_PlayMusic(int musicId) {
+	if (currentMusicPlaying != -1) {
+		alSourcei(musicPrecacheAudioTable[currentMusicPlaying].sourceId, AL_LOOPING, 0);
+		alSourceStop(musicPrecacheAudioTable[currentMusicPlaying].sourceId);
+	}
+	
+	alSourcei(musicPrecacheAudioTable[musicId].sourceId, AL_LOOPING, 1);
+	alSourcePlay(musicPrecacheAudioTable[musicId].sourceId);
+	currentMusicPlaying = musicId;
+}
+
+/*
+=============
 AudMix_Init
 =============
 */
@@ -191,6 +210,16 @@ void AudMix_Init(void) {
 		}
 	}
 
+	// Precache the music.
+	for (int i = 0; i < THEME_COUNT; i++) {
+		char expandedFilePath[512];
+
+		sprintf(expandedFilePath, "sound/music/%s.wav", GetThemeMusicFileName(i));
+		if (!loadWavFile(expandedFilePath, musicPrecacheAudioTable[i])) {
+			//assert(!"failed to load music!");
+		}
+	}
+
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);	
 }
 
@@ -210,6 +239,10 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 // void On_Speech(int speech_index) // MBL 02.06.2020
 void On_Speech(int speech_index, HouseClass* house)
 {
+	if (house == NULL) {
+		alSourcePlay(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][speech_index].sourceId);
+	}
+
 	// DLLExportClass::On_Speech(PlayerPtr, speech_index); // MBL 02.06.2020
 	//if (house == NULL) {
 	//	DLLExportClass::On_Speech(PlayerPtr, speech_index);

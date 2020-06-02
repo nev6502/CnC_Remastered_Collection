@@ -37,6 +37,8 @@
 
 class ThemeClass
 {
+	friend const char* GetThemeMusicFileName(int index);
+
 	private:
 		static char const * Theme_File_Name(ThemeType theme);
 

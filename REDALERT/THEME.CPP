@@ -49,6 +49,7 @@
 
 #include	"function.h"
 #include	"theme.h"
+#include	"AUDIOMIX.H"
 
 #ifndef WIN32
 extern short StreamLowImpact;
@@ -102,6 +103,9 @@ ThemeClass::ThemeControl ThemeClass::_themes[THEME_COUNT] = {
 #endif
 };
 
+const char* GetThemeMusicFileName(int index) {
+	return ThemeClass::_themes[index].Name;
+}
 
 /***********************************************************************************************
  * ThemeClass::Base_Name -- Fetches the base filename for the theme specified.                 *
@@ -283,32 +287,12 @@ ThemeType ThemeClass::Next_Song(ThemeType theme) const
 void ThemeClass::Queue_Song(ThemeType theme)
 {
 	/*
-	**	If there is no score file present, then abort.
-	*/
-	if (!ScoresPresent) return;
-
-	/*
-	**	If there is no sound driver or sounds have been specifically
-	**	turned off, then abort.
-	*/
-	if (SampleType == 0 || Debug_Quiet) return;
-
-	/*
 	**	If the current score volumne is set to silent, then there is no need to play the
 	**	specified theme.
 	*/
 	if (Options.ScoreVolume == 0) return;
 
-	/*
-	**	If the pending theme is available to be set and the specified theme is valid, then
-	**	set the queued theme accordingly.
-	*/
-	if (Pending == THEME_NONE || Pending == THEME_PICK_ANOTHER || theme == THEME_NONE || theme == THEME_QUIET) {
-		Pending = theme;
-		if (Still_Playing()) {
-			Fade_Sample(Current, THEME_DELAY);
-		}
-	}
+	AudMix_PlayMusic(theme);
 }
 
 
@@ -330,15 +314,17 @@ void ThemeClass::Queue_Song(ThemeType theme)
  *=============================================================================================*/
 int ThemeClass::Play_Song(ThemeType theme)
 {
-	if (ScoresPresent && SampleType && !Debug_Quiet && Options.ScoreVolume != 0) {
-		Stop();
-		Score = theme;
-		if (theme != THEME_NONE && theme != THEME_QUIET) {
-			//PG StreamLowImpact = true;
-			Current = File_Stream_Sample_Vol(Theme_File_Name(theme), 0xFF, true);
-			//PG StreamLowImpact = false;
-		}
-	}
+	AudMix_PlayMusic(theme);
+
+	//if (ScoresPresent && SampleType && !Debug_Quiet && Options.ScoreVolume != 0) {
+	//	Stop();
+	//	Score = theme;
+	//	if (theme != THEME_NONE && theme != THEME_QUIET) {
+	//		//PG StreamLowImpact = true;
+	//		Current = File_Stream_Sample_Vol(Theme_File_Name(theme), 0xFF, true);
+	//		//PG StreamLowImpact = false;
+	//	}
+	//}
 	return(Current);
 }
 
