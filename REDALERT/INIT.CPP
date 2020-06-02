@@ -3381,7 +3381,7 @@ static void Init_Mouse(void)
 	** to set one of our own.
 	*/
 #ifdef WIN32
-	ShowCursor(false);
+//	ShowCursor(false);
 #endif
 	if (MouseInstalled) {
 		void const * temp_mouse_shapes = MFCD::Retrieve("MOUSE.SHP");

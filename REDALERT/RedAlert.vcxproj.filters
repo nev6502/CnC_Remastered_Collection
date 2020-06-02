@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Resource">
       <UniqueIdentifier>{f4599de7-e877-410c-943f-afc4bef70eb6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\sdl">
+      <UniqueIdentifier>{3254aa87-c780-4496-a35f-35ab3a6d4cc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AADATA.CPP">
@@ -1838,5 +1841,10 @@
     <ResourceCompile Include="Resource\RedAlert.rc">
       <Filter>Source Files\Resource</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\external\sdl2\lib\x86\SDL2.lib">
+      <Filter>Source Files\sdl</Filter>
+    </Library>
   </ItemGroup>
 </Project>

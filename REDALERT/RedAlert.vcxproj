@@ -92,7 +92,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>./win32lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;TRUE_FALSE_DEFINED;ENGLISH;WIN32;NDEBUG;_WINDOWS;_USRDLL;REDALERT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -120,7 +120,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>./win32lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib</AdditionalIncludeDirectories>
       <SDLCheck>false</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -781,6 +781,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource\RedAlert.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\external\sdl2\lib\x86\SDL2.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

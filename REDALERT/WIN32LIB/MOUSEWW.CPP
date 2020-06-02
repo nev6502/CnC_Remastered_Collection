@@ -702,18 +702,18 @@ extern int DLLForceMouseY;
 
 int Get_Mouse_X(void)
 {
-	if (DLLForceMouseX >= 0) {
-		return DLLForceMouseX;
-	}
+	//if (DLLForceMouseX >= 0) {
+	//	return DLLForceMouseX;
+	//}
 	if (!_Mouse) return(0);
 	return(_Mouse->Get_Mouse_X());
 }
 
 int Get_Mouse_Y(void)
 {
-	if (DLLForceMouseY >= 0) {
-		return DLLForceMouseY;
-	}
+	//if (DLLForceMouseY >= 0) {
+	//	return DLLForceMouseY;
+	//}
 	
 	if (!_Mouse) return(0);
 	return(_Mouse->Get_Mouse_Y());

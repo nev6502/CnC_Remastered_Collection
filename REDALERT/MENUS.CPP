@@ -40,6 +40,8 @@
 #include	<sys\timeb.h>
 #endif
 
+#include <sdl.h>
+
 /*****************************
 **	Function prototypes
 ******************************/
@@ -806,7 +808,8 @@ int Main_Menu(unsigned long )
 
 		/*
 		**	Get and process player input.
-		*/
+		*/		
+		input = (KeyNumType)0;
 		input = commands->Input();
 
 #ifndef FIXIT_VERSION_3

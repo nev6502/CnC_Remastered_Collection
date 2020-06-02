@@ -55,6 +55,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "function.h"
+#include <SDL.h>
 
 
 /*
@@ -471,7 +472,6 @@ KeyNumType GadgetClass::Input(void)
 {
 	int mousex, mousey;
 	KeyNumType key;
-	unsigned flags;
 	int forced = false;
 
 	/*
@@ -530,33 +530,50 @@ KeyNumType GadgetClass::Input(void)
 	**	know the position of the mouse at the exact instant when the click occurred
 	**	rather the the mouse position at the time we get around to this function.
 	*/
-	if (((key&0xFF) == KN_LMOUSE) || ((key&0xFF) == KN_RMOUSE)) {
-	   mousex = Keyboard->MouseQX;
-	   mousey = Keyboard->MouseQY;
-	} else {
-	   mousex = Get_Mouse_X();
-	   mousey = Get_Mouse_Y();
+// jmarshall
+	static int flags = 0;
+	SDL_GetMouseState(&mousex, &mousey);
+
+	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
+		flags = 0;
+
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type)
+		{
+			case SDL_MOUSEBUTTONDOWN:
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					flags = LEFTPRESS;
+				}
+				break;
+
+			case SDL_MOUSEBUTTONUP:
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					flags = LEFTRELEASE;
+				}
+				break;
+		}
 	}
+// jmarshall end
 
 	/*
 	**	Set the mouse button state flags. These will be passed to the individual
 	**	buttons so that they can determine what action to perform (if any).
-	*/
-	flags = 0;
-	if (key) {
-		if (key == KN_LMOUSE) {
-			flags |= LEFTPRESS;
-		}
-		if (key == KN_RMOUSE) {
-			flags |= RIGHTPRESS;
-		}
-		if (key == (KN_LMOUSE | KN_RLSE_BIT)) {
-			flags |= LEFTRELEASE;
-		}
-		if (key == (KN_RMOUSE | KN_RLSE_BIT)) {
-			flags |= RIGHTRELEASE;
-		}
-	}
+	*/	
+	//if (key) {
+	//	if (key == KN_LMOUSE) {
+	//		flags |= LEFTPRESS;
+	//	}
+	//	if (key == KN_RMOUSE) {
+	//		flags |= RIGHTPRESS;
+	//	}
+	//	if (key == (KN_LMOUSE | KN_RLSE_BIT)) {
+	//		flags |= LEFTRELEASE;
+	//	}
+	//	if (key == (KN_RMOUSE | KN_RLSE_BIT)) {
+	//		flags |= RIGHTRELEASE;
+	//	}
+	//}
 
 	/*
 	**	If the mouse wasn't responsible for this key code, then it must be from

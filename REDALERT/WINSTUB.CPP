@@ -51,9 +51,13 @@
 #include "ipx95.h"
 #endif	//WINSOCK_IPX
 
+#include <SDL.h>
+#include <SDL_syswm.h>
+
 void output(short,short)
 {}
 
+SDL_Window* game_window;
 
 unsigned long CCFocusMessage = WM_USER+50;	//Private message for receiving application focus
 extern	void VQA_PauseAudio(void);
@@ -455,24 +459,31 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	//
 	// Create our main window
 	//
-	hwnd = CreateWindowEx (
-							WS_EX_TOPMOST,
-							WINDOW_NAME,
-							WINDOW_NAME,
-							WS_POPUP, // Denzil | WS_MAXIMIZE,
-							0,
-							0,
-							// Denzil 5/18/98 - Making window fullscreen prevents other apps
-							// from getting WM_PAINT messages
-// jmarshall
-							width, //width,
-							height, //height,
-// jmarshall end
-							// End Denzil
-							NULL,
-							NULL,
-							(HINSTANCE)instance,
-							NULL );
+//	hwnd = CreateWindowEx (
+//							WS_EX_TOPMOST,
+//							WINDOW_NAME,
+//							WINDOW_NAME,
+//							WS_POPUP, // Denzil | WS_MAXIMIZE,
+//							0,
+//							0,
+//							// Denzil 5/18/98 - Making window fullscreen prevents other apps
+//							// from getting WM_PAINT messages
+//// jmarshall
+//							width, //width,
+//							height, //height,
+//// jmarshall end
+//							// End Denzil
+//							NULL,
+//							NULL,
+//							(HINSTANCE)instance,
+//							NULL );
+	SDL_Init(SDL_INIT_VIDEO);
+	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(game_window, &wmInfo);
+	hwnd = wmInfo.info.win.window;
+	GameInFocus = TRUE;
 
 	ShowWindow (hwnd, command_show );
 	ShowCommand = command_show;
