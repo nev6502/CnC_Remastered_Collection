@@ -668,6 +668,10 @@ int Sound_Effect(VocType voc, fixed volume, int variation, signed short pan_valu
 	"LOAD1"			//	VOX_MISSION_LOADED
 };
 
+const char* GetSpeechFileName(int index) {
+	return Speech[index];
+}
+
 
 static VoxType CurrentVoice = VOX_NONE;
 

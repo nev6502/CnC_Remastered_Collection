@@ -17,7 +17,6 @@ ALCdevice* device = nullptr;
 ALCcontext* context = nullptr;
 
 struct AudioBuffer_t {
-	ALuint sourceId;
 	ALuint buffer;
 	ALsizei size;
 	ALsizei frequency;
@@ -34,9 +33,11 @@ enum AudioBufferType_t {
 #define MAX_PRECACHE_AUDIO				512
 
 AudioBuffer_t precacheAudioTable[AUDIO_BUFFER_NUMTYPES][MAX_PRECACHE_AUDIO];
+AudioBuffer_t speechPrecacheAudioTable[MAX_PRECACHE_AUDIO];
 AudioBuffer_t musicPrecacheAudioTable[MAX_PRECACHE_AUDIO];
 
 int currentMusicPlaying = -1;
+int currentAudioTSource = 0;
 
 struct RIFF_Header {
 	char chunkID[4];
@@ -59,6 +60,9 @@ struct WAVE_Data {
 	char subChunkID[4];
 	long subChunk2Size;
 };
+
+#define MAX_AUDIO_SOURCES 32
+ALuint audio_sources[MAX_AUDIO_SOURCES];
 
 bool loadWavFile(const char* filename, AudioBuffer_t &audioBuffer) {
 	FILE* soundFile = NULL;
@@ -135,9 +139,6 @@ bool loadWavFile(const char* filename, AudioBuffer_t &audioBuffer) {
 			*size, *frequency);
 		fclose(soundFile);
 
-		alGenSources(1, &audioBuffer.sourceId);
-		alSourcei(audioBuffer.sourceId, AL_BUFFER, *buffer);
-		alSource3f(audioBuffer.sourceId, AL_POSITION, 0.0f, 0.0f, 0.0f);
 		return true;
 	}
 	catch (char* error) {
@@ -164,12 +165,13 @@ AudMix_PlayMusic
 */
 void AudMix_PlayMusic(int musicId) {
 	if (currentMusicPlaying != -1) {
-		alSourcei(musicPrecacheAudioTable[currentMusicPlaying].sourceId, AL_LOOPING, 0);
-		alSourceStop(musicPrecacheAudioTable[currentMusicPlaying].sourceId);
+		//alSourcei(musicPrecacheAudioTable[currentMusicPlaying].sourceId, AL_LOOPING, 0);
+		alSourceStop(audio_sources[MAX_AUDIO_SOURCES - 1]);			
 	}
-	
-	alSourcei(musicPrecacheAudioTable[musicId].sourceId, AL_LOOPING, 1);
-	alSourcePlay(musicPrecacheAudioTable[musicId].sourceId);
+
+	alSourcei(audio_sources[MAX_AUDIO_SOURCES - 1], AL_BUFFER, musicPrecacheAudioTable[musicId].buffer);
+	alSourcei(audio_sources[MAX_AUDIO_SOURCES - 1], AL_LOOPING, 1);
+	alSourcePlay(audio_sources[MAX_AUDIO_SOURCES - 1]);
 	currentMusicPlaying = musicId;
 }
 
@@ -209,6 +211,16 @@ void AudMix_Init(void) {
 			}
 		}
 	}
+	
+	// Precache all the Speech
+	for (int i = 0; i < VOX_COUNT; i++) {
+		char expandedFilePath[512];
+
+		sprintf(expandedFilePath, "sound/speech/%s.wav", GetSpeechFileName(i));
+		if (!loadWavFile(expandedFilePath, speechPrecacheAudioTable[i])) {
+			//assert(!"failed to load music!");
+		}
+	}
 
 	// Precache the music.
 	for (int i = 0; i < THEME_COUNT; i++) {
@@ -220,9 +232,23 @@ void AudMix_Init(void) {
 		}
 	}
 
+	// Allocate the audio sources.
+	alGenSources(MAX_AUDIO_SOURCES, &audio_sources[0]);
+	for(int i = 0; i < MAX_AUDIO_SOURCES; i++)
+		alSource3f(audio_sources[i], AL_POSITION, 0.0f, 0.0f, 0.0f);
+
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);	
 }
 
+void PlayAudio(AudioBuffer_t& buffer) {
+	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 1)
+		currentAudioTSource = 0;
+
+	alSourcei(audio_sources[currentAudioTSource], AL_BUFFER, buffer.buffer);
+	alSourcePlay(audio_sources[currentAudioTSource]);
+
+	currentAudioTSource++;
+}
 
 void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house)
 {
@@ -232,7 +258,7 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 	{
 		return;
 	}
-	alSourcePlay(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index].sourceId);
+	PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index]);
 }
 
 
@@ -240,7 +266,7 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 void On_Speech(int speech_index, HouseClass* house)
 {
 	if (house == NULL) {
-		alSourcePlay(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][speech_index].sourceId);
+		PlayAudio(speechPrecacheAudioTable[speech_index]);
 	}
 
 	// DLLExportClass::On_Speech(PlayerPtr, speech_index); // MBL 02.06.2020
