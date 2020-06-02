@@ -1121,7 +1121,7 @@ void Read_Setup_Options( RawFileClass *config_file )
 		AllowHardwareBlitFills = ini.Get_Bool("Options", "HardwareFills", true);
 // jmarshall
 		ScreenWidth = 640;
-		ScreenHeight = 400; //ini.Get_Bool("Options", "Resolution", false) ? 3072 : 3072;
+		ScreenHeight = 480; //ini.Get_Bool("Options", "Resolution", false) ? 3072 : 3072;
 // jmarshall end
 		/*
 		** See if an alternative socket number has been specified
