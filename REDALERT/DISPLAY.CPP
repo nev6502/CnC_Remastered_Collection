@@ -1745,35 +1745,17 @@ bool DisplayClass::Map_Cell(CELL cell, HouseClass * house, bool check_radar_spie
 #define	EDGE_ZONE	(CELL_LEPTON_W*2)
 bool DisplayClass::Coord_To_Pixel(COORDINATE coord, int &x, int &y) const
 {
-	int xtac = Pixel_To_Lepton(Lepton_To_Pixel(Coord_X(TacticalCoord)));
-	int xoff = Pixel_To_Lepton(Lepton_To_Pixel(Coord_X(coord)));
-	xoff = (xoff + EDGE_ZONE) - xtac;
-
-	int ytac = Pixel_To_Lepton(Lepton_To_Pixel(Coord_Y(TacticalCoord)));
-	int yoff = Pixel_To_Lepton(Lepton_To_Pixel(Coord_Y(coord)));
-	yoff = (yoff + EDGE_ZONE) - ytac;
-
-	x = Lepton_To_Pixel(xoff) - CELL_PIXEL_W * 2;
-	y = Lepton_To_Pixel(yoff) - CELL_PIXEL_H * 2;
-
-	// Possibly ignore the view constraints if we aren't using the internal renderer. ST - 4/17/2019 9:06AM
-	return(coord && (IgnoreViewConstraints || ((xoff <= TacLeptonWidth + EDGE_ZONE * 2) && (yoff <= TacLeptonHeight + EDGE_ZONE * 2))));
-}
-
-#if (0) //reference. ST - 5/8/2019
-bool DisplayClass::Coord_To_Pixel(COORDINATE coord, int &x, int &y) const
-{
 	if (coord) {
 		int xtac = Pixel_To_Lepton(Lepton_To_Pixel(Coord_X(TacticalCoord)));
 		int xoff = Pixel_To_Lepton(Lepton_To_Pixel(Coord_X(coord)));
 
 		xoff = (xoff+EDGE_ZONE) - xtac;
-		if ((unsigned)xoff <= TacLeptonWidth + EDGE_ZONE*2) {
+		if ((int)xoff <= TacLeptonWidth + EDGE_ZONE*2) {
 			int ytac = Pixel_To_Lepton(Lepton_To_Pixel(Coord_Y(TacticalCoord)));
 			int yoff = Pixel_To_Lepton(Lepton_To_Pixel(Coord_Y(coord)));
 
 			yoff = (yoff+EDGE_ZONE) - ytac;
-			if ((unsigned)yoff <= TacLeptonHeight + EDGE_ZONE*2) {
+			if ((int)yoff <= TacLeptonHeight + EDGE_ZONE*2) {
 				x = Lepton_To_Pixel(xoff)-CELL_PIXEL_W*2;
 				y = Lepton_To_Pixel(yoff)-CELL_PIXEL_H*2;
 				return(true);
@@ -1782,7 +1764,6 @@ bool DisplayClass::Coord_To_Pixel(COORDINATE coord, int &x, int &y) const
 	}
 	return(false);
 }
-#endif
 
 /***********************************************************************************************
  * DisplayClass::Push_Onto_TacMap -- Moves x & y coords to being on tactical map               *

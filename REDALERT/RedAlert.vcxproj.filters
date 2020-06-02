@@ -19,7 +19,7 @@
     <Filter Include="Source Files\Resource">
       <UniqueIdentifier>{f4599de7-e877-410c-943f-afc4bef70eb6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\sdl">
+    <Filter Include="Source Files\external">
       <UniqueIdentifier>{3254aa87-c780-4496-a35f-35ab3a6d4cc1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -903,6 +903,9 @@
     <ClCompile Include="DLLInterfaceEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AUDMIX.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABSTRACT.H">
@@ -1769,6 +1772,9 @@
     <ClInclude Include="Resource\resource.h">
       <Filter>Source Files\Resource</Filter>
     </ClInclude>
+    <ClInclude Include="AUDIOMIX.H">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="COORDA.ASM">
@@ -1844,7 +1850,10 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\external\sdl2\lib\x86\SDL2.lib">
-      <Filter>Source Files\sdl</Filter>
+      <Filter>Source Files\external</Filter>
+    </Library>
+    <Library Include="..\external\openal\out\build\x86-Release\OpenAL32.lib">
+      <Filter>Source Files\external</Filter>
     </Library>
   </ItemGroup>
 </Project>

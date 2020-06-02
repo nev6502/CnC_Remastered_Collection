@@ -92,7 +92,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib;../external/openal/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;TRUE_FALSE_DEFINED;ENGLISH;WIN32;NDEBUG;_WINDOWS;_USRDLL;REDALERT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -101,7 +101,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4800;4244;4996</DisableSpecificWarnings>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -120,7 +120,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib;../external/openal/include</AdditionalIncludeDirectories>
       <SDLCheck>false</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -129,7 +129,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StructMemberAlignment>1Byte</StructMemberAlignment>
       <DisableSpecificWarnings>4800;4244;4996</DisableSpecificWarnings>
-      <TreatWarningAsError>true</TreatWarningAsError>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <AdditionalDependencies>ddraw.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -172,6 +172,7 @@
     <ClCompile Include="AIRCRAFT.CPP" />
     <ClCompile Include="ANIM.CPP" />
     <ClCompile Include="AUDIO.CPP" />
+    <ClCompile Include="AUDMIX.CPP" />
     <ClCompile Include="B64PIPE.CPP" />
     <ClCompile Include="B64STRAW.CPP" />
     <ClCompile Include="BAR.CPP" />
@@ -463,6 +464,7 @@
     <ClInclude Include="AIRCRAFT.H" />
     <ClInclude Include="ANIM.H" />
     <ClInclude Include="AUDIO.H" />
+    <ClInclude Include="AUDIOMIX.H" />
     <ClInclude Include="B64PIPE.H" />
     <ClInclude Include="B64STRAW.H" />
     <ClInclude Include="BAR.H" />
@@ -783,6 +785,7 @@
     <ResourceCompile Include="Resource\RedAlert.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="..\external\openal\out\build\x86-Release\OpenAL32.lib" />
     <Library Include="..\external\sdl2\lib\x86\SDL2.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

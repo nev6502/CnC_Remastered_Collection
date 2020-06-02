@@ -75,6 +75,7 @@
 #include	<sys\timeb.h>
 #endif
 #include  "ccdde.h"
+#include "AUDIOMIX.H"
 
 #include <time.h>
 
@@ -348,6 +349,11 @@ bool Init_Game(int , char * [])
 		MpgSettings = new MPGSettings(NULL); //RawFileClass(CONFIG_FILE_NAME));
 	}
 	#endif
+
+	// Init the new audio system.
+// jmarshall
+	AudMix_Init();
+// jmarshall end
 
 	/*
 	**	Play the startup animation.

@@ -285,6 +285,10 @@ struct SoundEffectNameStruct {
 };
 
 
+const char* GetEffectFileName(int index) {
+	return SoundEffectName[index].Name;
+}
+
 //
 // External handlers. MBL 06.17.2019
 //

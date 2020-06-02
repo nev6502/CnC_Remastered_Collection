@@ -834,7 +834,7 @@ void SidebarClass::Draw_It(bool complete)
  *=============================================================================================*/
 void SidebarClass::AI(KeyNumType & input, int x, int y)
 {
-	bool redraw = false;
+	bool redraw = true;
 
 	//
 	// We need to process the sidebar differently in multiplayer. ST - 8/7/2019 10:48AM
