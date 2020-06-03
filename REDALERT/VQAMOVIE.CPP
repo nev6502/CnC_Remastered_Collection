@@ -6,6 +6,33 @@
 #include <SDL.h>
 
 byte* raw_image_buffer = nullptr;
+int vqa_upscale_hack_width = 0;
+int vqa_upscale_hack_height = 0;
+byte* vqa_output_buffer = nullptr;
+
+byte* VQA_Dropsample(const byte* in, int inwidth, int inheight,
+	int outwidth, int outheight) {
+	int		i, j, k;
+	const byte* inrow;
+	const byte* pix1;
+	byte* out, * out_p;
+
+	out = vqa_output_buffer;
+	out_p = out;
+
+	for (i = 0; i < outheight; i++, out_p += outwidth * 1) {
+		inrow = in + 1 * inwidth * (int)((i + 0.25) * inheight / outheight);
+		for (j = 0; j < outwidth; j++) {
+			k = j * inwidth / outwidth;
+			pix1 = inrow + k * 1;
+			out_p[j * 1 + 0] = pix1[0];
+			//out_p[j * 3 + 1] = pix1[1];
+			//out_p[j * 3 + 2] = pix1[2];
+		}
+	}
+
+	return out;
+}
 
 /*
 ==================
@@ -52,6 +79,9 @@ long  VQA_Open(_VQAHandle *videoHandle, char const* filename)  {
 	smk_info_all(videoHandle->smacker_video, &frame, &videoHandle->frame_count, &usf);
 	smk_enable_video(videoHandle->smacker_video, 1);
 	videoHandle->video_graphics_buffer = &VisiblePage;//new GraphicBufferClass();
+	if (vqa_output_buffer == nullptr)
+		vqa_output_buffer = new byte[ScreenWidth * ScreenHeight * 3];
+
 	//videoHandle->video_graphics_buffer->Init(videoHandle->width, videoHandle->height, NULL, 0, (GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM));
 
 	return (0); 
@@ -97,7 +127,9 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 		raw_image_buffer = smk_get_palette(vqaHandle->smacker_video);
 		vqaHandle->video_graphics_buffer->Lock();
 
-		Buffer_To_Page(0, 0, vqaHandle->width, vqaHandle->height, smk_get_video(vqaHandle->smacker_video), *vqaHandle->video_graphics_buffer);
+		VQA_Dropsample(smk_get_video(vqaHandle->smacker_video), vqaHandle->width, vqaHandle->height, ScreenWidth, ScreenHeight);
+
+		Buffer_To_Page(0, 0, ScreenWidth, ScreenHeight, vqa_output_buffer, *vqaHandle->video_graphics_buffer);
 		vqaHandle->video_graphics_buffer->Unlock();
 
 		currentFrame++;
