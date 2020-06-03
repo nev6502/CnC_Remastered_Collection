@@ -26,6 +26,10 @@ struct _VQAHandle {
 	unsigned long			width;
 	unsigned long			height;
 	unsigned long			frame_count;
+	unsigned char			track_mask;
+	unsigned char			channels[7];
+	unsigned char			bitdepth[7];
+	unsigned long			audio_rate[7];
 
 	smk						smacker_video;
 };

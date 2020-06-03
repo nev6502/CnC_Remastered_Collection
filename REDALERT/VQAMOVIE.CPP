@@ -3,7 +3,9 @@
 
 #include "FUNCTION.H"
 #include "VQAMOVIE.H"
+#include "AUDIOMIX.H"
 #include <SDL.h>
+#include <ctime>
 
 byte* raw_image_buffer = nullptr;
 int vqa_upscale_hack_width = 0;
@@ -77,7 +79,8 @@ long  VQA_Open(_VQAHandle *videoHandle, char const* filename)  {
 	double usf;
 	smk_info_video(videoHandle->smacker_video, &videoHandle->width, &videoHandle->height, &yscalemode);
 	smk_info_all(videoHandle->smacker_video, &frame, &videoHandle->frame_count, &usf);
-	smk_enable_video(videoHandle->smacker_video, 1);
+	smk_enable_all(videoHandle->smacker_video, 65536);
+	smk_info_audio(videoHandle->smacker_video, &videoHandle->track_mask, &videoHandle->channels[0], &videoHandle->bitdepth[0], &videoHandle->audio_rate[0]);
 	videoHandle->video_graphics_buffer = &VisiblePage;//new GraphicBufferClass();
 	if (vqa_output_buffer == nullptr)
 		vqa_output_buffer = new byte[ScreenWidth * ScreenHeight * 3];
@@ -95,7 +98,9 @@ void  VQA_Close(_VQAHandle* vqaHandle) {
 	
 }
 long  VQA_Play(_VQAHandle* vqaHandle) { 
+	int curTime = clock(); //get the current time
 	int currentFrame = 0;	
+	bool shouldSampleAudio = true;
 
 	smk_first(vqaHandle->smacker_video);
 
@@ -113,7 +118,14 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 		
 		smk_render_frame(vqaHandle->smacker_video, currentFrame);
 		
+		if (shouldSampleAudio) {
+			unsigned char* audio_track = smk_get_audio(vqaHandle->smacker_video, 0);
+			int audio_track_len = smk_get_audio_size(vqaHandle->smacker_video, 0);
 
+			AudMix_QueueVideoAudio((const char*)audio_track, audio_track_len, vqaHandle->audio_rate[0]);
+
+			shouldSampleAudio = false;
+		}
 		//// Grab the frame from the movie.
 		//VQA_ImageForTime(vqaHandle, Sys_Milliseconds() - vqaHandle->startTime);
 		//
@@ -131,9 +143,14 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 
 		Buffer_To_Page(0, 0, ScreenWidth, ScreenHeight, vqa_output_buffer, *vqaHandle->video_graphics_buffer);
 		vqaHandle->video_graphics_buffer->Unlock();
+		
+		if (clock() - curTime >= 30) {
+			currentFrame++;
+			curTime = clock();
 
-		currentFrame++;
-		Sleep(30);
+			shouldSampleAudio = true;
+		}
+
 	}
 
 	//delete raw_image_buffer;

@@ -31,10 +31,12 @@ enum AudioBufferType_t {
 };
 
 #define MAX_PRECACHE_AUDIO				512
+#define MAX_STREAM_BUFFERS 20
 
 AudioBuffer_t precacheAudioTable[AUDIO_BUFFER_NUMTYPES][MAX_PRECACHE_AUDIO];
 AudioBuffer_t speechPrecacheAudioTable[MAX_PRECACHE_AUDIO];
 AudioBuffer_t musicPrecacheAudioTable[MAX_PRECACHE_AUDIO];
+ALuint streaming_buffers[MAX_STREAM_BUFFERS];
 
 int currentMusicPlaying = -1;
 int currentAudioTSource = 0;
@@ -62,7 +64,9 @@ struct WAVE_Data {
 };
 
 #define MAX_AUDIO_SOURCES 32
+#define MOVIE_AUDIO_SOURCE (MAX_AUDIO_SOURCES - 2)
 ALuint audio_sources[MAX_AUDIO_SOURCES];
+int current_streaming_audiosource = 0;
 
 bool loadWavFile(const char* filename, AudioBuffer_t &audioBuffer) {
 	FILE* soundFile = NULL;
@@ -175,6 +179,59 @@ void AudMix_PlayMusic(int musicId) {
 	currentMusicPlaying = musicId;
 }
 
+bool AudMix_IsSourcePlaying(ALuint source) 
+{ 
+	ALenum state;        
+	alGetSourcei(source, AL_SOURCE_STATE, &state);        
+	return (state == AL_PLAYING); 
+}
+
+void AudMix_TickMovieAudio(void) {
+	int numBuffers = 0;
+
+	alGetSourcei(audio_sources[MOVIE_AUDIO_SOURCE], AL_BUFFERS_PROCESSED, &numBuffers);
+	while (numBuffers--)
+	{
+		ALuint buffer;
+		alSourceUnqueueBuffers(audio_sources[MOVIE_AUDIO_SOURCE], 1, &buffer);
+	}
+}
+
+/*
+=============
+AudMix_QueueVideoAudio
+=============
+*/
+void AudMix_QueueVideoAudio(const char* audio_buffer, int length, int rate) {
+	int numBuffers = 0;
+
+	alGetSourcei(audio_sources[MOVIE_AUDIO_SOURCE], AL_BUFFERS_PROCESSED, &numBuffers);
+	while (numBuffers--)
+	{
+		ALuint buffer;
+		alSourceUnqueueBuffers(audio_sources[MOVIE_AUDIO_SOURCE], 1, &buffer);
+	}
+
+	numBuffers = 0;
+	alGetSourcei(audio_sources[MOVIE_AUDIO_SOURCE], AL_BUFFERS_QUEUED, &numBuffers);
+	if (numBuffers == MAX_STREAM_BUFFERS)
+	{
+	//	assert(!"Steam dropping raw samples, reached MAX_STREAM_BUFFERS");		
+		return;
+	}
+
+	if (current_streaming_audiosource >= MAX_STREAM_BUFFERS)
+		current_streaming_audiosource = 0;
+	
+	alBufferData(streaming_buffers[current_streaming_audiosource], AL_FORMAT_MONO16, (ALvoid*)audio_buffer, length, 22050);
+	alSourceQueueBuffers(audio_sources[MOVIE_AUDIO_SOURCE], 1, &streaming_buffers[current_streaming_audiosource]);
+	if(!AudMix_IsSourcePlaying(audio_sources[MOVIE_AUDIO_SOURCE]))
+		alSourcePlay(audio_sources[MOVIE_AUDIO_SOURCE]);
+
+	//MOVIE_AUDIO_SOURCE
+	current_streaming_audiosource++;
+}
+
 /*
 =============
 AudMix_Init
@@ -238,10 +295,12 @@ void AudMix_Init(void) {
 		alSource3f(audio_sources[i], AL_POSITION, 0.0f, 0.0f, 0.0f);
 
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);	
+
+	alGenBuffers(MAX_STREAM_BUFFERS, streaming_buffers);
 }
 
 void PlayAudio(AudioBuffer_t& buffer) {
-	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 1)
+	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 2)
 		currentAudioTSource = 0;
 
 	alSourcei(audio_sources[currentAudioTSource], AL_BUFFER, buffer.buffer);

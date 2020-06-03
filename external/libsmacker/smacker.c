@@ -653,13 +653,13 @@ char smk_enable_all(smk object, const unsigned char mask)
 	smk_null_check(object);
 	smk_null_check(object->video);
 
-	object->video->enable = (mask & 0x80);
+	object->video->enable = 1; //(mask & 0x80);
 
 	for (i = 0; i < 7; i ++)
 	{
 		if (object->audio[i])
 		{
-			object->audio[i]->enable = (mask & (0x01 << i));
+			object->audio[i]->enable = 1; //(mask & (0x01 << i));
 		}
 	}
 
