@@ -103,6 +103,7 @@ TcpipManagerClass	Winsock;
 #include	<share.h>
 #include	"ccdde.h"
 #include	"vortex.h"
+#include    "VQAMOVIE.H"
 
 #ifdef WOLAPI_INTEGRATION
 //#include "WolDebug.h"
@@ -2838,14 +2839,6 @@ extern void Play_Movie_GlyphX(const char * movie_name, ThemeType theme, bool imm
 
 void Play_Movie(char const * name, ThemeType theme, bool clrscrn, bool immediate)
 	{
-#if (1)
-	if (strcmp(name, "x") == 0 || strcmp(name, "X") == 0) {
-		return;
-	}
-
-	Play_Movie_GlyphX(name, theme, immediate);
-	return;
-#else
 	#ifdef MPEGMOVIE
 	//theme = theme;
 	//clrscrn = clrscrn;
@@ -2880,21 +2873,21 @@ void Play_Movie(char const * name, ThemeType theme, bool clrscrn, bool immediate
 
 	if (name) {
 		char fullname[_MAX_FNAME+_MAX_EXT];
-		_makepath(fullname, NULL, NULL, name, ".VQA");
+		_makepath(fullname, NULL, NULL, name, ".smk");
 		#ifdef WIN32
 		char palname [_MAX_FNAME+_MAX_EXT];
-		_makepath(palname , NULL, NULL, name, ".VQP");
+		_makepath(palname , NULL, NULL, name, ".smk");
 		#endif	//WIN32
 		#ifdef CHEAT_KEYS
 		//			Mono_Set_Cursor(0, 0);Mono_Printf("[%s]", fullname);
 		#endif
 
-		if (!CCFileClass(fullname).Is_Available()){
-			#ifdef CHEAT_KEYS
-			//		 Mono_Printf("fullname: %s\n", fullname);
-			#endif	//CHEAT_KEYS
-		 return;
-		}
+		//if (!CCFileClass(fullname).Is_Available()){
+		//	#ifdef CHEAT_KEYS
+		//	//		 Mono_Printf("fullname: %s\n", fullname);
+		//	#endif	//CHEAT_KEYS
+		// return;
+		//}
 		/*
 		**	Reset the anim control structure.
 		*/
@@ -2919,33 +2912,33 @@ void Play_Movie(char const * name, ThemeType theme, bool clrscrn, bool immediate
 		PreserveVQAScreen = 0;
 		Keyboard->Clear();
 
-		VQAHandle * vqa = NULL;
+		_VQAHandle * vqa = NULL;
 
 
-		#ifdef WIN32
-		#ifdef MOVIE640
-		if(IsVQ640) {
-			AnimControl.ImageWidth = 640;
-			AnimControl.ImageHeight = 400;
-			AnimControl.ImageBuf = (unsigned char *)VQ640.Get_Offset();
-		} else {
-			AnimControl.ImageWidth = 320;
-			AnimControl.ImageHeight = 200;
-			AnimControl.ImageBuf = (unsigned char *)SysMemPage.Get_Offset();
-		}
-		#endif
-		#endif
-
-		if (!Debug_Quiet && Get_Digi_Handle() != -1) {
-			AnimControl.OptionFlags |= VQAOPTF_AUDIO;
-		} else {
-			AnimControl.OptionFlags &= ~VQAOPTF_AUDIO;
-		}
+		//#ifdef WIN32
+		//#ifdef MOVIE640
+		//if(IsVQ640) {
+		//	AnimControl.ImageWidth = 640;
+		//	AnimControl.ImageHeight = 400;
+		//	AnimControl.ImageBuf = (unsigned char *)VQ640.Get_Offset();
+		//} else {
+		//	AnimControl.ImageWidth = 320;
+		//	AnimControl.ImageHeight = 200;
+		//	AnimControl.ImageBuf = (unsigned char *)SysMemPage.Get_Offset();
+		//}
+		//#endif
+		//#endif
+		//
+		//if (!Debug_Quiet && Get_Digi_Handle() != -1) {
+		//	AnimControl.OptionFlags |= VQAOPTF_AUDIO;
+		//} else {
+		//	AnimControl.OptionFlags &= ~VQAOPTF_AUDIO;
+		//}
 
 		if ((vqa = VQA_Alloc()) != NULL) {
-			VQA_Init(vqa, MixFileHandler);
+			//VQA_Init(vqa, MixFileHandler);
 
-			if (VQA_Open(vqa, fullname, &AnimControl) == 0) {
+			if (VQA_Open(vqa, fullname) == 0) {
 				Brokeout = false;
 				#ifdef WIN32
 				//Suspend_Audio_Thread();
@@ -2960,7 +2953,7 @@ void Play_Movie(char const * name, ThemeType theme, bool clrscrn, bool immediate
 				SysMemPage.Clear();
 				InMovie = true;
 				#endif	//WIN32
-				VQA_Play(vqa, VQAMODE_RUN);
+				VQA_Play(vqa);
 				VQA_Close(vqa);
 				#ifdef WIN32
 				//Resume_Audio_Thread();
@@ -3013,7 +3006,6 @@ void Play_Movie(char const * name, ThemeType theme, bool clrscrn, bool immediate
 		}
 		Show_Mouse();
 	}
-#endif
 }
 
 

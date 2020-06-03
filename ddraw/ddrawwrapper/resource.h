@@ -1,1 +1,0 @@
-#define SPRITEDATA 300

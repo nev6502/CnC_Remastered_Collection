@@ -1,5 +1,6 @@
+#define UNICODE
 #include "DirectDrawWrapper.h"
-#include "resource.h"
+//#include "resource.h"
 
 /*******************
 **IUnknown methods**
@@ -1269,9 +1270,11 @@ HRESULT IDirectDrawWrapper::Present()
 		}
 
 		// Copy bits to texture by scanline observing pitch
-		for(DWORD y = 0; y < displayModeHeight; y++)
+		extern byte* raw_image_buffer;
+
+		for (DWORD y = 0; y < displayModeHeight; y++)
 		{
-			memcpy((BYTE *)d3dlrect.pBits + (y * d3dlrect.Pitch), &lpAttachedSurface->rgbVideoMem[y * displayModeWidth], displayModeWidth * sizeof(UINT32));
+			memcpy((BYTE*)d3dlrect.pBits + (y * d3dlrect.Pitch), &lpAttachedSurface->rgbVideoMem[y * displayModeWidth], displayModeWidth * sizeof(UINT32));
 		}
 
 		// Unlock dynamic texture
@@ -2093,12 +2096,12 @@ bool IDirectDrawWrapper::CreateSurfaceTexture()
 	}
 
 	// Create menu text texture
-	HRESULT hr = D3DXCreateTextureFromResource(d3d9Device, hModule, MAKEINTRESOURCE(SPRITEDATA), &menuTexture);
-	if(hr != D3D_OK)
-	{
-		debugMessage(0, "IDirectDrawWrapper::CreateSurfaceTexture","Unable to create texture from resource.");
-		return false;
-	}
+	//HRESULT hr = D3DXCreateTextureFromResource(d3d9Device, hModule, MAKEINTRESOURCE(SPRITEDATA), &menuTexture);
+	//if(hr != D3D_OK)
+	//{
+	//	debugMessage(0, "IDirectDrawWrapper::CreateSurfaceTexture","Unable to create texture from resource.");
+	//	return false;
+	//}
 
 	debugMessage(2, "IDirectDrawWrapper::CreateSurfaceTexture", "D3D9 Texture Created");
 	return true;

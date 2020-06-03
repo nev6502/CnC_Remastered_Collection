@@ -92,7 +92,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib;../external/openal/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/dxsdk/Include;../external/ffmpeg-win32/include;../external/sdl2/include;./win32lib;../external/openal/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <PreprocessorDefinitions>WINDOWS_IGNORE_PACKING_MISMATCH;TRUE_FALSE_DEFINED;ENGLISH;WIN32;NDEBUG;_WINDOWS;_USRDLL;REDALERT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -106,7 +106,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>ddraw.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -120,7 +120,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>../external/sdl2/include;./win32lib;../external/openal/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../external/dxsdk/Include;../external/ffmpeg-win32/include;../external/sdl2/include;./win32lib;../external/openal/include</AdditionalIncludeDirectories>
       <SDLCheck>false</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -132,7 +132,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ddraw.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
@@ -164,6 +164,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ddraw\ddrawwrapper\ddraw2.cpp" />
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawClipperWrapper.cpp" />
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawPaletteWrapper.cpp" />
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawSurfaceWrapper.cpp" />
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawWrapper.cpp" />
+    <ClCompile Include="..\external\libsmacker\smacker.c" />
+    <ClCompile Include="..\external\libsmacker\smk_bitstream.c" />
+    <ClCompile Include="..\external\libsmacker\smk_hufftree.c" />
     <ClCompile Include="2KEYFRAM.CPP" />
     <ClCompile Include="AADATA.CPP" />
     <ClCompile Include="ABSTRACT.CPP" />
@@ -413,6 +421,10 @@
     <ClCompile Include="VESSEL.CPP" />
     <ClCompile Include="VISUDLG.CPP" />
     <ClCompile Include="VORTEX.CPP" />
+    <ClCompile Include="VQAMOVIE.CPP">
+      <StructMemberAlignment Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4Bytes</StructMemberAlignment>
+      <StructMemberAlignment Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4Bytes</StructMemberAlignment>
+    </ClCompile>
     <ClCompile Include="W95TRACE.CPP" />
     <ClCompile Include="WARHEAD.CPP" />
     <ClCompile Include="WEAPON.CPP" />
@@ -460,6 +472,13 @@
     <ClCompile Include="XSTRAW.CPP" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ddraw\ddrawwrapper\ddraw.h" />
+    <ClInclude Include="..\ddraw\ddrawwrapper\DirectDrawWrapper.h" />
+    <ClInclude Include="..\ddraw\ddrawwrapper\resource.h" />
+    <ClInclude Include="..\external\libsmacker\smacker.h" />
+    <ClInclude Include="..\external\libsmacker\smk_bitstream.h" />
+    <ClInclude Include="..\external\libsmacker\smk_hufftree.h" />
+    <ClInclude Include="..\external\libsmacker\smk_malloc.h" />
     <ClInclude Include="ABSTRACT.H" />
     <ClInclude Include="AIRCRAFT.H" />
     <ClInclude Include="ANIM.H" />
@@ -680,8 +699,10 @@
     <ClInclude Include="VECTOR.H" />
     <ClInclude Include="VERSION.H" />
     <ClInclude Include="VESSEL.H" />
+    <ClInclude Include="VGAMOVIE.H" />
     <ClInclude Include="VISUDLG.H" />
     <ClInclude Include="VORTEX.H" />
+    <ClInclude Include="VQAMOVIE.H" />
     <ClInclude Include="W95TRACE.H" />
     <ClInclude Include="WARHEAD.H" />
     <ClInclude Include="WATCOM.H" />
@@ -785,6 +806,7 @@
     <ResourceCompile Include="Resource\RedAlert.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Library Include="..\external\dxsdk\Lib\x86\d3dx9.lib" />
     <Library Include="..\external\openal\out\build\x86-Release\OpenAL32.lib" />
     <Library Include="..\external\sdl2\lib\x86\SDL2.lib" />
   </ItemGroup>

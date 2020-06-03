@@ -648,13 +648,6 @@ BOOL Any_Locked (void)
 //long unsigned  IPXManagerClass::Response_Time() { return (0); }
 //int  IPXManagerClass::Private_Num_Send( int ) { return (0); }
 
-//_VQAHandle  *  VQA_Alloc(void) { return ((_VQAHandle *)0); }
-//void  VQA_Init( _VQAHandle  *, long ( *)()) {}
-//long  VQA_Open( _VQAHandle  *, char const  *, _VQAConfig  * ) { return (0); }
-//void  VQA_Free( _VQAHandle  * ) {}
-//void  VQA_Close( _VQAHandle  * ) {}
-//long  VQA_Play( _VQAHandle  *, long ) { return (0); }
-
 //void VQA_Init(VQAHandle *, long(*)(VQAHandle *vqa, long action,	void *buffer, long nbytes)) {}
 
 //long VQA_Open(VQAHandle *, char const *, VQAConfig *)

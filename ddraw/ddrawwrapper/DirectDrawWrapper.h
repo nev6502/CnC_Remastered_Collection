@@ -243,6 +243,8 @@ class FAR IDirectDrawSurfaceWrapper : public IDirectDrawSurface
 {
 // Implemented interfaces
 public:
+	IDirectDrawSurfaceWrapper() { attachedPalette = NULL; }
+
 	/*** IUnknown methods ***/
 	HRESULT __stdcall QueryInterface(REFIID riid, LPVOID FAR * ppvObj);
 	ULONG __stdcall AddRef();

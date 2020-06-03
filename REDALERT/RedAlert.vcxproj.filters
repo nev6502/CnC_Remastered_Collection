@@ -22,6 +22,12 @@
     <Filter Include="Source Files\external">
       <UniqueIdentifier>{3254aa87-c780-4496-a35f-35ab3a6d4cc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ddraw">
+      <UniqueIdentifier>{fa43d876-162b-41ea-8b7e-71173f2a1c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\libsmacker">
+      <UniqueIdentifier>{70d28e5f-2ea4-4579-b2b9-b07f5a3b816c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AADATA.CPP">
@@ -906,6 +912,33 @@
     <ClCompile Include="AUDMIX.CPP">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VQAMOVIE.CPP">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawWrapper.cpp">
+      <Filter>Source Files\ddraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawClipperWrapper.cpp">
+      <Filter>Source Files\ddraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawPaletteWrapper.cpp">
+      <Filter>Source Files\ddraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawSurfaceWrapper.cpp">
+      <Filter>Source Files\ddraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ddraw\ddrawwrapper\ddraw2.cpp">
+      <Filter>Source Files\ddraw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\libsmacker\smacker.c">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\libsmacker\smk_bitstream.c">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\libsmacker\smk_hufftree.c">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABSTRACT.H">
@@ -1775,6 +1808,33 @@
     <ClInclude Include="AUDIOMIX.H">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="VGAMOVIE.H">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VQAMOVIE.H">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ddraw\ddrawwrapper\ddraw.h">
+      <Filter>Source Files\ddraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ddraw\ddrawwrapper\DirectDrawWrapper.h">
+      <Filter>Source Files\ddraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ddraw\ddrawwrapper\resource.h">
+      <Filter>Source Files\ddraw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\libsmacker\smacker.h">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\libsmacker\smk_bitstream.h">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\libsmacker\smk_hufftree.h">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\libsmacker\smk_malloc.h">
+      <Filter>Source Files\libsmacker</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="COORDA.ASM">
@@ -1853,6 +1913,9 @@
       <Filter>Source Files\external</Filter>
     </Library>
     <Library Include="..\external\openal\out\build\x86-Release\OpenAL32.lib">
+      <Filter>Source Files\external</Filter>
+    </Library>
+    <Library Include="..\external\dxsdk\Lib\x86\d3dx9.lib">
       <Filter>Source Files\external</Filter>
     </Library>
   </ItemGroup>

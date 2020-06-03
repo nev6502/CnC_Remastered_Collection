@@ -280,7 +280,7 @@ char const * const VQName[VQ_COUNT] = {
 	"AFTRMATH",
 	"SOVIET11",
 	"MASASSLT",
-	"ENGLISH",		// High res. Intro
+	"REDINTRO",		// High res. Intro
 	"SOVIET1",
 	"SOVIET2",
 	"SOVIET3",

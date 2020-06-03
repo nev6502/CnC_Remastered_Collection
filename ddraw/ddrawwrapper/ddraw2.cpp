@@ -1,7 +1,7 @@
 #pragma comment(linker, "/EXPORT:DirectDrawCreate=_DirectDrawCreate@12")
 
 #include "DirectDrawWrapper.h"
-#include "resource.h"
+//#include "resource.h"
 //#include "detours.h"
 #include <stdio.h>
 #include <math.h>
@@ -171,112 +171,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     return CallWindowProc(lpDD->lpPrevWndFunc, hwnd, message, wParam, lParam);
 }
 
-// Main dll entry
-BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
-{
-	LONG error;
-
-	switch (ul_reason_for_call)
-	{
-	// Initial process attach
-	case DLL_PROCESS_ATTACH:
-		// Store module handle
-		hMod = hModule;
-
-		// Set default variables
-		debugLevel = 0;
-   		debugDisplay = -1;
-
-		// Set time start
-		start_time = GetTickCount();
-
-		// Not in menu to start
-		inMenu = false;
-		
-        // Retrieve command line arguments
-		LPWSTR *szArgList;
-		int argCount;
-		szArgList = CommandLineToArgvW(GetCommandLine(), &argCount);
-		
-        // If arguments
-        if(szArgList != NULL)
-		{
-			for(int i = 0; i < argCount; i++)
-			{
-                // If debug
-				if(wcscmp(szArgList[i], L"/ddrawdebug") == 0) {
-					debugDisplay = 0;
-					debugLevel = 2;
-					// Create the debug console
-					AllocConsole();
-					// Redirect stdout to console
-					freopen( "CONOUT$", "wb", stdout);
-					break;
-				}
-                // If ddrawlog
-				else if(wcscmp(szArgList[i], L"/ddrawlog") == 0) {
-					debugDisplay = 1;
-					debugLevel = 2;
-					// Redireect stdout to file
-					char curPath[MAX_PATH];
-					char filename[MAX_PATH];
-					GetCurrentDirectoryA(MAX_PATH, curPath);
-					sprintf_s(filename, MAX_PATH, "%s\\ddraw_debug.log", curPath);
-					freopen_s(&debugFile, filename, "wb", stdout);
-					break;
-				}
-			}
-		}
-		LocalFree(szArgList);
-        
-		// Hook setcursorpos
-		//DetourRestoreAfterWith();
-        //DetourTransactionBegin();
-        //DetourUpdateThread(GetCurrentThread());
-        //DetourAttach(&(PVOID&)TrueSetCursorPos, OverrideSetCursorPos);
-		////DetourAttach(&(PVOID&)TrueLoadLibraryA, OverrideLoadLibraryA);
-        //error = DetourTransactionCommit();
-        //if (error == NO_ERROR) {
-        //    debugMessage(2, "DllMain(DLL_PROCESS_ATTACH)", "Successfully detoured SetCursorPos");
-        //}
-        //else {
-        //    debugMessage(1, "DllMain(DLL_PROCESS_ATTACH)", "Failed to detour SetCursorPos");
-        //}
-		break;
-	case DLL_THREAD_ATTACH:
-		// Do nothing on thread attach
-		break;
-	case DLL_THREAD_DETACH:
-		// Do nothing on thread detach
-		break;
-	case DLL_PROCESS_DETACH:		
-		// Delete DirectDrawWrapper object
-		delete lpDD;
-
-		// Detach function hook
-		//DetourTransactionBegin();
-        //DetourUpdateThread(GetCurrentThread());
-        //DetourDetach(&(PVOID&)TrueSetCursorPos, OverrideSetCursorPos);
-        //error = DetourTransactionCommit();
-
-        
-		//cleanup debug console or file if exists
-		if(debugDisplay == 0)
-		{
-			FreeConsole();
-		}
-		else if(debugDisplay == 1)
-		{
-			fclose(debugFile);
-		}
-        
-		break;
-	}
-	return TRUE;
-}
-
 // Emulated direct draw create
-extern HRESULT WINAPI DirectDrawCreate(GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
+HRESULT WINAPI DirectDrawCreate(GUID FAR* lpGUID, LPDIRECTDRAW FAR* lplpDD, IUnknown FAR* pUnkOuter)
 {
 	// Create directdraw object
 	lpDD = new IDirectDrawWrapper();

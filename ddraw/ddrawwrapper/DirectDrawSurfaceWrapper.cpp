@@ -1059,11 +1059,28 @@ HRESULT __stdcall IDirectDrawSurfaceWrapper::Unlock(LPVOID lpRect)
 	}*/
 	
 	// Always unlock full rect(fix)
+	extern byte* raw_image_buffer;
+	//int* hackPaletteLookup = (int*)&raw_image_buffer[0];
 
 	// Translate all of raw video memory to rgb video memory with palette
-	for(long i = 0; i < surfaceWidth * surfaceHeight; i++)
+	if (raw_image_buffer == NULL)
 	{
-		rgbVideoMem[i] = attachedPalette->rgbPalette[rawVideoMem[i]];
+		for (long i = 0; i < surfaceWidth * surfaceHeight; i++)
+		{
+			rgbVideoMem[i] = attachedPalette->rgbPalette[rawVideoMem[i]];
+		}
+	}
+	else
+	{
+		byte* rgbVideoMemRaw = (byte*)rgbVideoMem;
+		for (long i = 0; i < surfaceWidth * surfaceHeight; i++)
+		{
+			//rgbVideoMem[i] = hackPaletteLookup[rawVideoMem[i]];
+			rgbVideoMemRaw[(i * 4) + 0] = raw_image_buffer[(rawVideoMem[i] * 3) + 2];
+			rgbVideoMemRaw[(i * 4) + 1] = raw_image_buffer[(rawVideoMem[i] * 3) + 1];
+			rgbVideoMemRaw[(i * 4) + 2] = raw_image_buffer[(rawVideoMem[i] * 3) + 0];
+			rgbVideoMemRaw[(i * 4) + 3] = 255;
+		}
 	}
 
 	/*

@@ -57,8 +57,8 @@ unsigned 	Get_Free_Video_Memory(void);
 void 		Wait_Blit(void);
 unsigned 	Get_Video_Hardware_Capabilities(void);
 
-extern "C" void Wait_Vert_Blank(void);
-extern "C" void Set_DD_Palette (void *palette);
+void Wait_Vert_Blank(void);
+void Set_DD_Palette (void *palette);
 
 /*
 ** Pointer to function to call if we detect a focus loss
