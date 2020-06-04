@@ -76,6 +76,8 @@
 
 #include	"function.h"
 
+//#undef RESFACTOR
+//#define RESFACTOR 1
 
 void * SidebarClass::SidebarShape = NULL;
 void * SidebarClass::SidebarMiddleShape = NULL;
@@ -204,7 +206,7 @@ void SidebarClass::One_Time(void)
 	**	code so that as the sidebar buildable buttons scroll, they get properly
 	**	clipped at the top and bottom edges.
 	*/
-	WindowList[WINDOW_SIDEBAR][WINDOWX] = ScreenWidth - (SIDE_X + 8);
+	WindowList[WINDOW_SIDEBAR][WINDOWX] = (SIDE_X + 8);
 	WindowList[WINDOW_SIDEBAR][WINDOWY] = SIDE_Y + 1 + TOP_HEIGHT;
 	WindowList[WINDOW_SIDEBAR][WINDOWWIDTH] = SIDE_WIDTH;
 	WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT;
@@ -217,10 +219,16 @@ void SidebarClass::One_Time(void)
 	new (&Column[0]) StripClass(InitClass());
 	new (&Column[1]) StripClass(InitClass());
 
-	Column[0].X = ScreenWidth - (640 - (COLUMN_ONE_X * RESFACTOR));
-	Column[0].Y = (COLUMN_ONE_Y * RESFACTOR);
-	Column[1].X = ScreenWidth - (640 - (COLUMN_TWO_X * RESFACTOR));
-	Column[1].Y = (COLUMN_TWO_Y * RESFACTOR);
+	int column_one_x = (COLUMN_ONE_X * RESFACTOR);
+	int column_one_y = (COLUMN_ONE_Y * RESFACTOR);
+
+	int column_two_x = (COLUMN_TWO_X * RESFACTOR);
+	int column_two_y = (COLUMN_TWO_Y * RESFACTOR);
+
+	Column[0].X = column_one_x;
+	Column[0].Y = column_one_y;
+	Column[1].X = column_two_x;
+	Column[1].Y = column_two_y;
 
 	/*
 	**	This sets up the clipping window. This window is used by the shape drawing
@@ -1845,7 +1853,7 @@ void SidebarClass::StripClass::Draw_It(bool complete)
 					CC_Draw_Shape(ClockShapes, 0,
 							x-(WindowList[WINDOW_SIDEBAR][WINDOWX])+(LEFT_EDGE_OFFSET * RESFACTOR),
 							y-WindowList[WINDOW_SIDEBAR][WINDOWY],
-							WINDOW_SIDEBAR,
+						WINDOW_SIDEBAR,
 							SHAPE_NORMAL|SHAPE_WIN_REL|SHAPE_GHOST,
 							NULL, ClockTranslucentTable);
 				}

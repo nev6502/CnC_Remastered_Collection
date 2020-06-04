@@ -41,6 +41,27 @@
 
 class InitClass {};
 
+extern int ScreenWidth;
+#define BUTTON_ACTIVATOR 100			// Button ID for the activator.
+#define SIDE_X ((ScreenWidth / 2) - 80)					// The X position of sidebar upper left corner.
+#define SIDE_Y (7 + 70)	// The Y position of sidebar upper left corner.
+#define SIDE_WIDTH SIDEBAR_WID			// Width of the entire sidebar (in pixels).
+#define SIDE_HEIGHT (200 - (7 + 70)	)		// Height of the entire sidebar (in pixels).
+#define TOP_HEIGHT  13						// Height of top section (with repair/sell buttons).
+#define COLUMN_ONE_X (int)((SIDE_X) + 8)			// Sidestrip upper left coordinates...
+#define COLUMN_ONE_Y (int)(SIDE_Y + (TOP_HEIGHT))
+#define COLUMN_TWO_X (int)((SIDE_X) + 8 + ((80 - 16) / 2) + 3)
+#define COLUMN_TWO_Y (int)(7 + 70 + 13)
+#define BUTTON_ONE_WIDTH  32				// Button width.
+#define BUTTON_TWO_WIDTH  20				// Button width.
+#define BUTTON_THREE_WIDTH  20			// Button width.
+#define BUTTON_HEIGHT  9					// Button height.
+#define BUTTON_ONE_X  (int)(SIDE_X + 2)			// Left button X coordinate.
+#define BUTTON_ONE_Y  (int)(SIDE_Y + 2)			// Left button Y coordinate.
+#define BUTTON_TWO_X  (int)(SIDE_X + 36)			// Right button X coordinate.
+#define BUTTON_TWO_Y  (int)(SIDE_Y + 2)			// Right button Y coordinate.
+#define BUTTON_THREE_X  (int)(SIDE_X + 58)			// Right button X coordinate.
+#define BUTTON_THREE_Y  (int)(SIDE_Y + 2)			// Right button Y coordinate.
 class SidebarClass: public PowerClass
 {
 	public:
@@ -49,16 +70,7 @@ class SidebarClass: public PowerClass
 		**	as enumerations since C++ cannot use "const" in this context.
 		*/
 		enum SideBarClassEnums {
-			BUTTON_ACTIVATOR = 100,			// Button ID for the activator.
-			SIDE_X = 320 - 80,					// The X position of sidebar upper left corner.
-			SIDE_Y = 7 + 70,	// The Y position of sidebar upper left corner.
-			SIDE_WIDTH = SIDEBAR_WID,			// Width of the entire sidebar (in pixels).
-			SIDE_HEIGHT = 200 - (7 + 70),			// Height of the entire sidebar (in pixels).
-			TOP_HEIGHT = 13,						// Height of top section (with repair/sell buttons).
-			COLUMN_ONE_X = (320 - 80) + 8,			// Sidestrip upper left coordinates...
-			COLUMN_ONE_Y = int(SIDE_Y) + int(TOP_HEIGHT),
-			COLUMN_TWO_X = (320 - 80) + 8 + ((80 - 16) / 2) + 3,
-			COLUMN_TWO_Y = 7 + 70 + 13,
+			
 
 //BGA: changes to all buttons
 #ifdef GERMAN
@@ -88,16 +100,7 @@ class SidebarClass: public PowerClass
 #endif
 
 #ifdef ENGLISH
-			BUTTON_ONE_WIDTH=32,				// Button width.
-			BUTTON_TWO_WIDTH=20,				// Button width.
-			BUTTON_THREE_WIDTH=20,			// Button width.
-			BUTTON_HEIGHT=9,					// Button height.
-			BUTTON_ONE_X=(int)SIDE_X+2,			// Left button X coordinate.
-			BUTTON_ONE_Y=(int)SIDE_Y+2,			// Left button Y coordinate.
-			BUTTON_TWO_X=(int)SIDE_X+36,			// Right button X coordinate.
-			BUTTON_TWO_Y=(int)SIDE_Y+2,			// Right button Y coordinate.
-			BUTTON_THREE_X=(int)SIDE_X+58,			// Right button X coordinate.
-			BUTTON_THREE_Y=(int)SIDE_Y+2,			// Right button Y coordinate.
+
 #endif
 
 			COLUMNS=2							// Number of side strips on sidebar.
