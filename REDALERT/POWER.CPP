@@ -228,8 +228,8 @@ void PowerClass::Draw_It(bool complete)
 #endif
 					bottom = (175*RESFACTOR)+1;
 
-					LogicPage->Fill_Rect(ScreenWidth - (640 - (245*RESFACTOR)), bottom-power_height, 245*RESFACTOR+1, bottom, color2);
-					LogicPage->Fill_Rect(ScreenWidth - (640 - (246*RESFACTOR)), bottom-power_height, 246*RESFACTOR+1, bottom, color1);
+					LogicPage->Fill_Rect(ScreenWidth - (640 - (245*RESFACTOR)), bottom-power_height, ScreenWidth - (640 - (245*RESFACTOR+1)), bottom, color2);
+					LogicPage->Fill_Rect(ScreenWidth - (640 - (246*RESFACTOR)), bottom-power_height, ScreenWidth - (640 - (246*RESFACTOR+1)), bottom, color1);
 				}
 
 				/*
