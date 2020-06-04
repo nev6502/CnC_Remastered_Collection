@@ -89,8 +89,8 @@ class WWKeyboardClass
 		/* Define the public access variables which are used with the			*/
 		/*   Keyboard Class.																	*/
 		/*===================================================================*/
-		int				MouseQX;
-		int				MouseQY;
+		//int				MouseQX;
+		//int				MouseQY;
 
 		unsigned char	VKRemap[256];		// gives vk for any ascii char
 	private:

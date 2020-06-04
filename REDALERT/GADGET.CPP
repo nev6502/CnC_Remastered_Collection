@@ -86,7 +86,6 @@ RemapControlType * GadgetClass::ColorScheme = &_GreyScheme;
 
 int mousex, mousey;
 
-
 /***********************************************************************************************
  * GadgetClass::GadgetClass -- Constructor for gadget object.                                  *
  *                                                                                             *
@@ -535,11 +534,14 @@ KeyNumType GadgetClass::Input(void)
 	**	rather the the mouse position at the time we get around to this function.
 	*/
 // jmarshall
-	static int flags = 0;
+	int flags = 0;
 	SDL_GetMouseState(&mousex, &mousey);
 
-	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
-		flags = 0;
+	Keyboard->MouseQX = mousex;
+	Keyboard->MouseQY = mousey;
+
+//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
+//		flags = 0;
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
@@ -550,11 +552,18 @@ KeyNumType GadgetClass::Input(void)
 					flags = LEFTPRESS;
 					key = KN_LMOUSE;
 				}
+				else if (event.button.button == SDL_BUTTON_RIGHT) {
+					flags = RIGHTPRESS;
+					key = KN_LMOUSE;
+				}
 				break;
 
 			case SDL_MOUSEBUTTONUP:
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					flags = LEFTRELEASE;
+				}
+				else if (event.button.button == SDL_BUTTON_RIGHT) {
+					flags = RIGHTRELEASE;
 				}
 				break;
 		}
