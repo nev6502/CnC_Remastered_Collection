@@ -146,28 +146,7 @@ SidebarClass::SidebarClass(void) :
 	IsUpgradeActive(false),
 	IsDemolishActive(false)
 {
-	/*
-	**	This sets up the clipping window. This window is used by the shape drawing
-	**	code so that as the sidebar buildable buttons scroll, they get properly
-	**	clipped at the top and bottom edges.
-	*/
-	WindowList[WINDOW_SIDEBAR][WINDOWX] = (SIDE_X+8);
-	WindowList[WINDOW_SIDEBAR][WINDOWY] = SIDE_Y + 1 + TOP_HEIGHT;
-	WindowList[WINDOW_SIDEBAR][WINDOWWIDTH] = SIDE_WIDTH;
-	WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT;
-//	WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT-1;
 
-	/*
-	**	Set up the coordinates for the sidebar strips. These coordinates are for
-	**	the upper left corner.
-	*/
-	new (&Column[0]) StripClass(InitClass());
-	new (&Column[1]) StripClass(InitClass());
-
-	Column[0].X = COLUMN_ONE_X * RESFACTOR;
-	Column[0].Y = COLUMN_ONE_Y * RESFACTOR;
-	Column[1].X = COLUMN_TWO_X * RESFACTOR;
-	Column[1].Y = COLUMN_TWO_Y * RESFACTOR;
 }
 
 
@@ -219,6 +198,29 @@ SidebarClass::SidebarClass(NoInitClass const & x) : PowerClass(x)
 void SidebarClass::One_Time(void)
 {
 	PowerClass::One_Time();
+
+	/*
+	**	This sets up the clipping window. This window is used by the shape drawing
+	**	code so that as the sidebar buildable buttons scroll, they get properly
+	**	clipped at the top and bottom edges.
+	*/
+	WindowList[WINDOW_SIDEBAR][WINDOWX] = ScreenWidth - (SIDE_X + 8);
+	WindowList[WINDOW_SIDEBAR][WINDOWY] = SIDE_Y + 1 + TOP_HEIGHT;
+	WindowList[WINDOW_SIDEBAR][WINDOWWIDTH] = SIDE_WIDTH;
+	WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT;
+	//	WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT-1;
+
+		/*
+		**	Set up the coordinates for the sidebar strips. These coordinates are for
+		**	the upper left corner.
+		*/
+	new (&Column[0]) StripClass(InitClass());
+	new (&Column[1]) StripClass(InitClass());
+
+	Column[0].X = ScreenWidth - (640 - (COLUMN_ONE_X * RESFACTOR));
+	Column[0].Y = (COLUMN_ONE_Y * RESFACTOR);
+	Column[1].X = ScreenWidth - (640 - (COLUMN_TWO_X * RESFACTOR));
+	Column[1].Y = (COLUMN_TWO_Y * RESFACTOR);
 
 	/*
 	**	This sets up the clipping window. This window is used by the shape drawing
@@ -308,7 +310,7 @@ void SidebarClass::Init_IO(void)
 
 		Repair.IsSticky = true;
 		Repair.ID = BUTTON_REPAIR;
-		Repair.X = (0x1f2/2)*RESFACTOR;
+		Repair.X = ScreenWidth - (640 - (0x1f2/2)*RESFACTOR);
 		Repair.Y = (0x96/2)*RESFACTOR;
 		Repair.IsPressed = false;
 		Repair.IsToggleType = true;
@@ -318,7 +320,7 @@ void SidebarClass::Init_IO(void)
 		Upgrade.IsSticky = true;
 		Upgrade.ID = BUTTON_UPGRADE;
 #ifdef WIN32
-		Upgrade.X = 0x21f;
+		Upgrade.X = ScreenWidth - (640 - 0x21f);
 #else
 		Upgrade.X = ((0x21f/2)+1)*RESFACTOR;
 #endif
@@ -330,7 +332,7 @@ void SidebarClass::Init_IO(void)
 
 		Zoom.IsSticky = true;
 		Zoom.ID = BUTTON_ZOOM;
-		Zoom.X = (0x24c/2)*RESFACTOR;
+		Zoom.X = 1024 - (640 - ((0x24c/2)*RESFACTOR));
 		Zoom.Y = (0x96/2)*RESFACTOR;
 		Zoom.IsPressed = false;
 		Zoom.Set_Shape(MFCD::Retrieve("MAP.SHP"));
