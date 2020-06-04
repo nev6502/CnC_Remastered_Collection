@@ -1482,7 +1482,7 @@ bool UnitClass::Goto_Clear_Spot(void)
  * HISTORY:                                                                                    *
  *   06/18/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-bool UnitClass::Try_To_Deploy(void)
+bool UnitClass::Try_To_Deploy(bool isScriptUnpack) // jmarshall - added isScriptUnpack
 {
 	assert(Units.ID(this) == ID);
 	assert(IsActive);
@@ -1498,7 +1498,10 @@ bool UnitClass::Try_To_Deploy(void)
 			CELL cell = Coord_Cell(Adjacent_Cell(Center_Coord(), FACING_NW));
 			if (!BuildingTypeClass::As_Reference(STRUCT_CONST).Legal_Placement(cell)) {
 				if (PlayerPtr == House) {
-					Speak(VOX_DEPLOY);
+					// jmarshall: Don't play failure to deploy if the map script is trying to deploy the unit.
+					if (!isScriptUnpack) {
+						Speak(VOX_DEPLOY);
+					}
 				}
 				if (!House->IsHuman) {
 					BuildingTypeClass::As_Reference(STRUCT_CONST).Flush_For_Placement(cell, House);
@@ -1629,7 +1632,7 @@ void UnitClass::Per_Cell_Process(PCPType why)
 		**	preparing to deploy. In this case, it should begin its deploy process.
 		*/
 		if (IsDeploying) {
-			Try_To_Deploy();
+			Try_To_Deploy(false);
 			if (!IsActive) return;			// Unit no longer exists -- bail.
 		}
 	}
@@ -2574,7 +2577,7 @@ int UnitClass::Mission_Unload(void)
 
 				case 1:
 					if (!IsDriving) {
-						Try_To_Deploy();
+						Try_To_Deploy(true);
 						if (IsActive) {
 							if (IsDeploying) {
 								Status = 2;
@@ -2984,7 +2987,7 @@ int UnitClass::Mission_Hunt(void)
 			*/
 			case FIND_SPOT:
 				if (Goto_Clear_Spot()) {
-					if (Try_To_Deploy()) {
+					if (Try_To_Deploy(false)) {
 						Status = WAITING;
 					}
 				}

@@ -134,7 +134,7 @@ class UnitClass :	public DriveClass
 		static void Init(void);
 
 		bool Goto_Clear_Spot(void);
-		bool Try_To_Deploy(void);
+		bool Try_To_Deploy(bool isScriptUnpack);
 		virtual void Scatter(COORDINATE threat, bool forced=false, bool nokidding=false);
 
 		bool Tiberium_Check(CELL &center, int x, int y);

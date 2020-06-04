@@ -571,14 +571,14 @@ void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 	// ST - 3/1/2019 12:05PM
 	// Made the below code more consistent with the width calculation. This is needed if we aren't going to draw the tabs at the top of the screen
 	//
-	//if (height == -1) {
-	//	TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
-	//	//height = (SeenBuff.Get_Height()-y) / CELL_PIXEL_H;
-	//}
-	//else {
-	//	TacLeptonHeight = height * CELL_LEPTON_H;
-	//}
-	TacLeptonHeight = height * CELL_LEPTON_H;
+	if (height == -1) {
+		TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
+		//height = (SeenBuff.Get_Height()-y) / CELL_PIXEL_H;
+	}
+	else {
+		TacLeptonHeight = height * CELL_LEPTON_H;
+	}
+	//TacLeptonHeight = height * CELL_LEPTON_H;
 
 	/*
 	**	Adjust the tactical cell if it is now in an invalid position
@@ -3300,7 +3300,7 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 		}
 	}
 
-	return true; //(GadgetClass::Action(0, key));
+	return (GadgetClass::Action(0, key));
 }
 
 

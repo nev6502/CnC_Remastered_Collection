@@ -2252,7 +2252,7 @@ rept_loop:
    	    shr	ebx , 5
    	    imul	ecx , - 13
    	    mov	[ counter_x ] , ebx
-   	    lea	ecx , [ remapref_point + ecx ]
+   	    lea	ecx , [ remapref_point ]
    	    mov	[ entry ] , ecx
 
  	remapoutter_loop:
@@ -2495,7 +2495,7 @@ rept_loop:
    	    imul	ecx , -13
    	    shr	ebx , 5
    	    mov	[ counter_x ] , ebx
-   	    lea	ecx , [ trans_ref_point + ecx ]
+   	    lea	ecx , [ trans_ref_point ]
    	    mov	[ entry ] , ecx
 
  	trans_outter_loop:
@@ -2558,7 +2558,7 @@ rept_loop2:
    	    shr	ebx , 5
    	    imul	ecx , - 17
    	    mov	[ counter_x ] , ebx
-   	    lea	ecx , [ trans_remapref_point + ecx ]
+   	    lea	ecx , [ trans_remapref_point ]
    	    mov	[ entry ] , ecx
 
  	trans_remapoutter_loop:
