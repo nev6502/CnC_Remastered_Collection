@@ -328,7 +328,19 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 	{
 		return;
 	}
-	PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index], false);
+
+	if (precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index].buffer != 0) {
+		PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index], false);
+	}
+	else if(PlayerPtr != NULL) {
+		// We have to play a faction audio.
+		if (PlayerPtr->Class->House == HOUSE_USSR || PlayerPtr->Class->House == HOUSE_UKRAINE || PlayerPtr->Class->House == HOUSE_TURKEY) {
+			PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_SOVIET][sound_index], false);
+		}
+		else {
+			PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_ALIED][sound_index], false);
+		}
+	}
 }
 
 
