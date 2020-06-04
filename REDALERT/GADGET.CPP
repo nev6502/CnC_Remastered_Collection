@@ -201,6 +201,9 @@ int GadgetClass::Clicked_On(KeyNumType & key, unsigned flags, int mousex, int mo
 	*/
 	flags &= Flags;
 
+	if (mousex - X < 0 || mousey - Y < 0)
+		return false;
+
 	/*
 	**	If keyboard input should be processed by this "gadget" and keyboard input is
 	**	detected, then always call the action function. It is up to the action function
