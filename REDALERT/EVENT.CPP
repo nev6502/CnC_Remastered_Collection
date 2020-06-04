@@ -862,6 +862,9 @@ void EventClass::Execute(void)
 				Call_Back();
 			}
 			GameActive = false;
+// jmarshall - hack for skirmish games, lets the game flow go back to the mainmenu.
+			Session.Type = GAME_NORMAL;
+// jmarshall end
 			break;
 
 		/*
