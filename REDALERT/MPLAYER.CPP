@@ -396,7 +396,7 @@ GameType Select_MPlayer_Game (void)
 
 				case (BUTTON_SKIRMISH):
 					Session.Type = GAME_SKIRMISH;
-#if (0) //PG
+
 					if (Com_Scenario_Dialog(true)) {
 						retval = GAME_SKIRMISH;
 						process = false;
@@ -410,7 +410,6 @@ GameType Select_MPlayer_Game (void)
 						Session.Type = GAME_NORMAL;
 						display = REDRAW_ALL;
 					}
-#endif
 					break;
 
 				case (BUTTON_IPX):

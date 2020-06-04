@@ -199,6 +199,7 @@ typedef enum {
 	REJECT_DISBANDED,				// game was disbanded
 	REJECT_MISMATCH,				// "rules.ini" file mismatch.
 } RejectType;
+#endif
 
 #ifdef ENGLISH
 char const *EngMisStr[] = {
@@ -438,6 +439,10 @@ char const *EngMisStr[] = {
 	NULL
 };
 #endif
+
+
+#if (0)		//PG
+
 
 #ifdef GERMAN
 char const *EngMisStr[] = {

@@ -335,3 +335,5 @@ private:
 #endif
 
 #endif
+
+#define GAME_VERSION	0x00030003

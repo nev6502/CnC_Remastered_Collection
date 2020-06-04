@@ -295,7 +295,7 @@ SelectedObjectsType CurrentObject;
 /***************************************************************************
 **	This is the game version.
 */
-//PG VersionClass VerNum;
+VersionClass VerNum;
 
 
 /***************************************************************************
