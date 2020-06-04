@@ -64,6 +64,7 @@ struct WAVE_Data {
 };
 
 #define MAX_AUDIO_SOURCES 32
+#define SPEECH_AUDIO_SOURCE (MAX_AUDIO_SOURCES - 3)
 #define MOVIE_AUDIO_SOURCE (MAX_AUDIO_SOURCES - 2)
 ALuint audio_sources[MAX_AUDIO_SOURCES];
 int current_streaming_audiosource = 0;
@@ -299,8 +300,18 @@ void AudMix_Init(void) {
 	alGenBuffers(MAX_STREAM_BUFFERS, streaming_buffers);
 }
 
-void PlayAudio(AudioBuffer_t& buffer) {
-	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 2)
+void PlayAudio(AudioBuffer_t& buffer, bool speech) {
+	// Only one speech sound can play at once.
+	if (speech) {
+		if (AudMix_IsSourcePlaying(SPEECH_AUDIO_SOURCE))
+			return;
+
+		alSourcei(audio_sources[SPEECH_AUDIO_SOURCE], AL_BUFFER, buffer.buffer);
+		alSourcePlay(audio_sources[SPEECH_AUDIO_SOURCE]);
+		return;
+	}
+
+	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 3)
 		currentAudioTSource = 0;
 
 	alSourcei(audio_sources[currentAudioTSource], AL_BUFFER, buffer.buffer);
@@ -317,7 +328,7 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 	{
 		return;
 	}
-	PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index]);
+	PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index], false);
 }
 
 
@@ -325,7 +336,7 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 void On_Speech(int speech_index, HouseClass* house)
 {
 	if (house == NULL) {
-		PlayAudio(speechPrecacheAudioTable[speech_index]);
+		PlayAudio(speechPrecacheAudioTable[speech_index], true);
 	}
 
 	// DLLExportClass::On_Speech(PlayerPtr, speech_index); // MBL 02.06.2020
