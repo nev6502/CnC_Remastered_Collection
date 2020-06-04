@@ -1340,6 +1340,11 @@ void SidebarClass::StripClass::Reload_LogoShapes(void)
 	if(PlayerPtr) {
 		houseloaded = PlayerPtr->ActLike;
 	}
+// jmarshall
+	if (houseloaded >= HOUSE_BAD)
+		return;
+// jmarshall end
+
 	LogoShapes = (void*)MFCD::Retrieve(stripnames[houseloaded]);
 }
 

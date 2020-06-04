@@ -838,29 +838,3 @@ void Stop_Speaking(void)
 	SpeakQueue = VOX_NONE;
 	Stop_Sample_Playing(SpeechBuffer);
 }
-
-
-/***********************************************************************************************
- * Is_Speaking -- Checks to see if the eva voice is still playing.                             *
- *                                                                                             *
- *    Call this routine when the EVA voice being played needs to be checked. A typical use     *
- *    of this would be when some action needs to be delayed until the voice has finished --    *
- *    say the end of the game.                                                                 *
- *                                                                                             *
- * INPUT:   none                                                                               *
- *                                                                                             *
- * OUTPUT:  bool; Is the EVA voice still playing?                                              *
- *                                                                                             *
- * WARNINGS:   none                                                                            *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   03/12/1995 JLB : Created.                                                                 *
- *=============================================================================================*/
-bool Is_Speaking(void)
-{
-	Speak_AI();
-	if (!Debug_Quiet && SampleType != 0 && (SpeakQueue != VOX_NONE || Is_Sample_Playing(SpeechBuffer))) {
-		return(true);
-	}
-	return(false);
-}

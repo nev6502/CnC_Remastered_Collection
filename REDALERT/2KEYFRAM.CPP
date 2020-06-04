@@ -53,7 +53,7 @@ typedef struct {
 	short				flags;
 } KeyFrameHeaderType;
 
-#define	INITIAL_BIG_SHAPE_BUFFER_SIZE	8000000
+#define	INITIAL_BIG_SHAPE_BUFFER_SIZE	(64 * 1024 * 1024)
 #define	THEATER_BIG_SHAPE_BUFFER_SIZE 4000000
 #define	UNCOMPRESS_MAGIC_NUMBER			56789
 
@@ -62,7 +62,7 @@ unsigned	TheaterShapeBufferLength = THEATER_BIG_SHAPE_BUFFER_SIZE;
 extern "C"{
 	char		*BigShapeBufferStart = NULL;
 	char		*TheaterShapeBufferStart = NULL;
-	BOOL		UseBigShapeBuffer = FALSE;
+	BOOL		UseBigShapeBuffer = TRUE;
 	bool		IsTheaterShape = false;
 }
 #ifdef FIXIT_SCORE_CRASH

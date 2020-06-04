@@ -303,9 +303,10 @@ void AudMix_Init(void) {
 void PlayAudio(AudioBuffer_t& buffer, bool speech) {
 	// Only one speech sound can play at once.
 	if (speech) {
-		if (AudMix_IsSourcePlaying(SPEECH_AUDIO_SOURCE))
-			return;
+		//if (AudMix_IsSourcePlaying(SPEECH_AUDIO_SOURCE))
+		//	return;
 
+		alSourceStop(audio_sources[SPEECH_AUDIO_SOURCE]);
 		alSourcei(audio_sources[SPEECH_AUDIO_SOURCE], AL_BUFFER, buffer.buffer);
 		alSourcePlay(audio_sources[SPEECH_AUDIO_SOURCE]);
 		return;
@@ -359,4 +360,27 @@ void On_Speech(int speech_index, HouseClass* house)
 	//{
 	//	DLLExportClass::On_Speech(house, speech_index);
 	//}
+}
+
+
+/***********************************************************************************************
+ * Is_Speaking -- Checks to see if the eva voice is still playing.                             *
+ *                                                                                             *
+ *    Call this routine when the EVA voice being played needs to be checked. A typical use     *
+ *    of this would be when some action needs to be delayed until the voice has finished --    *
+ *    say the end of the game.                                                                 *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  bool; Is the EVA voice still playing?                                              *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   03/12/1995 JLB : Created.                                                                 *
+ *=============================================================================================*/
+bool Is_Speaking(void)
+{
+	Speak_AI();
+	return AudMix_IsSourcePlaying(SPEECH_AUDIO_SOURCE);
 }

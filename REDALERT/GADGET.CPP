@@ -566,6 +566,9 @@ KeyNumType GadgetClass::Input(void)
 					flags = RIGHTRELEASE;
 				}
 				break;
+			case SDL_KEYDOWN:
+				Keyboard->Put_Element(event.key.keysym.sym);
+				break;
 		}
 	}
 // jmarshall end

@@ -86,6 +86,7 @@ class WWKeyboardClass
 		int MouseQX;
 		int MouseQY;
 
+		bool Put_Element(unsigned short val);
 	private:
 
 		/*
@@ -102,8 +103,7 @@ class WWKeyboardClass
 
 		unsigned short Buff_Get(void);
 		unsigned short Fetch_Element(void);
-		unsigned short Peek_Element(void) const;
-		bool Put_Element(unsigned short val);
+		unsigned short Peek_Element(void) const;		
 		bool Is_Buffer_Full(void) const;
 		bool Is_Buffer_Empty(void) const;
 		static bool Is_Mouse_Key(unsigned short key);
@@ -120,7 +120,6 @@ class WWKeyboardClass
 		int Tail;
 };
 
-
 #define	VK_NONE				  0x00
 #define	VK_LBUTTON          0x01
 #define	VK_RBUTTON          0x02
@@ -129,8 +128,8 @@ class WWKeyboardClass
 #define	VK_NONE_05			  0x05
 #define	VK_NONE_06			  0x06
 #define	VK_NONE_07			  0x07
-#define	VK_BACK             0x08
-#define	VK_TAB              0x09
+#define	VK_BACK             '\b'
+#define	VK_TAB              '\t'
 #define	VK_NONE_0A			  0x0A
 #define	VK_NONE_0B			  0x0B
 #define	VK_CLEAR            0x0C
@@ -148,7 +147,7 @@ class WWKeyboardClass
 #define	VK_NONE_18			  0x18
 #define	VK_NONE_19			  0x19
 #define	VK_NONE_1A			  0x1A
-#define	VK_ESCAPE           0x1B
+#define	VK_ESCAPE           '\033'
 #define	VK_NONE_1C			  0x1C
 #define	VK_NONE_1D			  0x1D
 #define	VK_NONE_1E			  0x1E
@@ -192,7 +191,7 @@ class WWKeyboardClass
 #define	VK_E					  0x45
 #define	VK_F					  0x46
 #define	VK_G					  0x47
-#define	VK_H					  0x48
+#define	VK_H					  'h'
 #define	VK_I					  0x49
 #define	VK_J					  0x4A
 #define	VK_K					  0x4B
