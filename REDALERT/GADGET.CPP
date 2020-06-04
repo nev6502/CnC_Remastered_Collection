@@ -460,7 +460,6 @@ void GadgetClass::Draw_All(bool forced)
 	}
 }
 
-
 /***************************************************************************
  * GADGETCLASS::PROCESSLIST -- Check list for a mouse click within a gadget*
  *                                                                         *
@@ -535,42 +534,7 @@ KeyNumType GadgetClass::Input(void)
 	*/
 // jmarshall
 	int flags = 0;
-	SDL_GetMouseState(&mousex, &mousey);
-
-	Keyboard->MouseQX = mousex;
-	Keyboard->MouseQY = mousey;
-
-//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
-//		flags = 0;
-
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) {
-		switch (event.type)
-		{
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = LEFTPRESS;
-					key = KN_LMOUSE;
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					flags = RIGHTPRESS;
-					key = KN_LMOUSE;
-				}
-				break;
-
-			case SDL_MOUSEBUTTONUP:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = LEFTRELEASE;
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					flags = RIGHTRELEASE;
-				}
-				break;
-			case SDL_KEYDOWN:
-				Keyboard->Put_Element(event.key.keysym.sym);
-				break;
-		}
-	}
+	WWSDL_ProcessEvents(key, flags);
 // jmarshall end
 
 	/*

@@ -1072,6 +1072,8 @@ extern DynamicVectorClass<ActionChoiceClass *> xxx3;
 template <>class DynamicVectorClass<EgoClass *>;
 extern DynamicVectorClass<EgoClass *> whatever;
 
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags);
+
 /*
 ** Debug output. ST - 6/27/2019 10:00PM
 */

@@ -453,6 +453,7 @@
     <ClCompile Include="Win32Lib\WINDOWS.CPP" />
     <ClCompile Include="Win32Lib\WINHIDE.CPP" />
     <ClCompile Include="Win32Lib\WRITEPCX.CPP" />
+    <ClCompile Include="WIN32LIB\WSA.CPP" />
     <ClCompile Include="Win32Lib\_DIPTABL.CPP" />
     <ClCompile Include="WINSTUB.CPP" />
     <ClCompile Include="WOLAPIOB.CPP" />

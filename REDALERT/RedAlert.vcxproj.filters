@@ -939,6 +939,9 @@
     <ClCompile Include="..\external\libsmacker\smk_hufftree.c">
       <Filter>Source Files\libsmacker</Filter>
     </ClCompile>
+    <ClCompile Include="WIN32LIB\WSA.CPP">
+      <Filter>Source Files\win32lib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABSTRACT.H">

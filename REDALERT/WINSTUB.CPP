@@ -711,6 +711,48 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 }
 
 
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
+	extern int mousex, mousey;
+	SDL_GetMouseState(&mousex, &mousey);
+
+	Keyboard->MouseQX = mousex;
+	Keyboard->MouseQY = mousey;
+
+	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
+	//		flags = 0;
+
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		switch (event.type)
+		{
+		case SDL_MOUSEBUTTONDOWN:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				flags = GadgetClass::LEFTPRESS;
+				key = KN_LMOUSE;
+			}
+			else if (event.button.button == SDL_BUTTON_RIGHT) {
+				flags = GadgetClass::RIGHTPRESS;
+				key = KN_LMOUSE;
+			}
+			break;
+
+		case SDL_MOUSEBUTTONUP:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				flags = GadgetClass::LEFTRELEASE;
+			}
+			else if (event.button.button == SDL_BUTTON_RIGHT) {
+				flags = GadgetClass::RIGHTRELEASE;
+			}
+			break;
+		case SDL_KEYDOWN:
+			Keyboard->Put_Element(event.key.keysym.sym);
+			break;
+		}
+	}
+}
+
+
+
 #ifndef NDEBUG
 /***********************************************************************************************
  * Assert_Failure -- display the line and source file where a failed assert occurred           *

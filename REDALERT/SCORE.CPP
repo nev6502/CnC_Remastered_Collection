@@ -1421,66 +1421,72 @@ void ScoreClass::Input_Name(char str[], int xpos, int ypos, char const pal[])
 	** with black.
 	*/
 	HidPage.Blit(HidPage, 0, 100*RESFACTOR, 0, 0, 100*RESFACTOR, 100*RESFACTOR);
-
-	do {
-		Call_Back();
-		Animate_Score_Objs();
-		Animate_Cursor(index, ypos);
-		if (Keyboard->Check()) {
-			key = Keyboard->To_ASCII(Keyboard->Get()) & 0xFF;
-			Call_Back();
-
-			if (index == MAX_FAMENAME_LENGTH-2) {
-				while (Keyboard->Check()) {
-					Keyboard->Get();
-				}
-			}
-
-			/*
-			** If they hit 'backspace' when they're on the last letter,
-			** turn it into a space instead.
-			*/
-			if ((key == KA_BACKSPACE) && (index == MAX_FAMENAME_LENGTH-2) ) {
-				if (str[index] && str[index]!=32) key = 32;
-			}
-			if (key == KA_BACKSPACE) {							//if (key == KN_BACKSPACE) {
-				if (index) {
-					str[--index] = 0;
-
-					int xposindex6 = (xpos+(index*6))*RESFACTOR;
-					HidPage.Blit(SeenPage, xposindex6, (ypos-100)*RESFACTOR, xposindex6, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
-		#ifdef WIN32
-					HidPage.Blit(*PseudoSeenBuff, xposindex6, (ypos-100)*RESFACTOR, xposindex6, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
-		#endif
-					HidPage.Blit(HidPage,  xposindex6, (ypos-100)*RESFACTOR, xposindex6, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
-				}
-
-			} else if (key != KA_RETURN) {			//else if (key != KN_RETURN && key!=KN_KEYPAD_RETURN) {
-				ascii = key;					//ascii = KN_To_KA(key);
-				if (ascii >= 'a' && ascii <= 'z') ascii -= ('a' - 'A');
-				if ( (ascii >= '!' && ascii <= KA_TILDA) || ascii == ' ') {
-					HidPage.Blit(SeenPage, (xpos + (index*6))*RESFACTOR, (ypos-100)*RESFACTOR, (xpos + (index*6))*RESFACTOR, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
-		#ifdef WIN32
-					HidPage.Blit(*PseudoSeenBuff, (xpos + (index*6))*RESFACTOR, (ypos-100)*RESFACTOR, (xpos + (index*6))*RESFACTOR, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
-		#endif
-					HidPage.Blit(HidPage, (xpos + (index*6))*RESFACTOR, (ypos-100)*RESFACTOR, (xpos + (index*6))*RESFACTOR, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
-					str[index] = ascii;
-					str[index+1] = 0;
-
-					int objindex;
-#ifdef WIN32
-					Play_Sample(keystrok, 255, Options.Normalize_Volume(150));
-#else
-					Play_Sample(keystrok, 255, Options.Normalize_Volume(105));
-#endif
-					objindex = Alloc_Object(new ScoreScaleClass(str+index, xpos+(index*6), ypos, pal));
-					while (ScoreObjs[objindex]) Call_Back_Delay(1);
-
-					if (index < (MAX_FAMENAME_LENGTH-2) ) index++;
-				}
-			}
-		}
-	} while (key != KA_RETURN);					//	} while(key != KN_RETURN && key!=KN_KEYPAD_RETURN);
+// jmarshall - temp disable high school writing.
+//	do {
+//// jmarshall
+//		KeyNumType _key;
+//		int flags;
+//		WWSDL_ProcessEvents(_key, flags);
+//// jmarshall end
+//		Call_Back();
+//		Animate_Score_Objs();
+//		Animate_Cursor(index, ypos);
+//		if (Keyboard->Check()) {
+//			key = Keyboard->To_ASCII(Keyboard->Get()) & 0xFF;
+//			Call_Back();
+//
+//			if (index == MAX_FAMENAME_LENGTH-2) {
+//				while (Keyboard->Check()) {
+//					Keyboard->Get();
+//				}
+//			}
+//
+//			/*
+//			** If they hit 'backspace' when they're on the last letter,
+//			** turn it into a space instead.
+//			*/
+//			if ((key == KA_BACKSPACE) && (index == MAX_FAMENAME_LENGTH-2) ) {
+//				if (str[index] && str[index]!=32) key = 32;
+//			}
+//			if (key == KA_BACKSPACE) {							//if (key == KN_BACKSPACE) {
+//				if (index) {
+//					str[--index] = 0;
+//
+//					int xposindex6 = (xpos+(index*6))*RESFACTOR;
+//					HidPage.Blit(SeenPage, xposindex6, (ypos-100)*RESFACTOR, xposindex6, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
+//		#ifdef WIN32
+//					HidPage.Blit(*PseudoSeenBuff, xposindex6, (ypos-100)*RESFACTOR, xposindex6, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
+//		#endif
+//					HidPage.Blit(HidPage,  xposindex6, (ypos-100)*RESFACTOR, xposindex6, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
+//				}
+//
+//			} else if (key != KA_RETURN) {			//else if (key != KN_RETURN && key!=KN_KEYPAD_RETURN) {
+//				ascii = key;					//ascii = KN_To_KA(key);
+//				if (ascii >= 'a' && ascii <= 'z') ascii -= ('a' - 'A');
+//				if ( (ascii >= '!' && ascii <= KA_TILDA) || ascii == ' ') {
+//					HidPage.Blit(SeenPage, (xpos + (index*6))*RESFACTOR, (ypos-100)*RESFACTOR, (xpos + (index*6))*RESFACTOR, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
+//		#ifdef WIN32
+//					HidPage.Blit(*PseudoSeenBuff, (xpos + (index*6))*RESFACTOR, (ypos-100)*RESFACTOR, (xpos + (index*6))*RESFACTOR, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
+//		#endif
+//					HidPage.Blit(HidPage, (xpos + (index*6))*RESFACTOR, (ypos-100)*RESFACTOR, (xpos + (index*6))*RESFACTOR, ypos*RESFACTOR, 6*RESFACTOR, 6*RESFACTOR);
+//					str[index] = ascii;
+//					str[index+1] = 0;
+//
+//					int objindex;
+//#ifdef WIN32
+//					Play_Sample(keystrok, 255, Options.Normalize_Volume(150));
+//#else
+//					Play_Sample(keystrok, 255, Options.Normalize_Volume(105));
+//#endif
+//					objindex = Alloc_Object(new ScoreScaleClass(str+index, xpos+(index*6), ypos, pal));
+//					while (ScoreObjs[objindex]) Call_Back_Delay(1);
+//
+//					if (index < (MAX_FAMENAME_LENGTH-2) ) index++;
+//				}
+//			}
+//		}
+//	} while (key != KA_RETURN);					//	} while(key != KN_RETURN && key!=KN_KEYPAD_RETURN);
+// jmarshall end
 }
 
 
