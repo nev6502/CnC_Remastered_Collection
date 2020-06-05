@@ -1274,6 +1274,10 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 
 
 	}
+// jmarshall - force update the map when we scroll, this fixes the sidebar.
+	Map.Redraw_Tab();
+	Map.Flag_To_Redraw(true);
+// jmarshall end
 	return(true);
 }
 
