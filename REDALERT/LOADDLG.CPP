@@ -446,7 +446,12 @@ int LoadOptionsClass::Process(void)
 					break;
 				}
 
-				game_num = Files[game_idx]->Num;
+// jmarshall
+				if (Files.Length() > 0)
+					game_num = Files[game_idx]->Num;
+				else
+					game_num = 0;
+// jmarshall end
 				if (!Save_Game(game_num, game_descr)) {
 					WWMessageBox().Process(TXT_ERROR_SAVING_GAME);
 				} else {
@@ -613,12 +618,11 @@ void LoadOptionsClass::Clear_List(ListClass * list)
  *=============================================================================================*/
 void LoadOptionsClass::Fill_List(ListClass * list)
 {
-#if(0)		//PG
 	FileEntryClass * fdata;	// for adding entries to 'Files'
 	char descr[DESCRIP_MAX+32];
 	unsigned scenario;			// scenario #
 	HousesType house;				// house
-	struct find_t ff;		// for _dos_findfirst
+	WIN32_FIND_DATA ff;
 	int id;
 
 	/*
@@ -639,16 +643,16 @@ void LoadOptionsClass::Fill_List(ListClass * list)
 	/*
 	** Find all savegame files
 	*/
-	int rc = _dos_findfirst("SAVEGAME.*", _A_NORMAL, &ff);
+	HANDLE rc = FindFirstFile("SAVEGAME.*", &ff);
 
-	while (!rc) {
+	do {
 
-		if (stricmp(ff.name, NET_SAVE_FILE_NAME) != 0) {
+		if (stricmp(ff.cFileName, NET_SAVE_FILE_NAME) != 0) {
 
 			/*
 			** Extract the game ID from the filename
 			*/
-			id = Num_From_Ext(ff.name);
+			id = Num_From_Ext(ff.cFileName);
 
 			/*
 			** get the game's info; if success, add it to the list
@@ -680,15 +684,11 @@ void LoadOptionsClass::Fill_List(ListClass * list)
 			fdata->Scenario = scenario;
 			fdata->House = house;
 			fdata->Num = id;
-			fdata->DateTime = (((unsigned long)ff.wr_date) << 16) | (unsigned long)ff.wr_time;
+			fdata->DateTime = (((unsigned long)ff.ftLastWriteTime.dwHighDateTime) << 16) | (unsigned long)ff.ftLastWriteTime.dwLowDateTime;
 			Files.Add(fdata);
 		}
 
-		/*
-		** Find the next file
-		*/
-		rc = _dos_findnext(&ff);
-	}
+	} while (FindNextFile(rc, &ff));
 
 	/*
 	** If saving a game, determine a unique file ID for the empty slot
@@ -700,7 +700,8 @@ void LoadOptionsClass::Fill_List(ListClass * list)
 		** in the list; if any number isn't found, use that number; otherwise,
 		** use 'N + 1'.
 		*/
-		for (int i = 0; i < Files.Count(); i++) {		// i = the # we're searching for
+		int i;
+		for (i = 0; i < Files.Count(); i++) {		// i = the # we're searching for
 			id = -1;											// mark as 'not found'
 			for (int j = 0; j < Files.Count(); j++) {	// loop through all game ID's
 				if (Files[j]->Num==i) {					// if found, mark as found
@@ -725,7 +726,6 @@ void LoadOptionsClass::Fill_List(ListClass * list)
 	for (int i = 0; i < Files.Count(); i++) {
 		list->Add_Item(Files[i]->Descr);
 	}
-#endif
 }
 
 

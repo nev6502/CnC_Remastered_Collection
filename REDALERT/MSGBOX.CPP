@@ -75,7 +75,7 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 {
 #define BUFFSIZE (511)
 	char buffer[BUFFSIZE];
-	int retval;
+	int retval = 0;
 	bool process;								// loop while true
 	int selection;
 	bool pressed;
@@ -126,7 +126,12 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 			numbuttons = 1;
 		}
 	}
-
+// jmarshall
+	else {
+		bwidth = 0;
+		bheight = 0;
+	}
+// jmarshall end
 	/*
 	**	Determine the dimensions of the text to be used for the dialog box.
 	**	These dimensions will control how the dialog box looks.
