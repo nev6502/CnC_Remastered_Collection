@@ -254,6 +254,8 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 		pressed = false;
 		while (process) {
 
+			Device_Present();
+
 			#ifdef WIN32
 			/*
 			** If we have just received input focus again after running in the background then

@@ -898,10 +898,13 @@ void Do_Win(void)
 		Fancy_Text_Print(TXT_HACKHACK, x, 110*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
 #endif
 		CountDownTimer = TIMER_SECOND * 3;
-		while (Is_Speaking()) {};
+		while (Is_Speaking()) {
+			Device_Present();
+		};
 		Speak(VOX_ACCOMPLISHED);
 		while (CountDownTimer || Is_Speaking()) {
 			Call_Back();
+			Device_Present();
 		}
 	}
 

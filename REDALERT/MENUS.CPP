@@ -1017,6 +1017,8 @@ int Main_Menu(unsigned long )
 			default:
 				break;
 		}
+
+		Device_Present();
 	}
 
 	Options.Set_Score_Volume(oldvolume, false);

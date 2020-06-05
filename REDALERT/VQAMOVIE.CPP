@@ -143,6 +143,8 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 
 		Buffer_To_Page(0, 0, ScreenWidth, ScreenHeight, vqa_output_buffer, *vqaHandle->video_graphics_buffer);
 		vqaHandle->video_graphics_buffer->Unlock();
+
+		Device_Present();
 		
 		if (clock() - curTime >= 30) {
 			currentFrame++;

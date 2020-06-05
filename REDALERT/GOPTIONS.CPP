@@ -265,6 +265,7 @@ void GameOptionsClass::Process(void)
 	bool process = true;
 	pressed = false;
 	while (process) {
+		Device_Present();
 
 		/*
 		**	Invoke game callback.

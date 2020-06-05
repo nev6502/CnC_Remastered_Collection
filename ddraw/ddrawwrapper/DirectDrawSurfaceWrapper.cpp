@@ -1041,6 +1041,11 @@ HRESULT __stdcall IDirectDrawSurfaceWrapper::SetPalette(LPDIRECTDRAWPALETTE lpDD
 	*/
 }
 
+IDirectDrawWrapper* currentddrawParent = nullptr;
+void Device_Present(void) {
+	currentddrawParent->Present();
+}
+
 // Notifies DirectDraw that the direct surface manipulations are complete.
 HRESULT __stdcall IDirectDrawSurfaceWrapper::Unlock(LPVOID lpRect)
 {
@@ -1094,12 +1099,14 @@ HRESULT __stdcall IDirectDrawSurfaceWrapper::Unlock(LPVOID lpRect)
 	IDirectDrawSurface7::Lock and IDirectDrawSurface7::Unlock methods. 
 	*/
 
+	currentddrawParent = ddrawParent;
+
 	// Present the surface
-	if(!ddrawParent->Present())
-	{
-		// Failed to presnt the surface, error reporting handled previously
-		return DDERR_GENERIC;
-	}
+	//if(!ddrawParent->Present())
+	//{
+	//	// Failed to presnt the surface, error reporting handled previously
+	//	return DDERR_GENERIC;
+	//}
 
 	// Success
 	return DD_OK;

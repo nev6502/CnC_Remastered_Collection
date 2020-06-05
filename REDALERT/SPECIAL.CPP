@@ -567,6 +567,8 @@ int Fetch_Difficulty(void)
 		*/
 		Call_Back();
 
+		Device_Present();
+
 #ifdef WIN32
 		/*
 		** Handle possible surface loss due to a focus switch

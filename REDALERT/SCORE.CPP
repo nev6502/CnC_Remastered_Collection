@@ -1705,8 +1705,8 @@ void Draw_Bar_Graphs(int i, int gkilled, int nkilled)
  *=========================================================================*/
 void Call_Back_Delay(int time)
 {
-	time;
-#if (0)//PG
+	Device_Present();
+
 	if (time < 0 ) time = 0;
 	if (time > 60) time = 60;
 	CDTimerClass<SystemTimerClass> cd;
@@ -1721,16 +1721,16 @@ void Call_Back_Delay(int time)
 	if (ControlQ) time=0;
 
 	cd = time;
-	StreamLowImpact = true;
+//	StreamLowImpact = true;
 	do {
 		if (callbackcd == 0) {
 			Call_Back();
 			callbackcd = TIMER_SECOND/4;
 		}
 		Animate_Score_Objs();
+		Device_Present();
 	} while (cd);
-	StreamLowImpact = false;
-#endif
+	//StreamLowImpact = false;
 }
 
 

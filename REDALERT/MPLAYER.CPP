@@ -252,6 +252,8 @@ GameType Select_MPlayer_Game (void)
 	process = true;
 	pressed = false;
 	while (process) {
+			Device_Present();
+
 			#ifdef WIN32
 			/*
 			** If we have just received input focus again after running in the background then

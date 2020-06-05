@@ -416,6 +416,8 @@ void Main_Game(int argc, char * argv[])
 						break;
 				}
 			}
+
+			Device_Present();
 		}
 #endif
 
@@ -502,6 +504,8 @@ void Main_Game(int argc, char * argv[])
 		}
 #endif	//WIN32
 #endif	//	!WOLAPI_INTEGRATION
+
+		Device_Present();
 	}
 
 	/*

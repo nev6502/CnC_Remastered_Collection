@@ -719,7 +719,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 	Keyboard->MouseQY = mousey;
 
 	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
-	//		flags = 0;
+	//		flags = 0;	
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
@@ -749,6 +749,8 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 			break;
 		}
 	}
+
+	Device_Present();
 }
 
 

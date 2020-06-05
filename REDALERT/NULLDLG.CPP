@@ -617,6 +617,7 @@ int Com_Scenario_Dialog(bool skirmish)
 oh_dear_its_a_label:
 
 	while (process) {
+		Device_Present();
 #if(SHOW_MONO)
 		if (!skirmish) {
 			NullModem.Mono_Debug_Print(0);
