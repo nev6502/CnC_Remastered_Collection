@@ -364,11 +364,6 @@ Theme.Stop();
 	/*
 	** If there's no briefing movie, restate the mission at the beginning.
 	*/
-#if 1 // 12/04/2019 - LLL
-	if (Session.Type == GAME_NORMAL && Scen.BriefMovie == VQ_NONE) {
-		Display_Briefing_Text_GlyphX();
-	}
-#else
 	char buffer[25];
 	if (Scen.BriefMovie != VQ_NONE) {
 		sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
@@ -382,7 +377,6 @@ Theme.Stop();
 		}
 		Restate_Mission(Scen.ScenarioName, TXT_OK, TXT_NONE);
 	}
-#endif
 
 	if (briefing) {
 		Hide_Mouse();
@@ -1395,7 +1389,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 	bool pressed;
 	int curbutton;
 	TextButtonClass * buttons[3];
-	BOOL display;									// display level
+	BOOL display = 1;									// display level
 	int  realval[5];
 	int  morebutton = 3;						// which button says "more": 2 or 3?
 
