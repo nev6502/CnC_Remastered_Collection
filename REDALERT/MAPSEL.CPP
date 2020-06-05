@@ -228,6 +228,10 @@ char const * Map_Selection(void)
 	bool done = 0;
 	MouseType shape = MOUSE_NORMAL;
 	while (!done) {
+		KeyNumType _key;
+		int _flags = 0;
+		WWSDL_ProcessEvents(_key, _flags);
+
 #ifdef WIN32
 		/*
 		** If we have just received input focus again after running in the background then
@@ -255,8 +259,8 @@ char const * Map_Selection(void)
 			timer = delay;
 			Set_Mouse_Cursor(xspot, yspot, Extract_Shape(MouseClass::MouseShapes, start + frame));
 		}
-		if (Keyboard->Check()) {
-			if ((Keyboard->Get() & 0x10FF) == KN_LMOUSE) {
+		if (_flags == KN_LMOUSE) {
+			{
 				if (choice != -1) {
 					done = 1;
 					selection = choice;

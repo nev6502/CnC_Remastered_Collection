@@ -120,6 +120,9 @@ class WWKeyboardClass
 		int Tail;
 };
 
+#define RA_SCANCODE_MASK (1<<30)
+#define RA_SCANCODE_TO_KEYCODE(X)  (X | RA_SCANCODE_MASK)
+
 #define	VK_NONE				  0x00
 #define	VK_LBUTTON          0x01
 #define	VK_RBUTTON          0x02
@@ -157,10 +160,10 @@ class WWKeyboardClass
 #define	VK_NEXT             0x22
 #define	VK_END              0x23
 #define	VK_HOME             0x24
-#define	VK_LEFT             0x25
-#define	VK_UP               0x26
-#define	VK_RIGHT            0x27
-#define	VK_DOWN             0x28
+#define	VK_LEFT             80
+#define	VK_UP               82
+#define	VK_RIGHT            79
+#define	VK_DOWN             81
 #define	VK_SELECT           0x29
 #define	VK_PRINT            0x2A
 #define	VK_EXECUTE          0x2B

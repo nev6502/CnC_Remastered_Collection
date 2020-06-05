@@ -562,23 +562,26 @@ short const * DisplayClass::Text_Overlap_List(char const * text, int x, int y) c
  *=============================================================================================*/
 void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 {
-	if (width == -1) {
-		TacLeptonWidth = Pixel_To_Lepton(SeenBuff.Get_Width()-x);
-	} else {
-		TacLeptonWidth = width * CELL_LEPTON_W;
-	}
+	//if (width == -1) {
+	//	TacLeptonWidth = Pixel_To_Lepton(SeenBuff.Get_Width()-x);
+	//} else {
+	//	TacLeptonWidth = width * CELL_LEPTON_W;
+	//}
+	TacLeptonWidth = Pixel_To_Lepton(SeenBuff.Get_Width() - x);
 
 	// ST - 3/1/2019 12:05PM
 	// Made the below code more consistent with the width calculation. This is needed if we aren't going to draw the tabs at the top of the screen
 	//
-	if (height == -1) {
-		TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
-		//height = (SeenBuff.Get_Height()-y) / CELL_PIXEL_H;
-	}
-	else {
-		TacLeptonHeight = height * CELL_LEPTON_H;
-	}
+	//if (height == -1) {
+	//	TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
+	//	//height = (SeenBuff.Get_Height()-y) / CELL_PIXEL_H;
+	//}
+	//else {
+	//	TacLeptonHeight = height * CELL_LEPTON_H;
+	//}
 	//TacLeptonHeight = height * CELL_LEPTON_H;
+
+	TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
 
 	/*
 	**	Adjust the tactical cell if it is now in an invalid position
@@ -4228,11 +4231,11 @@ void DisplayClass::Set_Tactical_Position(COORDINATE coord)
 	/*
 	**	Bound the desired location to fit the legal map edges.
 	*/
-	int xx = 0;// (int)Coord_X(coord) - (int)Cell_To_Lepton(MapCellX);
-	int yy = 0;// (int)Coord_Y(coord) - (int)Cell_To_Lepton(MapCellY);
+	int xx = (int)Coord_X(coord) - (int)Cell_To_Lepton(MapCellX);
+	int yy = (int)Coord_Y(coord) - (int)Cell_To_Lepton(MapCellY);
 
-	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) + GlyphXClientSidebarWidthInLeptons, Cell_To_Lepton(MapCellHeight));		// Needed to accomodate Glyphx client sidebar. ST - 4/12/2019 5:29PM
-//	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth), Cell_To_Lepton(MapCellHeight));
+//	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) + GlyphXClientSidebarWidthInLeptons, Cell_To_Lepton(MapCellHeight));		// Needed to accomodate Glyphx client sidebar. ST - 4/12/2019 5:29PM
+	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth), Cell_To_Lepton(MapCellHeight));
 	coord = XY_Coord(xx + Cell_To_Lepton(MapCellX), yy + Cell_To_Lepton(MapCellY));
 
 	if (ScenarioInit) {
