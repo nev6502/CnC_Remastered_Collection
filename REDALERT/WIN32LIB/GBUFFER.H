@@ -974,6 +974,8 @@ inline BOOL	GraphicViewPortClass::Scale(	GraphicViewPortClass &dest, char *remap
  * HISTORY:                                                                *
  *   01/17/1995 PWG : Created.                                             *
  *=========================================================================*/
+
+void Device_Present(void);
 inline unsigned long	GraphicViewPortClass::Print(char const *str, int x, int y, int fcol, int bcol)
 {
 	unsigned long	return_code=0;
@@ -981,6 +983,8 @@ inline unsigned long	GraphicViewPortClass::Print(char const *str, int x, int y, 
 		return_code = (Buffer_Print(this, str, x, y, fcol, bcol));
 	}
 	Unlock();
+
+	Device_Present();
 	return ( return_code );
 }
 
