@@ -447,7 +447,7 @@ void RadarClass::Draw_It(bool forced)
 	*/
 	if (IsPlayerNames) {
 		Draw_Names();
-		IsToRedraw = false;
+	//	IsToRedraw = false;
 		BEnd(BENCH_RADAR);
 		return;
 	}
@@ -456,7 +456,7 @@ void RadarClass::Draw_It(bool forced)
 	** If in spy-on-radar facility mode, draw the appropriate info.
 	*/
 	if (IsHouseSpy) {
-		IsToRedraw = false;
+		//IsToRedraw = false;
 		if (Draw_House_Info()) {
 			BEnd(BENCH_RADAR);
 			return;
@@ -468,7 +468,7 @@ void RadarClass::Draw_It(bool forced)
 		Map.Repair.Draw_Me(true);
 		Map.Upgrade.Draw_Me(true);
 		Map.Zoom.Draw_Me(true);
-		IsToRedraw = false;
+		//IsToRedraw = false;
 		BEnd(BENCH_RADAR);
 		return;
 	}
@@ -486,7 +486,7 @@ void RadarClass::Draw_It(bool forced)
 			**	only these.
 			*/
 			if (!forced && IsToRedraw && !FullRedraw && !IsPulseActive) {
-				IsToRedraw = false;
+				//IsToRedraw = false;
 
 				if (PixelPtr) {
 
@@ -579,8 +579,8 @@ void RadarClass::Draw_It(bool forced)
 				}
 
 				Radar_Cursor(true);
-				FullRedraw = false;
-				IsToRedraw = false;
+				//FullRedraw = false;
+				//IsToRedraw = false;
 
 				Map.Repair.Draw_Me(true);
 				Map.Upgrade.Draw_Me(true);
@@ -602,8 +602,8 @@ void RadarClass::Draw_It(bool forced)
 			*/
 			int val = (DoesRadarExist) ?  MAX_RADAR_FRAMES : 0;
 			CC_Draw_Shape(RadarAnim, val, RadX, RadY + (1 * RESFACTOR), WINDOW_MAIN, SHAPE_NORMAL);
-			FullRedraw = false;
-			IsToRedraw = false;
+			//FullRedraw = false;
+			//IsToRedraw = false;
 
 			if (RunningAsDLL) {
 				BEnd(BENCH_RADAR);

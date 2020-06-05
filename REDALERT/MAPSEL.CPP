@@ -261,6 +261,7 @@ char const * Map_Selection(void)
 		}
 		if (_flags == KN_LMOUSE) {
 			{
+				choice = 0;
 				if (choice != -1) {
 					done = 1;
 					selection = choice;

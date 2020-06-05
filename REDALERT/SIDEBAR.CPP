@@ -779,7 +779,7 @@ void SidebarClass::Draw_It(bool complete)
 	BStart(BENCH_SIDEBAR);
 
 	if (IsSidebarActive && (IsToRedraw || complete) && !Debug_Map) {
-		IsToRedraw = false;
+	//	IsToRedraw = false;
 
 		if (LogicPage->Lock()) {
 			/*
@@ -814,7 +814,7 @@ void SidebarClass::Draw_It(bool complete)
 			Zoom.Draw_Me(true);
 		}
 	}
-	IsToRedraw = false;
+	//IsToRedraw = false;
 
 	BEnd(BENCH_SIDEBAR);
 }
@@ -1695,7 +1695,7 @@ bool SidebarClass::StripClass::AI(KeyNumType & input, int , int )
 void SidebarClass::StripClass::Draw_It(bool complete)
 {
 	if (IsToRedraw || complete) {
-		IsToRedraw = false;
+	//	IsToRedraw = false;
 
 		if (RunningAsDLL) {
 			return;
