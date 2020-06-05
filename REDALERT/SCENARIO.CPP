@@ -2382,9 +2382,11 @@ bool Read_Scenario_INI(char * fname, bool )
 		PlayerPtr->Credits += carryover;
 		PlayerPtr->Control.InitialCredits += carryover;
 	} else {
-		//Call the new Assign_Houses function. ST - 8/8/2019 12:35PM
-		//Assign_Houses();
-		GlyphX_Assign_Houses();
+// jmarshall - Thanks Iran and OmniBlade from the Choronoshift Discord!
+//			   This fixes ai building player controlled factions.
+		Assign_Houses();
+		//GlyphX_Assign_Houses();
+// jmarshall end
 	}
 	PlayerPtr->IsHuman = true;
 	PlayerPtr->IsPlayerControl = true;
