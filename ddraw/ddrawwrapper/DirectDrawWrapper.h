@@ -241,6 +241,7 @@ private:
  */
 class FAR IDirectDrawSurfaceWrapper : public IDirectDrawSurface
 {
+	friend void Device_Present(void);
 // Implemented interfaces
 public:
 	IDirectDrawSurfaceWrapper() { attachedPalette = NULL; }

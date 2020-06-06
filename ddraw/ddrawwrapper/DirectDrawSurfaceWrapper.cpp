@@ -1042,13 +1042,39 @@ HRESULT __stdcall IDirectDrawSurfaceWrapper::SetPalette(LPDIRECTDRAWPALETTE lpDD
 }
 
 IDirectDrawWrapper* currentddrawParent = nullptr;
+IDirectDrawSurfaceWrapper* currentSurfaceWrapper = nullptr;
 void Device_Present(void) {
+	extern byte* raw_image_buffer;
+
+	// Translate all of raw video memory to rgb video memory with palette
+	if (raw_image_buffer == NULL)
+	{
+		for (long i = 0; i < currentSurfaceWrapper->surfaceWidth * currentSurfaceWrapper->surfaceHeight; i++)
+		{
+			currentSurfaceWrapper->rgbVideoMem[i] = currentSurfaceWrapper->attachedPalette->rgbPalette[currentSurfaceWrapper->rawVideoMem[i]];
+		}
+	}
+	else
+	{
+		byte* rgbVideoMemRaw = (byte*)currentSurfaceWrapper->rgbVideoMem;
+		for (long i = 0; i < currentSurfaceWrapper->surfaceWidth * currentSurfaceWrapper->surfaceHeight; i++)
+		{
+			//rgbVideoMem[i] = hackPaletteLookup[rawVideoMem[i]];
+			rgbVideoMemRaw[(i * 4) + 0] = raw_image_buffer[(currentSurfaceWrapper->rawVideoMem[i] * 3) + 2];
+			rgbVideoMemRaw[(i * 4) + 1] = raw_image_buffer[(currentSurfaceWrapper->rawVideoMem[i] * 3) + 1];
+			rgbVideoMemRaw[(i * 4) + 2] = raw_image_buffer[(currentSurfaceWrapper->rawVideoMem[i] * 3) + 0];
+			rgbVideoMemRaw[(i * 4) + 3] = 255;
+		}
+	}
+
 	currentddrawParent->Present();
 }
 
 // Notifies DirectDraw that the direct surface manipulations are complete.
 HRESULT __stdcall IDirectDrawSurfaceWrapper::Unlock(LPVOID lpRect)
 {
+	currentSurfaceWrapper = this;
+
 	char message[2048] = "\0";
 
 	// NOTE: Disabled for performance
@@ -1064,29 +1090,10 @@ HRESULT __stdcall IDirectDrawSurfaceWrapper::Unlock(LPVOID lpRect)
 	}*/
 	
 	// Always unlock full rect(fix)
-	extern byte* raw_image_buffer;
+	
 	//int* hackPaletteLookup = (int*)&raw_image_buffer[0];
 
-	// Translate all of raw video memory to rgb video memory with palette
-	if (raw_image_buffer == NULL)
-	{
-		for (long i = 0; i < surfaceWidth * surfaceHeight; i++)
-		{
-			rgbVideoMem[i] = attachedPalette->rgbPalette[rawVideoMem[i]];
-		}
-	}
-	else
-	{
-		byte* rgbVideoMemRaw = (byte*)rgbVideoMem;
-		for (long i = 0; i < surfaceWidth * surfaceHeight; i++)
-		{
-			//rgbVideoMem[i] = hackPaletteLookup[rawVideoMem[i]];
-			rgbVideoMemRaw[(i * 4) + 0] = raw_image_buffer[(rawVideoMem[i] * 3) + 2];
-			rgbVideoMemRaw[(i * 4) + 1] = raw_image_buffer[(rawVideoMem[i] * 3) + 1];
-			rgbVideoMemRaw[(i * 4) + 2] = raw_image_buffer[(rawVideoMem[i] * 3) + 0];
-			rgbVideoMemRaw[(i * 4) + 3] = 255;
-		}
-	}
+
 
 	/*
 	A pointer to a RECT structure that was used to lock the surface in the corresponding 
