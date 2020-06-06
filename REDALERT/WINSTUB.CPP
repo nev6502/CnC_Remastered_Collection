@@ -732,7 +732,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 			}
 			else if (event.button.button == SDL_BUTTON_RIGHT) {
 				flags = GadgetClass::RIGHTPRESS;
-				key = KN_LMOUSE;
+				key = KN_RMOUSE;
 			}
 			break;
 

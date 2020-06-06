@@ -209,7 +209,7 @@ void Setup_Menu(int menu, char const * text[], unsigned long field, int index, i
 /*	INPUTS:																						*/
 /*	RETURNS:																						*/
 /*=========================================================================*/
-int Check_Menu(int menu, char const * text[], char *, long field, int index)
+int Check_Menu(int menu, char const * text[], char *, long field, int index, KeyNumType _key)
 {
 	int maxitem,select,key,menuy,menux;
 	int mx1,mx2,my1,my2,tempy;
@@ -236,14 +236,20 @@ int Check_Menu(int menu, char const * text[], char *, long field, int index)
 	**	present. If no keystroke is pending then simple mouse tracking will
 	**	be done.
 	*/
-	key = 0;
-	UnknownKey = 0;
-	if (Keyboard->Check()) {
+	if (_key == KN_NONE)
+	{
+		key = 0;
+		UnknownKey = 0;
+		if (Keyboard->Check()) {
 #ifdef WIN32
-		key = (Keyboard->Get() & ~(WWKEY_SHIFT_BIT|WWKEY_ALT_BIT|WWKEY_CTRL_BIT) );			/* mask off all but release bit	*/
+			key = (Keyboard->Get() & ~(WWKEY_SHIFT_BIT | WWKEY_ALT_BIT | WWKEY_CTRL_BIT));			/* mask off all but release bit	*/
 #else
-		key = (Keyboard->Get()&0x08FF);			/* mask off all but release bit	*/
+			key = (Keyboard->Get() & 0x08FF);			/* mask off all but release bit	*/
 #endif
+		}
+	}
+	else {
+		key = _key;
 	}
 
 	/*
@@ -432,8 +438,13 @@ int Do_Menu(char const ** strings, bool )
 	selection = -1;
 	UnknownKey = 0;
 	while (selection == -1) {
+// jmarshall
+		KeyNumType _key = KN_NONE;
+		int _flags;
+		WWSDL_ProcessEvents(_key, _flags);
+// jmarshall end
 		Call_Back();
-		selection = Check_Menu(0, strings, NULL, 0xFFL, 0);
+		selection = Check_Menu(0, strings, NULL, 0xFFL, 0, _key);
 		if (UnknownKey != 0 || UnknownKey == KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) break;
 	}
 	Keyboard->Clear();

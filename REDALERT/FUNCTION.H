@@ -734,7 +734,7 @@ int Coord_Spillage_Number(COORDINATE coord, int maxsize);
 **	MENUS.CPP
 */
 void Setup_Menu(int menu, char const *text[], unsigned long field, int index, int skip);
-int Check_Menu(int menu, char const *text[], char *selection, long field, int index);
+int Check_Menu(int menu, char const *text[], char *selection, long field, int index, KeyNumType _key = KN_NONE);
 int Do_Menu(char const **strings, bool blue);
 extern int UnknownKey;
 int Main_Menu(unsigned long timeout);
