@@ -712,7 +712,9 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
+	static int numFramesLMouse = 0;
 	extern int mousex, mousey;
+	bool leftMouseProcessed = false;
 	SDL_GetMouseState(&mousex, &mousey);
 
 	Keyboard->MouseQX = mousex;
@@ -728,9 +730,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 		case SDL_MOUSEBUTTONDOWN:
 			if (event.button.button == SDL_BUTTON_LEFT) {
 				flags = GadgetClass::LEFTPRESS;
+				leftMouseProcessed = true;
+				numFramesLMouse++;
 				key = KN_LMOUSE;
 			}
 			else if (event.button.button == SDL_BUTTON_RIGHT) {
+				numFramesLMouse = 0;
 				flags = GadgetClass::RIGHTPRESS;
 				key = KN_RMOUSE;
 			}
@@ -739,9 +744,11 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 		case SDL_MOUSEBUTTONUP:
 			if (event.button.button == SDL_BUTTON_LEFT) {
 				flags = GadgetClass::LEFTRELEASE;
+				numFramesLMouse = 0;
 			}
 			else if (event.button.button == SDL_BUTTON_RIGHT) {
 				flags = GadgetClass::RIGHTRELEASE;
+				numFramesLMouse = 0;
 			}
 			break;
 		case SDL_KEYDOWN:
@@ -749,6 +756,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 			break;
 		}
 	}
+
+	if (!leftMouseProcessed && numFramesLMouse != 0)
+		flags = GadgetClass::LEFTHELD;
 
 	Device_Present();
 }
