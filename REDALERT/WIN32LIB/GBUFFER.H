@@ -983,8 +983,7 @@ inline unsigned long	GraphicViewPortClass::Print(char const *str, int x, int y, 
 		return_code = (Buffer_Print(this, str, x, y, fcol, bcol));
 	}
 	Unlock();
-
-	Device_Present();
+	
 	return ( return_code );
 }
 
