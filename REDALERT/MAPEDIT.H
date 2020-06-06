@@ -335,6 +335,7 @@ class MapEditClass : public MouseClass
 		static char HealthBuf[20];
 		GaugeClass *BaseGauge;
 		TextLabelClass *BaseLabel;
+public:
 		static MissionType MapEditMissions[];
 };
 

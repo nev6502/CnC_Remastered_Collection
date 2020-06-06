@@ -47,17 +47,7 @@
  *   DynamicVectorClass<T>::ID -- Find matching value in the dynamic vector.                   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#ifndef VECTOR_H
-#define VECTOR_H
-
-#ifdef NEVER
-#ifndef false
-#define false 0
-#endif
-#ifndef true
-#define true 1
-#endif
-#endif
+#pragma once
 
 #include	<stdlib.h>
 #include	<stddef.h>
@@ -1008,5 +998,3 @@ int VectorClass<T>::Resize(unsigned newsize, T const * array)
 	}
 	return(true);
 }
-
-#endif

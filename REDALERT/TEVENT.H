@@ -32,9 +32,7 @@
  * Functions:                                                                                  *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-
-#ifndef TEVENT_H
-#define TEVENT_H
+#pragma once
 
 /*
 **	These are the trigger events that are checked for and if qualified, they will signal
@@ -180,6 +178,3 @@ class EventChoiceClass {
 };
 
 extern EventChoiceClass EventChoices[TEVENT_COUNT];
-
-
-#endif

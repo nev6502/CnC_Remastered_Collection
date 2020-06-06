@@ -73,7 +73,7 @@ MissionType MapEditClass::MapEditMissions[] = {
 	MISSION_HUNT,
 	MISSION_SLEEP,
 };
-#define NUM_EDIT_MISSIONS (sizeof(MapEditClass::MapEditMissions) / sizeof(MapEditClass::MapEditMissions[0]))
+const int NUM_EDIT_MISSIONS = (sizeof(MapEditClass::MapEditMissions) / sizeof(MapEditClass::MapEditMissions[0]));
 
 
 /*
@@ -1282,7 +1282,8 @@ void MapEditClass::AI(KeyNumType & input, int x, int y)
 				/*
 				**	Derive strength from current gauge reading
 				*/
-				strength = CurrentObject[0]->Class_Of().MaxStrength * fixed(HealthGauge->Get_Value(), 256);
+				int val = fixed(HealthGauge->Get_Value(), 256);
+				strength = CurrentObject[0]->Class_Of().MaxStrength * val;
 //				strength = Fixed_To_Cardinal((unsigned)CurrentObject[0]->Class_Of().MaxStrength, (unsigned)HealthGauge->Get_Value());
 
 				/*

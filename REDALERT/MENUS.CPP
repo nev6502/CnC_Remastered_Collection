@@ -42,6 +42,9 @@
 
 #include <sdl.h>
 
+#undef RESFACTOR
+#define RESFACTOR (2 + (ScreenWidth / 640))
+
 /*****************************
 **	Function prototypes
 ******************************/

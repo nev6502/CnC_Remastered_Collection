@@ -613,7 +613,7 @@ NeedType TeamMission_Needs(TeamMissionType tmtype)
  * HISTORY:                                                                                    *
  *   01/05/1996 JLB : Created.                                                                 *
  *=============================================================================================*/
-void TeamMissionClass::Draw_It(int index, int x, int y, int width, int height, bool selected, TextPrintType flags)
+void TeamMissionClass::Draw_It(int index, int x, int y, int width, int height, bool selected, TextPrintType flags) const
 {
 	RemapControlType * scheme = GadgetClass::Get_Color_Scheme();
 	static int _tabs[] = {13,40};
@@ -937,7 +937,7 @@ bool TeamTypeClass::Edit(void)
 	mlist.Set_Selected_Index(0);
 	mlist.Add_Tail(*commands);
 
-	TListClass<TeamMissionClass *> missionlist2(BUTTON_MISSION2, missionlist1.X+60, missionlist1.Y+22, 240, 8*7,
+	TListClass<const TeamMissionClass *> missionlist2(BUTTON_MISSION2, missionlist1.X+60, missionlist1.Y+22, 240, 8*7,
 		TPF_EFNT | TPF_NOSHADOW,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
@@ -1225,7 +1225,7 @@ bool TeamTypeClass::Edit(void)
 			*/
 			case BUTTON_REPLACE | KN_BUTTON:
 				if (missionlist2.Count()) {
-					TeamMissionClass * tm = missionlist2.Current_Item();
+					TeamMissionClass * tm = (TeamMissionClass *)missionlist2.Current_Item();
 					tm->Mission = TeamMissionType(missionlist1.Current_Index());
 					tm->Data.Value = 0;
 					switch (TeamMission_Needs(tm->Mission)) {
@@ -1274,7 +1274,7 @@ bool TeamTypeClass::Edit(void)
 			*/
 			case BUTTON_DELETE | KN_BUTTON:
 				if (missionlist2.Count()) {
-					TeamMissionClass * tm = missionlist2.Current_Item();
+					TeamMissionClass * tm = (TeamMissionClass*)missionlist2.Current_Item();
 					missionlist2.Remove_Index(missionlist2.Current_Index());
 					delete tm;
 				}

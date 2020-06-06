@@ -79,7 +79,7 @@ class TeamMissionClass
 		char const * Description(int index) const;
 		operator const char * () const {return(Description(0));};
 #endif
-		void Draw_It(int index, int x, int y, int width, int height, bool selected, TextPrintType flags);
+		void Draw_It(int index, int x, int y, int width, int height, bool selected, TextPrintType flags) const;
 
 		TeamMissionType Mission;		// Mission type.
 		union {

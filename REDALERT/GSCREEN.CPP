@@ -394,7 +394,6 @@ void GScreenClass::Render(void)
 	//	IsToRedraw = true;
 	//}
 
-
 	if (IsToUpdate || IsToRedraw) {
 		BStart(BENCH_GSCREEN_RENDER);
 

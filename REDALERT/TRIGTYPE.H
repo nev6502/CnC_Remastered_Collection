@@ -33,8 +33,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-#ifndef TRIGTYPE_H
-#define TRIGTYPE_H
+#pragma  once
 
 #include	"tevent.h"
 #include	"taction.h"
@@ -145,5 +144,3 @@ class TriggerTypeClass : public AbstractTypeClass
 		void Draw_It(int index, int x, int y, int width, int height, bool selected, TextPrintType flags) const;
 };
 
-
-#endif

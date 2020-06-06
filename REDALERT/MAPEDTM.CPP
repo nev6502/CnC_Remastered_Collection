@@ -251,7 +251,7 @@ int MapEditClass::Select_Team(char const * )
 	*/
 	GadgetClass * commands = NULL;				// the button list
 
-	TListClass<CCPtr<TeamTypeClass> > teamlist (TEAM_LIST,
+	TListClass<const TeamTypeClass *> teamlist (TEAM_LIST,
 		D_LIST_X, D_LIST_Y, D_LIST_W, D_LIST_H,
 		TPF_EFNT | TPF_NOSHADOW,
 		MFCD::Retrieve("EBTN-UP.SHP"),
@@ -280,11 +280,11 @@ int MapEditClass::Select_Team(char const * )
 
 	if (CurTeam) {
 		teamlist.Set_Selected_Index(CurTeam);
-		CurTeam = teamlist.Current_Item();
+		CurTeam = (TeamTypeClass *)teamlist.Current_Item();
 	} else {
 		teamlist.Set_Selected_Index(0);
 		if (TeamTypes.Count()) {
-			CurTeam = teamlist.Current_Item();
+			CurTeam = (TeamTypeClass*)teamlist.Current_Item();
 		}
 	}
 
@@ -337,7 +337,7 @@ int MapEditClass::Select_Team(char const * )
 		*/
 		switch (input) {
 			case (TEAM_LIST | KN_BUTTON):
-				CurTeam = teamlist.Current_Item();
+				CurTeam = (TeamTypeClass*)teamlist.Current_Item();
 				break;
 
 			case (BUTTON_EDIT | KN_BUTTON):

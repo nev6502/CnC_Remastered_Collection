@@ -3591,7 +3591,7 @@ static void Init_Keys(void)
 
 	FastKey = ini.Get_PKey(true);
 #ifdef SCENARIO_EDITOR
-	SlowKey = ini.Get_PKey(false);
+	//SlowKey = ini.Get_PKey(false);
 #endif
 }
 

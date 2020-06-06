@@ -2574,7 +2574,7 @@ int MapEditClass::Select_Trigger(void)
 	*/
 	ControlClass * commands = NULL;				// the button list
 
-	TListClass<CCPtr<TriggerTypeClass> > triggerlist(TRIGGER_LIST, D_LIST_X, D_LIST_Y, D_LIST_W, D_LIST_H,
+	TListClass<const TriggerTypeClass *> triggerlist(TRIGGER_LIST, D_LIST_X, D_LIST_Y, D_LIST_W, D_LIST_H,
 		TPF_EFNT|TPF_NOSHADOW,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
@@ -2610,7 +2610,7 @@ int MapEditClass::Select_Trigger(void)
 	if (TriggerTypes.Count()==0) {
 		CurTrigger = NULL;
 	} else {
-		CurTrigger = triggerlist.Current_Item();
+		CurTrigger = (TriggerTypeClass *)triggerlist.Current_Item();
 //		if (!CurTrigger) {
 //			CurTrigger = &*triggerlist.Current_Item();
 //		}
@@ -2660,7 +2660,7 @@ int MapEditClass::Select_Trigger(void)
 		*/
 		switch (input) {
 			case (TRIGGER_LIST | KN_BUTTON):
-				CurTrigger = &*triggerlist.Current_Item();
+				CurTrigger = (TriggerTypeClass *)&*triggerlist.Current_Item();
 //				CurTrigger = (TriggerTypeClass *)&*triggerlist.Current_Item();
 				break;
 
