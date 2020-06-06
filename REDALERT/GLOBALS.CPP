@@ -41,7 +41,7 @@ bool Debug_Quiet = false;
 bool Debug_Cheat = false;
 bool Debug_Remap = false;
 bool Debug_Icon = false;
-bool Debug_Flag = false;
+bool Debug_Flag = true;
 bool Debug_Lose = false;
 bool Debug_Win = false;
 bool Debug_Map = false;					// true = map editor mode

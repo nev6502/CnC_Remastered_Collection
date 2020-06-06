@@ -578,7 +578,7 @@ typedef enum KeyNumType {
 	KN_F10				= VK_F10,
 	KN_F11				= VK_F11,
 	KN_F12				= VK_F12,
-	KN_F2					= VK_F2,
+	KN_F2					= 59,
 	KN_F3					= VK_F3,
 	KN_F4					= VK_F4,
 	KN_F5					= VK_F5,
