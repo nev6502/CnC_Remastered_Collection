@@ -2812,13 +2812,13 @@ typedef enum BenchType : unsigned char {
 } BenchType;
 
 
-#ifdef CHEAT_KEYS
-#define	BStart(a)	if (Benches != NULL) Benches[a].Begin()
-#define	BEnd(a)		if (Benches != NULL) Benches[a].End()
-#else
+//#ifdef CHEAT_KEYS
+//#define	BStart(a)	if (Benches != NULL) Benches[a].Begin()
+//#define	BEnd(a)		if (Benches != NULL) Benches[a].End()
+//#else
 #define	BStart(a)
 #define	BEnd(a)
-#endif
+//#endif
 
 
 /**********************************************************************

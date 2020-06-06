@@ -869,12 +869,6 @@ void GlyphX_Assign_Houses(void)
 	srand(timeGetTime());
 
 	/*
-	** Use pre-selected start locations as long as at least one has been defined, otherwise let the original code
-	** in SCENARIO.CPP figure it out
-	*/
-	UseGlyphXStartLocations = false;
-
-	/*
 	** Assign random start positions if needed.
 	*/
 	int random_start_locations[26];
@@ -886,7 +880,6 @@ void GlyphX_Assign_Houses(void)
 			for (j = 0; !preassigned && (j < Session.Players.Count()); j++) {
 				if (MPlayerStartLocations[j] == num_start_locations) {
 					preassigned = true;
-					UseGlyphXStartLocations = true;
 				}
 			}
 			if (!preassigned) {

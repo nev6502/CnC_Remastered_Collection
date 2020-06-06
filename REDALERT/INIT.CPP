@@ -199,9 +199,9 @@ bool Init_Game(int , char * [])
 	**	compile flags indicate.
 	*/
 	#ifdef CHEAT_KEYS
-	if (Processor() >= 2) {
-		Benches = new Benchmark [BENCH_COUNT];
-	}
+	//if (Processor() >= 2) {
+	//	Benches = new Benchmark [BENCH_COUNT];
+	//}
 	#endif
 
 	/*

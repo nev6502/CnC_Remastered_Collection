@@ -71,7 +71,6 @@ extern int PreserveVQAScreen;
 void Display_Briefing_Text_GlyphX();
 
 extern void GlyphX_Assign_Houses(void);	//ST - 8/8/2019 12:35PM
-extern bool UseGlyphXStartLocations;		//ST - 3/31/2020 9:54AM
 
 //#include "WolDebug.h"
 
@@ -2888,7 +2887,6 @@ static void Remove_AI_Players(void)
 	HousesType house;
 	HouseClass * housep;
 
-#if (0)
 	for (i = 0; i < MAX_PLAYERS; i++) {
 		house = (HousesType)(i + (int)HOUSE_MULTI1);
 		housep = HouseClass::As_Pointer (house);
@@ -2899,21 +2897,6 @@ static void Remove_AI_Players(void)
 			}
 		}
 	}
-#else
-	/*
-	** AI players are set up like human players now. ST - 8/13/2019 1:32PM
-	*/
-	for (i = 0; i < MAX_PLAYERS; i++) {
-		if (i >= Session.Players.Count()) {
-			house = (HousesType)(i + (int)HOUSE_MULTI1);
-			housep = HouseClass::As_Pointer (house);
-			if (housep->IsHuman == false) {
-				housep->Clobber_All();
-			}
-		}
-	}
-
-#endif
 }
 
 
@@ -3092,17 +3075,11 @@ static void Create_Units(bool official)
 	**	if there are 4 or fewer players. Unofficial maps will pick from all the
 	**	available waypoints.
 	*/
-#ifndef USE_GLYPHX_START_LOCATIONS
 	int look_for = max(4, Session.Players.Count()+Session.Options.AIPlayers);
 	if (!official) {
 		look_for = 8;
 	}
-#else
-	/*
-	** We allow the users to choose from all available start positions, even on official maps. ST - 1/15/2020 9:19AM
-	*/
-	int look_for = Session.Players.Count();
-#endif
+
 		
 	for (int waycount = 0; waycount < 26; waycount++) {
 //	for (int waycount = 0; waycount < max(4, Session.Players.Count()+Session.Options.AIPlayers); waycount++) {
@@ -3156,71 +3133,61 @@ static void Create_Units(bool official)
 		**	one of the valid locations at random. The other houses pick the furthest
 		**	wapoint from the existing houses.
 		*/
-		if (!UseGlyphXStartLocations) {
-		
-			if (numtaken == 0) {
-				int pick = Random_Pick(0, num_waypts-1);
-				centroid = waypts[pick];
-				taken[pick] = true;
-				numtaken++;
-			} else {
+		if (numtaken == 0) {
+			int pick = Random_Pick(0, num_waypts - 1);
+			centroid = waypts[pick];
+			taken[pick] = true;
+			numtaken++;
+		}
+		else {
+
+			/*
+			**	Set all waypoints to have a score of zero in preparation for giving
+			**	a distance score to all waypoints.
+			*/
+			int score[26];
+			memset(score, '\0', sizeof(score));
+
+			/*
+			**	Scan through all waypoints and give a score as a value of the sum
+			**	of the distances from this waypoint to all taken waypoints.
+			*/
+			for (int index = 0; index < num_waypts; index++) {
 
 				/*
-				**	Set all waypoints to have a score of zero in preparation for giving
-				**	a distance score to all waypoints.
+				**	If this waypoint has not already been taken, then accumulate the
+				**	sum of the distance between this waypoint and all other taken
+				**	waypoints.
 				*/
-				int score[26];
-				memset(score, '\0', sizeof(score));
+				if (!taken[index]) {
+					for (int trypoint = 0; trypoint < num_waypts; trypoint++) {
 
-				/*
-				**	Scan through all waypoints and give a score as a value of the sum
-				**	of the distances from this waypoint to all taken waypoints.
-				*/
-				for (int index = 0; index < num_waypts; index++) {
-
-					/*
-					**	If this waypoint has not already been taken, then accumulate the
-					**	sum of the distance between this waypoint and all other taken
-					**	waypoints.
-					*/
-					if (!taken[index]) {
-						for (int trypoint = 0; trypoint < num_waypts; trypoint++) {
-
-							if (taken[trypoint]) {
-								score[index] += Distance(Cell_Coord(waypts[index]), Cell_Coord(waypts[trypoint]));
-							}
+						if (taken[trypoint]) {
+							score[index] += Distance(Cell_Coord(waypts[index]), Cell_Coord(waypts[trypoint]));
 						}
 					}
 				}
-
-				/*
-				**	Now find the waypoint with the largest score. This waypoint is the one
-				**	that is furthest from all other taken waypoints.
-				*/
-				int best = 0;
-				int bestvalue = 0;
-				for (int searchindex = 0; searchindex < num_waypts; searchindex++) {
-					if (score[searchindex] > bestvalue || bestvalue == 0) {
-						bestvalue = score[searchindex];
-						best = searchindex;
-					}
-				}
-
-				/*
-				**	Assign this best position to the house.
-				*/
-				centroid = waypts[best];
-				taken[best] = true;
-				numtaken++;
 			}
-		} else {
-			
+
 			/*
-			** New code that respects the start locations passed in from GlyphX.
-			**
-			** ST - 1/8/2020 3:39PM
+			**	Now find the waypoint with the largest score. This waypoint is the one
+			**	that is furthest from all other taken waypoints.
 			*/
-			centroid = waypts[hptr->StartLocationOverride];
+			int best = 0;
+			int bestvalue = 0;
+			for (int searchindex = 0; searchindex < num_waypts; searchindex++) {
+				if (score[searchindex] > bestvalue || bestvalue == 0) {
+					bestvalue = score[searchindex];
+					best = searchindex;
+				}
+			}
+
+			/*
+			**	Assign this best position to the house.
+			*/
+			centroid = waypts[best];
+			taken[best] = true;
+			numtaken++;
 		}
 
 		/*

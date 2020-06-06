@@ -52,6 +52,7 @@ typedef int bool;
 #endif
 #endif
 
+#pragma warning(disable : 4005)
 
 typedef enum {
 	WWKEY_SHIFT_BIT	= 0x100,
@@ -579,8 +580,8 @@ typedef enum KeyNumType {
 	KN_F11				= VK_F11,
 	KN_F12				= VK_F12,
 	KN_F2					= 59,
-	KN_F3					= VK_F3,
-	KN_F4					= VK_F4,
+	KN_F3					= 60,
+	KN_F4					= 61,
 	KN_F5					= VK_F5,
 	KN_F6					= VK_F6,
 	KN_F7					= VK_F7,

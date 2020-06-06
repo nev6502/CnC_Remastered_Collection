@@ -332,7 +332,7 @@ void Debug_Key(unsigned input)
 				}
 				break;
 
-			case ((int)KN_F4 | (int)KN_CTRL_BIT):
+			case ((int)KN_F4):
 				Debug_Unshroud = (Debug_Unshroud == false);
 				Map.Flag_To_Redraw(true);
 				break;
@@ -363,21 +363,22 @@ void Debug_Key(unsigned input)
  *=============================================================================================*/
 static char const * Bench_Time(BenchType btype)
 {
-	static char buffer[32];
-
-	int rootcount = Benches[BENCH_GAME_FRAME].Count();
-	if (rootcount == 0) rootcount = 1;
-	int roottime = Benches[BENCH_GAME_FRAME].Value();
-	int count = Benches[btype].Count();
-	int time = Benches[btype].Value();
-	if (count > 0 && count * time > roottime * rootcount) time = roottime / count;
-	int percent = 0;
-	if (roottime != 0 && rootcount != 0) {
-		percent = ((count * time) * 99) / (roottime * rootcount);
-	}
-	if (percent > 99) percent = 99;
-	sprintf(buffer, "%-2d%% %7d", percent, time);
-	return(buffer);
+	//static char buffer[32];
+	//
+	//int rootcount = Benches[BENCH_GAME_FRAME].Count();
+	//if (rootcount == 0) rootcount = 1;
+	//int roottime = Benches[BENCH_GAME_FRAME].Value();
+	//int count = Benches[btype].Count();
+	//int time = Benches[btype].Value();
+	//if (count > 0 && count * time > roottime * rootcount) time = roottime / count;
+	//int percent = 0;
+	//if (roottime != 0 && rootcount != 0) {
+	//	percent = ((count * time) * 99) / (roottime * rootcount);
+	//}
+	//if (percent > 99) percent = 99;
+	//sprintf(buffer, "%-2d%% %7d", percent, time);
+	//return(buffer);
+	return "";
 }
 
 
@@ -401,50 +402,50 @@ static char const * Bench_Time(BenchType btype)
  *=============================================================================================*/
 static void Benchmarks(MonoClass * mono)
 {
-	static bool _first = true;
-	if (_first) {
-		_first = false;
-		mono->Clear();
-		mono->Set_Cursor(0, 0);
-		mono->Print(Text_String(TXT_DEBUG_PERFORMANCE));
-		if (Benches == NULL) {
-			mono->Set_Cursor(20, 15);
-			mono->Printf(TXT_NO_PENTIUM);
-		}
-	}
-
-	if (Benches != NULL) {
-		mono->Set_Cursor(1, 2);mono->Printf("%s", Bench_Time(BENCH_FINDPATH));
-		mono->Set_Cursor(1, 4);mono->Printf("%s", Bench_Time(BENCH_GREATEST_THREAT));
-		mono->Set_Cursor(1, 6);mono->Printf("%s", Bench_Time(BENCH_AI));
-		mono->Set_Cursor(1, 8);mono->Printf("%s", Bench_Time(BENCH_PCP));
-		mono->Set_Cursor(1, 10);mono->Printf("%s", Bench_Time(BENCH_EVAL_OBJECT));
-		mono->Set_Cursor(1, 12);mono->Printf("%s", Bench_Time(BENCH_EVAL_CELL));
-		mono->Set_Cursor(1, 14);mono->Printf("%s", Bench_Time(BENCH_EVAL_WALL));
-		mono->Set_Cursor(1, 16);mono->Printf("%s", Bench_Time(BENCH_MISSION));
-
-		mono->Set_Cursor(14, 2);mono->Printf("%s", Bench_Time(BENCH_CELL));
-		mono->Set_Cursor(14, 4);mono->Printf("%s", Bench_Time(BENCH_OBJECTS));
-		mono->Set_Cursor(14, 6);mono->Printf("%s", Bench_Time(BENCH_ANIMS));
-
-		mono->Set_Cursor(27, 2);mono->Printf("%s", Bench_Time(BENCH_PALETTE));
-
-		mono->Set_Cursor(40, 2);mono->Printf("%s", Bench_Time(BENCH_GSCREEN_RENDER));
-		mono->Set_Cursor(40, 4);mono->Printf("%s", Bench_Time(BENCH_SIDEBAR));
-		mono->Set_Cursor(40, 6);mono->Printf("%s", Bench_Time(BENCH_RADAR));
-		mono->Set_Cursor(40, 8);mono->Printf("%s", Bench_Time(BENCH_TACTICAL));
-		mono->Set_Cursor(40, 10);mono->Printf("%s", Bench_Time(BENCH_POWER));
-		mono->Set_Cursor(40, 12);mono->Printf("%s", Bench_Time(BENCH_SHROUD));
-		mono->Set_Cursor(40, 14);mono->Printf("%s", Bench_Time(BENCH_TABS));
-		mono->Set_Cursor(40, 16);mono->Printf("%s", Bench_Time(BENCH_BLIT_DISPLAY));
-
-		mono->Set_Cursor(66, 2);mono->Printf("%7d", Benches[BENCH_RULES].Value());
-		mono->Set_Cursor(66, 4);mono->Printf("%7d", Benches[BENCH_SCENARIO].Value());
-
-		for (BenchType index = BENCH_FIRST; index < BENCH_COUNT; index++) {
-			if (index != BENCH_RULES && index != BENCH_SCENARIO) Benches[index].Reset();
-		}
-	}
+	//static bool _first = true;
+	//if (_first) {
+	//	_first = false;
+	//	mono->Clear();
+	//	mono->Set_Cursor(0, 0);
+	//	mono->Print(Text_String(TXT_DEBUG_PERFORMANCE));
+	//	if (Benches == NULL) {
+	//		mono->Set_Cursor(20, 15);
+	//		mono->Printf(TXT_NO_PENTIUM);
+	//	}
+	//}
+	//
+	//if (Benches != NULL) {
+	//	mono->Set_Cursor(1, 2);mono->Printf("%s", Bench_Time(BENCH_FINDPATH));
+	//	mono->Set_Cursor(1, 4);mono->Printf("%s", Bench_Time(BENCH_GREATEST_THREAT));
+	//	mono->Set_Cursor(1, 6);mono->Printf("%s", Bench_Time(BENCH_AI));
+	//	mono->Set_Cursor(1, 8);mono->Printf("%s", Bench_Time(BENCH_PCP));
+	//	mono->Set_Cursor(1, 10);mono->Printf("%s", Bench_Time(BENCH_EVAL_OBJECT));
+	//	mono->Set_Cursor(1, 12);mono->Printf("%s", Bench_Time(BENCH_EVAL_CELL));
+	//	mono->Set_Cursor(1, 14);mono->Printf("%s", Bench_Time(BENCH_EVAL_WALL));
+	//	mono->Set_Cursor(1, 16);mono->Printf("%s", Bench_Time(BENCH_MISSION));
+	//
+	//	mono->Set_Cursor(14, 2);mono->Printf("%s", Bench_Time(BENCH_CELL));
+	//	mono->Set_Cursor(14, 4);mono->Printf("%s", Bench_Time(BENCH_OBJECTS));
+	//	mono->Set_Cursor(14, 6);mono->Printf("%s", Bench_Time(BENCH_ANIMS));
+	//
+	//	mono->Set_Cursor(27, 2);mono->Printf("%s", Bench_Time(BENCH_PALETTE));
+	//
+	//	mono->Set_Cursor(40, 2);mono->Printf("%s", Bench_Time(BENCH_GSCREEN_RENDER));
+	//	mono->Set_Cursor(40, 4);mono->Printf("%s", Bench_Time(BENCH_SIDEBAR));
+	//	mono->Set_Cursor(40, 6);mono->Printf("%s", Bench_Time(BENCH_RADAR));
+	//	mono->Set_Cursor(40, 8);mono->Printf("%s", Bench_Time(BENCH_TACTICAL));
+	//	mono->Set_Cursor(40, 10);mono->Printf("%s", Bench_Time(BENCH_POWER));
+	//	mono->Set_Cursor(40, 12);mono->Printf("%s", Bench_Time(BENCH_SHROUD));
+	//	mono->Set_Cursor(40, 14);mono->Printf("%s", Bench_Time(BENCH_TABS));
+	//	mono->Set_Cursor(40, 16);mono->Printf("%s", Bench_Time(BENCH_BLIT_DISPLAY));
+	//
+	//	mono->Set_Cursor(66, 2);mono->Printf("%7d", Benches[BENCH_RULES].Value());
+	//	mono->Set_Cursor(66, 4);mono->Printf("%7d", Benches[BENCH_SCENARIO].Value());
+	//
+	//	for (BenchType index = BENCH_FIRST; index < BENCH_COUNT; index++) {
+	//		if (index != BENCH_RULES && index != BENCH_SCENARIO) Benches[index].Reset();
+	//	}
+	//}
 }
 
 

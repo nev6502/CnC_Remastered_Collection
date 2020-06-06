@@ -227,10 +227,12 @@ fixed HouseClass::Tiberium_Fraction(void) const
  *   01/23/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
 HouseClass * HouseClass::As_Pointer(HousesType house)
-{
+{	
 	if (house != HOUSE_NONE) {
 		for (int index = 0; index < Houses.Count(); index++) {
-			if (Houses.Ptr(index)->Class->House == house) {
+			HouseClass* houseClass = Houses.Ptr(index);
+			HouseTypeClass* houseTypeClass = houseClass->Class;
+			if (houseTypeClass->House == house) {
 				return(Houses.Ptr(index));
 			}
 		}
