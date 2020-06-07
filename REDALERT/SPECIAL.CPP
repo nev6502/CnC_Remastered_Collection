@@ -527,12 +527,12 @@ int Fetch_Difficulty(void)
 	**	Main Processing Loop.
 	*/
 	Set_Logic_Page(SeenBuff);
-	bool redraw = true;
+	//bool redraw = true;
 	bool process = true;
 	while (process) {
 
-		if (redraw) {
-			redraw = false;
+		{
+		//	redraw = false;
 
 			/*
 			**	Draw the background of the dialog.
@@ -575,7 +575,7 @@ int Fetch_Difficulty(void)
 		*/
 		if (AllSurfaces.SurfacesRestored) {
 			AllSurfaces.SurfacesRestored=FALSE;
-			redraw = true;
+			//redraw = true;
 			continue;
 		}
 #endif	//WIN32

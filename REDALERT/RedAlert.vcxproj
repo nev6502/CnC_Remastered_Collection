@@ -449,6 +449,7 @@
     <ClCompile Include="Win32Lib\IRANDOM.CPP" />
     <ClCompile Include="Win32Lib\LOAD.CPP" />
     <ClCompile Include="Win32Lib\LOADFONT.CPP" />
+    <ClCompile Include="WIN32LIB\MouseShape.cpp" />
     <ClCompile Include="Win32Lib\MOUSEWW.CPP" />
     <ClCompile Include="Win32Lib\PALETTE.CPP" />
     <ClCompile Include="Win32Lib\SET_FONT.CPP" />
@@ -739,6 +740,7 @@
     <ClInclude Include="Win32Lib\MODEMREG.H" />
     <ClInclude Include="Win32Lib\MONO.H" />
     <ClInclude Include="Win32Lib\MOUSE.H" />
+    <ClInclude Include="WIN32LIB\MouseShape.h" />
     <ClInclude Include="Win32Lib\PALETTE.H" />
     <ClInclude Include="Win32Lib\PLAYCD.H" />
     <ClInclude Include="Win32Lib\PROFILE.H" />

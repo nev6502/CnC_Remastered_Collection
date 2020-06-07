@@ -274,7 +274,7 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 			#endif
 
 			if (display) {
-				display = false;
+				//display = false;
 
 				Hide_Mouse();
 				Dialog_Box(x, y, width, height);

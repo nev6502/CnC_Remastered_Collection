@@ -535,6 +535,8 @@ KeyNumType GadgetClass::Input(void)
 // jmarshall
 	int flags = 0;
 	WWSDL_ProcessEvents(key, flags);
+
+	Show_Mouse(); // jmarshall: thsi shouldn't be here!
 // jmarshall end
 
 	/*

@@ -942,6 +942,9 @@
     <ClCompile Include="WIN32LIB\WSA.CPP">
       <Filter>Source Files\win32lib</Filter>
     </ClCompile>
+    <ClCompile Include="WIN32LIB\MouseShape.cpp">
+      <Filter>Source Files\win32lib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ABSTRACT.H">
@@ -1837,6 +1840,9 @@
     </ClInclude>
     <ClInclude Include="..\external\libsmacker\smk_malloc.h">
       <Filter>Source Files\libsmacker</Filter>
+    </ClInclude>
+    <ClInclude Include="WIN32LIB\MouseShape.h">
+      <Filter>Source Files\win32lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

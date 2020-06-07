@@ -60,6 +60,24 @@ class WWMouseClass {
 		void Set_Cursor_Clip(void);
 		void Clear_Cursor_Clip(void);
 
+// jmarshall - accessor functions to hook up mouse code from chronoshift.
+		int Get_Hotspot_X(void) { return MouseXHot; }
+		int Get_Hotspot_Y(void) { return MouseYHot; }
+		int Get_Cursor_Width(void) { return CursorWidth; }
+		int Get_Cursor_Height(void) { return CursorHeight; }
+		int Get_Max_Width(void) { return MaxWidth; }
+		int Get_Max_Height(void) { return MaxHeight; }
+		void Set_Hotspot_X(int hotspotX) { MouseXHot = hotspotX; }
+		void Set_Hotspot_Y(int hotspotY) { MouseYHot = hotspotY; }
+		void Set_Cursor_Width(int width) { CursorWidth = width; }
+		void Set_Cursor_Height(int height) { CursorHeight = height; }
+		void Set_Max_Width(int width) { MaxWidth = width; }
+		void Set_Max_Height(int height) { MaxHeight = height; }
+
+		char* Get_Image_Buff(void) { return MouseCursor; }
+		void* Get_Frame_Pointer() { return PrevCursor; }
+		void Set_Frame_Pointer(void* frame) { PrevCursor = (char *)frame; }
+// jmarshall end
 	private:
 		enum 	{
 			CONDHIDE		= 1,
@@ -105,11 +123,9 @@ class WWMouseClass {
 
 };
 
-extern "C" {
-	 void __cdecl Mouse_Shadow_Buffer(void *thisptr, GraphicViewPortClass *srcdst, void *buffer, int x, int y, int hotx, int hoty, int store);
-	 void __cdecl Draw_Mouse(void *thisptr, GraphicViewPortClass *srcdst, int x, int y);
-	 void * __cdecl ASM_Set_Mouse_Cursor(void * thisptr, int hotspotx, int hotspoty, VOID *cursor);
-};
+void __cdecl Mouse_Shadow_Buffer(WWMouseClass& mouse, GraphicViewPortClass& viewport, void* buffer, int x_pos, int y_pos, int hspot_x, int hspot_y, BOOL save);
+void __cdecl Mouse_Draw(WWMouseClass& mouse, GraphicViewPortClass& viewport, int x_pos, int y_pos);
+void* __cdecl Mouse_Set_Cursor(WWMouseClass& mouse, int hspot_x, int hspot_y, void* frame);
 
 void Hide_Mouse(void);
 void Show_Mouse(void);
