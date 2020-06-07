@@ -1882,7 +1882,8 @@ void Nearest_CopyImage(byte* source, int sourceX, int sourceY, int sourceWidth, 
 			int destPos = (destWidth * (_y + (destY))) + (_x + (destX));
 			int sourcePos = (sourceWidth * (_y + (sourceY))) + (_x + (sourceX));
 
-			dest[destPos] = source[sourcePos];
+			if(source[sourcePos] != 0)
+				dest[destPos] = source[sourcePos];
 		}
 	}
 }
