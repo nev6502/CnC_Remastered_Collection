@@ -12,8 +12,7 @@ int vqa_upscale_hack_width = 0;
 int vqa_upscale_hack_height = 0;
 byte* vqa_output_buffer = nullptr;
 
-byte* VQA_Dropsample(const byte* in, int inwidth, int inheight,
-	int outwidth, int outheight) {
+byte* VQA_Dropsample(const byte* in, int inwidth, int inheight, int outwidth, int outheight) {
 	int		i, j, k;
 	const byte* inrow;
 	const byte* pix1;

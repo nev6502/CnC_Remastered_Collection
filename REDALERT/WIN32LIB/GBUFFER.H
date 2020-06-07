@@ -374,7 +374,11 @@ class GraphicBufferClass : public GraphicViewPortClass, public BufferClass {
 
 		// Member to get a pointer to a direct draw surface
 		LPDIRECTDRAWSURFACE Get_DD_Surface ( void );
-
+// jmarshall
+		void* GetMemoryBuffer(void) {
+			return VideoSurfaceDescription.lpSurface;
+		}
+// jmarshall end
 	protected:
 		LPDIRECTDRAWSURFACE	VideoSurfacePtr;		//Pointer to the related direct draw surface
 		DDSURFACEDESC			VideoSurfaceDescription;//Description of the said surface
