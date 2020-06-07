@@ -1921,6 +1921,9 @@ BOOL __cdecl Linear_Scale_To_Linear(void *this_object, void *dest, int src_x, in
 	GraphicViewPortClass* viewportClass = (GraphicViewPortClass*)this_object;
 	GraphicViewPortClass* destViewportClass = (GraphicViewPortClass*)dest;
 
+	if (destViewportClass->Get_Graphic_Buffer()->Get_Buffer() == NULL)
+		return false;
+
 	byte* viewportBuffer = ((byte*)viewportClass->Get_Graphic_Buffer()->Get_Buffer());
 
 	// Scale the GraphicViewPortClass to dest_x, dest_y
