@@ -55,6 +55,7 @@
  *   MapEditClass::Verify_House -- sees if given house can own given obj   *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include	"imgui.h"
 #include	"function.h"
 
 #ifdef SCENARIO_EDITOR
@@ -1508,6 +1509,46 @@ bool MapEditClass::Mouse_Moved(void)
 	return(retcode);
 }
 
+int mainmenu_selection = -1;
+int mainmenu_x = -1;
+int mainmenu_y = -1;
+
+void Imgui_MapEdit_MainMenu(void) {
+	extern int mousex, mousey;
+	bool toolActive = false;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(150, 200));
+	ImGui::SetNextWindowPos(ImVec2(mainmenu_x, mainmenu_y));
+	ImGui::Begin("MainMenu", &toolActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);
+		if (ImGui::Button("New Scenario")) {
+			mainmenu_selection = 0;
+		}
+		if(ImGui::Button("Load Scenario")) {
+			mainmenu_selection = 1;
+		}
+		if (ImGui::Button("Save Scenario")) {
+			mainmenu_selection = 2;
+		}
+		if (ImGui::Button("Size Map")) {
+			mainmenu_selection = 3;
+		}
+		if (ImGui::Button("Add Game Object")) {
+			mainmenu_selection = 4;
+		}
+		if (ImGui::Button("Scenario Options")) {
+			mainmenu_selection = 5;
+		}
+		if (ImGui::Button("AI Options")) {
+			mainmenu_selection = 6;
+		}
+		if (ImGui::Button("Play Scenario")) {
+			mainmenu_selection = 7;
+		}
+	ImGui::End();
+}
+
 
 /***************************************************************************
  * MapEditClass::Main_Menu -- main menu processor for map editor           *
@@ -1526,23 +1567,15 @@ bool MapEditClass::Mouse_Moved(void)
  *=========================================================================*/
 void MapEditClass::Main_Menu(void)
 {
-	char const * _menus[MAX_MAIN_MENU_NUM + 1];
+	extern int mousex, mousey;
 	int selection;						// option the user picks
 	bool process;						// menu stays up while true
 	int rc;
 
-	/*
-	**	Fill in menu items
-	*/
-	_menus[0] = "New Scenario";
-	_menus[1] = "Load Scenario";
-	_menus[2] = "Save Scenario";
-	_menus[3] = "Size Map";
-	_menus[4] = "Add Game Object";
-	_menus[5] = "Scenario Options";
-	_menus[6] = "AI Options";
-	_menus[7] = "Play Scenario";
-	_menus[8] = NULL;
+	Imgui_Dialog_Function = Imgui_MapEdit_MainMenu;
+	mainmenu_selection = -1;
+	mainmenu_x = mousex;
+	mainmenu_y = mousey;
 
 	/*
 	**	Main Menu loop
@@ -1560,11 +1593,17 @@ void MapEditClass::Main_Menu(void)
 		**	Invoke menu
 		*/
 		Hide_Mouse();		// Do_Menu assumes the mouse is already hidden
-		selection = Do_Menu(&_menus[0], true);
+		selection = mainmenu_selection;
+		KeyNumType _key;
+		int _flags;
+		WWSDL_ProcessEvents(_key, _flags);
 		Show_Mouse();
 		if (UnknownKey==KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) {
 			break;
 		}
+
+		if (selection == -1)
+			continue;
 
 		/*
 		**	Process selection
@@ -1690,7 +1729,12 @@ void MapEditClass::Main_Menu(void)
 				Start_Scenario(Scen.ScenarioName);
 				return;
 		}
+
+		mainmenu_selection = selection = -1;
+		break;
 	}
+
+	Imgui_Dialog_Function = nullptr;
 
 	/*
 	**	Restore the display:
