@@ -951,9 +951,6 @@
     <ClCompile Include="..\external\imgui\examples\imgui_impl_dx9.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\external\imgui\examples\imgui_impl_win32.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="..\external\imgui\imgui.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
@@ -961,6 +958,9 @@
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\external\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\imgui\examples\imgui_impl_sdl.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1865,9 +1865,6 @@
     <ClInclude Include="..\external\imgui\examples\imgui_impl_dx9.h">
       <Filter>Source Files\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="..\external\imgui\examples\imgui_impl_win32.h">
-      <Filter>Source Files\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="..\external\imgui\imconfig.h">
       <Filter>Source Files\imgui</Filter>
     </ClInclude>
@@ -1884,6 +1881,9 @@
       <Filter>Source Files\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\external\imgui\imstb_truetype.h">
+      <Filter>Source Files\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\imgui\examples\imgui_impl_sdl.h">
       <Filter>Source Files\imgui</Filter>
     </ClInclude>
   </ItemGroup>

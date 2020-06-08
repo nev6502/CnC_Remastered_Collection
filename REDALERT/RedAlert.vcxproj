@@ -172,7 +172,7 @@
     <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawSurfaceWrapper.cpp" />
     <ClCompile Include="..\ddraw\ddrawwrapper\DirectDrawWrapper.cpp" />
     <ClCompile Include="..\external\imgui\examples\imgui_impl_dx9.cpp" />
-    <ClCompile Include="..\external\imgui\examples\imgui_impl_win32.cpp" />
+    <ClCompile Include="..\external\imgui\examples\imgui_impl_sdl.cpp" />
     <ClCompile Include="..\external\imgui\imgui.cpp" />
     <ClCompile Include="..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\imgui\imgui_widgets.cpp" />
@@ -488,7 +488,7 @@
     <ClInclude Include="..\ddraw\ddrawwrapper\DirectDrawWrapper.h" />
     <ClInclude Include="..\ddraw\ddrawwrapper\resource.h" />
     <ClInclude Include="..\external\imgui\examples\imgui_impl_dx9.h" />
-    <ClInclude Include="..\external\imgui\examples\imgui_impl_win32.h" />
+    <ClInclude Include="..\external\imgui\examples\imgui_impl_sdl.h" />
     <ClInclude Include="..\external\imgui\imconfig.h" />
     <ClInclude Include="..\external\imgui\imgui.h" />
     <ClInclude Include="..\external\imgui\imgui_internal.h" />

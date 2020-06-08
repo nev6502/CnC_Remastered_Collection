@@ -1,10 +1,11 @@
 #define UNICODE
 #include "DirectDrawWrapper.h"
 #include "imgui.h"
-#include "examples/imgui_impl_win32.h"
+#include "examples/imgui_impl_sdl.h"
 #include "examples/imgui_impl_dx9.h"
 //#include "resource.h"
 LPDIRECT3DDEVICE9 globald3d9Device;
+extern SDL_Window* game_window;
 
 /*******************
 **IUnknown methods**
@@ -1324,9 +1325,11 @@ HRESULT IDirectDrawWrapper::Present()
 	if (Imgui_Dialog_Function) {
 		ImGuiIO& io = ImGui::GetIO();
 
-		io.DisplaySize = ImVec2(displayWidth, displayHeight);
+		io.DisplaySize = ImVec2(displayWidth, displayHeight);		
 		ImGui_ImplDX9_NewFrame();
 		ImGui::NewFrame();
+
+		ImGui_ImplSDL2_NewFrame(game_window);
 
 		Imgui_Dialog_Function();
 

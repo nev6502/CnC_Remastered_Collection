@@ -41,8 +41,10 @@
  *   Focus_Loss -- this function is called when a library function detects focus loss          *
  *   Memory_Error_Handler -- Handle a possibly fatal failure to allocate memory                *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-
+#include    "imgui.h"
+#include	"examples/imgui_impl_sdl.h"
 #include	"function.h"
+
 
 #ifdef WINSOCK_IPX
 #include "WSProto.h"
@@ -755,6 +757,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 			Keyboard->Put_Element(event.key.keysym.sym);
 			break;
 		}
+
+		if (Debug_Map)
+			ImGui_ImplSDL2_ProcessEvent(&event);
 	}
 
 	if (!leftMouseProcessed && numFramesLMouse != 0)

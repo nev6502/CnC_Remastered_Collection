@@ -37,11 +37,12 @@
 
  // jmarshall - imgui
 #include "imgui.h"
-#include "examples/imgui_impl_win32.h"
+#include "examples/imgui_impl_sdl.h"
 #include "examples/imgui_impl_dx9.h"
 
 #include <d3d9.h>
 extern LPDIRECT3DDEVICE9 globald3d9Device;
+extern SDL_Window* game_window;
 // jmarshall end
 
 
@@ -574,7 +575,7 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 			//ImGui::StyleColorsClassic();
 
 			// Setup Platform/Renderer bindings
-			ImGui_ImplWin32_Init(MainWindow);
+			ImGui_ImplSDL2_InitForD3D(game_window);
 			ImGui_ImplDX9_Init(globald3d9Device);
 
 			io.Fonts->AddFontFromFileTTF("code/fonts/Roboto-Medium.ttf", 16.0f);
