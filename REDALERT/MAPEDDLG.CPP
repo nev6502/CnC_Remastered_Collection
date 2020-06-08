@@ -394,7 +394,60 @@ int MapEditClass::Save_Scenario(void)
 bool pickscenerio_faction[4] = { false, false, false, false };
 bool pickscenerio_sides[2] = { false, false };
 bool pickscenerio_version[4] = { false, false, false, false };
+bool pickscenerio_process = false;
+bool pickscenerio_cancel = false;
 
+struct PickScenerioResults {
+	char* scene_buf;
+	int *scen_nump;
+	ScenarioPlayerType *playerp;
+	ScenarioDirType *dirp;
+	ScenarioVarType *varp;
+};
+
+PickScenerioResults pickScenerioResults;
+
+/***************************************************************************
+ * MapEditClass::Pick_Scenario -- dialog for choosing scenario             *
+ *                                                                         *
+ * Prompts user for:                                                       *
+ *   - House (GDI, NOD)                                                    *
+ *   - Scenario #                                                          *
+ *                                                                         *
+ *           ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                          *
+ *           ³            Caption               ³                          *
+ *           ³                                  ³                          *
+ *           ³         Scenario ___             ³                          *
+ *           ³          Version ___             ³                          *
+ *           ³                                  ³                          *
+ *           ³         [East]  [West]           ³                          *
+ *           ³                                  ³                          *
+ *           ³         [    GDI     ]           ³                          *
+ *           ³         [    NOD     ]           ³                          *
+ *           ³         [Multi-Player]           ³                          *
+ *           ³                                  ³                          *
+ *           ³         [OK]  [Cancel]           ³                          *
+ *           ³                                  ³                          *
+ *           ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                          *
+ *                                                                         *
+ * INPUT:                                                                  *
+ *      caption      string to use as a title                              *
+ *      scen_nump   output: ptr to scenario #                              *
+ *      playerp      output: ptr to player type                            *
+ *      dirp         output: ptr to direction                              *
+ *      varp         output: ptr to variation                              *
+ *      multi         1 = allow to change single/multiplayer; 0 = not      *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *      0 = OK, -1 = cancel                                                *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *      none.                                                              *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   10/21/1994 BR : Created.                                              *
+ *   09/04/1996 JLB : Simplified                                           *
+ *=========================================================================*/
 void Imgui_PickScenerio_Dialog(void) {
 	/*
 	**	Dialog & button dimensions
@@ -490,8 +543,7 @@ void Imgui_PickScenerio_Dialog(void) {
 	ImGui::Begin("New Scenario", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::Text("Scenario");
 	
-	static char scenerioId[512];	
-	ImGui::InputText("Scenario", &scenerioId[0], sizeof(scenerioId));
+	ImGui::InputText("Scenario", &pickScenerioResults.scene_buf[0], 10);
 
 	//ImGui::Text("Version");
 	//
@@ -503,31 +555,37 @@ void Imgui_PickScenerio_Dialog(void) {
 		if (ImGui::Checkbox("A", &pickscenerio_version[0])) {
 			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
 			pickscenerio_version[0] = true;
+			*pickScenerioResults.varp = SCEN_VAR_A;
 		}
 		ImGui::SameLine();
 		if (ImGui::Checkbox("B", &pickscenerio_version[1])) {
 			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
 			pickscenerio_version[1] = true;
+			*pickScenerioResults.varp = SCEN_VAR_B;
 		}
 		ImGui::SameLine();
 		if (ImGui::Checkbox("C", &pickscenerio_version[2])) {
 			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
 			pickscenerio_version[2] = true;
+			*pickScenerioResults.varp = SCEN_VAR_C;
 		}
 		ImGui::SameLine();
 		if (ImGui::Checkbox("D", &pickscenerio_version[3])) {
 			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
 			pickscenerio_version[3] = true;
+			*pickScenerioResults.varp = SCEN_VAR_D;
 		}
 	}	
 	ImGui::Text("Side");
 	{
 		if (ImGui::Checkbox("East", &pickscenerio_sides[0])) {
+			*pickScenerioResults.dirp = SCEN_DIR_EAST;
 			memset(pickscenerio_sides, 0, sizeof(pickscenerio_sides));
 			pickscenerio_sides[0] = true;
 		}
 		ImGui::SameLine();
 		if (ImGui::Checkbox("West", &pickscenerio_sides[1])) {
+			*pickScenerioResults.dirp = SCEN_DIR_WEST;
 			memset(pickscenerio_sides, 0, sizeof(pickscenerio_sides));
 			pickscenerio_sides[1] = true;
 		}
@@ -537,473 +595,69 @@ void Imgui_PickScenerio_Dialog(void) {
 	
 	
 	if (ImGui::Checkbox("North (Spain)", &pickscenerio_faction[0])) {
+		*pickScenerioResults.playerp = SCEN_PLAYER_SPAIN;
 		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
 		pickscenerio_faction[0] = true;
 	}
 	if (ImGui::Checkbox("South(Greece)", &pickscenerio_faction[1])) {
+		*pickScenerioResults.playerp = SCEN_PLAYER_GREECE;
 		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
 		pickscenerio_faction[1] = true;
 	}
 	if (ImGui::Checkbox("USSR", &pickscenerio_faction[2])) {
+		*pickScenerioResults.playerp = SCEN_PLAYER_USSR;
 		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
 		pickscenerio_faction[2] = true;
 	}
 	if (ImGui::Checkbox("Multiplayer", &pickscenerio_faction[3])) {
+		*pickScenerioResults.playerp = SCEN_PLAYER_MPLAYER;
 		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
 		pickscenerio_faction[3] = true;
 	}
 	ImGui::NewLine();
 
 	{
-		ImGui::Button("Ok");
+		if (ImGui::Button("Ok")) {
+			pickscenerio_cancel = false;
+			pickscenerio_process = false;
+		}
 		ImGui::SameLine();
-		ImGui::Button("Cancel");
+		if (ImGui::Button("Cancel")) {
+			pickscenerio_cancel = true;
+			pickscenerio_process = false;
+		}
 	}
 
 	ImGui::End();
 }
 
-/***************************************************************************
- * MapEditClass::Pick_Scenario -- dialog for choosing scenario             *
- *                                                                         *
- * Prompts user for:                                                       *
- *   - House (GDI, NOD)                                                    *
- *   - Scenario #                                                          *
- *                                                                         *
- *           ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿                          *
- *           ³            Caption               ³                          *
- *           ³                                  ³                          *
- *           ³         Scenario ___             ³                          *
- *           ³          Version ___             ³                          *
- *           ³                                  ³                          *
- *           ³         [East]  [West]           ³                          *
- *           ³                                  ³                          *
- *           ³         [    GDI     ]           ³                          *
- *           ³         [    NOD     ]           ³                          *
- *           ³         [Multi-Player]           ³                          *
- *           ³                                  ³                          *
- *           ³         [OK]  [Cancel]           ³                          *
- *           ³                                  ³                          *
- *           ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ                          *
- *                                                                         *
- * INPUT:                                                                  *
- *      caption      string to use as a title                              *
- *      scen_nump   output: ptr to scenario #                              *
- *      playerp      output: ptr to player type                            *
- *      dirp         output: ptr to direction                              *
- *      varp         output: ptr to variation                              *
- *      multi         1 = allow to change single/multiplayer; 0 = not      *
- *                                                                         *
- * OUTPUT:                                                                 *
- *      0 = OK, -1 = cancel                                                *
- *                                                                         *
- * WARNINGS:                                                               *
- *      none.                                                              *
- *                                                                         *
- * HISTORY:                                                                *
- *   10/21/1994 BR : Created.                                              *
- *   09/04/1996 JLB : Simplified                                           *
- *=========================================================================*/
 int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioPlayerType & playerp, ScenarioDirType & dirp, ScenarioVarType & varp)
 {
 	Imgui_Dialog_Function = Imgui_PickScenerio_Dialog;
-	/*
-	**	Dialog & button dimensions
-	*/
-	enum {
-		D_DIALOG_W = 200,											// dialog width
-		D_DIALOG_H = 164,											// dialog height
-		D_DIALOG_X = ((320 - D_DIALOG_W) / 2),				// centered x-coord
-		D_DIALOG_Y = ((200 - D_DIALOG_H) / 2),				// centered y-coord
-		D_DIALOG_CX = D_DIALOG_X + (D_DIALOG_W / 2),		// coord of x-center
+	pickscenerio_process = true;
+	pickscenerio_cancel = false;
 
-		D_TXT8_H = 11,												// ht of 8-pt text
-		D_MARGIN = 7,												// margin width/height
+	char scen_buf[10] = { 0 };						// buffer for editing scenario 
 
-		D_SCEN_W = 45,												// Scenario # width
-		D_SCEN_H = 9,												// Scenario # height
-		D_SCEN_X = D_DIALOG_CX + 5,							// Scenario # x
-		D_SCEN_Y = D_DIALOG_Y + D_MARGIN + D_TXT8_H + D_MARGIN,	// Scenario # y
-
-		D_VARA_W = 13,												// Version A width
-		D_VARA_H = 9,												// Version A height
-		D_VARA_X = D_DIALOG_CX - (D_VARA_W * 5) / 2,		// Version A x
-		D_VARA_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version A y
-
-		D_VARB_W = 13,												// Version B width
-		D_VARB_H = 9,												// Version B height
-		D_VARB_X = D_VARA_X + D_VARA_W,						// Version B x
-		D_VARB_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version B y
-
-		D_VARC_W = 13,												// Version C width
-		D_VARC_H = 9,												// Version C height
-		D_VARC_X = D_VARB_X + D_VARB_W,						// Version C x
-		D_VARC_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version C y
-
-		D_VARD_W = 13,												// Version D width
-		D_VARD_H = 9,												// Version D height
-		D_VARD_X = D_VARC_X + D_VARC_W,						// Version D x
-		D_VARD_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version D y
-
-		D_VARLOSE_W = 13,											// Version Lose width
-		D_VARLOSE_H = 9,											// Version Lose height
-		D_VARLOSE_X = D_VARD_X + D_VARD_W,					// Version Lose x
-		D_VARLOSE_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,	// Version Lose y
-
-		D_EAST_W = 50,												// EAST width
-		D_EAST_H = 9,												// EAST height
-		D_EAST_X = D_DIALOG_CX - D_EAST_W - 5,				// EAST x
-		D_EAST_Y = D_VARLOSE_Y + D_VARLOSE_H + D_MARGIN,// EAST y
-
-		D_WEST_W = 50,												// WEST width
-		D_WEST_H = 9,												// WEST height
-		D_WEST_X = D_DIALOG_CX + 5,							// WEST x
-		D_WEST_Y = D_VARLOSE_Y + D_VARLOSE_H + D_MARGIN,// EAST y
-
-		D_GDI_W = 90,												// GDI width
-		D_GDI_H = 9,												// GDI height
-		D_GDI_X = D_DIALOG_CX - (D_GDI_W / 2),				// GDI x
-		D_GDI_Y = D_EAST_Y + D_EAST_H + D_MARGIN,			// GDI y
-
-		D_NOD_W = 90,												// NOD width
-		D_NOD_H = 9,												// NOD height
-		D_NOD_X = D_DIALOG_CX - (D_NOD_W / 2),				// NOD x
-		D_NOD_Y = D_GDI_Y + D_GDI_H,							// NOD y
-
-		D_NEU_W = 90,												// Neutral width
-		D_NEU_H = 9,												// Neutral height
-		D_NEU_X = D_DIALOG_CX - (D_NOD_W / 2),				// Neutral x
-		D_NEU_Y = D_NOD_Y + D_NOD_H,							// Neutral y
-
-		D_MPLAYER_W = 90,											// Multi-Player width
-		D_MPLAYER_H = 9,											// Multi-Player height
-		D_MPLAYER_X = D_DIALOG_CX - (D_MPLAYER_W / 2),	// Multi-Player x
-		D_MPLAYER_Y = D_NEU_Y + D_NEU_H,						// Multi-Player y
-
-		D_OK_W = 45,												// OK width
-		D_OK_H = 9,													// OK height
-		D_OK_X = D_DIALOG_CX - D_OK_W - 5,					// OK x
-		D_OK_Y = D_DIALOG_Y + D_DIALOG_H - D_OK_H - (D_MARGIN+15),	// OK y
-
-		D_CANCEL_W = 45,											// Cancel width
-		D_CANCEL_H = 9,											// Cancel height
-		D_CANCEL_X = D_DIALOG_CX + 5,							// Cancel x
-		D_CANCEL_Y = D_DIALOG_Y + D_DIALOG_H - D_CANCEL_H - (D_MARGIN+15), // Cancel y
-
-	};
-
-	/*
-	**	Button enumerations
-	*/
-	enum {
-		BUTTON_GDI=100,
-		BUTTON_NOD,
-		BUTTON_NEUTRAL,
-		BUTTON_MPLAYER,
-		BUTTON_EAST,
-		BUTTON_WEST,
-		BUTTON_OK,
-		BUTTON_CANCEL,
-		BUTTON_SCENARIO,
-		BUTTON_VAR_A,
-		BUTTON_VAR_B,
-		BUTTON_VAR_C,
-		BUTTON_VAR_D,
-	};
-
-	/*
-	**	Dialog variables
-	*/
-	bool cancel = false;							// true = user cancels
-
-	/*
-	**	Other Variables
-	*/
-	char scen_buf[10]={0};						// buffer for editing scenario #
-
-	/*
-	**	Buttons
-	*/
-	ControlClass * commands = NULL;		// the button list
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-	EditClass editbtn (BUTTON_SCENARIO, scen_buf, 5, TPF_EFNT|TPF_NOSHADOW, D_SCEN_X, D_SCEN_Y, D_SCEN_W, D_SCEN_H, EditClass::ALPHANUMERIC);
-#else
-	EditClass editbtn (BUTTON_SCENARIO, scen_buf, 5, TPF_EFNT|TPF_NOSHADOW, D_SCEN_X, D_SCEN_Y, D_SCEN_W, D_SCEN_H, EditClass::NUMERIC);
-#endif
-
-	TextButtonClass varabtn(BUTTON_VAR_A, "A", TPF_EBUTTON, D_VARA_X, D_VARA_Y, D_VARA_W, D_VARA_H);
-	TextButtonClass varbbtn(BUTTON_VAR_B, "B", TPF_EBUTTON, D_VARB_X, D_VARB_Y, D_VARB_W, D_VARB_H);
-	TextButtonClass varcbtn(BUTTON_VAR_C, "C", TPF_EBUTTON, D_VARC_X, D_VARC_Y, D_VARC_W, D_VARC_H);
-	TextButtonClass vardbtn(BUTTON_VAR_D, "D", TPF_EBUTTON, D_VARD_X, D_VARD_Y, D_VARD_W, D_VARD_H);
-	TextButtonClass gdibtn(BUTTON_GDI, "North (Spain)", TPF_EBUTTON, D_GDI_X, D_GDI_Y, D_GDI_W, D_GDI_H);
-	TextButtonClass nodbtn(BUTTON_NOD, "South (Greece)", TPF_EBUTTON, D_NOD_X, D_NOD_Y, D_NOD_W, D_NOD_H);
-	TextButtonClass neubtn(BUTTON_NEUTRAL, HouseTypeClass::As_Reference(HOUSE_USSR).IniName, TPF_EBUTTON, D_NEU_X, D_NEU_Y, D_NEU_W, D_NEU_H);
-	TextButtonClass playermbtn(BUTTON_MPLAYER, "Multiplayer", TPF_EBUTTON, D_MPLAYER_X, D_MPLAYER_Y, D_MPLAYER_W, D_MPLAYER_H);
-	TextButtonClass eastbtn(BUTTON_EAST, "East", TPF_EBUTTON, D_EAST_X, D_EAST_Y, D_EAST_W, D_EAST_H);
-	TextButtonClass westbtn(BUTTON_WEST, "West", TPF_EBUTTON, D_WEST_X, D_WEST_Y, D_WEST_W, D_WEST_H);
-	TextButtonClass okbtn(BUTTON_OK, TXT_OK, TPF_EBUTTON, D_OK_X, D_OK_Y, D_OK_W, D_OK_H);
-	TextButtonClass cancelbtn(BUTTON_CANCEL, TXT_CANCEL, TPF_EBUTTON, D_CANCEL_X, D_CANCEL_Y, D_CANCEL_W, D_CANCEL_H);
-
-	/*
-	**	Initialize
-	*/
-	Set_Logic_Page(SeenBuff);
-
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-	if (scen_nump < 100) {
-		sprintf(scen_buf, "%d", scen_nump);		// init edit buffer
-	} else {
-		char first = scen_nump / 36;
-		char second = scen_nump % 36;
-		scen_buf[0] = first + 'A';
-//Mono_Printf("picking map, scen# = %d, first = %c, second = %d (numeric)\n",scen_nump, scen_buf[0],second);Keyboard->Get();Keyboard->Get();
-		if (second < 10) {
-			scen_buf[1] = second + '0';
-		} else {
-			scen_buf[1] = (second-10) + 'A';
-		}
-		scen_buf[2] = 0;
-	}
-#else
-	sprintf(scen_buf, "%d", scen_nump);		// init edit buffer
-#endif
-	editbtn.Set_Text(scen_buf, 5);
-
-	varabtn.Turn_Off();
-	varbbtn.Turn_Off();
-	varcbtn.Turn_Off();
-	vardbtn.Turn_Off();
-	switch (varp) {
-		case SCEN_VAR_A:
-			varabtn.Turn_On();
-			break;
-
-		case SCEN_VAR_B:
-			varbbtn.Turn_On();
-			break;
-
-		case SCEN_VAR_C:
-			varcbtn.Turn_On();
-			break;
-
-		case SCEN_VAR_D:
-			vardbtn.Turn_On();
-			break;
-	}
-
-	/*
-	**	Create the button list
-	*/
-	commands = &editbtn;
-	varabtn.Add_Tail(*commands);
-	varbbtn.Add_Tail(*commands);
-	varcbtn.Add_Tail(*commands);
-	vardbtn.Add_Tail(*commands);
-	gdibtn.Add_Tail(*commands);
-	nodbtn.Add_Tail(*commands);
-	neubtn.Add_Tail(*commands);
-	playermbtn.Add_Tail(*commands);
-	eastbtn.Add_Tail(*commands);
-	westbtn.Add_Tail(*commands);
-	okbtn.Add_Tail(*commands);
-	cancelbtn.Add_Tail(*commands);
-
-	/*
-	**	Init the button states
-	*/
-	gdibtn.Turn_Off();
-	nodbtn.Turn_Off();
-	neubtn.Turn_Off();
-	playermbtn.Turn_Off();
-	if (playerp == SCEN_PLAYER_MPLAYER) {
-		playermbtn.Turn_On();
-	} else {
-		if (PlayerPtr) {
-			switch (PlayerPtr->Class->House) {
-				case HOUSE_SPAIN:
-					gdibtn.Turn_On();
-					break;
-
-				case HOUSE_GREECE:
-					nodbtn.Turn_On();
-					break;
-
-				case HOUSE_USSR:
-					neubtn.Turn_On();
-					break;
-			}
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-		} else {
-			switch (Scen.ScenarioName[2]) {
-				case 'G':
-					gdibtn.Turn_On();
-					break;
-
-				case 'U':
-					nodbtn.Turn_On();
-					break;
-
-				case 'M':
-					playermbtn.Turn_On();
-					break;
-			}
-#endif
-		}
-	}
-
-	eastbtn.Turn_Off();
-	westbtn.Turn_Off();
-	if (dirp == SCEN_DIR_EAST) {
-		eastbtn.Turn_On();
-	} else {
-		westbtn.Turn_On();
-	}
+	pickScenerioResults.scene_buf = &scen_buf[0];
+	pickScenerioResults.scen_nump = &scen_nump;
+	pickScenerioResults.playerp = &playerp;
+	pickScenerioResults.dirp = &dirp;
+	pickScenerioResults.varp = &varp;
 
 	/*
 	**	Main Processing Loop
 	*/
 	bool display = true;
-	bool process = true;
-	while (process) {
-
-		/*
-		**	Invoke game callback
-		*/
-		Call_Back();
-
-		/*
-		**	Refresh display if needed
-		*/
-		if (display) {
-			Hide_Mouse();
-			Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
-			Draw_Caption(caption, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
-			Fancy_Text_Print("Scenario", D_DIALOG_CX - 5, D_SCEN_Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_RIGHT | TPF_EFNT | TPF_NOSHADOW);
-			commands->Draw_All();
-			Show_Mouse();
-
-			display = false;
-		}
-
-		/*
-		**	Get user input
-		*/
-		KeyNumType input = commands->Input();
-
-		/*
-		**	Process input
-		*/
-		switch (input) {
-
-			/*
-			**	Handle a click on one of the scenario variation group buttons.
-			*/
-			case (BUTTON_VAR_A | KN_BUTTON):
-			case (BUTTON_VAR_B | KN_BUTTON):
-			case (BUTTON_VAR_C | KN_BUTTON):
-			case (BUTTON_VAR_D | KN_BUTTON):
-				varabtn.Turn_Off();
-				varbbtn.Turn_Off();
-				varcbtn.Turn_Off();
-				vardbtn.Turn_Off();
-				switch (input) {
-					case (BUTTON_VAR_A | KN_BUTTON):
-						varp = SCEN_VAR_A;
-						varabtn.Turn_On();
-						break;
-
-					case (BUTTON_VAR_B | KN_BUTTON):
-						varp = SCEN_VAR_B;
-						varbbtn.Turn_On();
-						break;
-
-					case (BUTTON_VAR_C | KN_BUTTON):
-						varp = SCEN_VAR_C;
-						varcbtn.Turn_On();
-						break;
-
-					case (BUTTON_VAR_D | KN_BUTTON):
-						varp = SCEN_VAR_D;
-						vardbtn.Turn_On();
-						break;
-				}
-				break;
-
-			/*
-			**	Handle a click on the east/west variation group.
-			*/
-			case (BUTTON_EAST | KN_BUTTON):
-			case (BUTTON_WEST | KN_BUTTON):
-				westbtn.Turn_Off();
-				eastbtn.Turn_Off();
-				switch (input) {
-					case (BUTTON_EAST | KN_BUTTON):
-						dirp = SCEN_DIR_EAST;
-						eastbtn.Turn_On();
-						break;
-
-					case (BUTTON_WEST | KN_BUTTON):
-						dirp = SCEN_DIR_WEST;
-						westbtn.Turn_On();
-						break;
-				}
-				break;
-
-
-			/*
-			**	Handle a click on one of the player category
-			**	group buttons.
-			*/
-			case (BUTTON_GDI | KN_BUTTON):
-			case (BUTTON_NOD | KN_BUTTON):
-			case (BUTTON_NEUTRAL | KN_BUTTON):
-			case (BUTTON_MPLAYER | KN_BUTTON):
-				gdibtn.Turn_Off();
-				nodbtn.Turn_Off();
-				neubtn.Turn_Off();
-				playermbtn.Turn_Off();
-				switch (input) {
-					case (BUTTON_GDI | KN_BUTTON):
-						playerp = SCEN_PLAYER_SPAIN;
-						gdibtn.Turn_On();
-						break;
-
-					case (BUTTON_NOD | KN_BUTTON):
-						playerp = SCEN_PLAYER_GREECE;
-						nodbtn.Turn_On();
-						break;
-
-					case (BUTTON_NEUTRAL | KN_BUTTON):
-						playerp = SCEN_PLAYER_USSR;
-						neubtn.Turn_On();
-						break;
-
-					case (BUTTON_MPLAYER | KN_BUTTON):
-						playerp = SCEN_PLAYER_MPLAYER;
-						playermbtn.Turn_On();
-						break;
-				}
-				break;
-
-			case (KN_RETURN):
-			case (BUTTON_OK | KN_BUTTON):
-				cancel = false;
-				process = false;
-				break;
-
-			case (KN_ESC):
-			case (BUTTON_CANCEL | KN_BUTTON):
-				cancel = true;
-				process = false;
-				break;
-
-			case (BUTTON_SCENARIO | KN_BUTTON):
-				break;
-
-			default:
-				break;
-		}
+	while (pickscenerio_process) {
+		KeyNumType _key;
+		int _flags;
+		WWSDL_ProcessEvents(_key, _flags);
 	}
+
+	Imgui_Dialog_Function = nullptr;
+
+	bool cancel = pickscenerio_cancel;
 
 	/*
 	**	Redraw the display
