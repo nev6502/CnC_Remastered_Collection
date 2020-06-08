@@ -398,6 +398,7 @@ bool pickscenerio_process = false;
 bool pickscenerio_cancel = false;
 
 struct PickScenerioResults {
+	const char* caption;
 	char* scene_buf;
 	int *scen_nump;
 	ScenarioPlayerType *playerp;
@@ -540,7 +541,7 @@ void Imgui_PickScenerio_Dialog(void) {
 	style.FramePadding = ImVec2(0, 0);
 	ImGui::SetNextWindowSize(ImVec2(D_DIALOG_W, D_DIALOG_H));
 	ImGui::SetNextWindowPos(ImVec2(D_DIALOG_X * 2, D_DIALOG_Y));
-	ImGui::Begin("New Scenario", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin(pickScenerioResults.caption, &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
 	ImGui::Text("Scenario");
 	
 	ImGui::InputText("Scenario", &pickScenerioResults.scene_buf[0], 10);
@@ -639,6 +640,7 @@ int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioP
 
 	char scen_buf[10] = { 0 };						// buffer for editing scenario 
 
+	pickScenerioResults.caption = caption;
 	pickScenerioResults.scene_buf = &scen_buf[0];
 	pickScenerioResults.scen_nump = &scen_nump;
 	pickScenerioResults.playerp = &playerp;

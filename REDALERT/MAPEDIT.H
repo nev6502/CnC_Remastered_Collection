@@ -46,6 +46,7 @@
 #define MAPEDIT_H
 
 #include	"function.h"
+#include <vector>
 
 /*
 **	This is the maximum # of ObjectTypeClasses the editor has to deal with.
@@ -260,17 +261,12 @@ class MapEditClass : public MouseClass
 		*/
 //		ScenarioVarType ScenVar;
 
-		/*
-		**	Array of all TypeClasses the user can add to the map; cleared by
-		**	Clear_List(), added to by Add_To_List()
-		*/
-		ObjectTypeClass const * Objects[MAX_EDIT_OBJECTS];
-		int ObjCount;							// # of objects in the Objects array
+		std::vector<ObjectTypeClass const*> Objects[NUM_EDIT_CLASSES];
 
 		/*
 		**	Last-selected object to place, and last-selected house of object
 		*/
-		int LastChoice;						// index of item user picked last
+		//int LastChoice;						// index of item user picked last
 		HousesType LastHouse;				// house of last item picked
 
 		/*
@@ -279,25 +275,6 @@ class MapEditClass : public MouseClass
 		ObjectClass * GrabbedObject;		// object "grabbed" with mouse
 		CELL GrabOffset;						// offset to grabbed obj's upper-left
 		unsigned long LastClickTime;		// time of last LMOUSE click
-
-		/*
-		**	Number of each type of object in Objects, so we can switch categories
-		*/
-		int NumType[NUM_EDIT_CLASSES];		// # of each type of class:
-														// 0 = Template
-														// 1 = Overlay
-														// 2 = Smudge
-														// 3 = Terrain
-														// 4 = Unit
-														// 5 = Infantry
-														// 6 = Vessels
-														// 7 = Building
-														// 8 = Aircraft
-
-		/*
-		**	The offset of each type of object within the Objects[] array
-		*/
-		int TypeOffset[NUM_EDIT_CLASSES];	// offsets within Objects[]
 
 		/*
 		**	The "current" trigger for point-and-click trigger setting

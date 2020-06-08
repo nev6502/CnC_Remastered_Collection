@@ -51,10 +51,104 @@
  *   MapEditClass::Toggle_House -- toggles current placement object's house*
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include	"imgui.h"
 #include	"function.h"
 
 #ifdef SCENARIO_EDITOR
+int placementeditor_faction = 0;
+char* placementeditor_housenames[256];
+int placementeditor_numhouses = 0;
+bool placementeditor_catagory[9] = { false, false, false, false, false, false, false, false, false };
+int placementeditor_ObjCount = 0;
+bool placementeditor_process = true;
+bool placementeditor_cancel = false;							// true = user cancels
+int LastChoice = 0;
+static int typeindex = 0;									// index of class type
 
+void ImGui_Placement_Editor(void) {
+	bool toolActive;
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(480, 220));
+	ImGui::SetNextWindowPos(ImVec2(0, 150));
+	ImGui::Begin("Place Object", &toolActive, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground*/);
+		ImGui::Columns(3, "outer", true);
+		ImGui::LabelText("Test", "Object Name");
+		ImGui::NewLine();
+		ImGui::SameLine(45);
+		if (ImGui::Button("Prev")) {
+			LastChoice--;
+			if (LastChoice < 0) {
+				LastChoice = placementeditor_ObjCount -1;
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Next")) {
+			LastChoice++;
+			if (LastChoice == placementeditor_ObjCount) {
+				LastChoice = 0;
+			}
+		}
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::NewLine();
+		ImGui::SameLine(45);
+		if (ImGui::Button("Ok")) {
+			placementeditor_process = false;
+			placementeditor_cancel = false;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			placementeditor_process = false;
+			placementeditor_cancel = true;
+		}
+		ImGui::NextColumn();			
+		ImGui::ListBox("", &placementeditor_faction, &placementeditor_housenames[0], placementeditor_numhouses);		
+		ImGui::NextColumn();
+		//ImGui::NewLine();
+		if (ImGui::Checkbox("Template", &placementeditor_catagory[0])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[0] = true;
+		}
+		if (ImGui::Checkbox("Overlay", &placementeditor_catagory[1])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[1] = true;
+		}
+		if (ImGui::Checkbox("Smudge", &placementeditor_catagory[2])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[2] = true;
+		}
+		if (ImGui::Checkbox("Terrain", &placementeditor_catagory[3])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[3] = true;
+		}
+		if (ImGui::Checkbox("Units", &placementeditor_catagory[4])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[4] = true;
+		}
+		if (ImGui::Checkbox("Infantry", &placementeditor_catagory[5])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[5] = true;
+		}
+		if (ImGui::Checkbox("Ships", &placementeditor_catagory[6])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[6] = true;
+		}
+		if (ImGui::Checkbox("Building", &placementeditor_catagory[7])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[7] = true;
+		}
+		if (ImGui::Checkbox("Aircraft", &placementeditor_catagory[8])) {
+			memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+			placementeditor_catagory[8] = true;
+		}		
+	ImGui::Columns(1);
+	ImGui::End();
+}
 
 /***************************************************************************
  * MapEditClass::Placement_Dialog -- adds an object to the scenario        *
@@ -98,16 +192,27 @@
  *   05/12/1996 JLB : Handles hi-res.                                      *
  *=========================================================================*/
 int MapEditClass::Placement_Dialog(void)
-{
+{	
 	HousesType house;
 	RemapControlType * scheme = GadgetClass::Get_Color_Scheme();
+
+	placementeditor_faction = 0;
+	placementeditor_numhouses = 0;
+	placementeditor_process = 0;
+	//placementeditor_ObjCount = ObjCount;
+	memset(&placementeditor_catagory[0], 0, sizeof(placementeditor_catagory));
+	placementeditor_catagory[0] = true;
+	placementeditor_cancel = false;
+	placementeditor_process = true;
+
+	Imgui_Dialog_Function = ImGui_Placement_Editor;
 
 	/*
 	**	Dialog & button dimensions
 	*/
 	enum {
-		D_DIALOG_W = 400,
-		D_DIALOG_H = 180,
+		D_DIALOG_W = 200,
+		D_DIALOG_H = 150,
 		D_DIALOG_X = 0,
 		D_DIALOG_Y = 0,
 		D_DIALOG_CX = D_DIALOG_X + (D_DIALOG_W / 2),
@@ -117,7 +222,7 @@ int MapEditClass::Placement_Dialog(void)
 
 		D_PICTURE_W = 152,					// must be divisible by 8!
 		D_PICTURE_H = 105,
-		D_PICTURE_X = D_DIALOG_X + 35,		// must start on a byte boundary!
+		D_PICTURE_X = -20,		// must start on a byte boundary!
 		D_PICTURE_Y = D_DIALOG_Y + D_MARGIN + D_TXT8_H + D_MARGIN,
 		D_PICTURE_CX = D_PICTURE_X + D_PICTURE_W / 2,
 
@@ -221,15 +326,13 @@ int MapEditClass::Placement_Dialog(void)
 
 	/*
 	**	Dialog variables
-	*/
-	bool cancel = false;							// true = user cancels
+	*/	
 	const ObjectTypeClass * curobj;			// Working object pointer.
 	int x,y;											// for drawing the grid
 	KeyNumType input;								// user input
 	short const * occupy;							// ptr into object's OccupyList
 	int cell;										// cell index for parsing OccupyList
-	int i;
-	int typeindex;									// index of class type
+	int i;	
 
 	/*
 	**	Buttons
@@ -242,23 +345,25 @@ int MapEditClass::Placement_Dialog(void)
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
 	for (house = HOUSE_FIRST; house < HOUSE_COUNT; house++) {
-		housebtn.Add_Item(HouseTypeClass::As_Reference(house).IniName);
+		//housebtn.Add_Item(HouseTypeClass::As_Reference(house).IniName);
+		placementeditor_housenames[house] = HouseTypeClass::As_Reference(house).IniName;
+		placementeditor_numhouses++;
 	}
 	house = HOUSE_FIRST;
 
-	TextButtonClass nextbtn(BUTTON_NEXT, TXT_RIGHT, TPF_EBUTTON, D_RIGHT_X, D_RIGHT_Y, D_RIGHT_W, D_RIGHT_H);
-	TextButtonClass prevbtn(BUTTON_PREV, TXT_LEFT, TPF_EBUTTON, D_LEFT_X, D_LEFT_Y, D_LEFT_W, D_LEFT_H);
-	TextButtonClass okbtn(BUTTON_OK, "OK", TPF_EBUTTON, D_OK_X, D_OK_Y, D_OK_W, D_OK_H);
-	TextButtonClass cancelbtn(BUTTON_CANCEL, "Cancel", TPF_EBUTTON, D_CANCEL_X, D_CANCEL_Y, D_CANCEL_W, D_CANCEL_H);
-	TextButtonClass templatebtn(BUTTON_TEMPLATE, "Template", TPF_EBUTTON, D_TEMPLATE_X, D_TEMPLATE_Y, D_TEMPLATE_W, D_TEMPLATE_H);
-	TextButtonClass overlaybtn(BUTTON_OVERLAY, "Overlay", TPF_EBUTTON, D_OVERLAY_X, D_OVERLAY_Y, D_OVERLAY_W, D_OVERLAY_H);
-	TextButtonClass smudgebtn(BUTTON_SMUDGE, "Smudge", TPF_EBUTTON, D_SMUDGE_X, D_SMUDGE_Y, D_SMUDGE_W, D_SMUDGE_H);
-	TextButtonClass terrainbtn(BUTTON_TERRAIN, "Terrain", TPF_EBUTTON, D_TERRAIN_X, D_TERRAIN_Y, D_TERRAIN_W, D_TERRAIN_H);
-	TextButtonClass unitbtn(BUTTON_UNIT, "Unit", TPF_EBUTTON, D_UNIT_X, D_UNIT_Y, D_UNIT_W, D_UNIT_H);
-	TextButtonClass infantrybtn(BUTTON_INFANTRY, "Infantry", TPF_EBUTTON, D_INFANTRY_X, D_INFANTRY_Y, D_INFANTRY_W, D_INFANTRY_H);
-	TextButtonClass aircraftbtn(BUTTON_AIRCRAFT, "Ships", TPF_EBUTTON, D_AIRCRAFT_X, D_AIRCRAFT_Y, D_AIRCRAFT_W, D_AIRCRAFT_H);
-	TextButtonClass buildingbtn(BUTTON_BUILDING, "Building", TPF_EBUTTON, D_BUILDING_X, D_BUILDING_Y, D_BUILDING_W, D_BUILDING_H);
-	TextButtonClass airbtn(BUTTON_AIR, "Aircraft", TPF_EBUTTON, D_AIR_X, D_AIR_Y, D_AIR_W, D_AIR_H);
+	//TextButtonClass nextbtn(BUTTON_NEXT, TXT_RIGHT, TPF_EBUTTON, D_RIGHT_X, D_RIGHT_Y, D_RIGHT_W, D_RIGHT_H);
+	//TextButtonClass prevbtn(BUTTON_PREV, TXT_LEFT, TPF_EBUTTON, D_LEFT_X, D_LEFT_Y, D_LEFT_W, D_LEFT_H);
+	//TextButtonClass okbtn(BUTTON_OK, "OK", TPF_EBUTTON, D_OK_X, D_OK_Y, D_OK_W, D_OK_H);
+	//TextButtonClass cancelbtn(BUTTON_CANCEL, "Cancel", TPF_EBUTTON, D_CANCEL_X, D_CANCEL_Y, D_CANCEL_W, D_CANCEL_H);
+	//TextButtonClass templatebtn(BUTTON_TEMPLATE, "Template", TPF_EBUTTON, D_TEMPLATE_X, D_TEMPLATE_Y, D_TEMPLATE_W, D_TEMPLATE_H);
+	//TextButtonClass overlaybtn(BUTTON_OVERLAY, "Overlay", TPF_EBUTTON, D_OVERLAY_X, D_OVERLAY_Y, D_OVERLAY_W, D_OVERLAY_H);
+	//TextButtonClass smudgebtn(BUTTON_SMUDGE, "Smudge", TPF_EBUTTON, D_SMUDGE_X, D_SMUDGE_Y, D_SMUDGE_W, D_SMUDGE_H);
+	//TextButtonClass terrainbtn(BUTTON_TERRAIN, "Terrain", TPF_EBUTTON, D_TERRAIN_X, D_TERRAIN_Y, D_TERRAIN_W, D_TERRAIN_H);
+	//TextButtonClass unitbtn(BUTTON_UNIT, "Unit", TPF_EBUTTON, D_UNIT_X, D_UNIT_Y, D_UNIT_W, D_UNIT_H);
+	//TextButtonClass infantrybtn(BUTTON_INFANTRY, "Infantry", TPF_EBUTTON, D_INFANTRY_X, D_INFANTRY_Y, D_INFANTRY_W, D_INFANTRY_H);
+	//TextButtonClass aircraftbtn(BUTTON_AIRCRAFT, "Ships", TPF_EBUTTON, D_AIRCRAFT_X, D_AIRCRAFT_Y, D_AIRCRAFT_W, D_AIRCRAFT_H);
+	//TextButtonClass buildingbtn(BUTTON_BUILDING, "Building", TPF_EBUTTON, D_BUILDING_X, D_BUILDING_Y, D_BUILDING_W, D_BUILDING_H);
+	//TextButtonClass airbtn(BUTTON_AIR, "Aircraft", TPF_EBUTTON, D_AIR_X, D_AIR_Y, D_AIR_W, D_AIR_H);
 
 	/*
 	**	Initialize addable objects list; we must do this every time in case one
@@ -270,63 +375,50 @@ int MapEditClass::Placement_Dialog(void)
 	OverlayTypeClass::Prep_For_Add();
 	SmudgeTypeClass::Prep_For_Add();
 	TerrainTypeClass::Prep_For_Add();
+	TerrainTypeClass::Prep_For_Add();
 	UnitTypeClass::Prep_For_Add();
 	InfantryTypeClass::Prep_For_Add();
 	VesselTypeClass::Prep_For_Add();
 	BuildingTypeClass::Prep_For_Add();
-	AircraftTypeClass::Prep_For_Add();
+	AircraftTypeClass::Prep_For_Add();	
 
-	/*
-	**	Compute offset of each class type in the Objects array
-	*/
-	TypeOffset[0] = 0;
-	for (i = 1; i < NUM_EDIT_CLASSES; i++) {
-		TypeOffset[i] = TypeOffset[i-1] + NumType[i-1];
-	}
-
-	/*
-	**	Return if no objects to place
-	*/
-	if (!ObjCount)  {
-		return(-1);
-	}
+	if (Objects[0].size() <= 0)
+		return -1;
 
 	/*
 	**	Initialize
 	*/
 	Set_Logic_Page(SeenBuff);
-	if (LastChoice >= ObjCount) {
-		LastChoice = 0;
-	}
-	curobj = Objects[LastChoice];		// current object to choose
+	LastChoice = 0;
+	curobj = Objects[0][0];		// current object to choose
 
-	commands = &nextbtn;
-	housebtn.Add_Tail(*commands);
-	prevbtn.Add_Tail(*commands);
-	okbtn.Add_Tail(*commands);
-	cancelbtn.Add_Tail(*commands);
-	templatebtn.Add_Tail(*commands);
-	overlaybtn.Add_Tail(*commands);
-	smudgebtn.Add_Tail(*commands);
-	terrainbtn.Add_Tail(*commands);
-	unitbtn.Add_Tail(*commands);
-	infantrybtn.Add_Tail(*commands);
-	aircraftbtn.Add_Tail(*commands);
-	buildingbtn.Add_Tail(*commands);
-	airbtn.Add_Tail(*commands);
+	//commands = &nextbtn;
+	//housebtn.Add_Tail(*commands);
+	//prevbtn.Add_Tail(*commands);
+	//okbtn.Add_Tail(*commands);
+	//cancelbtn.Add_Tail(*commands);
+	//templatebtn.Add_Tail(*commands);
+	//overlaybtn.Add_Tail(*commands);
+	//smudgebtn.Add_Tail(*commands);
+	//terrainbtn.Add_Tail(*commands);
+	//unitbtn.Add_Tail(*commands);
+	//infantrybtn.Add_Tail(*commands);
+	//aircraftbtn.Add_Tail(*commands);
+	//buildingbtn.Add_Tail(*commands);
+	//airbtn.Add_Tail(*commands);
 
 	/*
 	**	Make sure the recorded house selection matches the house list
 	**	box selection.
 	*/
-	LastHouse = HousesType(housebtn.Current_Index());
+	//LastHouse = HousesType(housebtn.Current_Index());
 
 	/*
 	**	Main processing loop
 	*/
-	bool display = true;
-	bool process = true;
-	while (process) {
+	bool display = true;	
+	while (placementeditor_process) {
+		placementeditor_ObjCount = Objects[typeindex].size();
 
 		/*
 		**	Invoke game callback
@@ -343,7 +435,7 @@ int MapEditClass::Placement_Dialog(void)
 			*/
 			Hide_Mouse();
 			Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
-			Draw_Caption(TXT_PLACE_OBJECT, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
+		//	Draw_Caption(TXT_PLACE_OBJECT, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
 
 			/*
 			**	Display the current object:
@@ -357,7 +449,7 @@ int MapEditClass::Placement_Dialog(void)
 			WindowList[WINDOW_EDITOR][WINDOWWIDTH] = D_PICTURE_W;
 			WindowList[WINDOW_EDITOR][WINDOWHEIGHT] = D_PICTURE_H;
 			Change_Window((int)WINDOW_EDITOR);
-			Draw_Box(D_PICTURE_X, D_PICTURE_Y, D_PICTURE_W, D_PICTURE_H, BOXSTYLE_DOWN, false);
+		//	Draw_Box(D_PICTURE_X, D_PICTURE_Y, D_PICTURE_W, D_PICTURE_H, BOXSTYLE_DOWN, false);
 			curobj->Display(WinW/2, WinH>>1, WINDOW_EDITOR, LastHouse);
 //			curobj->Display(WinW<<2, WinH>>1, WINDOW_EDITOR, LastHouse);
 
@@ -410,228 +502,263 @@ int MapEditClass::Placement_Dialog(void)
 			**	the category button states.
 			*/
 			i = 0;
-			for (typeindex = 0; typeindex < NUM_EDIT_CLASSES; typeindex++) {
-				i += NumType[typeindex];
-				if (LastChoice < i) break;
-			}
-			templatebtn.Turn_Off();
-			overlaybtn.Turn_Off();
-			smudgebtn.Turn_Off();
-			terrainbtn.Turn_Off();
-			unitbtn.Turn_Off();
-			infantrybtn.Turn_Off();
-			aircraftbtn.Turn_Off();
-			airbtn.Turn_Off();
-			buildingbtn.Turn_Off();
-			switch (typeindex + BUTTON_TEMPLATE) {
-				case BUTTON_TEMPLATE:
-					templatebtn.Turn_On();
-					break;
-
-				case BUTTON_OVERLAY:
-					overlaybtn.Turn_On();
-					break;
-
-				case BUTTON_SMUDGE:
-					smudgebtn.Turn_On();
-					break;
-
-				case BUTTON_TERRAIN:
-					terrainbtn.Turn_On();
-					break;
-
-				case BUTTON_UNIT:
-					unitbtn.Turn_On();
-					break;
-
-				case BUTTON_INFANTRY:
-					infantrybtn.Turn_On();
-					break;
-
-				case BUTTON_AIRCRAFT:
-					aircraftbtn.Turn_On();
-					break;
-
-				case BUTTON_AIR:
-					airbtn.Turn_On();
-					break;
-
-				case BUTTON_BUILDING:
-					buildingbtn.Turn_On();
-					break;
-			}
+			//for (typeindex = 0; typeindex < NUM_EDIT_CLASSES; typeindex++) {
+			//	i += NumType[typeindex];
+			//	if (LastChoice < i) break;
+			//}
+			//templatebtn.Turn_Off();
+			//overlaybtn.Turn_Off();
+			//smudgebtn.Turn_Off();
+			//terrainbtn.Turn_Off();
+			//unitbtn.Turn_Off();
+			//infantrybtn.Turn_Off();
+			//aircraftbtn.Turn_Off();
+			//airbtn.Turn_Off();
+			//buildingbtn.Turn_Off();
+			//switch (typeindex + BUTTON_TEMPLATE) {
+			//	case BUTTON_TEMPLATE:
+			//		templatebtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_OVERLAY:
+			//		overlaybtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_SMUDGE:
+			//		smudgebtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_TERRAIN:
+			//		terrainbtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_UNIT:
+			//		unitbtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_INFANTRY:
+			//		infantrybtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_AIRCRAFT:
+			//		aircraftbtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_AIR:
+			//		airbtn.Turn_On();
+			//		break;
+			//
+			//	case BUTTON_BUILDING:
+			//		buildingbtn.Turn_On();
+			//		break;
+			//}
 
 			/*
 			**	Redraw buttons
 			*/
-			commands->Draw_All();
+			//commands->Draw_All();
 			Show_Mouse();
 			display = false;
 
 		}
+				
+		display = true;
+
+		if (placementeditor_catagory[0]) {
+			typeindex = 0;
+		}
+		else if (placementeditor_catagory[1]) {
+			typeindex = 1;
+		}
+		else if (placementeditor_catagory[2]) {
+			typeindex = 2;
+		}
+		else if (placementeditor_catagory[3]) {
+			typeindex = 3;
+		}
+		else if (placementeditor_catagory[4]) {
+			typeindex = 4;
+		}
+		else if (placementeditor_catagory[5]) {
+			typeindex = 5;
+		}
+		else if (placementeditor_catagory[6]) {
+			typeindex = 6;
+		}
+		else if (placementeditor_catagory[7]) {
+			typeindex = 7;
+		}
+		else if (placementeditor_catagory[8]) {
+			typeindex = 8;
+		}
+
+		LastHouse = (HousesType)placementeditor_faction;
+		curobj = Objects[typeindex][LastChoice];
 
 		/*
 		**	Get user input
 		*/
-		input = commands->Input();
-
-		/*
-		**	Process user input
-		*/
-		switch (input) {
-
-			/*
-			**	GDI House
-			*/
-			case (BUTTON_HOUSE | KN_BUTTON):
-				house = HousesType(housebtn.Current_Index());
-
-				/*
-				**	Set flags & buttons
-				*/
-				LastHouse = house;
-				display = true;
-				break;
-
-			/*
-			**	Next in list
-			*/
-			case (KN_RIGHT):
-			case (BUTTON_NEXT | KN_BUTTON):
-				/*
-				**	Increment to next obj
-				*/
-				LastChoice++;
-				if (LastChoice == ObjCount) {
-					LastChoice = 0;
-				}
-				curobj = Objects[LastChoice];
-
-				nextbtn.Turn_Off();
-				display = true;
-				break;
-
-			/*
-			**	Previous in list
-			*/
-			case (KN_LEFT):
-			case (BUTTON_PREV | KN_BUTTON):
-
-				/*
-				**	Decrement to prev obj
-				*/
-				LastChoice--;
-				if (LastChoice < 0) {
-					LastChoice = ObjCount-1;
-				}
-				curobj = Objects[LastChoice];
-				prevbtn.Turn_Off();
-				display = true;
-				break;
-
-			/*
-			**	Select a class type
-			*/
-			case (BUTTON_TEMPLATE | KN_BUTTON):
-			case (BUTTON_OVERLAY | KN_BUTTON):
-			case (BUTTON_SMUDGE | KN_BUTTON):
-			case (BUTTON_TERRAIN | KN_BUTTON):
-			case (BUTTON_UNIT | KN_BUTTON):
-			case (BUTTON_INFANTRY | KN_BUTTON):
-			case (BUTTON_AIRCRAFT | KN_BUTTON):
-			case (BUTTON_BUILDING | KN_BUTTON):
-			case (BUTTON_AIR | KN_BUTTON):
-
-				/*
-				**	Find index of class
-				*/
-				typeindex = input - (BUTTON_TEMPLATE | KN_BUTTON);
-
-				/*
-				**	If no objects of that type, do nothing
-				*/
-				if (NumType[typeindex]==0) {
-					display = true;
-					break;
-				}
-
-				/*
-				**	Set current object
-				*/
-				LastChoice = TypeOffset[typeindex];
-				curobj = Objects[LastChoice];
-				display = true;
-				break;
-
-			/*
-			**	Next category
-			*/
-			case KN_PGDN:
-				typeindex++;
-				if (typeindex==NUM_EDIT_CLASSES) {
-					typeindex = 0;
-				}
-
-				/*
-				**	Set current object
-				*/
-				LastChoice = TypeOffset[typeindex];
-				curobj = Objects[LastChoice];
-				display = true;
-				break;
-
-			/*
-			**	Previous category
-			*/
-			case KN_PGUP:
-				typeindex--;
-				if (typeindex < 0) {
-					typeindex = NUM_EDIT_CLASSES - 1;
-				}
-
-				/*
-				**	Set current object
-				*/
-				LastChoice = TypeOffset[typeindex];
-				curobj = Objects[LastChoice];
-				display = true;
-				break;
-
-			/*
-			**	Jump to 1st choice
-			*/
-			case KN_HOME:
-				LastChoice = 0;
-
-				/*
-				**	Set current object
-				*/
-				curobj = Objects[LastChoice];
-				display = true;
-				break;
-
-			/*
-			**	OK
-			*/
-			case (KN_RETURN):
-			case (BUTTON_OK | KN_BUTTON):
-				cancel = false;
-				process = false;
-				break;
-
-			/*
-			**	Cancel
-			*/
-			case (KN_ESC):
-			case (BUTTON_CANCEL | KN_BUTTON):
-				cancel = true;
-				process = false;
-				break;
-
-			default:
-				break;
-		}
-
+		//input = commands->Input();
+		//
+		///*
+		//**	Process user input
+		//*/
+		//switch (input) {
+		//
+		//	/*
+		//	**	GDI House
+		//	*/
+		//	case (BUTTON_HOUSE | KN_BUTTON):
+		//		house = HousesType(housebtn.Current_Index());
+		//
+		//		/*
+		//		**	Set flags & buttons
+		//		*/
+		//		LastHouse = house;
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	Next in list
+		//	*/
+		//	case (KN_RIGHT):
+		//	case (BUTTON_NEXT | KN_BUTTON):
+		//		/*
+		//		**	Increment to next obj
+		//		*/
+		//		LastChoice++;
+		//		if (LastChoice == ObjCount) {
+		//			LastChoice = 0;
+		//		}
+		//		curobj = Objects[LastChoice];
+		//
+		//		nextbtn.Turn_Off();
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	Previous in list
+		//	*/
+		//	case (KN_LEFT):
+		//	case (BUTTON_PREV | KN_BUTTON):
+		//
+		//		/*
+		//		**	Decrement to prev obj
+		//		*/
+		//		LastChoice--;
+		//		if (LastChoice < 0) {
+		//			LastChoice = ObjCount-1;
+		//		}
+		//		curobj = Objects[LastChoice];
+		//		prevbtn.Turn_Off();
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	Select a class type
+		//	*/
+		//	case (BUTTON_TEMPLATE | KN_BUTTON):
+		//	case (BUTTON_OVERLAY | KN_BUTTON):
+		//	case (BUTTON_SMUDGE | KN_BUTTON):
+		//	case (BUTTON_TERRAIN | KN_BUTTON):
+		//	case (BUTTON_UNIT | KN_BUTTON):
+		//	case (BUTTON_INFANTRY | KN_BUTTON):
+		//	case (BUTTON_AIRCRAFT | KN_BUTTON):
+		//	case (BUTTON_BUILDING | KN_BUTTON):
+		//	case (BUTTON_AIR | KN_BUTTON):
+		//
+		//		/*
+		//		**	Find index of class
+		//		*/
+		//		typeindex = input - (BUTTON_TEMPLATE | KN_BUTTON);
+		//
+		//		/*
+		//		**	If no objects of that type, do nothing
+		//		*/
+		//		if (NumType[typeindex]==0) {
+		//			display = true;
+		//			break;
+		//		}
+		//
+		//		/*
+		//		**	Set current object
+		//		*/
+		//		LastChoice = TypeOffset[typeindex];
+		//		curobj = Objects[LastChoice];
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	Next category
+		//	*/
+		//	case KN_PGDN:
+		//		typeindex++;
+		//		if (typeindex==NUM_EDIT_CLASSES) {
+		//			typeindex = 0;
+		//		}
+		//
+		//		/*
+		//		**	Set current object
+		//		*/
+		//		LastChoice = TypeOffset[typeindex];
+		//		curobj = Objects[LastChoice];
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	Previous category
+		//	*/
+		//	case KN_PGUP:
+		//		typeindex--;
+		//		if (typeindex < 0) {
+		//			typeindex = NUM_EDIT_CLASSES - 1;
+		//		}
+		//
+		//		/*
+		//		**	Set current object
+		//		*/
+		//		LastChoice = TypeOffset[typeindex];
+		//		curobj = Objects[LastChoice];
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	Jump to 1st choice
+		//	*/
+		//	case KN_HOME:
+		//		LastChoice = 0;
+		//
+		//		/*
+		//		**	Set current object
+		//		*/
+		//		curobj = Objects[LastChoice];
+		//		display = true;
+		//		break;
+		//
+		//	/*
+		//	**	OK
+		//	*/
+		//	case (KN_RETURN):
+		//	case (BUTTON_OK | KN_BUTTON):
+		//		cancel = false;
+		//		process = false;
+		//		break;
+		//
+		//	/*
+		//	**	Cancel
+		//	*/
+		//	case (KN_ESC):
+		//	case (BUTTON_CANCEL | KN_BUTTON):
+		//		cancel = true;
+		//		process = false;
+		//		break;
+		//
+		//	default:
+		//		break;
+		//}
+		KeyNumType _key;
+		int _type;
+		WWSDL_ProcessEvents(_key, _type);
 	}
 
 	/*
@@ -641,7 +768,7 @@ int MapEditClass::Placement_Dialog(void)
 	Flag_To_Redraw(true);
 	Render();
 
-	if (cancel) {
+	if (placementeditor_cancel) {
 		return(-1);
 	}
 
@@ -685,14 +812,6 @@ void MapEditClass::Start_Placement(void)
 	AircraftTypeClass::Prep_For_Add();
 
 	/*
-	**	Compute offset of each class type in the Objects array
-	*/
-	TypeOffset[0] = 0;
-	for (int i = 1; i < NUM_EDIT_CLASSES; i++) {
-		TypeOffset[i] = TypeOffset[i-1] + NumType[i-1];
-	}
-
-	/*
 	**	Create the placement object:
 	**	- For normal placement mode, use the last-used index into Objects
 	**	  (LastChoice), and the last-used house (LastHouse).
@@ -700,20 +819,20 @@ void MapEditClass::Start_Placement(void)
 	**	  House specified in the Base object
 	*/
 	if (!BaseBuilding) {
-		if (LastChoice >= ObjCount) {
-			LastChoice = ObjCount - 1;
+		if (LastChoice >= Objects[typeindex].size()) {
+			LastChoice = Objects[typeindex].size() - 1;
 		}
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(LastHouse));
 	} else {
-		if (LastChoice < TypeOffset[7]) {
-			LastChoice = TypeOffset[7];
+		//if (LastChoice < TypeOffset[7]) {
+		//	LastChoice = TypeOffset[7];
+		//}
+		if (LastChoice >= Objects[typeindex].size()) {
+			LastChoice = Objects[typeindex].size() - 1;
 		}
-		if (LastChoice >= ObjCount) {
-			LastChoice = ObjCount - 1;
-		}
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse = Base.House;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(LastHouse));
 	}
@@ -1059,7 +1178,7 @@ void MapEditClass::Place_Next(void)
 		**	Go to next object in Objects list
 		*/
 		LastChoice++;
-		if (LastChoice == ObjCount) {
+		if (LastChoice == Objects[typeindex].size()) {
 
 			/*
 			** If we're in normal placement mode, wrap to the 1st object;
@@ -1068,14 +1187,16 @@ void MapEditClass::Place_Next(void)
 			if (!BaseBuilding) {
 				LastChoice = 0;
 			} else {
-				LastChoice = TypeOffset[7];
+				//LastChoice = TypeOffset[7];
+				typeindex = 7;
+				LastChoice = Objects[typeindex].size() - 1;
 			}
 		}
 
 		/*
 		**	Create placement object
 		*/
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(PendingHouse));
 		if (!PendingObjectPtr) {
@@ -1141,18 +1262,22 @@ void MapEditClass::Place_Prev(void)
 		*/
 		if (!BaseBuilding) {
 			if (LastChoice < 0) {
-				LastChoice = ObjCount - 1;
+				LastChoice = Objects[typeindex].size() - 1;
 			}
 		} else {
-			if (LastChoice < TypeOffset[7]) {
-				LastChoice = ObjCount - 1;
+			//if (LastChoice < TypeOffset[7]) {
+			//	LastChoice = ObjCount - 1;
+			//}
+			if (LastChoice <= 0 && typeindex > 0) {
+				typeindex--;
+				LastChoice = Objects[typeindex].size() - 1;
 			}
 		}
 
 		/*
 		**	Create placement object
 		*/
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(PendingHouse));
 		if (!PendingObjectPtr) {
@@ -1211,9 +1336,9 @@ void MapEditClass::Place_Next_Category(void)
 	**	Go to next category in Objects list
 	*/
 	i = LastChoice;
-	while (Objects[i]->What_Am_I() == Objects[LastChoice]->What_Am_I()) {
+	while (Objects[typeindex][i]->What_Am_I() == Objects[typeindex][LastChoice]->What_Am_I()) {
 		i++;
-		if (i == ObjCount) {
+		if (i == Objects[typeindex].size()) {
 			i = 0;
 		}
 	}
@@ -1234,7 +1359,7 @@ void MapEditClass::Place_Next_Category(void)
 		/*
 		**	Create placement object
 		*/
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(PendingHouse));
 
@@ -1244,7 +1369,7 @@ void MapEditClass::Place_Next_Category(void)
 		if (!PendingObjectPtr) {
 			PendingObject = NULL;
 			LastChoice++;
-			if (LastChoice == ObjCount) {
+			if (LastChoice == Objects[typeindex].size()) {
 				LastChoice = 0;
 			}
 		}
@@ -1305,29 +1430,29 @@ void MapEditClass::Place_Prev_Category(void)
 	/*
 	**	Scan for start of this category
 	*/
-	while (Objects[i]->What_Am_I() == Objects[LastChoice]->What_Am_I()) {
+	while (Objects[typeindex][i]->What_Am_I() == Objects[typeindex][LastChoice]->What_Am_I()) {
 		i--;
 		if (i < 0) {
-			i = ObjCount - 1;
+			i = Objects[typeindex].size() - 1;
 		}
 	}
 
 	i--;
-	if (i < 0) i = ObjCount-1;
+	if (i < 0) i = Objects[typeindex].size() -1;
 	LastChoice = i;
 
 	/*
 	**	Scan for the previous category
 	*/
-	while (Objects[i]->What_Am_I() == Objects[LastChoice]->What_Am_I()) {
+	while (Objects[typeindex][i]->What_Am_I() == Objects[typeindex][LastChoice]->What_Am_I()) {
 		i--;
 		if (i < 0) {
-			i = ObjCount - 1;
+			i = Objects[typeindex].size() - 1;
 		}
 	}
 
 	i++;
-	if (i >= ObjCount) i = 0;
+	if (i >= Objects[typeindex].size()) i = 0;
 	LastChoice = i;
 
 	/*
@@ -1345,7 +1470,7 @@ void MapEditClass::Place_Prev_Category(void)
 		/*
 		**	Create placement object
 		*/
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(PendingHouse));
 
@@ -1356,7 +1481,7 @@ void MapEditClass::Place_Prev_Category(void)
 			PendingObject = NULL;
 			LastChoice--;
 			if (LastChoice < 0) {
-				LastChoice = ObjCount - 1;
+				LastChoice = Objects[typeindex].size() - 1;
 			}
 		}
 	}
@@ -1415,14 +1540,14 @@ void MapEditClass::Place_Home(void)
 		/*
 		**	Get house for this object type
 		*/
-		if (!Verify_House(LastHouse, Objects[LastChoice])) {
-			LastHouse = Cycle_House(LastHouse, Objects[LastChoice]);
+		if (!Verify_House(LastHouse, Objects[typeindex][LastChoice])) {
+			LastHouse = Cycle_House(LastHouse, Objects[typeindex][LastChoice]);
 		}
 
 		/*
 		**	Create placement object
 		*/
-		PendingObject = Objects[LastChoice];
+		PendingObject = Objects[typeindex][LastChoice];
 		PendingHouse = LastHouse;
 		PendingObjectPtr = PendingObject->Create_One_Of(HouseClass::As_Pointer(PendingHouse));
 
@@ -1432,7 +1557,7 @@ void MapEditClass::Place_Home(void)
 		if (!PendingObjectPtr) {
 			PendingObject = NULL;
 			LastChoice++;
-			if (LastChoice == ObjCount) {
+			if (LastChoice == Objects[typeindex].size()) {
 				LastChoice = 0;
 			}
 		}

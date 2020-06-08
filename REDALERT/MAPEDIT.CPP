@@ -84,7 +84,6 @@ extern int UnknownKey;					// in menus.cpp
 
 char MapEditClass::HealthBuf[20];
 
-
 /***************************************************************************
  * MapEditClass::MapEditClass -- class constructor                         *
  *                                                                         *
@@ -106,14 +105,8 @@ MapEditClass::MapEditClass(void)
 	**	Init data members.
 	*/
 //	ScenVar = SCEN_VAR_A;
-	ObjCount = 0;
-	LastChoice = 0;
 	LastHouse = HOUSE_GOOD;
 	GrabbedObject = 0;
-	for (int i=0; i < NUM_EDIT_CLASSES; i++) {
-		NumType[i] = 0;
-		TypeOffset[i] = 0;
-	}
 	Scen.Waypoint[WAYPT_HOME] = 0;
 	CurrentCell = 0;
 	CurTeam = NULL;
@@ -274,9 +267,8 @@ void MapEditClass::Clear_List(void)
 	/*
 	**	Set # object type ptrs to 0, set NumType for each type to 0
 	*/
-	ObjCount = 0;
 	for (int i = 0; i < NUM_EDIT_CLASSES; i++) {
-		NumType[i] = 0;
+		Objects[i].clear();
 	}
 }
 
@@ -308,49 +300,49 @@ bool MapEditClass::Add_To_List(ObjectTypeClass const * object)
 	/*
 	**	Add the object if there's room.
 	*/
-	if (object && ObjCount < MAX_EDIT_OBJECTS) {
-		Objects[ObjCount++] = object;
-
+	if (object /*&& ObjCount < MAX_EDIT_OBJECTS*/) {
+		//Objects[ObjCount++] = object;
 		/*
 		**	Update type counters.
 		*/
 		switch (object->What_Am_I()) {
-			case RTTI_TEMPLATETYPE:
-				NumType[0]++;
-				break;
+		case RTTI_TEMPLATETYPE:
+			Objects[0].push_back(object);
+			break;
 
-			case RTTI_OVERLAYTYPE:
-				NumType[1]++;
-				break;
+		case RTTI_OVERLAYTYPE:
+			Objects[1].push_back(object);
+			break;
 
-			case RTTI_SMUDGETYPE:
-				NumType[2]++;
-				break;
+		case RTTI_SMUDGETYPE:
+			Objects[2].push_back(object);
+			break;
 
-			case RTTI_TERRAINTYPE:
-				NumType[3]++;
-				break;
+		case RTTI_TERRAINTYPE:
+			Objects[3].push_back(object);
+			break;
 
-			case RTTI_UNITTYPE:
-				NumType[4]++;
-				break;
+		case RTTI_UNITTYPE:
+			Objects[4].push_back(object);
+			break;
 
-			case RTTI_INFANTRYTYPE:
-				NumType[5]++;
-				break;
+		case RTTI_INFANTRYTYPE:
+			Objects[5].push_back(object);
+			break;
 
-			case RTTI_VESSELTYPE:
-				NumType[6]++;
-				break;
+		case RTTI_VESSELTYPE:
+			Objects[6].push_back(object);
+			break;
 
-			case RTTI_BUILDINGTYPE:
-				NumType[7]++;
-				break;
+		case RTTI_BUILDINGTYPE:
+			Objects[7].push_back(object);
+			break;
 
-			case RTTI_AIRCRAFTTYPE:
-				NumType[8]++;
-				break;
+		case RTTI_AIRCRAFTTYPE:
+			Objects[8].push_back(object);
+			break;
 		}
+		
 		return(true);
 	}
 
@@ -1598,7 +1590,7 @@ void MapEditClass::Main_Menu(void)
 		int _flags;
 		WWSDL_ProcessEvents(_key, _flags);
 		Show_Mouse();
-		if (UnknownKey==KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) {
+		if (UnknownKey==KN_ESC || _key == KN_RMOUSE) {
 			break;
 		}
 
