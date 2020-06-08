@@ -128,7 +128,9 @@ void __cdecl Mouse_Draw(WWMouseClass& mouse, GraphicViewPortClass& viewport, int
 void* __cdecl Mouse_Set_Cursor(WWMouseClass& mouse, int hspot_x, int hspot_y, void* frame);
 
 void Hide_Mouse(void);
-void Show_Mouse(void);
+// jmarshall
+void Show_Mouse(bool clearPrevious = true);
+// jmarshall end
 void Conditional_Hide_Mouse(int x1, int y1, int x2, int y2);
 void Conditional_Show_Mouse(void);
 int Get_Mouse_State(void);

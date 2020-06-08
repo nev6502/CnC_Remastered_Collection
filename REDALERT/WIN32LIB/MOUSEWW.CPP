@@ -295,7 +295,7 @@ void *WWMouseClass::Set_Cursor(int xhotspot, int yhotspot, void *cursor)
 
 void WWMouseClass::Low_Hide_Mouse()
 {
-	if (!State) {
+	//if (!State) {
 		if (MouseBuffX != -1 || MouseBuffY != -1) {
 			if (Screen->Lock()){
 				Mouse_Shadow_Buffer(*this, *Screen, MouseBuffer, MouseBuffX, MouseBuffY, MouseXHot, MouseYHot, 0);
@@ -304,7 +304,7 @@ void WWMouseClass::Low_Hide_Mouse()
 		}
 		MouseBuffX = -1;
 		MouseBuffY = -1;
-	}
+	//}
 
 	State++;
 }
@@ -632,9 +632,13 @@ void Hide_Mouse(void)
 	_Mouse->Hide_Mouse();
 }
 
-void Show_Mouse(void)
+void Show_Mouse(bool clearPrevious)
 {
 	if (!_Mouse) return;
+
+	if(clearPrevious)
+		_Mouse->Hide_Mouse();
+
 	_Mouse->Show_Mouse();
 }
 
