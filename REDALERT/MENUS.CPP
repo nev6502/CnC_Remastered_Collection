@@ -442,6 +442,7 @@ int Do_Menu(char const ** strings, bool )
 		KeyNumType _key = KN_NONE;
 		int _flags;
 		WWSDL_ProcessEvents(_key, _flags);
+		Show_Mouse(true);
 // jmarshall end
 		Call_Back();
 		selection = Check_Menu(0, strings, NULL, 0xFFL, 0, _key);
