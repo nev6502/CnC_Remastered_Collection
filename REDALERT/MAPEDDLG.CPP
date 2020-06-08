@@ -391,6 +391,10 @@ int MapEditClass::Save_Scenario(void)
 	return(0);
 }
 
+bool pickscenerio_faction[4] = { false, false, false, false };
+bool pickscenerio_sides[2] = { false, false };
+bool pickscenerio_version[4] = { false, false, false, false };
+
 void Imgui_PickScenerio_Dialog(void) {
 	/*
 	**	Dialog & button dimensions
@@ -496,27 +500,58 @@ void Imgui_PickScenerio_Dialog(void) {
 	//ImGui::InputText("Version", &verionsId[0], sizeof(verionsId));
 	ImGui::Text("Version");
 	{
-		ImGui::Button("A");
+		if (ImGui::Checkbox("A", &pickscenerio_version[0])) {
+			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
+			pickscenerio_version[0] = true;
+		}
 		ImGui::SameLine();
-		ImGui::Button("B");
+		if (ImGui::Checkbox("B", &pickscenerio_version[1])) {
+			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
+			pickscenerio_version[1] = true;
+		}
 		ImGui::SameLine();
-		ImGui::Button("C");
+		if (ImGui::Checkbox("C", &pickscenerio_version[2])) {
+			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
+			pickscenerio_version[2] = true;
+		}
 		ImGui::SameLine();
-		ImGui::Button("D");
-	}
-
+		if (ImGui::Checkbox("D", &pickscenerio_version[3])) {
+			memset(pickscenerio_version, 0, sizeof(pickscenerio_version));
+			pickscenerio_version[3] = true;
+		}
+	}	
 	ImGui::Text("Side");
 	{
-		ImGui::Button("East");
+		if (ImGui::Checkbox("East", &pickscenerio_sides[0])) {
+			memset(pickscenerio_sides, 0, sizeof(pickscenerio_sides));
+			pickscenerio_sides[0] = true;
+		}
 		ImGui::SameLine();
-		ImGui::Button("West");
+		if (ImGui::Checkbox("West", &pickscenerio_sides[1])) {
+			memset(pickscenerio_sides, 0, sizeof(pickscenerio_sides));
+			pickscenerio_sides[1] = true;
+		}
 	}
 
 	ImGui::Text("Faction");
-	ImGui::Button("North (Spain)");
-	ImGui::Button("South(Greece)");
-	ImGui::Button("USSR");
-	ImGui::Button("Multiplayer");
+	
+	
+	if (ImGui::Checkbox("North (Spain)", &pickscenerio_faction[0])) {
+		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
+		pickscenerio_faction[0] = true;
+	}
+	if (ImGui::Checkbox("South(Greece)", &pickscenerio_faction[1])) {
+		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
+		pickscenerio_faction[1] = true;
+	}
+	if (ImGui::Checkbox("USSR", &pickscenerio_faction[2])) {
+		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
+		pickscenerio_faction[2] = true;
+	}
+	if (ImGui::Checkbox("Multiplayer", &pickscenerio_faction[3])) {
+		memset(pickscenerio_faction, 0, sizeof(pickscenerio_faction));
+		pickscenerio_faction[3] = true;
+	}
 	ImGui::NewLine();
 
 	{
