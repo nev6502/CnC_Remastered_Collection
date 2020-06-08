@@ -712,6 +712,44 @@ int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioP
 	return(0);
 }
 
+static int map_x1;										// map coords x1, pixel coords
+static int map_x2;										// map coords x2, pixel coords
+static int map_y1;										// map coords y1, pixel coords
+static int map_y2;										// map coords y2, pixel coords
+bool sizemap_cancel = false;							// true = user cancels
+bool sizemap_process = true;
+void Imgui_SizeMap(void) {
+	extern int mousex, mousey;
+	bool toolActive = false;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(500, 100));
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::Begin("Size Map", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Columns(4, "outer", true);
+		ImGui::Text("X");
+		ImGui::InputInt("", &map_x1);
+		ImGui::NextColumn();
+		ImGui::Text("Y");
+		ImGui::InputInt("", &map_y1);
+		if (ImGui::Button("Ok")) {
+			sizemap_cancel = false;
+			sizemap_process = false;
+		}
+		ImGui::NextColumn();
+		ImGui::Text("X2");
+		ImGui::InputInt("", &map_x2);
+		if (ImGui::Button("Cancel")) {
+			sizemap_cancel = true;
+			sizemap_process = false;
+		}
+		ImGui::NextColumn();
+		ImGui::Text("Y2");
+		ImGui::InputInt("", &map_y2);
+	ImGui::Columns(1);
+	ImGui::End();
+}
 
 /***************************************************************************
  * MapEditClass::Size_Map -- lets user set size & location of map          *
@@ -759,6 +797,10 @@ int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioP
  *=========================================================================*/
 int MapEditClass::Size_Map(int x, int y, int w, int h)
 {
+	Imgui_Dialog_Function = Imgui_SizeMap;
+	sizemap_cancel = false;							// true = user cancels
+	sizemap_process = true;
+
 	/*
 	**	Dialog & button dimensions
 	*/
@@ -811,13 +853,8 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 	**	Dialog variables:
 	*/
 	RedrawType display;							// requested redraw level
-	bool cancel = false;							// true = user cancels
 	KeyNumType input;								// user input
 	int grabbed = 0;								// 1=TLeft,2=TRight,3=BRight,4=BLeft
-	int map_x1;										// map coords x1, pixel coords
-	int map_x2;										// map coords x2, pixel coords
-	int map_y1;										// map coords y1, pixel coords
-	int map_y2;										// map coords y2, pixel coords
 	int delta1, delta2;							// mouse-click proximity
 	int mx,my;										// last-saved mouse coords
 //	char txt[40];
@@ -870,8 +907,8 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 	**	Main processing loop
 	*/
 	display = REDRAW_ALL;
-	bool process = true;
-	while (process) {
+	
+	while (sizemap_process) {
 
 		/*
 		**	Invoke game callback
@@ -881,441 +918,210 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 		/*
 		**	Refresh display if needed
 		*/
-		if (display) {
-			Hide_Mouse();
-
-			/*
-			**	Redraw the background, map border, key, and coord labels
-			*/
-			if (display >= REDRAW_BACKGROUND) {
-
-				/*
-				**	Background
-				*/
-				Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
-				Draw_Caption(TXT_SIZE_MAP, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
-
-				/*
-				**	Draw the map border
-				*/
-				if (LogicPage->Lock()) {
-					LogicPage->Draw_Rect(D_BORD_X1, D_BORD_Y1, D_BORD_X2, D_BORD_Y2, scheme->Shadow);
-//					for (index = D_BORD_X1; index < D_BORD_X2;
-//						index += (320/ICON_PIXEL_W)) {
-//						LogicPage->Put_Pixel(index, D_BORD_Y1-1, scheme->Shadow);
-//						LogicPage->Put_Pixel(index, D_BORD_Y2+1, scheme->Shadow);
+//		if (display) {
+//			Hide_Mouse();
+//
+//			/*
+//			**	Redraw the background, map border, key, and coord labels
+//			*/
+//			if (display >= REDRAW_BACKGROUND) {
+//
+//				/*
+//				**	Background
+//				*/
+//				Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
+//				Draw_Caption(TXT_SIZE_MAP, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
+//
+//				/*
+//				**	Draw the map border
+//				*/
+//				if (LogicPage->Lock()) {
+//					LogicPage->Draw_Rect(D_BORD_X1, D_BORD_Y1, D_BORD_X2, D_BORD_Y2, scheme->Shadow);
+////					for (index = D_BORD_X1; index < D_BORD_X2;
+////						index += (320/ICON_PIXEL_W)) {
+////						LogicPage->Put_Pixel(index, D_BORD_Y1-1, scheme->Shadow);
+////						LogicPage->Put_Pixel(index, D_BORD_Y2+1, scheme->Shadow);
+////					}
+////					for (index = D_BORD_Y1; index < D_BORD_Y2-8;
+////						index += (200/ICON_PIXEL_H)) {
+////						LogicPage->Put_Pixel(D_BORD_X1-1, index, scheme->Shadow);
+////						LogicPage->Put_Pixel(D_BORD_X2+1, index, scheme->Shadow);
+////					}
+//
+//					/*
+//					**	Draw the map "key"
+//					*/
+//					txt_x = D_BORD_X2 + 15;
+//					txt_y = D_BORD_Y1;
+//					Plain_Text_Print("Clear Terrain", txt_x, txt_y, GroundColor[LAND_CLEAR], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Water", txt_x, txt_y, GroundColor[LAND_WATER], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Tiberium", txt_x, txt_y, GroundColor[LAND_TIBERIUM], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Rock", txt_x, txt_y, GroundColor[LAND_ROCK], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Wall", txt_x, txt_y, GroundColor[LAND_WALL], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Beach", txt_x, txt_y, GroundColor[LAND_BEACH], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Rough", txt_x, txt_y, GroundColor[LAND_ROUGH], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("River", txt_x, txt_y, GroundColor[LAND_RIVER], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+////					txt_y += 8;
+////					Plain_Text_Print("GDI Unit", txt_x, txt_y, YELLOW, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+////					txt_y += 8;
+////					Plain_Text_Print("Nod Unit", txt_x, txt_y, RED, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+////					txt_y += 8;
+////					Plain_Text_Print("Neutral Unit", txt_x, txt_y, PURPLE, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Terrain Object", txt_x, txt_y, DKGREEN, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//					txt_y += 8;
+//					Plain_Text_Print("Starting Cell", txt_x, txt_y, WHITE, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
+//
+//					/*
+//					**	Draw the coordinate labels
+//					*/
+//					txt_x = D_DIALOG_X + D_DIALOG_W / 8;
+//					txt_y = D_DIALOG_Y + D_DIALOG_H - D_OK_H - 43;
+//					Fancy_Text_Print("  X", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
+//
+//					txt_x += (D_DIALOG_W - 20) / 4;
+//					Fancy_Text_Print("  Y", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
+//
+//					txt_x += (D_DIALOG_W - 20) / 4;
+//					Fancy_Text_Print(" Width", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
+//
+//					txt_x += (D_DIALOG_W - 20) / 4;
+//					Fancy_Text_Print(" Height", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
+//
+//					LogicPage->Unlock();
+//				}
+//
+//				/*
+//				**	Redraw the buttons
+//				*/
+//				commands->Flag_List_To_Redraw();
+//			}
+//
+//			/*
+//			**	Redraw the map symbology & location
+//			*/
+//			if (display >= REDRAW_MAP) {
+//
+//				if (LogicPage->Lock()) {
+//
+//					/*
+//					**	Erase the map interior
+//					*/
+//					LogicPage->Fill_Rect(D_BORD_X1 + 1, D_BORD_Y1 + 1, D_BORD_X2 - 1, D_BORD_Y2 - 1, BLACK);
+//
+//					/*
+//					**	Draw Land map symbols (use color according to Ground[] array).
+//					*/
+//					for (cell=0; cell < MAP_CELL_TOTAL; cell++) {
+//						occupier = (*this)[cell].Cell_Occupier();
+//						if (occupier == NULL) {
+//							color = GroundColor[(*this)[cell].Land_Type()];
+//							LogicPage->Put_Pixel(D_BORD_X1 + Cell_X(cell) + 1, D_BORD_Y1 + Cell_Y(cell) + 1, color);
+//						}
 //					}
-//					for (index = D_BORD_Y1; index < D_BORD_Y2-8;
-//						index += (200/ICON_PIXEL_H)) {
-//						LogicPage->Put_Pixel(D_BORD_X1-1, index, scheme->Shadow);
-//						LogicPage->Put_Pixel(D_BORD_X2+1, index, scheme->Shadow);
+//
+//					/*
+//					**	Draw the actual map location
+//					*/
+//					LogicPage->Draw_Rect(map_x1, map_y1, map_x2, map_y2, WHITE);
+//					switch (grabbed) {
+//						case 1:
+//							LogicPage->Draw_Line(map_x1, map_y1, map_x1 + 5, map_y1, BLUE);
+//							LogicPage->Draw_Line(map_x1, map_y1, map_x1, map_y1 + 5, BLUE);
+//							break;
+//
+//						case 2:
+//							LogicPage->Draw_Line(map_x2, map_y1, map_x2 - 5, map_y1, BLUE);
+//							LogicPage->Draw_Line(map_x2, map_y1, map_x2, map_y1 + 5, BLUE);
+//							break;
+//
+//						case 3:
+//							LogicPage->Draw_Line(map_x2, map_y2, map_x2 - 5, map_y2, BLUE);
+//							LogicPage->Draw_Line(map_x2, map_y2, map_x2, map_y2 - 5, BLUE);
+//							break;
+//
+//						case 4:
+//							LogicPage->Draw_Line(map_x1, map_y2, map_x1 + 5, map_y2, BLUE);
+//							LogicPage->Draw_Line(map_x1, map_y2, map_x1, map_y2 - 5, BLUE);
+//							break;
+//
+//						case 5:
+//							LogicPage->Draw_Rect(map_x1, map_y1, map_x2, map_y2, BLUE);
+//							break;
+//
+//						default:
+//							break;
 //					}
+//
+//					/*
+//					**	Draw Unit map symbols (Use the radar map color according to
+//					**	that specified in the house type class object.
+//					**	DKGREEN = terrain object
+//					*/
+//					for (cell=0; cell < MAP_CELL_TOTAL; cell++) {
+//						occupier = (*this)[cell].Cell_Occupier();
+//						if (occupier) {
+//							color = DKGREEN;
+//							if (occupier && occupier->Owner() != HOUSE_NONE) {
+//								color = ColorRemaps[HouseClass::As_Pointer(occupier->Owner())->RemapColor].Color;
+//							}
+//							LogicPage->Put_Pixel(D_BORD_X1 + Cell_X(cell) + 1, D_BORD_Y1 + Cell_Y(cell) + 1, color);
+//						}
+//					}
+//
+//					/*
+//					**	Draw Home location
+//					*/
+//					LogicPage->Put_Pixel(D_BORD_X1 + Cell_X(Scen.Waypoint[WAYPT_HOME]) + 1, D_BORD_Y1 + Cell_Y(Scen.Waypoint[WAYPT_HOME]) + 1, WHITE);
+//
+//					/*
+//					**	Erase old coordinates
+//					*/
+////					LogicPage->Fill_Rect( D_DIALOG_X + 7,
+////						D_DIALOG_Y + D_DIALOG_H - D_OK_H - 22,
+////						D_DIALOG_X + D_DIALOG_W - 7,
+////						D_DIALOG_Y + D_DIALOG_H - D_OK_H - 22 + 10, BLACK);
+//
+//					/*
+//					**	Draw the coordinates
+//					*/
+//					txt_x = D_DIALOG_X + D_DIALOG_W / 8;
+//					txt_y = D_DIALOG_Y + D_DIALOG_H - D_OK_H - 32;
+//					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_x1 - D_BORD_X1 - 1);
+//
+//					txt_x += (D_DIALOG_W - 20) / 4;
+//					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_y1 - D_BORD_Y1 - 1);
+//
+//					txt_x += (D_DIALOG_W - 20) / 4;
+//					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_x2 - map_x1 + 1);
+//
+//					txt_x += (D_DIALOG_W - 20) / 4;
+//					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_y2 - map_y1 + 1);
+//
+//					LogicPage->Unlock();
+//				}
+//			}
+//
+//			Show_Mouse();
+			KeyNumType _key;
+			int _types;
+			WWSDL_ProcessEvents(_key, _types);
 
-					/*
-					**	Draw the map "key"
-					*/
-					txt_x = D_BORD_X2 + 15;
-					txt_y = D_BORD_Y1;
-					Plain_Text_Print("Clear Terrain", txt_x, txt_y, GroundColor[LAND_CLEAR], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Water", txt_x, txt_y, GroundColor[LAND_WATER], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Tiberium", txt_x, txt_y, GroundColor[LAND_TIBERIUM], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Rock", txt_x, txt_y, GroundColor[LAND_ROCK], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Wall", txt_x, txt_y, GroundColor[LAND_WALL], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Beach", txt_x, txt_y, GroundColor[LAND_BEACH], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Rough", txt_x, txt_y, GroundColor[LAND_ROUGH], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("River", txt_x, txt_y, GroundColor[LAND_RIVER], TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-//					txt_y += 8;
-//					Plain_Text_Print("GDI Unit", txt_x, txt_y, YELLOW, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-//					txt_y += 8;
-//					Plain_Text_Print("Nod Unit", txt_x, txt_y, RED, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-//					txt_y += 8;
-//					Plain_Text_Print("Neutral Unit", txt_x, txt_y, PURPLE, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Terrain Object", txt_x, txt_y, DKGREEN, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-					txt_y += 8;
-					Plain_Text_Print("Starting Cell", txt_x, txt_y, WHITE, TBLACK, TPF_DROPSHADOW | TPF_EFNT);
-
-					/*
-					**	Draw the coordinate labels
-					*/
-					txt_x = D_DIALOG_X + D_DIALOG_W / 8;
-					txt_y = D_DIALOG_Y + D_DIALOG_H - D_OK_H - 43;
-					Fancy_Text_Print("  X", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
-
-					txt_x += (D_DIALOG_W - 20) / 4;
-					Fancy_Text_Print("  Y", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
-
-					txt_x += (D_DIALOG_W - 20) / 4;
-					Fancy_Text_Print(" Width", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
-
-					txt_x += (D_DIALOG_W - 20) / 4;
-					Fancy_Text_Print(" Height", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW);
-
-					LogicPage->Unlock();
-				}
-
-				/*
-				**	Redraw the buttons
-				*/
-				commands->Flag_List_To_Redraw();
-			}
-
-			/*
-			**	Redraw the map symbology & location
-			*/
-			if (display >= REDRAW_MAP) {
-
-				if (LogicPage->Lock()) {
-
-					/*
-					**	Erase the map interior
-					*/
-					LogicPage->Fill_Rect(D_BORD_X1 + 1, D_BORD_Y1 + 1, D_BORD_X2 - 1, D_BORD_Y2 - 1, BLACK);
-
-					/*
-					**	Draw Land map symbols (use color according to Ground[] array).
-					*/
-					for (cell=0; cell < MAP_CELL_TOTAL; cell++) {
-						occupier = (*this)[cell].Cell_Occupier();
-						if (occupier == NULL) {
-							color = GroundColor[(*this)[cell].Land_Type()];
-							LogicPage->Put_Pixel(D_BORD_X1 + Cell_X(cell) + 1, D_BORD_Y1 + Cell_Y(cell) + 1, color);
-						}
-					}
-
-					/*
-					**	Draw the actual map location
-					*/
-					LogicPage->Draw_Rect(map_x1, map_y1, map_x2, map_y2, WHITE);
-					switch (grabbed) {
-						case 1:
-							LogicPage->Draw_Line(map_x1, map_y1, map_x1 + 5, map_y1, BLUE);
-							LogicPage->Draw_Line(map_x1, map_y1, map_x1, map_y1 + 5, BLUE);
-							break;
-
-						case 2:
-							LogicPage->Draw_Line(map_x2, map_y1, map_x2 - 5, map_y1, BLUE);
-							LogicPage->Draw_Line(map_x2, map_y1, map_x2, map_y1 + 5, BLUE);
-							break;
-
-						case 3:
-							LogicPage->Draw_Line(map_x2, map_y2, map_x2 - 5, map_y2, BLUE);
-							LogicPage->Draw_Line(map_x2, map_y2, map_x2, map_y2 - 5, BLUE);
-							break;
-
-						case 4:
-							LogicPage->Draw_Line(map_x1, map_y2, map_x1 + 5, map_y2, BLUE);
-							LogicPage->Draw_Line(map_x1, map_y2, map_x1, map_y2 - 5, BLUE);
-							break;
-
-						case 5:
-							LogicPage->Draw_Rect(map_x1, map_y1, map_x2, map_y2, BLUE);
-							break;
-
-						default:
-							break;
-					}
-
-					/*
-					**	Draw Unit map symbols (Use the radar map color according to
-					**	that specified in the house type class object.
-					**	DKGREEN = terrain object
-					*/
-					for (cell=0; cell < MAP_CELL_TOTAL; cell++) {
-						occupier = (*this)[cell].Cell_Occupier();
-						if (occupier) {
-							color = DKGREEN;
-							if (occupier && occupier->Owner() != HOUSE_NONE) {
-								color = ColorRemaps[HouseClass::As_Pointer(occupier->Owner())->RemapColor].Color;
-							}
-							LogicPage->Put_Pixel(D_BORD_X1 + Cell_X(cell) + 1, D_BORD_Y1 + Cell_Y(cell) + 1, color);
-						}
-					}
-
-					/*
-					**	Draw Home location
-					*/
-					LogicPage->Put_Pixel(D_BORD_X1 + Cell_X(Scen.Waypoint[WAYPT_HOME]) + 1, D_BORD_Y1 + Cell_Y(Scen.Waypoint[WAYPT_HOME]) + 1, WHITE);
-
-					/*
-					**	Erase old coordinates
-					*/
-//					LogicPage->Fill_Rect( D_DIALOG_X + 7,
-//						D_DIALOG_Y + D_DIALOG_H - D_OK_H - 22,
-//						D_DIALOG_X + D_DIALOG_W - 7,
-//						D_DIALOG_Y + D_DIALOG_H - D_OK_H - 22 + 10, BLACK);
-
-					/*
-					**	Draw the coordinates
-					*/
-					txt_x = D_DIALOG_X + D_DIALOG_W / 8;
-					txt_y = D_DIALOG_Y + D_DIALOG_H - D_OK_H - 32;
-					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_x1 - D_BORD_X1 - 1);
-
-					txt_x += (D_DIALOG_W - 20) / 4;
-					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_y1 - D_BORD_Y1 - 1);
-
-					txt_x += (D_DIALOG_W - 20) / 4;
-					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_x2 - map_x1 + 1);
-
-					txt_x += (D_DIALOG_W - 20) / 4;
-					Fancy_Text_Print("%5d", txt_x, txt_y, GadgetClass::Get_Color_Scheme(), BLACK, TPF_CENTER | TPF_EFNT | TPF_NOSHADOW, map_y2 - map_y1 + 1);
-
-					LogicPage->Unlock();
-				}
-			}
-
-			Show_Mouse();
-			display = REDRAW_NONE;
-		}
+		//	display = REDRAW_NONE;
+		
 
 		/*
 		**	Process user input
 		*/
 		input = commands->Input();
 
-		/*
-		**	Normal button processing: This is done when the mouse button is NOT
-		**	being held down ('grabbed' is 0).
-		*/
-		if (grabbed == 0) {
-			switch (input) {
-				case (KN_RETURN):
-				case (BUTTON_OK | KN_BUTTON):
-					cancel = false;
-					process = false;
-					break;
-
-				case (KN_ESC):
-				case (BUTTON_CANCEL | KN_BUTTON):
-					cancel = true;
-					process = false;
-					break;
-
-				case KN_LMOUSE:
-					/*
-					**	Grab top left
-					*/
-					delta1 =  abs(Keyboard->MouseQX - map_x1);
-					delta2 =  abs(Keyboard->MouseQY - map_y1);
-					if (delta1 < 3 && delta2 < 3) {
-						grabbed = 1;
-						mx = Keyboard->MouseQX;
-						my = Keyboard->MouseQY;
-						display = REDRAW_MAP;
-						break;
-					}
-
-					/*
-					**	Grab top right
-					*/
-					delta1 =  abs(Keyboard->MouseQX - map_x2);
-					delta2 =  abs(Keyboard->MouseQY - map_y1);
-					if (delta1 < 3 && delta2 < 3) {
-						grabbed = 2;
-						mx = Keyboard->MouseQX;
-						my = Keyboard->MouseQY;
-						display = REDRAW_MAP;
-						break;
-					}
-
-					/*
-					**	Grab bottom right
-					*/
-					delta1 =  abs(Keyboard->MouseQX - map_x2);
-					delta2 =  abs(Keyboard->MouseQY - map_y2);
-					if (delta1 < 3 && delta2 < 3) {
-						grabbed = 3;
-						mx = Keyboard->MouseQX;
-						my = Keyboard->MouseQY;
-						display = REDRAW_MAP;
-						break;
-					}
-
-					/*
-					**	Grab bottom left
-					*/
-					delta1 =  abs(Keyboard->MouseQX - map_x1);
-					delta2 =  abs(Keyboard->MouseQY - map_y2);
-					if (delta1 < 3 && delta2 < 3) {
-						grabbed = 4;
-						mx = Keyboard->MouseQX;
-						my = Keyboard->MouseQY;
-						display = REDRAW_MAP;
-						break;
-					}
-
-					/*
-					**	Grab the whole map
-					*/
-					delta1 = abs(Keyboard->MouseQX - ((map_x1 + map_x2) / 2));
-					delta2 = abs(Keyboard->MouseQY - ((map_y1 + map_y2) / 2));
-					if (delta1 < (map_x2 - map_x1) / 4 &&
-						delta2 < (map_y2 - map_y1) / 4) {
-						grabbed = 5;
-						mx = Keyboard->MouseQX;
-						my = Keyboard->MouseQY;
-						display = REDRAW_MAP;
-					}
-					break;
-
-				default:
-					break;
-			}
-		} else {
-
-			/*
-			**	Mouse motion processing: This is done while the left mouse button IS
-			**	being held down.
-			**	- First, check for the button release; if detected, un-grab
-			**	- Then, handle mouse motion. WWLIB doesn't pass through a KN_MOUSE_MOVE
-			**	  value while the button is being held down, so this case must be
-			**	  trapped as a default.
-			*/
-			switch (input) {
-				case ((int)KN_LMOUSE | (int)KN_RLSE_BIT):
-					grabbed = 0;
-					display = REDRAW_MAP;
-					break;
-
-				default:
-					delta1 = Get_Mouse_X() - mx;
-					delta2 = Get_Mouse_Y() - my;
-					if (delta1==0 && delta2==0) {
-						break;
-					}
-
-					/*
-					**	Move top left
-					*/
-					if (grabbed==1) {
-						map_x1 += delta1;
-						if (map_x1 > map_x2 - 2) {
-							map_x1 = map_x2 - 2;
-						} else {
-							if (map_x1 < D_BORD_X1 + 2) {
-								map_x1 = D_BORD_X1 + 2;
-							}
-						}
-
-						map_y1 += delta2;
-						if (map_y1 > map_y2 - 2) {
-							map_y1 = map_y2 - 2;
-						} else {
-							if (map_y1 < D_BORD_Y1 + 2) {
-								map_y1 = D_BORD_Y1 + 2;
-							}
-						}
-						display = REDRAW_MAP;
-						mx = Get_Mouse_X();
-						my = Get_Mouse_Y();
-					}
-
-					/*
-					**	Move top right
-					*/
-					if (grabbed==2) {
-						map_x2 += delta1;
-						if (map_x2 < map_x1 + 2) {
-							map_x2 = map_x1 + 2;
-						} else {
-							if (map_x2 > D_BORD_X2 - 2) {
-								map_x2 = D_BORD_X2 - 2;
-							}
-						}
-
-						map_y1 += delta2;
-						if (map_y1 > map_y2 - 2) {
-							map_y1 = map_y2 - 2;
-						} else {
-							if (map_y1 < D_BORD_Y1 + 2) {
-								map_y1 = D_BORD_Y1 + 2;
-							}
-						}
-						display = REDRAW_MAP;
-						mx = Get_Mouse_X();
-						my = Get_Mouse_Y();
-					}
-
-					/*
-					**	Move bottom right
-					*/
-					if (grabbed==3) {
-						map_x2 += delta1;
-						if (map_x2 < map_x1 + 2) {
-							map_x2 = map_x1 + 2;
-						} else {
-							if (map_x2 > D_BORD_X2 - 2) {
-								map_x2 = D_BORD_X2 - 2;
-							}
-						}
-
-						map_y2 += delta2;
-						if (map_y2 < map_y1 + 2) {
-							map_y2 = map_y1 + 2;
-						} else {
-							if (map_y2 > D_BORD_Y2 - 2) {
-								map_y2 = D_BORD_Y2 - 2;
-							}
-						}
-						display = REDRAW_MAP;
-						mx = Get_Mouse_X();
-						my = Get_Mouse_Y();
-					}
-
-					/*
-					**	Move bottom left
-					*/
-					if (grabbed==4) {
-						map_x1 += delta1;
-						if (map_x1 > map_x2 - 2) {
-							map_x1 = map_x2 - 2;
-						} else {
-							if (map_x1 < D_BORD_X1 + 2) {
-								map_x1 = D_BORD_X1 + 2;
-							}
-						}
-
-						map_y2 += delta2;
-						if (map_y2 < map_y1 + 2) {
-							map_y2 = map_y1 + 2;
-						} else {
-							if (map_y2 > D_BORD_Y2 - 2) {
-								map_y2 = D_BORD_Y2 - 2;
-							}
-						}
-						display = REDRAW_MAP;
-						mx = Get_Mouse_X();
-						my = Get_Mouse_Y();
-					}
-
-					/*
-					**	Move whole map
-					*/
-					if (grabbed==5) {
-						if (map_x1 + delta1 > D_BORD_X1 + 1 && map_x2 + delta1 < D_BORD_X2 - 1) {
-							map_x1 += delta1;
-							map_x2 += delta1;
-						}
-
-						if (map_y1 + delta2 > D_BORD_Y1 + 1 && map_y2 + delta2 < D_BORD_Y2 - 1) {
-							map_y1 += delta2;
-							map_y2 += delta2;
-						}
-						display = REDRAW_MAP;
-						mx = Get_Mouse_X();
-						my = Get_Mouse_Y();
-					}
-					break;
-			}
-		}
 	}
 
 	/*
@@ -1328,7 +1134,7 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 	/*
 	**	If cancel, just return
 	*/
-	if (cancel) {
+	if (sizemap_cancel) {
 		return(-1);
 	}
 
