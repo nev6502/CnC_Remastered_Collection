@@ -66,6 +66,7 @@ struct WAVE_Data {
 #define MAX_AUDIO_SOURCES 32
 #define SPEECH_AUDIO_SOURCE (MAX_AUDIO_SOURCES - 3)
 #define MOVIE_AUDIO_SOURCE (MAX_AUDIO_SOURCES - 2)
+#define MUSIC_AUDIO_SOURCE (MAX_AUDIO_SOURCES - 1)
 ALuint audio_sources[MAX_AUDIO_SOURCES];
 int current_streaming_audiosource = 0;
 
@@ -319,6 +320,15 @@ void PlayAudio(AudioBuffer_t& buffer, bool speech) {
 	alSourcePlay(audio_sources[currentAudioTSource]);
 
 	currentAudioTSource++;
+}
+
+void AudMix_SetMusicState(bool musicState) {
+	if (!musicState) {
+		alSourcePause(audio_sources[MUSIC_AUDIO_SOURCE]);
+	}
+	else {
+		alSourcePlay(audio_sources[MUSIC_AUDIO_SOURCE]);
+	}
 }
 
 void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house)

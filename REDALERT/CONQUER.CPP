@@ -104,6 +104,7 @@ TcpipManagerClass	Winsock;
 #include	"ccdde.h"
 #include	"vortex.h"
 #include    "VQAMOVIE.H"
+#include	"AUDIOMIX.H"
 
 #ifdef WOLAPI_INTEGRATION
 //#include "WolDebug.h"
@@ -2537,6 +2538,7 @@ void Go_Editor(bool flag)
 	**	Go into Scenario Editor mode
 	*/
 	if (flag) {
+		AudMix_SetMusicState(false); // jmarshall: disable music if we are in editor mode
 		Debug_Map = true;
 		Debug_Unshroud = true;
 
@@ -2567,7 +2569,7 @@ void Go_Editor(bool flag)
 		Map.Render();
 
 	} else {
-
+		AudMix_SetMusicState(true); // jmarshall: enable music if we are going back into editor mode.
 		/*
 		**	Go into normal game mode
 		*/

@@ -484,7 +484,7 @@ void MapEditClass::AI(KeyNumType & input, int x, int y)
 					Changed = 0;
 				}
 				BaseGauge->Set_Value(Scen.Percent);
-				Go_Editor(!Debug_Map);
+				Go_Editor(!Debug_Map);				
 			}
 		}
 	}
