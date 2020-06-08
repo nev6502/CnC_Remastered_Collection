@@ -1168,6 +1168,74 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 	return(0);
 }
 
+std::vector<const char *> scenerio_theaters;
+std::vector<const char*> scenerio_intros;
+std::vector<const char*> scenario_briefing;
+std::vector<const char*> scenario_action;
+std::vector<const char*> scenario_win;
+std::vector<const char*> scenario_loose;
+
+char description[DESCRIP_MAX] = "";
+int scenario_intromovie = 0;
+void ImGui_ScenerioDialog(void) {
+	bool toolActive = false;
+	int theater = Scen.Theater; 
+	int briefmovie = Scen.BriefMovie + 1;
+	int action = Scen.ActionMovie + 1;
+	int win = Scen.WinMovie + 1;
+	int lose = Scen.LoseMovie + 1;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(320 * RESFACTOR, 200 * RESFACTOR));
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::Begin("Scenario Editor", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Columns(2, "outer", true);
+		ImGui::Text("Theater");
+		ImGui::PushID("t_text");
+			ImGui::Combo("", (int *)&theater, &scenerio_theaters[0], scenerio_theaters.size());
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::Text("Scenario Name:");
+		ImGui::PushID("s_name");
+			ImGui::InputText("", description, sizeof(description));
+		ImGui::PopID();
+		ImGui::Columns(1);
+		ImGui::Columns(5, "outer2", true);
+		ImGui::Text("Intro");
+		ImGui::PushID("s_intro");
+			ImGui::Combo("", (int*)&scenario_intromovie, &scenerio_intros[0], scenerio_intros.size());
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::Text("Briefing");
+		ImGui::PushID("brief_txt");
+			ImGui::Combo("", (int*)&briefmovie, &scenario_briefing[0], scenario_briefing.size());
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::Text("Action");
+		ImGui::PushID("action_txt");
+			ImGui::Combo("", (int*)&action, &scenario_action[0], scenario_action.size());
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::Text("Win");
+		ImGui::PushID("win_txt");
+			ImGui::Combo("", (int*)&win, &scenario_win[0], scenario_win.size());
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::Text("Lose");
+		ImGui::PushID("lose_txt");
+			ImGui::Combo("", (int*)&lose, &scenario_loose[0], scenario_loose.size());
+		ImGui::PopID();
+		ImGui::Columns(1);
+	ImGui::End();
+
+	Scen.Theater = (TheaterType)(theater);
+	Scen.BriefMovie = (VQType)(briefmovie - 1);
+	Scen.ActionMovie = (VQType)(action - 1);
+	Scen.WinMovie = (VQType)(win - 1);
+	Scen.LoseMovie = (VQType)(lose - 1);
+}
+
 
 /***************************************************************************
  * MapEditClass::Scenario_Dialog -- scenario global parameters dialog      *
@@ -1190,10 +1258,26 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
  *=========================================================================*/
 int MapEditClass::Scenario_Dialog(void)
 {
-	TheaterType orig_theater = Scen.Theater;		// original theater
+	
 	HousesType house = PlayerPtr->Class->House;
 	HousesType newhouse = house;
 	HouseStaticClass hdata[HOUSE_COUNT];
+
+	Imgui_Dialog_Function = ImGui_ScenerioDialog;
+
+
+	scenerio_theaters.clear();
+	scenerio_intros.clear();
+	scenario_briefing.clear();
+	scenario_action.clear();
+	scenario_win.clear();
+	scenario_loose.clear();
+
+	scenerio_intros.push_back("<NONE>");
+	scenario_briefing.push_back("<NONE>");
+	scenario_action.push_back("<NONE>");
+	scenario_win.push_back("<NONE>");
+	scenario_loose.push_back("<NONE>");
 
 	/*
 	**	Fill in the house data for each house that exists.
@@ -1277,12 +1361,13 @@ int MapEditClass::Scenario_Dialog(void)
 		D_DIALOG_X+15*RESFACTOR, D_DIALOG_Y+30, 65, 8*5,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	for (TheaterType t = THEATER_FIRST; t < THEATER_COUNT; t++) {
-		theaterbtn.Add_Item(Theaters[t].Name);
-	}
-	theaterbtn.Set_Selected_Index(orig_theater);
 
-	char description[DESCRIP_MAX] = "";
+	for (TheaterType t = THEATER_FIRST; t < THEATER_COUNT; t++) {
+		scenerio_theaters.push_back(Theaters[t].Name);		
+	}
+	//theaterbtn.Set_Selected_Index(orig_theater);
+
+	
 	strcpy(description, Scen.Description);
 	EditClass desc(BUTTON_DESCRIPTION, description, sizeof(description), TPF_EFNT|TPF_NOSHADOW, theaterbtn.X+theaterbtn.Width+15, theaterbtn.Y, 160);
 
@@ -1406,11 +1491,11 @@ int MapEditClass::Scenario_Dialog(void)
 		theaterbtn.X, theaterbtn.Y+theaterbtn.Height+24, 50, 7*10,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	intro.Add_Item("<none>");
+	//intro.Add_Item("<none>");
 	for (VQType v = VQ_FIRST; v < VQ_COUNT; v++) {
-		intro.Add_Item(VQName[v]);
+		scenerio_intros.push_back(&VQName[v][0]);		
 	}
-	intro.Set_Selected_Index((int)Scen.IntroMovie + 1);
+	//intro.Set_Selected_Index((int)Scen.IntroMovie + 1);
 
 	/*
 	**	Briefing movie name.
@@ -1421,11 +1506,12 @@ int MapEditClass::Scenario_Dialog(void)
 		intro.X+intro.Width+10, intro.Y, 50, 7*10,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	briefing.Add_Item("<none>");
+	//briefing.Add_Item("<none>");
 	for (v = VQ_FIRST; v < VQ_COUNT; v++) {
-		briefing.Add_Item(VQName[v]);
+		//briefing.Add_Item(VQName[v]);
+		scenario_briefing.push_back(VQName[v]);
 	}
-	briefing.Set_Selected_Index((int)Scen.BriefMovie + 1);
+	//briefing.Set_Selected_Index((int)Scen.BriefMovie + 1);
 
 	char actiontext[_MAX_FNAME+_MAX_EXT];
 	DropListClass action(BUTTON_ACTION, actiontext, sizeof(actiontext),
@@ -1433,11 +1519,12 @@ int MapEditClass::Scenario_Dialog(void)
 		briefing.X+briefing.Width+10, briefing.Y, 50, 7*10,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	action.Add_Item("<none>");
+	//action.Add_Item("<none>");
 	for (v = VQ_FIRST; v < VQ_COUNT; v++) {
-		action.Add_Item(VQName[v]);
+		//action.Add_Item(VQName[v]);
+		scenario_action.push_back(VQName[v]);
 	}
-	action.Set_Selected_Index((int)Scen.ActionMovie + 1);
+	//action.Set_Selected_Index((int)Scen.ActionMovie + 1);
 
 	char wintext[_MAX_FNAME+_MAX_EXT];
 	DropListClass win(BUTTON_WIN, wintext, sizeof(wintext),
@@ -1445,11 +1532,12 @@ int MapEditClass::Scenario_Dialog(void)
 		action.X+action.Width+10, action.Y, 50, 7*10,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	win.Add_Item("<none>");
+	//win.Add_Item("<none>");
 	for (v = VQ_FIRST; v < VQ_COUNT; v++) {
-		win.Add_Item(VQName[v]);
+		//win.Add_Item(VQName[v]);
+		scenario_win.push_back(VQName[v]);
 	}
-	win.Set_Selected_Index((int)Scen.WinMovie + 1);
+	//win.Set_Selected_Index((int)Scen.WinMovie + 1);
 
 	char losetext[_MAX_FNAME+_MAX_EXT];
 	DropListClass lose(BUTTON_LOSE, losetext, sizeof(losetext),
@@ -1457,11 +1545,12 @@ int MapEditClass::Scenario_Dialog(void)
 		win.X+win.Width+10, win.Y, 50, 7*10,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	lose.Add_Item("<none>");
+	//lose.Add_Item("<none>");
 	for (v = VQ_FIRST; v < VQ_COUNT; v++) {
-		lose.Add_Item(VQName[v]);
+		//lose.Add_Item(VQName[v]);
+		scenario_loose.push_back(VQName[v]);
 	}
-	lose.Set_Selected_Index((int)Scen.LoseMovie + 1);
+	//lose.Set_Selected_Index((int)Scen.LoseMovie + 1);
 
 	/*
 	**	House choice list.
@@ -1601,40 +1690,40 @@ int MapEditClass::Scenario_Dialog(void)
 	/*
 	**	Create the list
 	*/
-	commands = &okbtn;
-	cancelbtn.Add_Tail(*commands);
-	theaterbtn.Add_Tail(*commands);
-	themebtn.Add_Tail(*commands);
-	housebtn.Add_Tail(*commands);
-	techlevel.Add_Tail(*commands);
-	techstatic.Add_Tail(*commands);
-	sourcebtn.Add_Tail(*commands);
-	creditbtn.Add_Tail(*commands);
-	creditstatic.Add_Tail(*commands);
-	maxunitstatic.Add_Tail(*commands);
-	moneytib.Add_Tail(*commands);
-	smartiesstatic.Add_Tail(*commands);
-	allies.Add_Tail(*commands);
-	control.Add_Tail(*commands);
-	maxunit.Add_Tail(*commands);
-	nospyplane.Add_Tail(*commands);
-	skipscore.Add_Tail(*commands);
-	nomapsel.Add_Tail(*commands);
-	onetime.Add_Tail(*commands);
-	inherit.Add_Tail(*commands);
-	timercarry.Add_Tail(*commands);
-	tanya.Add_Tail(*commands);
-	record.Add_Tail(*commands);
-	truckcrate.Add_Tail(*commands);
-	endofgame.Add_Tail(*commands);
-	briefing.Add_Tail(*commands);
-	intro.Add_Tail(*commands);
-	action.Add_Tail(*commands);
-	win.Add_Tail(*commands);
-	lose.Add_Tail(*commands);
-	basebtn.Add_Tail(*commands);
-	smarties.Add_Tail(*commands);
-	desc.Add_Tail(*commands);
+	//commands = &okbtn;
+	//cancelbtn.Add_Tail(*commands);
+	//theaterbtn.Add_Tail(*commands);
+	//themebtn.Add_Tail(*commands);
+	//housebtn.Add_Tail(*commands);
+	//techlevel.Add_Tail(*commands);
+	//techstatic.Add_Tail(*commands);
+	//sourcebtn.Add_Tail(*commands);
+	//creditbtn.Add_Tail(*commands);
+	//creditstatic.Add_Tail(*commands);
+	//maxunitstatic.Add_Tail(*commands);
+	//moneytib.Add_Tail(*commands);
+	//smartiesstatic.Add_Tail(*commands);
+	//allies.Add_Tail(*commands);
+	//control.Add_Tail(*commands);
+	//maxunit.Add_Tail(*commands);
+	//nospyplane.Add_Tail(*commands);
+	//skipscore.Add_Tail(*commands);
+	//nomapsel.Add_Tail(*commands);
+	//onetime.Add_Tail(*commands);
+	//inherit.Add_Tail(*commands);
+	//timercarry.Add_Tail(*commands);
+	//tanya.Add_Tail(*commands);
+	//record.Add_Tail(*commands);
+	//truckcrate.Add_Tail(*commands);
+	//endofgame.Add_Tail(*commands);
+	//briefing.Add_Tail(*commands);
+	//intro.Add_Tail(*commands);
+	//action.Add_Tail(*commands);
+	//win.Add_Tail(*commands);
+	//lose.Add_Tail(*commands);
+	//basebtn.Add_Tail(*commands);
+	//smarties.Add_Tail(*commands);
+	//desc.Add_Tail(*commands);
 
 	/*
 	**	Main Processing Loop
@@ -1676,61 +1765,61 @@ int MapEditClass::Scenario_Dialog(void)
 		/*
 		**	Refresh display if needed
 		*/
-		if (display) {
-			Hide_Mouse();
-
-			/*
-			**	Draw the background
-			*/
-			Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
-			Draw_Caption(TXT_SCENARIO_OPTIONS, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
-
-			/*
-			**	Display the text that doesn't need drawing except when the entire dialog
-			**	needs to be redrawn.
-			*/
-			Fancy_Text_Print("Tech Level =", techlevel.X, techlevel.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Credits =", creditbtn.X, creditbtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Unit Max =", maxunit.X, maxunit.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("IQ =", smarties.X, smarties.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Prebuild Base:", basebtn.X, basebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Theater:", theaterbtn.X, theaterbtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Scenario Name:", desc.X, desc.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Country:", housebtn.X, housebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Home Edge:", sourcebtn.X, sourcebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Allies:", allies.X, allies.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Plyr Control:", control.X, control.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Theme:", themebtn.X, themebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Intro:", intro.X, intro.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Briefing:", briefing.X, briefing.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Action:", action.X, action.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Win:", win.X, win.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Lose:", lose.X, lose.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Store scenario?", record.X+10, record.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Inherit stored scenario?", inherit.X+10, inherit.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Auto evac. Tanya (civilian)?", tanya.X+10, tanya.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Last mission of game?", endofgame.X+10, endofgame.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Inherit mission timer from last scenario?", timercarry.X+10, timercarry.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Disable spy plane?", nospyplane.X+10, nospyplane.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Skip the score screen?", skipscore.X+10, skipscore.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("No map selection (force var 'B')?", nomapsel.X+10, nomapsel.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Return to main menu after scenario finishes?", onetime.X+10, onetime.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Truck carries wood crate?", truckcrate.X+10, truckcrate.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-			Fancy_Text_Print("Initial money is transferred to silos?", moneytib.X+10, moneytib.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
-
-			theaterbtn.Collapse();
-			themebtn.Collapse();
-			intro.Collapse();
-			briefing.Collapse();
-			action.Collapse();
-			win.Collapse();
-			lose.Collapse();
-			basebtn.Collapse();
-			commands->Draw_All(true);
-			Show_Mouse();
-			display = false;
-			dotext = true;
-		}
+		//if (display) {
+		//	Hide_Mouse();
+		//
+		//	/*
+		//	**	Draw the background
+		//	*/
+		//	Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
+		//	Draw_Caption(TXT_SCENARIO_OPTIONS, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
+		//
+		//	/*
+		//	**	Display the text that doesn't need drawing except when the entire dialog
+		//	**	needs to be redrawn.
+		//	*/
+		//	Fancy_Text_Print("Tech Level =", techlevel.X, techlevel.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Credits =", creditbtn.X, creditbtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Unit Max =", maxunit.X, maxunit.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("IQ =", smarties.X, smarties.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Prebuild Base:", basebtn.X, basebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Theater:", theaterbtn.X, theaterbtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Scenario Name:", desc.X, desc.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Country:", housebtn.X, housebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Home Edge:", sourcebtn.X, sourcebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Allies:", allies.X, allies.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Plyr Control:", control.X, control.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Theme:", themebtn.X, themebtn.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Intro:", intro.X, intro.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Briefing:", briefing.X, briefing.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Action:", action.X, action.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Win:", win.X, win.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Lose:", lose.X, lose.Y-7, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Store scenario?", record.X+10, record.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Inherit stored scenario?", inherit.X+10, inherit.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Auto evac. Tanya (civilian)?", tanya.X+10, tanya.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Last mission of game?", endofgame.X+10, endofgame.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Inherit mission timer from last scenario?", timercarry.X+10, timercarry.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Disable spy plane?", nospyplane.X+10, nospyplane.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Skip the score screen?", skipscore.X+10, skipscore.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("No map selection (force var 'B')?", nomapsel.X+10, nomapsel.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Return to main menu after scenario finishes?", onetime.X+10, onetime.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Truck carries wood crate?", truckcrate.X+10, truckcrate.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//	Fancy_Text_Print("Initial money is transferred to silos?", moneytib.X+10, moneytib.Y, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		//
+		//	theaterbtn.Collapse();
+		//	themebtn.Collapse();
+		//	intro.Collapse();
+		//	briefing.Collapse();
+		//	action.Collapse();
+		//	win.Collapse();
+		//	lose.Collapse();
+		//	basebtn.Collapse();
+		//	//commands->Draw_All(true);
+		//	Show_Mouse();
+		//	display = false;
+		//	dotext = true;
+		//}
 
 		/*
 		**	Display the text of the buttons that could change their text as a
@@ -1762,7 +1851,11 @@ int MapEditClass::Scenario_Dialog(void)
 		/*
 		**	Get user input
 		*/
-		KeyNumType input = commands->Input();
+		KeyNumType input = KN_NONE; //commands->Input();
+
+		KeyNumType _key;
+		int _flags;
+		WWSDL_ProcessEvents(_key, _flags);
 
 		/*
 		**	Process input
@@ -1899,7 +1992,7 @@ int MapEditClass::Scenario_Dialog(void)
 	PlayerPtr->IsPlayerControl = true;
 	strncpy(Scen.Description, desc.Get_Text(), sizeof(Scen.Description));
 	Scen.Description[sizeof(Scen.Description)-1] = '\0';
-	Scen.IntroMovie = VQType(intro.Current_Index()-1);
+	Scen.IntroMovie = VQType(scenario_intromovie);
 	Scen.BriefMovie = VQType(briefing.Current_Index()-1);
 	Scen.ActionMovie = VQType(action.Current_Index()-1);
 	Scen.WinMovie = VQType(win.Current_Index()-1);
@@ -1925,6 +2018,7 @@ int MapEditClass::Scenario_Dialog(void)
 	**	- Then, re-initialize the TypeClasses for the new Theater
 	*/
 	TheaterType theater = TheaterType(theaterbtn.Current_Index());
+	TheaterType orig_theater = Scen.Theater;
 	if (theater != orig_theater) {
 
 		unsigned char theater_mask;	// template/terrain mask
