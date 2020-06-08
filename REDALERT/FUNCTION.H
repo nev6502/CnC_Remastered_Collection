@@ -1135,6 +1135,7 @@ void On_Achievement_Event(const HouseClass* player_ptr, const char *achievement_
 
 extern const int NUM_EDIT_MISSIONS;
 
+extern void (*Imgui_Dialog_Function)(void);
 
 
 #endif

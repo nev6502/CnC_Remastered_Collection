@@ -1,6 +1,10 @@
 #define UNICODE
 #include "DirectDrawWrapper.h"
+#include "imgui.h"
+#include "examples/imgui_impl_win32.h"
+#include "examples/imgui_impl_dx9.h"
 //#include "resource.h"
+LPDIRECT3DDEVICE9 globald3d9Device;
 
 /*******************
 **IUnknown methods**
@@ -1239,6 +1243,8 @@ HRESULT IDirectDrawWrapper::WrapperInitialize(WNDPROC wp, HMODULE hMod)
 	return DD_OK;
 }
 
+void (*Imgui_Dialog_Function)(void) = nullptr;
+
 /* Helper function to present the d3d surface
  * 
  */
@@ -1313,6 +1319,19 @@ HRESULT IDirectDrawWrapper::Present()
 	{
 		debugMessage(0, "IDirectDrawWrapper::Present","Failed to draw primitive");
 		return false;
+	}
+
+	if (Imgui_Dialog_Function) {
+		ImGuiIO& io = ImGui::GetIO();
+
+		io.DisplaySize = ImVec2(displayWidth, displayHeight);
+		ImGui_ImplDX9_NewFrame();
+		ImGui::NewFrame();
+
+		Imgui_Dialog_Function();
+
+		ImGui::Render();
+		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	// Display menu options
@@ -1959,6 +1978,8 @@ bool IDirectDrawWrapper::CreateD3DDevice()
 		MessageBox(NULL, TEXT("Failed to create Direct3DX9 sprite."), TEXT("Direct3DX9 Error"), MB_OK);
 		return false;
 	}
+	
+	globald3d9Device = d3d9Device;
 
 	debugMessage(2, "IDirectDrawWrapper::createD3DDevice", "Create D3D9 Object");
 	

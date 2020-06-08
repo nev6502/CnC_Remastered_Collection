@@ -42,6 +42,7 @@
  *   MapEditClass::Size_Map -- lets user set size & location of map        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include "imgui.h"
 #include	"function.h"
 
 #ifdef SCENARIO_EDITOR
@@ -390,6 +391,142 @@ int MapEditClass::Save_Scenario(void)
 	return(0);
 }
 
+void Imgui_PickScenerio_Dialog(void) {
+	/*
+	**	Dialog & button dimensions
+	*/
+	enum {
+		D_DIALOG_W = 200,											// dialog width
+		D_DIALOG_H = 290,											// dialog height
+		D_DIALOG_X = ((320 - D_DIALOG_W) / 2),				// centered x-coord
+		D_DIALOG_Y = 45,				// centered y-coord
+		D_DIALOG_CX = D_DIALOG_X + (D_DIALOG_W / 2),		// coord of x-center
+
+		D_TXT8_H = 11,												// ht of 8-pt text
+		D_MARGIN = 7,												// margin width/height
+
+		D_SCEN_W = 45,												// Scenario # width
+		D_SCEN_H = 9,												// Scenario # height
+		D_SCEN_X = D_DIALOG_CX + 5,							// Scenario # x
+		D_SCEN_Y = D_DIALOG_Y + D_MARGIN + D_TXT8_H + D_MARGIN,	// Scenario # y
+
+		D_VARA_W = 13,												// Version A width
+		D_VARA_H = 9,												// Version A height
+		D_VARA_X = D_DIALOG_CX - (D_VARA_W * 5) / 2,		// Version A x
+		D_VARA_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version A y
+
+		D_VARB_W = 13,												// Version B width
+		D_VARB_H = 9,												// Version B height
+		D_VARB_X = D_VARA_X + D_VARA_W,						// Version B x
+		D_VARB_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version B y
+
+		D_VARC_W = 13,												// Version C width
+		D_VARC_H = 9,												// Version C height
+		D_VARC_X = D_VARB_X + D_VARB_W,						// Version C x
+		D_VARC_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version C y
+
+		D_VARD_W = 13,												// Version D width
+		D_VARD_H = 9,												// Version D height
+		D_VARD_X = D_VARC_X + D_VARC_W,						// Version D x
+		D_VARD_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,		// Version D y
+
+		D_VARLOSE_W = 13,											// Version Lose width
+		D_VARLOSE_H = 9,											// Version Lose height
+		D_VARLOSE_X = D_VARD_X + D_VARD_W,					// Version Lose x
+		D_VARLOSE_Y = D_SCEN_Y + D_SCEN_H + D_MARGIN,	// Version Lose y
+
+		D_EAST_W = 50,												// EAST width
+		D_EAST_H = 9,												// EAST height
+		D_EAST_X = D_DIALOG_CX - D_EAST_W - 5,				// EAST x
+		D_EAST_Y = D_VARLOSE_Y + D_VARLOSE_H + D_MARGIN,// EAST y
+
+		D_WEST_W = 50,												// WEST width
+		D_WEST_H = 9,												// WEST height
+		D_WEST_X = D_DIALOG_CX + 5,							// WEST x
+		D_WEST_Y = D_VARLOSE_Y + D_VARLOSE_H + D_MARGIN,// EAST y
+
+		D_GDI_W = 90,												// GDI width
+		D_GDI_H = 9,												// GDI height
+		D_GDI_X = D_DIALOG_CX - (D_GDI_W / 2),				// GDI x
+		D_GDI_Y = D_EAST_Y + D_EAST_H + D_MARGIN,			// GDI y
+
+		D_NOD_W = 90,												// NOD width
+		D_NOD_H = 9,												// NOD height
+		D_NOD_X = D_DIALOG_CX - (D_NOD_W / 2),				// NOD x
+		D_NOD_Y = D_GDI_Y + D_GDI_H,							// NOD y
+
+		D_NEU_W = 90,												// Neutral width
+		D_NEU_H = 9,												// Neutral height
+		D_NEU_X = D_DIALOG_CX - (D_NOD_W / 2),				// Neutral x
+		D_NEU_Y = D_NOD_Y + D_NOD_H,							// Neutral y
+
+		D_MPLAYER_W = 90,											// Multi-Player width
+		D_MPLAYER_H = 9,											// Multi-Player height
+		D_MPLAYER_X = D_DIALOG_CX - (D_MPLAYER_W / 2),	// Multi-Player x
+		D_MPLAYER_Y = D_NEU_Y + D_NEU_H,						// Multi-Player y
+
+		D_OK_W = 45,												// OK width
+		D_OK_H = 9,													// OK height
+		D_OK_X = D_DIALOG_CX - D_OK_W - 5,					// OK x
+		D_OK_Y = D_DIALOG_Y + D_DIALOG_H - D_OK_H - (D_MARGIN + 15),	// OK y
+
+		D_CANCEL_W = 45,											// Cancel width
+		D_CANCEL_H = 9,											// Cancel height
+		D_CANCEL_X = D_DIALOG_CX + 5,							// Cancel x
+		D_CANCEL_Y = D_DIALOG_Y + D_DIALOG_H - D_CANCEL_H - (D_MARGIN + 15), // Cancel y
+
+	};
+
+	bool toolActive = false;
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(D_DIALOG_W, D_DIALOG_H));
+	ImGui::SetNextWindowPos(ImVec2(D_DIALOG_X * 2, D_DIALOG_Y));
+	ImGui::Begin("New Scenario", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Text("Scenario");
+	
+	static char scenerioId[512];	
+	ImGui::InputText("Scenario", &scenerioId[0], sizeof(scenerioId));
+
+	//ImGui::Text("Version");
+	//
+	//static char verionsId[512];
+	//ImGui::SameLine();
+	//ImGui::InputText("Version", &verionsId[0], sizeof(verionsId));
+	ImGui::Text("Version");
+	{
+		ImGui::Button("A");
+		ImGui::SameLine();
+		ImGui::Button("B");
+		ImGui::SameLine();
+		ImGui::Button("C");
+		ImGui::SameLine();
+		ImGui::Button("D");
+	}
+
+	ImGui::Text("Side");
+	{
+		ImGui::Button("East");
+		ImGui::SameLine();
+		ImGui::Button("West");
+	}
+
+	ImGui::Text("Faction");
+	ImGui::Button("North (Spain)");
+	ImGui::Button("South(Greece)");
+	ImGui::Button("USSR");
+	ImGui::Button("Multiplayer");
+	ImGui::NewLine();
+
+	{
+		ImGui::Button("Ok");
+		ImGui::SameLine();
+		ImGui::Button("Cancel");
+	}
+
+	ImGui::End();
+}
 
 /***************************************************************************
  * MapEditClass::Pick_Scenario -- dialog for choosing scenario             *
@@ -434,6 +571,7 @@ int MapEditClass::Save_Scenario(void)
  *=========================================================================*/
 int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioPlayerType & playerp, ScenarioDirType & dirp, ScenarioVarType & varp)
 {
+	Imgui_Dialog_Function = Imgui_PickScenerio_Dialog;
 	/*
 	**	Dialog & button dimensions
 	*/
