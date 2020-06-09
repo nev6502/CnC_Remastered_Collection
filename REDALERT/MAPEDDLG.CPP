@@ -729,24 +729,32 @@ void Imgui_SizeMap(void) {
 	ImGui::Begin("Size Map", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
 		ImGui::Columns(4, "outer", true);
 		ImGui::Text("X");
-		ImGui::InputInt("", &map_x1);
+		ImGui::PushID("map_x");
+			ImGui::InputInt("", &map_x1);
+		ImGui::PopID();
 		ImGui::NextColumn();
 		ImGui::Text("Y");
-		ImGui::InputInt("", &map_y1);
+		ImGui::PushID("map_y");
+			ImGui::InputInt("", &map_y1);
+		ImGui::PopID();
 		if (ImGui::Button("Ok")) {
 			sizemap_cancel = false;
 			sizemap_process = false;
 		}
 		ImGui::NextColumn();
 		ImGui::Text("X2");
-		ImGui::InputInt("", &map_x2);
+		ImGui::PushID("map_x2");
+			ImGui::InputInt("", &map_x2);
+		ImGui::PopID();
 		if (ImGui::Button("Cancel")) {
 			sizemap_cancel = true;
 			sizemap_process = false;
 		}
 		ImGui::NextColumn();
 		ImGui::Text("Y2");
-		ImGui::InputInt("", &map_y2);
+		ImGui::PushID("map_y2");
+			ImGui::InputInt("", &map_y2);
+		ImGui::PopID();
 	ImGui::Columns(1);
 	ImGui::End();
 }
