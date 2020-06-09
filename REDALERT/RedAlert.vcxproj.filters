@@ -1947,9 +1947,6 @@
     <MASM Include="Win32Lib\LCWCOMP.ASM">
       <Filter>Source Files\win32lib</Filter>
     </MASM>
-    <MASM Include="LCWCOMP.ASM">
-      <Filter>Source Files</Filter>
-    </MASM>
     <MASM Include="Win32Lib\TOBUFF.ASM">
       <Filter>Source Files\win32lib</Filter>
     </MASM>

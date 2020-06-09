@@ -33,6 +33,7 @@
  *   Find_Child_Node -- Find a matching dictionary entry.                                      *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -534,3 +535,175 @@ int LZW_Uncompress(Buffer & inbuff, Buffer & outbuff)
 }
 
 #endif
+
+// jmarshall: This function is from OmniBlade at Chronoshift
+// https://github.com/TheAssemblyArmada/Chronoshift/blob/develop/src/game/common/lcw.cpp
+/**
+ * @brief Compresses data to the proprietary LCW format used in many games developed by Westwood Studios.
+ * @warning Worst case can have the compressed data larger than the original.
+ */
+extern "C" int LCW_Comp(const void* src, void* dst, unsigned int bytes)
+{
+	//captainslog_assert(src != nullptr);
+	//captainslog_assert(dst != nullptr);
+
+	if (!bytes) {
+		return 0;
+	}
+
+	// Decide if we are going to do relative offsets for 3 and 5 byte commands
+	bool relative = bytes > UINT16_MAX;
+
+	const uint8_t* getp = static_cast<const uint8_t*>(src);
+	uint8_t* putp = static_cast<uint8_t*>(dst);
+	const uint8_t* getstart = getp;
+	const uint8_t* getend = getp + bytes;
+	uint8_t* putstart = putp;
+
+	// captainslog_debug("LCW Compression... ");
+
+	// relative LCW starts with 0 to flag as relative for decoder
+	if (relative) {
+		// captainslog_debug("LCW Relative compressor.");
+		*putp++ = 0;
+	}
+
+	// Write a starting cmd1 and set bool to have cmd1 in progress
+	uint8_t* cmd_onep = putp;
+	*putp++ = 0x81;
+	*putp++ = *getp++;
+	bool cmd_one = true;
+
+	// Compress data
+	while (getp < getend) {
+		// Is RLE encode (4bytes) worth evaluating?
+		if (getend - getp > 64 && *getp == *(getp + 64)) {
+			// RLE run length is encoded as a short so max is UINT16_MAX
+			const uint8_t* rlemax = (getend - getp) < UINT16_MAX ? getend : getp + UINT16_MAX;
+			const uint8_t* rlep;
+
+			for (rlep = getp + 1; *rlep == *getp && rlep < rlemax; ++rlep)
+				;
+
+			uint16_t run_length = rlep - getp;
+
+			// If run length is long enough, write the command and start loop again
+			if (run_length >= 0x41) {
+				// captainslog_debug("0b11111110 Source Pos %ld, Dest Pos %ld, Count %d", getp - getstart, putp - putstart,
+				// run_length);  write 4byte command 0b11111110
+				cmd_one = false;
+				*putp++ = 0xFE;
+				*putp++ = run_length;
+				*putp++ = run_length >> 8;
+				*putp++ = *getp;
+				getp = rlep;
+				continue;
+			}
+		}
+
+		// current block size for an offset copy
+		int block_size = 0;
+		const uint8_t* offstart;
+
+		// Set where we start looking for matching runs.
+		if (relative) {
+			offstart = (getp - getstart) < UINT16_MAX ? getstart : getp - UINT16_MAX;
+		}
+		else {
+			offstart = getstart;
+		}
+
+		// Look for matching runs
+		const uint8_t* offchk = offstart;
+		const uint8_t* offsetp = getp;
+		while (offchk < getp) {
+			// Move offchk to next matching position
+			while (offchk < getp && *offchk != *getp) {
+				++offchk;
+			}
+
+			// If the checking pointer has reached current pos, break
+			if (offchk >= getp) {
+				break;
+			}
+
+			// find out how long the run of matches goes for
+			//<= because it can consider the current pixel as part of a run
+			int i;
+			for (i = 1; &getp[i] < getend; ++i) {
+				if (offchk[i] != getp[i]) {
+					break;
+				}
+			}
+
+			if (i >= block_size) {
+				block_size = i;
+				offsetp = offchk;
+			}
+
+			++offchk;
+		}
+
+		// decide what encoding to use for current run
+		if (block_size <= 2) {
+			// short copy 0b10??????
+			// check we have an existing 1 byte command and if its value is still
+			// small enough to handle additional bytes
+			// start a new command if current one doesn't have space or we don't
+			// have one to continue
+			if (cmd_one && *cmd_onep < 0xBF) {
+				// increment command value
+				++* cmd_onep;
+				// captainslog_debug("0b10?????? Source Pos %ld, Dest Pos %ld, Count %d", getp - getstart, cmd_onep - putstart,
+				// *cmd_onep - 0x80);
+				*putp++ = *getp++;
+			}
+			else {
+				cmd_onep = putp;
+				// captainslog_debug("0b10?????? Source Pos %ld, Dest Pos %ld, Count %d", getp - getstart, cmd_onep - putstart, 1);
+				*putp++ = 0x81;
+				*putp++ = *getp++;
+				cmd_one = true;
+			}
+		}
+		else {
+			uint16_t offset;
+			uint16_t rel_offset = getp - offsetp;
+			if (block_size > 0xA || (rel_offset > 0xFFF)) {
+				// write 5 byte command 0b11111111
+				if (block_size > 0x40) {
+					// captainslog_debug("0b11111111 Source Pos %ld, Dest Pos %ld, Count %d, ", getp - getstart, putp - putstart,
+					// block_size);
+					*putp++ = 0xFF;
+					*putp++ = block_size;
+					*putp++ = block_size >> 8;
+					// write 3 byte command 0b11??????
+				}
+				else {
+					// captainslog_debug("0b11?????? Source Pos %ld, Dest Pos %ld, Count %d, ", getp - getstart, putp - putstart,
+					// block_size);
+					*putp++ = (block_size - 3) | 0xC0;
+				}
+
+				offset = relative ? rel_offset : offsetp - getstart;
+				// captainslog_debug("Offset %d", offset);
+				// write 2 byte command? 0b0???????
+			}
+			else {
+				// captainslog_debug("0b0??????? Source Pos %ld, Dest Pos %ld, Count %d, ", getp - getstart, putp - putstart,
+				// block_size);  uint8_t cmd_two_val = 16 * (block_size - 3) + (rel_offset >> 8);  captainslog_debug("Offset %d",
+				// rel_offset);
+				offset = rel_offset << 8 | (16 * (block_size - 3) + (rel_offset >> 8));
+			}
+			*putp++ = offset;
+			*putp++ = offset >> 8;
+			getp += block_size;
+			cmd_one = false;
+		}
+	}
+
+	// write final 0x80, this is why its also known as format80 compression
+	*putp++ = 0x80;
+	return putp - putstart;
+}
+// jmarshall end
