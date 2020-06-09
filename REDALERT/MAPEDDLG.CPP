@@ -1830,6 +1830,8 @@ int MapEditClass::Scenario_Dialog(void)
 	//smarties.Add_Tail(*commands);
 	//desc.Add_Tail(*commands);
 
+	TheaterType orig_theater = Scen.Theater;
+
 	/*
 	**	Main Processing Loop
 	*/
@@ -2120,8 +2122,7 @@ int MapEditClass::Scenario_Dialog(void)
 	**	  theater; if not compatible, set TType to TEMPLATE_NONE & TIcon to 0
 	**	- Then, re-initialize the TypeClasses for the new Theater
 	*/
-	TheaterType theater = TheaterType(theaterbtn.Current_Index());
-	TheaterType orig_theater = Scen.Theater;
+	TheaterType theater = Scen.Theater;
 	if (theater != orig_theater) {
 
 		unsigned char theater_mask;	// template/terrain mask
