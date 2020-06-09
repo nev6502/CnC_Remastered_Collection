@@ -1174,9 +1174,17 @@ std::vector<const char*> scenario_briefing;
 std::vector<const char*> scenario_action;
 std::vector<const char*> scenario_win;
 std::vector<const char*> scenario_loose;
+std::vector<const char*> scenario_theme;
+std::vector<const char*> scenario_houses;
 
 char description[DESCRIP_MAX] = "";
 int scenario_intromovie = 0;
+bool scenerio_general_options[9] = { 0 };
+
+bool scenerio_process = true;
+bool scenerio_cancel = false;		// true = user cancels
+
+HouseStaticClass hdata[HOUSE_COUNT];
 void ImGui_ScenerioDialog(void) {
 	bool toolActive = false;
 	int theater = Scen.Theater; 
@@ -1184,49 +1192,127 @@ void ImGui_ScenerioDialog(void) {
 	int action = Scen.ActionMovie + 1;
 	int win = Scen.WinMovie + 1;
 	int lose = Scen.LoseMovie + 1;
+	int theme = -1;
+	int base_house = Base.House;
+
+	int house = PlayerPtr->Class->House;
+	HousesType newhouse = (HousesType)house;
+
+	HouseStaticClass* hstatic = &hdata[newhouse];
+
+	if (Scen.TransitTheme != THEME_NONE) {
+		theme = Scen.TransitTheme + 1;
+	}
+	else {
+		theme = 0;
+	}
+	int ally = 0;
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
-	ImGui::SetNextWindowSize(ImVec2(320 * RESFACTOR, 200 * RESFACTOR));
-	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::SetNextWindowSize(ImVec2(840, 400));
+	ImGui::SetNextWindowPos(ImVec2(100, 100));
 	ImGui::Begin("Scenario Editor", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
 		ImGui::Columns(2, "outer", true);
-		ImGui::Text("Theater");
-		ImGui::PushID("t_text");
-			ImGui::Combo("", (int *)&theater, &scenerio_theaters[0], scenerio_theaters.size());
-		ImGui::PopID();
-		ImGui::NextColumn();
-		ImGui::Text("Scenario Name:");
-		ImGui::PushID("s_name");
-			ImGui::InputText("", description, sizeof(description));
-		ImGui::PopID();
+			ImGui::Text("Theater");
+			ImGui::PushID("t_text");
+				ImGui::Combo("", (int *)&theater, &scenerio_theaters[0], scenerio_theaters.size());
+			ImGui::PopID();
+			ImGui::NextColumn();
+			ImGui::Text("Scenario Name:");
+			ImGui::PushID("s_name");
+				ImGui::InputText("", description, sizeof(description));
+			ImGui::PopID();
 		ImGui::Columns(1);
 		ImGui::Columns(5, "outer2", true);
-		ImGui::Text("Intro");
-		ImGui::PushID("s_intro");
-			ImGui::Combo("", (int*)&scenario_intromovie, &scenerio_intros[0], scenerio_intros.size());
-		ImGui::PopID();
-		ImGui::NextColumn();
-		ImGui::Text("Briefing");
-		ImGui::PushID("brief_txt");
-			ImGui::Combo("", (int*)&briefmovie, &scenario_briefing[0], scenario_briefing.size());
-		ImGui::PopID();
-		ImGui::NextColumn();
-		ImGui::Text("Action");
-		ImGui::PushID("action_txt");
-			ImGui::Combo("", (int*)&action, &scenario_action[0], scenario_action.size());
-		ImGui::PopID();
-		ImGui::NextColumn();
-		ImGui::Text("Win");
-		ImGui::PushID("win_txt");
-			ImGui::Combo("", (int*)&win, &scenario_win[0], scenario_win.size());
-		ImGui::PopID();
-		ImGui::NextColumn();
-		ImGui::Text("Lose");
-		ImGui::PushID("lose_txt");
-			ImGui::Combo("", (int*)&lose, &scenario_loose[0], scenario_loose.size());
-		ImGui::PopID();
+			ImGui::Text("Intro");
+			ImGui::PushID("s_intro");
+				ImGui::Combo("", (int*)&scenario_intromovie, &scenerio_intros[0], scenerio_intros.size());
+			ImGui::PopID();
+			ImGui::NextColumn();
+			ImGui::Text("Briefing");
+			ImGui::PushID("brief_txt");
+				ImGui::Combo("", (int*)&briefmovie, &scenario_briefing[0], scenario_briefing.size());
+			ImGui::PopID();
+			ImGui::NextColumn();
+			ImGui::Text("Action");
+			ImGui::PushID("action_txt");
+				ImGui::Combo("", (int*)&action, &scenario_action[0], scenario_action.size());
+			ImGui::PopID();
+			ImGui::NextColumn();
+			ImGui::Text("Win");
+			ImGui::PushID("win_txt");
+				ImGui::Combo("", (int*)&win, &scenario_win[0], scenario_win.size());
+			ImGui::PopID();
+			ImGui::NextColumn();
+			ImGui::Text("Lose");
+			ImGui::PushID("lose_txt");
+				ImGui::Combo("", (int*)&lose, &scenario_loose[0], scenario_loose.size());
+			ImGui::PopID();
 		ImGui::Columns(1);
+		ImGui::Columns(2, "outer3", true);
+			ImGui::Text("Prebuild base");
+			ImGui::PushID("prebuild_txt");
+				ImGui::Combo("", (int*)&base_house, &scenario_houses[0], scenario_houses.size());
+			ImGui::PopID();
+			ImGui::NextColumn();
+			ImGui::Text("Theme");
+			ImGui::PushID("theme_txt");
+				ImGui::Combo("", (int*)&theme, &scenario_theme[0], scenario_theme.size());
+			ImGui::PopID();
+		ImGui::Columns(1);
+		ImGui::Columns(5, "outer4", true);
+				ImGui::Text("Country:");
+				ImGui::PushID("country_box");
+					ImGui::ListBox("", (int *)&house, &scenario_houses[0], scenario_houses.size());
+				ImGui::PopID();
+			ImGui::NextColumn();
+				ImGui::Text("Tech Level");
+				ImGui::PushID("tech_slider");
+					ImGui::SliderInt("", &hstatic->TechLevel, 1, 16);
+				ImGui::PopID();
+				ImGui::Text("Credits");
+				ImGui::PushID("credits_slider");
+					ImGui::SliderInt("", (int *)&hstatic->InitialCredits, 0, 20000);
+				ImGui::PopID();
+				ImGui::Text("Unit Max");
+				ImGui::PushID("unit_max_slider");
+					ImGui::SliderInt("", (int*)&hstatic->MaxUnit, 0, 500);
+				ImGui::PopID();
+				ImGui::Text("Home Edge");				
+				ImGui::Text("IQ");
+			ImGui::NextColumn();
+				ImGui::Text("Allies(broke):");
+				ImGui::PushID("Allies_Control");
+					ImGui::ListBox("", (int*)&ally, &scenario_houses[0], scenario_houses.size());
+				ImGui::PopID();
+			ImGui::NextColumn();
+				ImGui::Text("Plyr Control");
+				ImGui::PushID("Plyr_Control");
+					ImGui::ListBox("", (int*)&house, &scenario_houses[0], scenario_houses.size());
+				ImGui::PopID();
+			ImGui::NextColumn();
+				ImGui::Checkbox("Inherit Stored Scenario?", &scenerio_general_options[0]);
+				ImGui::Checkbox("Store Scenario?", &scenerio_general_options[1]);
+				ImGui::Checkbox("Auto Evac. Tanya(Civilian)?", &scenerio_general_options[2]);
+				ImGui::Checkbox("Last Mission of Game?", &scenerio_general_options[3]);
+				ImGui::Checkbox("Inherit Mission Timer from last scenario?", &scenerio_general_options[4]);
+				ImGui::Checkbox("Disable Spyplane?", &scenerio_general_options[5]);
+				ImGui::Checkbox("Skip the score screen?", &scenerio_general_options[6]);
+				ImGui::Checkbox("No Map Selection(Force Var 'B')?", &scenerio_general_options[7]);
+				ImGui::Checkbox("Return to main menu after scenario finishes?", &scenerio_general_options[8]);
+		ImGui::Columns(1);
+		ImGui::NewLine();
+		ImGui::NewLine();
+		if (ImGui::Button("Ok")) {
+			scenerio_process = false;
+			scenerio_cancel = false;		// true = user cancels
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			scenerio_process = false;
+			scenerio_cancel = true;		// true = user cancels
+		}
 	ImGui::End();
 
 	Scen.Theater = (TheaterType)(theater);
@@ -1234,6 +1320,11 @@ void ImGui_ScenerioDialog(void) {
 	Scen.ActionMovie = (VQType)(action - 1);
 	Scen.WinMovie = (VQType)(win - 1);
 	Scen.LoseMovie = (VQType)(lose - 1);
+	Base.House = (HousesType)base_house;
+	PlayerPtr->Class->House = (HousesType)house;
+	if (Scen.TransitTheme != THEME_NONE) {
+		Scen.TransitTheme = (ThemeType)(theme - 1);
+	}
 }
 
 
@@ -1258,10 +1349,11 @@ void ImGui_ScenerioDialog(void) {
  *=========================================================================*/
 int MapEditClass::Scenario_Dialog(void)
 {
+	scenerio_process = true;
+	scenerio_cancel = false;		// true = user cancels
 	
 	HousesType house = PlayerPtr->Class->House;
 	HousesType newhouse = house;
-	HouseStaticClass hdata[HOUSE_COUNT];
 
 	Imgui_Dialog_Function = ImGui_ScenerioDialog;
 
@@ -1272,12 +1364,15 @@ int MapEditClass::Scenario_Dialog(void)
 	scenario_action.clear();
 	scenario_win.clear();
 	scenario_loose.clear();
+	scenario_theme.clear();
+	scenario_houses.clear();
 
 	scenerio_intros.push_back("<NONE>");
 	scenario_briefing.push_back("<NONE>");
 	scenario_action.push_back("<NONE>");
 	scenario_win.push_back("<NONE>");
 	scenario_loose.push_back("<NONE>");
+	scenario_theme.push_back("<NONE>");
 
 	/*
 	**	Fill in the house data for each house that exists.
@@ -1560,10 +1655,10 @@ int MapEditClass::Scenario_Dialog(void)
 		TPF_EFNT|TPF_NOSHADOW,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	for (h = HOUSE_FIRST; h < HOUSE_COUNT; h++) {
-		housebtn.Add_Item(HouseTypeClass::As_Reference(h).IniName);
-	}
-	housebtn.Set_Selected_Index(PlayerPtr->Class->House);
+	//for (h = HOUSE_FIRST; h < HOUSE_COUNT; h++) {
+	//	housebtn.Add_Item(HouseTypeClass::As_Reference(h).IniName);
+	//}
+	//housebtn.Set_Selected_Index(PlayerPtr->Class->House);
 
 	/*
 	**	Base house choice drop down list.
@@ -1575,7 +1670,8 @@ int MapEditClass::Scenario_Dialog(void)
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
 	for (h = HOUSE_FIRST; h < HOUSE_COUNT; h++) {
-		basebtn.Add_Item(HouseTypeClass::As_Reference(h).IniName);
+		//basebtn.Add_Item(HouseTypeClass::As_Reference(h).IniName);
+		scenario_houses.push_back(HouseTypeClass::As_Reference(h).IniName);
 	}
 	if (Base.House != HOUSE_NONE) {
 		basebtn.Set_Selected_Index(Base.House);
@@ -1590,15 +1686,16 @@ int MapEditClass::Scenario_Dialog(void)
 		basebtn.X+basebtn.Width+15*RESFACTOR, basebtn.Y, 85, 7*10,
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
-	themebtn.Add_Item("<none>");
+	//themebtn.Add_Item("<none>");
 	for (ThemeType th = THEME_FIRST; th < THEME_COUNT; th++) {
-		themebtn.Add_Item(Theme.Full_Name(th));
+		//themebtn.Add_Item(Theme.Full_Name(th));
+		scenario_theme.push_back(Theme.Full_Name(th));
 	}
-	if (Scen.TransitTheme != THEME_NONE) {
-		themebtn.Set_Selected_Index(Scen.TransitTheme+1);
-	} else {
-		themebtn.Set_Selected_Index(0);
-	}
+	//if (Scen.TransitTheme != THEME_NONE) {
+	//	themebtn.Set_Selected_Index(Scen.TransitTheme+1);
+	//} else {
+	//	themebtn.Set_Selected_Index(0);
+	//}
 
 	/*
 	**	Build level (technology).
@@ -1730,12 +1827,10 @@ int MapEditClass::Scenario_Dialog(void)
 	*/
 	bool housechange = true;
 	bool display = true;
-	bool process = true;
-	bool cancel = false;		// true = user cancels
 	bool dotext = true;		// display the text.
 	bool fetch = false;		// Fetch data from dialog into tracking structure.
 	//Set_Logic_Page(SeenBuff);
-	while (process) {
+	while (scenerio_process) {
 
 		/*
 		**	Invoke game callback
@@ -1918,15 +2013,15 @@ int MapEditClass::Scenario_Dialog(void)
 
 			case (KN_RETURN):
 			case (BUTTON_OK | KN_BUTTON):
-				cancel = false;
-				process = false;
+				//cancel = false;
+				//process = false;
 				fetch = true;
 				break;
 
 			case (KN_ESC):
 			case (BUTTON_CANCEL | KN_BUTTON):
-				cancel = true;
-				process = false;
+				//cancel = true;
+				//process = false;
 				break;
 
 			default:
@@ -1938,25 +2033,25 @@ int MapEditClass::Scenario_Dialog(void)
 		**	If the house changes, then all the gadgets that reflect the settings of the
 		**	house should change as well.
 		*/
-		if (fetch) {
-			fetch = false;
-			HouseStaticClass * hstatic = &hdata[house];
-
-			Base.House = HousesType(basebtn.Current_Index());
-			hstatic->InitialCredits = creditbtn.Get_Value() * 100;
-			hstatic->Edge = SourceType(sourcebtn.Current_Index());
-			hstatic->TechLevel = techlevel.Get_Value();
-			hstatic->MaxUnit = maxunit.Get_Value()/2;
-			hstatic->MaxInfantry = maxunit.Get_Value()/2;
-			hstatic->IQ = smarties.Get_Value();
-			for (h = HOUSE_FIRST; h < HOUSE_COUNT; h++) {
-				if (allies.Is_Checked(h)) {
-					hstatic->Allies |= (1L << h);
-				} else {
-					hstatic->Allies &= ~(1L << h);
-				}
-			}
-		}
+		//if (fetch) {
+		//	fetch = false;
+		//	HouseStaticClass * hstatic = &hdata[house];
+		//
+		//	Base.House = HousesType(basebtn.Current_Index());
+		//	hstatic->InitialCredits = creditbtn.Get_Value() * 100;
+		//	hstatic->Edge = SourceType(sourcebtn.Current_Index());
+		//	hstatic->TechLevel = techlevel.Get_Value();
+		//	hstatic->MaxUnit = maxunit.Get_Value()/2;
+		//	hstatic->MaxInfantry = maxunit.Get_Value()/2;
+		//	hstatic->IQ = smarties.Get_Value();
+		//	for (h = HOUSE_FIRST; h < HOUSE_COUNT; h++) {
+		//		if (allies.Is_Checked(h)) {
+		//			hstatic->Allies |= (1L << h);
+		//		} else {
+		//			hstatic->Allies &= ~(1L << h);
+		//		}
+		//	}
+		//}
 	}
 
 	/*
@@ -1969,7 +2064,7 @@ int MapEditClass::Scenario_Dialog(void)
 	/*
 	**	If cancel, just return
 	*/
-	if (cancel) {
+	if (scenerio_cancel) {
 		return(-1);
 	}
 
