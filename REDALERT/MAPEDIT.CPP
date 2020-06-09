@@ -141,7 +141,7 @@ void MapEditClass::One_Time(void)
 	**	The map: a single large "button"
 	*/
 #ifdef WIN32
-	MapArea = new ControlClass(MAP_AREA, 0, 8, 640-8, 400-8, GadgetClass::LEFTPRESS | GadgetClass::LEFTRELEASE, false);
+	MapArea = new ControlClass(MAP_AREA, 0, 8, ScreenWidth-8, ScreenHeight-8, GadgetClass::LEFTPRESS | GadgetClass::LEFTRELEASE, false);
 #else
 	MapArea = new ControlClass(MAP_AREA, 0, 8, 312, 192, GadgetClass::LEFTPRESS | GadgetClass::LEFTRELEASE, false);
 #endif
