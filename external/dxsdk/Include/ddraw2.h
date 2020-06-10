@@ -10,7 +10,6 @@
 #ifndef __DDRAW_INCLUDED__
 #define __DDRAW_INCLUDED__
 
-
 // Always disable warning C4201: "nonstandard extension used :
 // nameless struct/union"
 #if _MSC_VER >= 1200

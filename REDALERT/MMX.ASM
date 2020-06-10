@@ -278,40 +278,10 @@ MMX_Single_Line_Trans proc near
 ;
 ; If we are doing less than 8 bytes then dont use MMX
 ;
-		cmp	ecx,8
-		jge	@@mmx_loop
 		push	offset Single_Line_Trans_Entry
 		ret
 
-;
-; Use MMX instructions to mask 8 bytes at once
-;
-; Creates a bitmask based on the source bytes equality with zero and then uses this to mask
-; out the source bytes in the destination data. The advatage that MMX gives us is that there is
-; no 'test for zero then jump' required to mask.
-;
-		align	64		;MMX instructions like 64 byte alignment!
 
-@@mmx_loop:
-		movq	mm0,[esi]	; move 8 bytes of source into mm0
-		pxor	mm1,mm1		; zero out mm1
-		pcmpeqb mm1,mm0		; compare mm0 with 0. Bits get set in mm1
-		lea	esi,[esi+8]     ; adjust the source data pointer
-		pand	mm1,[edi]	; and in the destination data to throw away the bytes which arent zero in the source
-		sub	ecx,8		; adjust the byte counter
-		por	mm1,mm0         ; or in the source with the destination data
-		movq	[edi],mm1       ; write back the destination data
-		lea	edi,[edi+8]	; adjust the destination pointer
-
-		cmp	ecx,8
-		jg	@@mmx_loop
-
-;
-; Jump to the approprite code for drawing the end of this line or going to the next one
-;
-		push	offset Next_Line
-		jcxz   	@@next_line
-		push	offset Single_Line_Trans_Entry
 @@next_line:	ret
 
 

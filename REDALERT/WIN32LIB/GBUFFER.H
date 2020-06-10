@@ -290,6 +290,8 @@ class GraphicViewPortClass {
 		unsigned long	Print(int num, int x_pixel, int y_pixel, int fcol, int bcol);
 		unsigned long	Print(long num, int x_pixel, int y_pixel, int fcol, int bcol);
 
+		int Get_Full_Pitch() { return Get_Pitch() + Get_XAdd() + Get_Width(); }
+
 		/*===================================================================*/
 		/* Define the list of graphic functions which work only with a 		*/
 		/*		graphic buffer.																*/
@@ -366,7 +368,7 @@ class GraphicBufferClass : public GraphicViewPortClass, public BufferClass {
 		void DD_Init(GBC_Enum flags);
 		void Init(int w, int h, void *buffer, long size, GBC_Enum flags);
 		void Un_Init(void);
-		void GraphicBufferClass::Attach_DD_Surface (GraphicBufferClass * attach_buffer);
+		void Attach_DD_Surface (GraphicBufferClass * attach_buffer);
 		BOOL Lock(void);
 		BOOL Unlock(void);
 

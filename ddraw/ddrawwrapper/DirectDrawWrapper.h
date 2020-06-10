@@ -4,7 +4,7 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <stdio.h>
-#include <ddraw.h>
+#include <ddraw2.h>
 
 #ifndef H_DDW
 #define H_DDW

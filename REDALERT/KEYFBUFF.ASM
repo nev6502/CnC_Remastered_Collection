@@ -297,7 +297,7 @@ externdef CriticalFadeRedirections:dword
 
 externdef	C Single_Line_Trans:near
 externdef	C Single_Line_Trans_Entry:near
-externdef	C Next_Line:near
+;externdef	C Next_Line:near
 
 
 .CODE
