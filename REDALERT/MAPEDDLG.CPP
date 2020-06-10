@@ -2330,7 +2330,15 @@ void ImGui_SelectTrigger(void) {
 	ImGui::SetNextWindowPos(ImVec2(100, 100));
 	ImGui::Begin("Trigger Editor", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);		
 		ImGui::PushItemWidth(450);
+		bool forceClear = false;
+		if (triggerlist.size() == 0) {
+			forceClear = true;
+			triggerlist.push_back("<NONE>");
+		}
 		ImGui::ListBox("", &select_trigger_seleceted, &triggerlist[0], triggerlist.size());		
+		if (forceClear) {
+			triggerlist.clear();
+		}
 		ImGui::PopItemWidth();
 		ImGui::NewLine();
 		ImGui::Columns(4, "outert", true);
@@ -2400,6 +2408,7 @@ int MapEditClass::Select_Trigger(void)
 {
 	selectTriggerButtonState = SELECT_TRIGGER_BUTTON_NONE;
 	Imgui_Dialog_Function = ImGui_SelectTrigger;
+	select_trigger_seleceted = 0;
 
 	/*
 	**	Dialog & button dimensions

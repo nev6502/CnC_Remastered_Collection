@@ -247,11 +247,450 @@ static char* _perstext[3] = {
 };
 static TriggerTypeClass *currentTriggerClass;
 bool edittrigger_process = true;
+
+int FindIndexInVector(std::vector<const char *> &vec, const char* txt) {
+	for (int i = 0; i < vec.size(); i++) {
+		if (!strcmp(vec[i], txt)) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void ImGui_UpdateUITrigger(void) {
+	//EventChoices
+
+	/*
+	**	Primary event specific data retrieval.
+	*/
+	//EventControl = MultiStyleType(eventflag);
+	current_trig_event = currentTriggerClass->Event1.Event;
+	switch (Event_Needs(currentTriggerClass->Event1.Event)) {
+	case NEED_HOUSE:
+		current_event1 = currentTriggerClass->Event1.Data.House;
+		break;
+
+	case NEED_TIME:
+		current_event1 = currentTriggerClass->Event1.Data.Value;
+		break;
+
+	case NEED_NUMBER:
+		current_event1 = currentTriggerClass->Event1.Data.Value;
+		break;
+
+	case NEED_STRUCTURE:
+		current_event1 = currentTriggerClass->Event1.Data.Structure;
+		break;
+
+	case NEED_UNIT:
+		current_event1 = currentTriggerClass->Event1.Data.Unit;
+		break;
+
+	case NEED_INFANTRY:
+		current_event1 = currentTriggerClass->Event1.Data.Infantry;
+		break;
+
+	case NEED_AIRCRAFT:
+		current_event1 = currentTriggerClass->Event1.Data.Aircraft;
+		break;
+
+	case NEED_WAYPOINT:
+		//Event1.Data.Value = toupper(way1[0]) - 'A';
+		//if (way1[1] != '\0') {
+		//	Event1.Data.Value = (Event1.Data.Value + 1) * 26;
+		//	Event1.Data.Value += toupper(way1[1]) - 'A';
+		//}
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Event1.Team = TeamTypeClass::From_Name(current_trig_event);
+		break;
+	}
+
+	/*
+	**	Secondary event specific data retrieval.
+	*/
+	current_trig2_event = currentTriggerClass->Event2.Event;
+	switch (Event_Needs(currentTriggerClass->Event2.Event)) {
+	case NEED_HOUSE:
+		current_event2 = currentTriggerClass->Event2.Data.House;
+		break;
+
+	case NEED_TIME:
+		current_event2 = currentTriggerClass->Event2.Data.Value;
+		break;
+
+	case NEED_NUMBER:
+		current_event2 = currentTriggerClass->Event2.Data.Value;
+		break;
+
+	case NEED_STRUCTURE:
+		current_event2 = currentTriggerClass->Event2.Data.Structure;
+		break;
+
+	case NEED_UNIT:
+		current_event2 = currentTriggerClass->Event2.Data.Unit;
+		break;
+
+	case NEED_INFANTRY:
+		current_event2 = currentTriggerClass->Event2.Data.Infantry;
+		break;
+
+	case NEED_AIRCRAFT:
+		current_event2 = currentTriggerClass->Event2.Data.Aircraft;
+		break;
+
+	case NEED_WAYPOINT:
+		//currentTriggerClass->Event2.Data.Value = toupper(way2[0]) - 'A';
+		//if (way2[1] != '\0') {
+		//	Event2.Data.Value = (Event2.Data.Value + 1) * 26;
+		//	Event2.Data.Value += toupper(way2[1]) - 'A';
+		//}
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Event2.Team = TeamTypeClass::As_Pointer(ttype2list.Current_Item());
+		break;
+	}
+
+	/*
+	**	Primary action data retrieval.
+	*/
+	//currentTriggerClass->ActionControl = MultiStyleType(actionflag);
+	current_trig_action = currentTriggerClass->Action1.Action;
+	switch (Action_Needs(currentTriggerClass->Action1.Action)) {
+	case NEED_SPECIAL:
+		current_event3 = currentTriggerClass->Action1.Data.Special;
+		break;
+
+	case NEED_HOUSE:
+		current_event3 = currentTriggerClass->Action1.Data.House;
+		break;
+
+	case NEED_TRIGGER:
+		current_event3 = FindIndexInVector(triggerentrylist, currentTriggerClass->Action1.Trigger->Description());
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Action1.Team = TeamTypeClass::From_Name(ttype3list.Current_Item());
+		break;
+
+	case NEED_NUMBER:
+		current_event3 = currentTriggerClass->Action1.Data.Value;
+		break;
+
+	case NEED_WAYPOINT:
+		//currentTriggerClass->Action1.Data.Value = toupper(way3[0]) - 'A';
+		//if (way3[1] != '\0') {
+		//	Action1.Data.Value = (Action1.Data.Value + 1) * 26;
+		//	Action1.Data.Value += toupper(way3[1]) - 'A';
+		//}
+		break;
+
+	case NEED_BOOL:
+		current_event3 = currentTriggerClass->Action1.Data.Bool;
+		break;
+
+	case NEED_THEME:
+		current_event3 = currentTriggerClass->Action1.Data.Theme;
+		break;
+
+	case NEED_SOUND:
+		current_event3 = currentTriggerClass->Action1.Data.Sound;
+		break;
+
+	case NEED_MOVIE:
+		current_event3 = currentTriggerClass->Action1.Data.Movie;
+		break;
+
+	case NEED_SPEECH:
+		current_event3 = currentTriggerClass->Action1.Data.Speech;
+		break;
+
+	case NEED_QUARRY:
+		current_event3 = currentTriggerClass->Action1.Data.Quarry;
+		break;
+	}
+
+	/*
+	**	Secondary action data retrieval.
+	*/
+	current_trig2_action = currentTriggerClass->Action2.Action;
+	switch (Action_Needs(currentTriggerClass->Action2.Action)) {
+	case NEED_SPECIAL:
+		current_event4 = currentTriggerClass->Action2.Data.Special;
+		break;
+
+	case NEED_HOUSE:
+		current_event4 = currentTriggerClass->Action2.Data.House;
+		break;
+
+	case NEED_TRIGGER:
+		current_event4 = FindIndexInVector(triggerentrylist, currentTriggerClass->Action2.Trigger->Description());
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Action2.Team = TeamTypeClass::From_Name(ttype4list.Current_Item());
+		break;
+
+	case NEED_NUMBER:
+		current_event4 = currentTriggerClass->Action2.Data.Value;
+		break;
+
+	case NEED_WAYPOINT:
+		//currentTriggerClass->Action2.Data.Value = toupper(way4[0]) - 'A';
+		//if (way4[1] != '\0') {
+		//	currentTriggerClass->Action2.Data.Value = (Action2.Data.Value + 1) * 26;
+		//	currentTriggerClass->Action2.Data.Value += toupper(way4[1]) - 'A';
+		//}
+		break;
+
+	case NEED_BOOL:
+		current_event4 = currentTriggerClass->Action2.Data.Bool;
+		break;
+
+	case NEED_THEME:
+		current_event4 = currentTriggerClass->Action2.Data.Theme;
+		break;
+
+	case NEED_MOVIE:
+		current_event4 = currentTriggerClass->Action2.Data.Movie;
+		break;
+
+	case NEED_SOUND:
+		current_event4 = currentTriggerClass->Action2.Data.Sound;
+		break;
+
+	case NEED_SPEECH:
+		current_event4 = currentTriggerClass->Action2.Data.Speech;
+		break;
+
+	case NEED_QUARRY:
+		current_event4 = currentTriggerClass->Action2.Data.Quarry;
+		break;
+	}
+}
+
+void ImGui_SaveTrigger(void) {	
+	//EventChoices
+
+	/*
+	**	Primary event specific data retrieval.
+	*/
+	//EventControl = MultiStyleType(eventflag);
+	currentTriggerClass->Event1.Event = (TEventType)current_trig_event;
+	switch (Event_Needs(currentTriggerClass->Event1.Event)) {
+	case NEED_HOUSE:
+		currentTriggerClass->Event1.Data.House = (HousesType)current_event1;
+		break;
+
+	case NEED_TIME:
+		currentTriggerClass->Event1.Data.Value = current_event1;
+		break;
+
+	case NEED_NUMBER:
+		currentTriggerClass->Event1.Data.Value = current_event1;
+		break;
+
+	case NEED_STRUCTURE:
+		currentTriggerClass->Event1.Data.Structure = StructType(current_event1);
+		break;
+
+	case NEED_UNIT:
+		currentTriggerClass->Event1.Data.Unit = UnitType(current_event1);
+		break;
+
+	case NEED_INFANTRY:
+		currentTriggerClass->Event1.Data.Infantry = InfantryType(current_event1);
+		break;
+
+	case NEED_AIRCRAFT:
+		currentTriggerClass->Event1.Data.Aircraft = AircraftType(current_event1);
+		break;
+
+	case NEED_WAYPOINT:
+		//Event1.Data.Value = toupper(way1[0]) - 'A';
+		//if (way1[1] != '\0') {
+		//	Event1.Data.Value = (Event1.Data.Value + 1) * 26;
+		//	Event1.Data.Value += toupper(way1[1]) - 'A';
+		//}
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Event1.Team = TeamTypeClass::From_Name(current_trig_event);
+		break;
+	}
+
+	/*
+	**	Secondary event specific data retrieval.
+	*/
+	currentTriggerClass->Event2.Event = (TEventType)current_trig2_event;
+	switch (Event_Needs(currentTriggerClass->Event2.Event)) {
+	case NEED_HOUSE:
+		currentTriggerClass->Event2.Data.House = HousesType(current_event2);
+		break;
+
+	case NEED_TIME:
+		currentTriggerClass->Event2.Data.Value = current_event2;
+		break;
+
+	case NEED_NUMBER:
+		currentTriggerClass->Event2.Data.Value = current_event2;
+		break;
+
+	case NEED_STRUCTURE:
+		currentTriggerClass->Event2.Data.Structure = StructType(current_event2);
+		break;
+
+	case NEED_UNIT:
+		currentTriggerClass->Event2.Data.Unit = UnitType(current_event2);
+		break;
+
+	case NEED_INFANTRY:
+		currentTriggerClass->Event2.Data.Infantry = InfantryType(current_event2);
+		break;
+
+	case NEED_AIRCRAFT:
+		currentTriggerClass->Event2.Data.Aircraft = AircraftType(current_event2);
+		break;
+
+	case NEED_WAYPOINT:
+		//currentTriggerClass->Event2.Data.Value = toupper(way2[0]) - 'A';
+		//if (way2[1] != '\0') {
+		//	Event2.Data.Value = (Event2.Data.Value + 1) * 26;
+		//	Event2.Data.Value += toupper(way2[1]) - 'A';
+		//}
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Event2.Team = TeamTypeClass::As_Pointer(ttype2list.Current_Item());
+		break;
+	}
+
+	/*
+	**	Primary action data retrieval.
+	*/
+	//currentTriggerClass->ActionControl = MultiStyleType(actionflag);
+	currentTriggerClass->Action1.Action = (TActionType)current_trig_action;
+	switch (Action_Needs(currentTriggerClass->Action1.Action)) {
+	case NEED_SPECIAL:
+		currentTriggerClass->Action1.Data.Special = SpecialWeaponType(current_event3);
+		break;
+
+	case NEED_HOUSE:
+		currentTriggerClass->Action1.Data.House = HousesType(current_event3);
+		break;
+
+	case NEED_TRIGGER:
+		currentTriggerClass->Action1.Trigger = TriggerTypeClass::From_Name(typelist[current_event3]);
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Action1.Team = TeamTypeClass::From_Name(ttype3list.Current_Item());
+		break;
+
+	case NEED_NUMBER:
+		currentTriggerClass->Action1.Data.Value = current_event3;
+		break;
+
+	case NEED_WAYPOINT:
+		//currentTriggerClass->Action1.Data.Value = toupper(way3[0]) - 'A';
+		//if (way3[1] != '\0') {
+		//	Action1.Data.Value = (Action1.Data.Value + 1) * 26;
+		//	Action1.Data.Value += toupper(way3[1]) - 'A';
+		//}
+		break;
+
+	case NEED_BOOL:
+		currentTriggerClass->Action1.Data.Bool = current_event3;
+		break;
+
+	case NEED_THEME:
+		currentTriggerClass->Action1.Data.Theme = ThemeType(current_event3);
+		break;
+
+	case NEED_SOUND:
+		currentTriggerClass->Action1.Data.Sound = VocType(current_event3);
+		break;
+
+	case NEED_MOVIE:
+		currentTriggerClass->Action1.Data.Movie = VQType(current_event3);
+		break;
+
+	case NEED_SPEECH:
+		currentTriggerClass->Action1.Data.Speech = VoxType(current_event3);
+		break;
+
+	case NEED_QUARRY:
+		currentTriggerClass->Action1.Data.Quarry = QuarryType(current_event3);
+		break;
+	}
+
+	/*
+	**	Secondary action data retrieval.
+	*/
+	currentTriggerClass->Action2.Action = (TActionType)current_trig2_action;
+	switch (Action_Needs(currentTriggerClass->Action2.Action)) {
+	case NEED_SPECIAL:
+		currentTriggerClass->Action2.Data.Special = SpecialWeaponType(current_event4);
+		break;
+
+	case NEED_HOUSE:
+		currentTriggerClass->Action2.Data.House = HousesType(current_event4);
+		break;
+
+	case NEED_TRIGGER:
+		currentTriggerClass->Action2.Trigger = TriggerTypeClass::From_Name(typelist[current_event4]);
+		break;
+
+	case NEED_TEAM:
+		//currentTriggerClass->Action2.Team = TeamTypeClass::From_Name(ttype4list.Current_Item());
+		break;
+
+	case NEED_NUMBER:
+		currentTriggerClass->Action2.Data.Value = current_event4;
+		break;
+
+	case NEED_WAYPOINT:
+		//currentTriggerClass->Action2.Data.Value = toupper(way4[0]) - 'A';
+		//if (way4[1] != '\0') {
+		//	currentTriggerClass->Action2.Data.Value = (Action2.Data.Value + 1) * 26;
+		//	currentTriggerClass->Action2.Data.Value += toupper(way4[1]) - 'A';
+		//}
+		break;
+
+	case NEED_BOOL:
+		currentTriggerClass->Action2.Data.Bool = current_event4;
+		break;
+
+	case NEED_THEME:
+		currentTriggerClass->Action2.Data.Theme = ThemeType(current_event4);
+		break;
+
+	case NEED_MOVIE:
+		currentTriggerClass->Action2.Data.Movie = VQType(current_event4);
+		break;
+
+	case NEED_SOUND:
+		currentTriggerClass->Action2.Data.Sound = VocType(current_event4);
+		break;
+
+	case NEED_SPEECH:
+		currentTriggerClass->Action2.Data.Speech = VoxType(current_event4);
+		break;
+
+	case NEED_QUARRY:
+		currentTriggerClass->Action2.Data.Quarry = QuarryType(current_event4);
+		break;
+	}
+}
+
 void ImGui_TriggerEdit(void) {
 	bool toolActive = false;
 	current_trig_house = currentTriggerClass->House;
 	current_trig_perst = currentTriggerClass->IsPersistant;
-	
+	ImGui_UpdateUITrigger();
 
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
@@ -343,6 +782,8 @@ void ImGui_TriggerEdit(void) {
 
 	currentTriggerClass->House = (HousesType)current_trig_house;
 	currentTriggerClass->IsPersistant = (TriggerTypeClass::PersistantType)current_trig_perst;
+
+	ImGui_SaveTrigger();
 }
 
  /***********************************************************************************************
@@ -1562,224 +2003,7 @@ bool TriggerTypeClass::Edit(void)
 			*/
 		case KN_RETURN:
 		case BUTTON_OK | KN_BUTTON:
-			House = HousesType(housebtn.Current_Index());
-			IsPersistant = PersistantType(persbtn.Current_Index());
-			if (strlen(selected_trigger_name) == 0) {
-				Set_Name("____");
-			}
-			else {
-				Set_Name(selected_trigger_name);
-			}
-
-			/*
-			**	Primary event specific data retrieval.
-			*/
-			EventControl = MultiStyleType(eventflag);
-			Event1.Event = *event1list.Current_Item();
-			switch (Event_Needs(Event1.Event)) {
-			case NEED_HOUSE:
-				Event1.Data.House = HousesType(htype1list.Current_Index());
-				break;
-
-			case NEED_TIME:
-				Event1.Data.Value = atoi(event1data.Get_Text());
-				break;
-
-			case NEED_NUMBER:
-				Event1.Data.Value = atoi(event1data.Get_Text());
-				break;
-
-			case NEED_STRUCTURE:
-				Event1.Data.Structure = StructType(btype1list.Current_Index());
-				break;
-
-			case NEED_UNIT:
-				Event1.Data.Unit = UnitType(utype1list.Current_Index());
-				break;
-
-			case NEED_INFANTRY:
-				Event1.Data.Infantry = InfantryType(itype1list.Current_Index());
-				break;
-
-			case NEED_AIRCRAFT:
-				Event1.Data.Aircraft = AircraftType(atype1list.Current_Index());
-				break;
-
-			case NEED_WAYPOINT:
-				Event1.Data.Value = toupper(way1[0]) - 'A';
-				if (way1[1] != '\0') {
-					Event1.Data.Value = (Event1.Data.Value + 1) * 26;
-					Event1.Data.Value += toupper(way1[1]) - 'A';
-				}
-				break;
-
-			case NEED_TEAM:
-				Event1.Team = TeamTypeClass::From_Name(ttype1list.Current_Item());
-				break;
-			}
-
-			/*
-			**	Secondary event specific data retrieval.
-			*/
-			Event2.Event = *event2list.Current_Item();
-			switch (Event_Needs(Event2.Event)) {
-			case NEED_HOUSE:
-				Event2.Data.House = HousesType(htype2list.Current_Index());
-				break;
-
-			case NEED_TIME:
-				Event2.Data.Value = atoi(event2data.Get_Text());
-				break;
-
-			case NEED_NUMBER:
-				Event2.Data.Value = atoi(event2data.Get_Text());
-				break;
-
-			case NEED_STRUCTURE:
-				Event2.Data.Structure = StructType(btype2list.Current_Index());
-				break;
-
-			case NEED_UNIT:
-				Event2.Data.Unit = UnitType(utype2list.Current_Index());
-				break;
-
-			case NEED_INFANTRY:
-				Event2.Data.Infantry = InfantryType(itype2list.Current_Index());
-				break;
-
-			case NEED_AIRCRAFT:
-				Event2.Data.Aircraft = AircraftType(atype2list.Current_Index());
-				break;
-
-			case NEED_WAYPOINT:
-				Event2.Data.Value = toupper(way2[0]) - 'A';
-				if (way2[1] != '\0') {
-					Event2.Data.Value = (Event2.Data.Value + 1) * 26;
-					Event2.Data.Value += toupper(way2[1]) - 'A';
-				}
-				break;
-
-			case NEED_TEAM:
-				Event2.Team = TeamTypeClass::As_Pointer(ttype2list.Current_Item());
-				break;
-			}
-
-			/*
-			**	Primary action data retrieval.
-			*/
-			ActionControl = MultiStyleType(actionflag);
-			Action1.Action = *action1list.Current_Item();
-			switch (Action_Needs(Action1.Action)) {
-			case NEED_SPECIAL:
-				Action1.Data.Special = SpecialWeaponType(spc1.Current_Index());
-				break;
-
-			case NEED_HOUSE:
-				Action1.Data.House = HousesType(htype3list.Current_Index());
-				break;
-
-			case NEED_TRIGGER:
-				Action1.Trigger = TriggerTypeClass::From_Name(trtype1list.Current_Item());
-				break;
-
-			case NEED_TEAM:
-				Action1.Team = TeamTypeClass::From_Name(ttype3list.Current_Item());
-				break;
-
-			case NEED_NUMBER:
-				Action1.Data.Value = atoi(action1data.Get_Text());
-				break;
-
-			case NEED_WAYPOINT:
-				Action1.Data.Value = toupper(way3[0]) - 'A';
-				if (way3[1] != '\0') {
-					Action1.Data.Value = (Action1.Data.Value + 1) * 26;
-					Action1.Data.Value += toupper(way3[1]) - 'A';
-				}
-				break;
-
-			case NEED_BOOL:
-				Action1.Data.Bool = booltype1list.Current_Index();
-				break;
-
-			case NEED_THEME:
-				Action1.Data.Theme = ThemeType(themetype1list.Current_Index());
-				break;
-
-			case NEED_SOUND:
-				Action1.Data.Sound = VocType(soundtype1list.Current_Index());
-				break;
-
-			case NEED_MOVIE:
-				Action1.Data.Movie = VQType(movietype1list.Current_Index());
-				break;
-
-			case NEED_SPEECH:
-				Action1.Data.Speech = VoxType(speechtype1list.Current_Index());
-				break;
-
-			case NEED_QUARRY:
-				Action1.Data.Quarry = QuarryType(qlist1.Current_Index());
-				break;
-			}
-
-			/*
-			**	Secondary action data retrieval.
-			*/
-			Action2.Action = *action2list.Current_Item();
-			switch (Action_Needs(Action2.Action)) {
-			case NEED_SPECIAL:
-				Action2.Data.Special = SpecialWeaponType(spc2.Current_Index());
-				break;
-
-			case NEED_HOUSE:
-				Action2.Data.House = HousesType(htype4list.Current_Index());
-				break;
-
-			case NEED_TRIGGER:
-				Action2.Trigger = TriggerTypeClass::From_Name(trtype2list.Current_Item());
-				break;
-
-			case NEED_TEAM:
-				Action2.Team = TeamTypeClass::From_Name(ttype4list.Current_Item());
-				break;
-
-			case NEED_NUMBER:
-				Action2.Data.Value = atoi(action2data.Get_Text());
-				break;
-
-			case NEED_WAYPOINT:
-				Action2.Data.Value = toupper(way4[0]) - 'A';
-				if (way4[1] != '\0') {
-					Action2.Data.Value = (Action2.Data.Value + 1) * 26;
-					Action2.Data.Value += toupper(way4[1]) - 'A';
-				}
-				break;
-
-			case NEED_BOOL:
-				Action2.Data.Bool = booltype2list.Current_Index();
-				break;
-
-			case NEED_THEME:
-				Action2.Data.Theme = ThemeType(themetype2list.Current_Index());
-				break;
-
-			case NEED_MOVIE:
-				Action2.Data.Movie = VQType(movietype2list.Current_Index());
-				break;
-
-			case NEED_SOUND:
-				Action2.Data.Sound = VocType(soundtype2list.Current_Index());
-				break;
-
-			case NEED_SPEECH:
-				Action2.Data.Speech = VoxType(speechtype2list.Current_Index());
-				break;
-
-			case NEED_QUARRY:
-				Action2.Data.Quarry = QuarryType(qlist1.Current_Index());
-				break;
-			}
+		
 			return(true);
 
 		case KN_ESC:
