@@ -188,32 +188,32 @@ class WWKeyboardClass
 #define	VK_NONE_3E			  0x3E
 #define	VK_NONE_3F			  0x3F
 #define	VK_NONE_40			  0x40
-#define	VK_A					  0x41
-#define	VK_B					  0x42
-#define	VK_C					  0x43
-#define	VK_D					  0x44
-#define	VK_E					  0x45
-#define	VK_F					  0x46
-#define	VK_G					  0x47
+#define	VK_A					  'a'
+#define	VK_B					  'b'
+#define	VK_C					  'c'
+#define	VK_D					  'd'
+#define	VK_E					  'e'
+#define	VK_F					  'f'
+#define	VK_G					  'g'
 #define	VK_H					  'h'
-#define	VK_I					  0x49
-#define	VK_J					  0x4A
-#define	VK_K					  0x4B
-#define	VK_L					  0x4C
-#define	VK_M					  0x4D
-#define	VK_N					  0x4E
-#define	VK_O					  0x4F
-#define	VK_P					  0x50
-#define	VK_Q					  0x51
-#define	VK_R					  0x52
-#define	VK_S					  0x53
-#define	VK_T					  0x54
-#define	VK_U					  0x55
-#define	VK_V					  0x56
-#define	VK_W					  0x57
-#define	VK_X					  0x58
-#define	VK_Y					  0x59
-#define	VK_Z					  0x5A
+#define	VK_I					  'i'
+#define	VK_J					  'j'
+#define	VK_K					  'k'
+#define	VK_L					  'l'
+#define	VK_M					  'm'
+#define	VK_N					  'n'
+#define	VK_O					  'o'
+#define	VK_P					  'p'
+#define	VK_Q					  'q'
+#define	VK_R					  'r'
+#define	VK_S					  's'
+#define	VK_T					  't'
+#define	VK_U					  'u'
+#define	VK_V					  'v'
+#define	VK_W					  'w'
+#define	VK_X					  'x'
+#define	VK_Y					  'y'
+#define	VK_Z					  'z'
 #define	VK_NONE_5B			  0x5B
 #define	VK_NONE_5C			  0x5C
 #define	VK_NONE_5D			  0x5D
@@ -576,17 +576,17 @@ typedef enum KeyNumType {
 	KN_E_UP				= VK_NUMPAD8,
 	KN_F 					= VK_F,
 	KN_F1					= VK_F1,
-	KN_F10				= VK_F10,
-	KN_F11				= VK_F11,
-	KN_F12				= VK_F12,
+	KN_F10				= 67,
+	KN_F11				= 68,
+	KN_F12				= 69,
 	KN_F2					= 59,
 	KN_F3					= 60,
 	KN_F4					= 61,
-	KN_F5					= VK_F5,
-	KN_F6					= VK_F6,
-	KN_F7					= VK_F7,
-	KN_F8					= VK_F8,
-	KN_F9					= VK_F9,
+	KN_F5					= 62,
+	KN_F6					= 63,
+	KN_F7					= 64,
+	KN_F8					= 65,
+	KN_F9					= 66,
 	KN_G 					= VK_G,
 	KN_GRAVE 			= VK_NONE_C0,
 	KN_H 					= VK_H,

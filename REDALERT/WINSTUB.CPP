@@ -754,7 +754,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 			}
 			break;
 		case SDL_KEYDOWN:
-			Keyboard->Put_Element(event.key.keysym.sym);
+			const Uint8* state = SDL_GetKeyboardState(NULL);
+
+			if(state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
+				Keyboard->Put_Element(event.key.keysym.sym | KN_ALT_BIT);
+			else
+				Keyboard->Put_Element(event.key.keysym.sym);
 			break;
 		}
 
