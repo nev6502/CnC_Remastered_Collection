@@ -216,7 +216,6 @@ set(src_redalert
 	./RedAlert/DDE.H
 	./RedAlert/DEBUG.CPP
 	./RedAlert/DEBUG.H
-	./RedAlert/decompiled.h
 	./RedAlert/DEFINES.H
 	./RedAlert/DESCDLG.CPP
 	./RedAlert/DESCDLG.H
