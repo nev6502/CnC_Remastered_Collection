@@ -2022,7 +2022,7 @@ bool TriggerTypeClass::Edit(void)
 			break;
 		}
 	}
-	return(false);
+	return(true);
 }
 #endif
 
