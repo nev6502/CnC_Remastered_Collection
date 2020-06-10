@@ -142,5 +142,8 @@ class TriggerTypeClass : public AbstractTypeClass
 		operator const char * (void) const {return(Description());};
 #endif
 		void Draw_It(int index, int x, int y, int width, int height, bool selected, TextPrintType flags) const;
+// jmarshall - made this instance based.
+		char _buffer[128];
+// jmarshall end
 };
 

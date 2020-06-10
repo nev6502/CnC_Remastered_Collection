@@ -48,7 +48,7 @@
  *   TriggerTypeClass::~TriggerTypeClass -- Deleting a trigger type deletes associated triggers*
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-
+#include    "imgui.h"
 #include	"function.h"
 #include "trigtype.h"
 
@@ -165,6 +165,186 @@ enum {
 	BUTTON_EVENT,					// Multiple event control button.
 };
 
+char selected_trigger_name[5] = { 0 };
+std::vector<const char*> trig_houses;
+std::vector<const char*> trig_events;
+std::vector<const char*> trig_actions;
+int current_trig_action = 0;
+int current_trig_house = 0;
+int current_trig_perst = 0;
+int current_trig_event = 0;
+int current_trig2_event = -1;
+int current_trig2_action = -1;
+
+int current_event1 = 0;
+int current_event2 = 0;
+int current_event3 = 0;
+int current_event4 = 0;
+
+std::vector<const char*> typelist;
+std::vector<const char*> triggerentrylist;
+std::vector<const char*> boollist;
+std::vector<const char*> themelist;
+std::vector<const char*> movielist;
+std::vector<const char*> soundlist;
+std::vector<const char*> speechlist;
+std::vector<const char*> buildinglist;
+std::vector<const char*> infrantrylist;
+std::vector<const char*> aircraftlist;
+std::vector<const char*> unitlist;
+std::vector<const char*> quarytypelist;
+std::vector<const char*> specialweaponlist;
+
+void ImGui_DrawCombo(int eventListType, int *eventId) {
+	ImGui::SameLine();
+	switch (Event_Needs(EventChoices[eventListType])) {
+		case NEED_MOVIE:
+			ImGui::Combo("", eventId, &movielist[0], movielist.size());
+			break;
+		case NEED_SOUND:
+			ImGui::Combo("", eventId, &soundlist[0], soundlist.size());
+			break;
+		case NEED_HOUSE:
+			ImGui::Combo("", eventId, &trig_houses[0], trig_houses.size());
+			break;
+		case NEED_TEAM:
+			ImGui::Combo("", eventId, &typelist[0], typelist.size());
+			break;
+		case NEED_WAYPOINT:
+
+			break;
+
+		case NEED_TIME:
+		case NEED_NUMBER:
+			ImGui::InputInt("", eventId);
+			break;
+
+		case NEED_STRUCTURE:
+			ImGui::Combo("", eventId, &buildinglist[0], buildinglist.size());
+			break;
+
+		case NEED_INFANTRY:
+			ImGui::Combo("", eventId, &infrantrylist[0], infrantrylist.size());
+			break;
+
+		case NEED_AIRCRAFT:
+			ImGui::Combo("", eventId, &aircraftlist[0], aircraftlist.size());
+			break;
+
+		case NEED_UNIT:
+			ImGui::Combo("", eventId, &unitlist[0], unitlist.size());
+			break;
+		default:
+			ImGui::NewLine();
+			break;
+	}
+}
+
+static char* _perstext[3] = {
+	"Volatile",
+	"Semi-persistent",
+	"Persistent"
+};
+static TriggerTypeClass *currentTriggerClass;
+bool edittrigger_process = true;
+void ImGui_TriggerEdit(void) {
+	bool toolActive = false;
+	current_trig_house = currentTriggerClass->House;
+	current_trig_perst = currentTriggerClass->IsPersistant;
+	
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(450, 340));
+	ImGui::SetNextWindowPos(ImVec2(100, 100));
+	ImGui::Begin("Edit Trigger", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Columns(3, "trigger_o3", true);
+			ImGui::Text("Name");
+			ImGui::PushID("trigedit_name");
+				ImGui::InputText("", selected_trigger_name, 5);
+			ImGui::PopID();
+		ImGui::NextColumn();
+			ImGui::Text("House");
+			ImGui::PushID("trigedit_house");
+				ImGui::Combo("", &current_trig_house, &trig_houses[0], trig_houses.size());
+			ImGui::PopID();
+		ImGui::NextColumn();
+			ImGui::Text("Persistence");
+			ImGui::PushID("trigedit_persistance");
+				ImGui::Combo("", &current_trig_perst, &_perstext[0], 3);
+			ImGui::PopID();
+		ImGui::Columns(1);
+		ImGui::NewLine();		
+		ImGui::Text("Trigger Event:");
+		ImGui::PushID("trigedit_event");
+			ImGui::Combo("", &current_trig_event, &trig_events[0], trig_events.size());
+		ImGui::PopID();
+		ImGui::PushID("trigedit_data1");
+			ImGui_DrawCombo(current_trig_event, &current_event1);
+		ImGui::PopID();
+		if (current_trig2_event == -1) {
+			ImGui::PushID("trigedit_justevent_btn");
+			if (ImGui::Button("Just this event")) {
+				current_trig2_event = 0;
+			}
+			ImGui::PopID();
+		}
+		else {
+			ImGui::PushID("trigedit_and1_btn");
+			if (ImGui::Button("_AND_")) {
+				current_trig2_event = -1;
+			}
+			ImGui::PopID();
+			ImGui::PushID("trigedit_event2");
+				ImGui::Combo("", &current_trig2_event, &trig_events[0], trig_events.size());
+			ImGui::PopID();
+
+			ImGui::PushID("trigedit_data2");
+				ImGui_DrawCombo(current_trig2_event, &current_event3);
+			ImGui::PopID();
+		}
+		ImGui::NewLine();
+		ImGui::Text("Action to perform:");
+		ImGui::PushID("trigedit_action");
+			ImGui::Combo("", &current_trig_action, &trig_actions[0], trig_actions.size());
+		ImGui::PopID();
+		ImGui::SameLine();			
+		ImGui::PushID("trigedit_data3");
+			ImGui_DrawCombo(current_trig_action, &current_event3);
+		ImGui::PopID();
+		if (current_trig2_action == -1) {
+			ImGui::PushID("trigedit_justaction_btn");
+			if (ImGui::Button("Just this action")) {
+				current_trig2_action = 0;
+			}
+			ImGui::PopID();
+		}
+		else {
+			ImGui::PushID("trigedit_and2_btn");
+			if (ImGui::Button("_AND_")) {
+				current_trig2_action = -1;
+			}
+			ImGui::PopID();
+			ImGui::PushID("trigedit_action2");
+				ImGui::Combo("", &current_trig2_action, &trig_actions[0], trig_actions.size());
+			ImGui::PopID();
+
+			ImGui::PushID("trigedit_data4");
+				ImGui_DrawCombo(current_trig2_action, &current_event4);
+			ImGui::PopID();
+		}
+		ImGui::NewLine();
+		if (ImGui::Button("Ok")) {
+			edittrigger_process = false;
+		}
+		//ImGui::SameLine();
+		//ImGui::Button("Cancel");
+	ImGui::End();
+
+	currentTriggerClass->House = (HousesType)current_trig_house;
+	currentTriggerClass->IsPersistant = (TriggerTypeClass::PersistantType)current_trig_perst;
+}
+
  /***********************************************************************************************
   * TriggerTypeClass::Edit -- Edit the trigger type through the scenario editor.                *
   *                                                                                             *
@@ -183,6 +363,28 @@ enum {
   *=============================================================================================*/
 bool TriggerTypeClass::Edit(void)
 {
+	edittrigger_process = true;
+	currentTriggerClass = this;
+	trig_houses.clear();
+	trig_events.clear();
+	trig_actions.clear();
+
+	typelist.clear();
+	triggerentrylist.clear();
+	boollist.clear();
+	themelist.clear();
+	movielist.clear();
+	soundlist.clear();
+	speechlist.clear();
+	buildinglist.clear();
+	infrantrylist.clear();
+	aircraftlist.clear();
+	unitlist.clear();
+	quarytypelist.clear();
+	specialweaponlist.clear();
+
+	Imgui_Dialog_Function = ImGui_TriggerEdit;
+	
 	/*
 	**	Dialog variables:
 	*/
@@ -213,6 +415,8 @@ bool TriggerTypeClass::Edit(void)
 	for (TEventType event = TEVENT_FIRST; event < TEVENT_COUNT; event++) {
 		event1list.Add_Item(&EventChoices[event]);
 		event2list.Add_Item(&EventChoices[event]);
+
+		trig_events.push_back(EventChoices[event].Description());
 	}
 
 	PBubble_Sort(&event1list[0], event1list.Count());
@@ -241,6 +445,7 @@ bool TriggerTypeClass::Edit(void)
 	for (TActionType action = TACTION_FIRST; action < TACTION_COUNT; action++) {
 		action1list.Add_Item(&ActionChoices[action]);
 		action2list.Add_Item(&ActionChoices[action]);
+		trig_actions.push_back(ActionChoices[action].Description());
 	}
 
 	PBubble_Sort(&action1list[0], action1list.Count());
@@ -373,13 +578,15 @@ bool TriggerTypeClass::Edit(void)
 		TPF_EFNT | TPF_NOSHADOW,
 		AD2_X, AD2_Y, ED_WIDTH, ED_HEIGHT,
 		MFCD::Retrieve("EBTN-UP.SHP"),
-		MFCD::Retrieve("EBTN-DN.SHP"));
+		MFCD::Retrieve("EBTN-DN.SHP"));	
 
 	for (int index = 0; index < TeamTypes.Count(); index++) {
 		ttype1list.Add_Item(TeamTypes.Ptr(index)->IniName);
 		ttype2list.Add_Item(TeamTypes.Ptr(index)->IniName);
 		ttype3list.Add_Item(TeamTypes.Ptr(index)->IniName);
 		ttype4list.Add_Item(TeamTypes.Ptr(index)->IniName);
+
+		typelist.push_back(TeamTypes.Ptr(index)->IniName);
 	}
 
 	if (Event1.Team.Is_Valid()) {
@@ -426,6 +633,7 @@ bool TriggerTypeClass::Edit(void)
 	for (index = 0; index < TriggerTypes.Count(); index++) {
 		trtype1list.Add_Item(TriggerTypes.Ptr(index)->IniName);
 		trtype2list.Add_Item(TriggerTypes.Ptr(index)->IniName);
+		triggerentrylist.push_back(TriggerTypes.Ptr(index)->IniName);
 	}
 
 	if (Action1.Trigger.Is_Valid()) {
@@ -457,6 +665,9 @@ bool TriggerTypeClass::Edit(void)
 		MFCD::Retrieve("EBTN-UP.SHP"),
 		MFCD::Retrieve("EBTN-DN.SHP"));
 
+	boollist.push_back("OFF");
+	boollist.push_back("ON");
+
 	booltype1list.Add_Item("OFF");
 	booltype1list.Add_Item("ON");
 	booltype2list.Add_Item("OFF");
@@ -484,6 +695,7 @@ bool TriggerTypeClass::Edit(void)
 	for (ThemeType theme = THEME_FIRST; theme < THEME_COUNT; theme++) {
 		themetype1list.Add_Item(Theme.Full_Name(theme));
 		themetype2list.Add_Item(Theme.Full_Name(theme));
+		themelist.push_back(Theme.Full_Name(theme));
 	}
 
 	if (Action_Needs(Action1.Action) == NEED_THEME) {
@@ -518,6 +730,7 @@ bool TriggerTypeClass::Edit(void)
 	for (VQType movie = VQ_FIRST; movie < VQ_COUNT; movie++) {
 		movietype1list.Add_Item(VQName[movie]);
 		movietype2list.Add_Item(VQName[movie]);
+		movielist.push_back(VQName[movie]);
 	}
 
 	if (Action_Needs(Action1.Action) == NEED_MOVIE) {
@@ -552,6 +765,7 @@ bool TriggerTypeClass::Edit(void)
 	for (VocType sound = VOC_FIRST; sound < VOC_COUNT; sound++) {
 		soundtype1list.Add_Item(Voc_Name(sound));
 		soundtype2list.Add_Item(Voc_Name(sound));
+		soundlist.push_back(Voc_Name(sound));
 	}
 
 	if (Action_Needs(Action1.Action) == NEED_SOUND) {
@@ -586,6 +800,7 @@ bool TriggerTypeClass::Edit(void)
 	for (VoxType speech = VOX_FIRST; speech < VOX_COUNT; speech++) {
 		speechtype1list.Add_Item(Speech_Name(speech));
 		speechtype2list.Add_Item(Speech_Name(speech));
+		speechlist.push_back(Speech_Name(speech));
 	}
 
 	if (Action_Needs(Action1.Action) == NEED_SPEECH) {
@@ -620,6 +835,7 @@ bool TriggerTypeClass::Edit(void)
 	for (StructType ss = STRUCT_FIRST; ss < STRUCT_COUNT; ss++) {
 		btype1list.Add_Item(Text_String(BuildingTypeClass::As_Reference(ss).Full_Name()));
 		btype2list.Add_Item(Text_String(BuildingTypeClass::As_Reference(ss).Full_Name()));
+		buildinglist.push_back(BuildingTypeClass::As_Reference(ss).Name());
 	}
 
 	if (Event_Needs(Event1.Event) == NEED_STRUCTURE) {
@@ -654,6 +870,7 @@ bool TriggerTypeClass::Edit(void)
 	for (InfantryType ii = INFANTRY_FIRST; ii < INFANTRY_COUNT; ii++) {
 		itype1list.Add_Item(Text_String(InfantryTypeClass::As_Reference(ii).Full_Name()));
 		itype2list.Add_Item(Text_String(InfantryTypeClass::As_Reference(ii).Full_Name()));
+		infrantrylist.push_back(InfantryTypeClass::As_Reference(ii).Name());
 	}
 
 	if (Event_Needs(Event1.Event) == NEED_INFANTRY) {
@@ -688,6 +905,7 @@ bool TriggerTypeClass::Edit(void)
 	for (AircraftType aa = AIRCRAFT_FIRST; aa < AIRCRAFT_COUNT; aa++) {
 		atype1list.Add_Item(Text_String(AircraftTypeClass::As_Reference(aa).Full_Name()));
 		atype2list.Add_Item(Text_String(AircraftTypeClass::As_Reference(aa).Full_Name()));
+		aircraftlist.push_back(Text_String(AircraftTypeClass::As_Reference(aa).Full_Name()));
 	}
 
 	if (Event_Needs(Event1.Event) == NEED_AIRCRAFT) {
@@ -722,6 +940,7 @@ bool TriggerTypeClass::Edit(void)
 	for (UnitType uu = UNIT_FIRST; uu < UNIT_COUNT; uu++) {
 		utype1list.Add_Item(Text_String(UnitTypeClass::As_Reference(uu).Full_Name()));
 		utype2list.Add_Item(Text_String(UnitTypeClass::As_Reference(uu).Full_Name()));
+		unitlist.push_back(Text_String(UnitTypeClass::As_Reference(uu).Full_Name()));
 	}
 
 	if (Event_Needs(Event1.Event) == NEED_UNIT) {
@@ -770,6 +989,8 @@ bool TriggerTypeClass::Edit(void)
 		htype2list.Add_Item(HouseTypeClass::As_Reference(hh).IniName);
 		htype3list.Add_Item(HouseTypeClass::As_Reference(hh).IniName);
 		htype4list.Add_Item(HouseTypeClass::As_Reference(hh).IniName);
+
+		trig_houses.push_back(HouseTypeClass::As_Reference(hh).IniName);
 	}
 
 	if (Event_Needs(Event1.Event) == NEED_HOUSE) {
@@ -815,6 +1036,7 @@ bool TriggerTypeClass::Edit(void)
 	for (SpecialWeaponType spec = SPC_FIRST; spec < SPC_COUNT; spec++) {
 		spc1.Add_Item(SpecialWeaponName[spec]);
 		spc2.Add_Item(SpecialWeaponName[spec]);
+		specialweaponlist.push_back(SpecialWeaponName[spec]);
 	}
 	if ((unsigned)Action1.Data.Special < SPC_COUNT) {
 		spc1.Set_Selected_Index(Action1.Data.Special);
@@ -847,6 +1069,7 @@ bool TriggerTypeClass::Edit(void)
 	for (QuarryType q = QUARRY_FIRST; q < QUARRY_COUNT; q++) {
 		qlist1.Add_Item(QuarryName[q]);
 		qlist2.Add_Item(QuarryName[q]);
+		quarytypelist.push_back(SpecialWeaponName[spec]);
 	}
 	if ((unsigned)Action1.Data.Quarry < QUARRY_COUNT) {
 		qlist1.Set_Selected_Index(Action1.Data.Quarry);
@@ -864,9 +1087,9 @@ bool TriggerTypeClass::Edit(void)
 	/*
 	**	Name of this trigger text edit field.
 	*/
-	char namebuf[5] = "";
-	EditClass name_edt(NAME_EDIT, namebuf, sizeof(namebuf), TPF_EFNT | TPF_NOSHADOW, D_DIALOG_X + 40, D_DIALOG_Y + 30, 40, 9, EditClass::ALPHANUMERIC);
-	strcpy(namebuf, IniName);				// Name
+//	char namebuf[5] = "";
+	EditClass name_edt(NAME_EDIT, selected_trigger_name, sizeof(selected_trigger_name), TPF_EFNT | TPF_NOSHADOW, D_DIALOG_X + 40, D_DIALOG_Y + 30, 40, 9, EditClass::ALPHANUMERIC);
+	strcpy(selected_trigger_name, IniName);				// Name
 
 	/*
 	**	Create the list of house's allowed for trigger.
@@ -888,11 +1111,6 @@ bool TriggerTypeClass::Edit(void)
 	**	TriggerTypeClass definition.
 	*/
 	char perstext[DESC_SIZE] = "";
-	static char* _perstext[3] = {
-		"Volatile",
-		"Semi-persistent",
-		"Persistent"
-	};
 	DropListClass persbtn(BUTTON_PERSISTANCE, perstext, sizeof(perstext),
 		TPF_EFNT | TPF_NOSHADOW,
 		housebtn.X + housebtn.Width + 20, housebtn.Y, 105, 8 * 5,
@@ -943,9 +1161,8 @@ bool TriggerTypeClass::Edit(void)
 	/*
 	**	Main Processing Loop
 	*/
-	bool display = true;
-	bool process = true;
-	while (process) {
+	bool display = true;	
+	while (edittrigger_process) {
 
 		/*
 		**	Invoke game callback
@@ -1347,11 +1564,11 @@ bool TriggerTypeClass::Edit(void)
 		case BUTTON_OK | KN_BUTTON:
 			House = HousesType(housebtn.Current_Index());
 			IsPersistant = PersistantType(persbtn.Current_Index());
-			if (strlen(namebuf) == 0) {
+			if (strlen(selected_trigger_name) == 0) {
 				Set_Name("____");
 			}
 			else {
-				Set_Name(namebuf);
+				Set_Name(selected_trigger_name);
 			}
 
 			/*
@@ -1567,7 +1784,7 @@ bool TriggerTypeClass::Edit(void)
 
 		case KN_ESC:
 		case BUTTON_CANCEL | KN_BUTTON:
-			process = false;
+			edittrigger_process = false;
 
 			/*
 			**	Always signal a redraw if any of the buttons were touched. This
@@ -1742,9 +1959,7 @@ void TriggerTypeClass::Detach(TARGET target, bool)
  *   07/09/1996 JLB : Created.                                                                 *
  *=============================================================================================*/
 char const * TriggerTypeClass::Description(void) const
-{
-	static char _buffer[128];
-
+{	
 	char special;
 	switch (EventControl) {
 		case MULTI_AND:
@@ -1813,7 +2028,7 @@ char const * TriggerTypeClass::Description(void) const
 	if (IsPersistant == SEMIPERSISTANT) pers = 'S';
 	if (IsPersistant == PERSISTANT) pers = 'P';
 
-	sprintf(_buffer, "%4.4s\t %s %c%c%c  %s%s",
+	sprintf((char * const)&_buffer[0], "%4.4s\t %s %c%c%c  %s%s",
 		IniName,
 		HouseTypeClass::As_Reference(House).Suffix,
 		pers,

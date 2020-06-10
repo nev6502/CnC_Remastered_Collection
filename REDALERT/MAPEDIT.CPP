@@ -1703,6 +1703,8 @@ void MapEditClass::Main_Menu(void)
 			*/
 			case 7:
 				if (Changed) {
+					Imgui_Dialog_Function = nullptr;
+					WWSDL_ProcessEvents(_key, _flags);
 					rc = WWMessageBox().Process("Save Changes?", TXT_YES, TXT_NO, TXT_CANCEL);
 					HidPage.Clear();
 					Flag_To_Redraw(true);
@@ -1718,6 +1720,7 @@ void MapEditClass::Main_Menu(void)
 				}
 				Changed = 0;
 				Debug_Map = false;
+				Imgui_Dialog_Function = nullptr;
 				Start_Scenario(Scen.ScenarioName);
 				return;
 		}

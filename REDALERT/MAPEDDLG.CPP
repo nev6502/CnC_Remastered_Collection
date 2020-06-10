@@ -2303,6 +2303,63 @@ void MapEditClass::Handle_Triggers(void)
 	}
 }
 
+int select_trigger_seleceted = 0;
+enum SelectTriggerButtonState_t {
+	SELECT_TRIGGER_BUTTON_NONE = 0,
+	SELECT_TRIGGER_BUTTON_EDIT,
+	SELECT_TRIGGER_BUTTON_DELETE,
+	SELECT_TRIGGER_BUTTON_OK,
+	SELECT_TRIGGER_BUTTON_NEW
+};
+
+SelectTriggerButtonState_t selectTriggerButtonState = SELECT_TRIGGER_BUTTON_NONE;
+
+void ImGui_SelectTrigger(void) {
+	bool toolActive = false;
+
+	std::vector<const char*> triggerlist;
+
+	for (int i = 0; i < TriggerTypes.Count(); i++) {
+		//triggerlist.Add_Item(TriggerTypes.Ptr(i));
+		triggerlist.push_back(TriggerTypes.Ptr(i)->Description());
+	}	
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(450, 230));
+	ImGui::SetNextWindowPos(ImVec2(100, 100));
+	ImGui::Begin("Trigger Editor", &toolActive, ImGuiWindowFlags_AlwaysAutoResize);		
+		ImGui::PushItemWidth(450);
+		ImGui::ListBox("", &select_trigger_seleceted, &triggerlist[0], triggerlist.size());		
+		ImGui::PopItemWidth();
+		ImGui::NewLine();
+		ImGui::Columns(4, "outert", true);
+		ImGui::PushID("st_edit");
+			if (ImGui::Button("Edit")) {
+				selectTriggerButtonState = SELECT_TRIGGER_BUTTON_EDIT;
+			}
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::PushID("st_new");
+			if (ImGui::Button("New")) {
+				selectTriggerButtonState = SELECT_TRIGGER_BUTTON_NEW;
+			}
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::PushID("st_delete");
+			if (ImGui::Button("Delete")) {
+				selectTriggerButtonState = SELECT_TRIGGER_BUTTON_DELETE;
+			}
+		ImGui::PopID();
+		ImGui::NextColumn();
+		ImGui::PushID("st_ok");
+			if (ImGui::Button("Ok")) {
+				selectTriggerButtonState = SELECT_TRIGGER_BUTTON_OK;
+			}
+		ImGui::PopID();
+		ImGui::Columns(1);
+	ImGui::End();
+}
 
 /***************************************************************************
  * MapEditClass::Select_Trigger -- lets user select a trigger              *
@@ -2341,6 +2398,9 @@ void MapEditClass::Handle_Triggers(void)
  *=========================================================================*/
 int MapEditClass::Select_Trigger(void)
 {
+	selectTriggerButtonState = SELECT_TRIGGER_BUTTON_NONE;
+	Imgui_Dialog_Function = ImGui_SelectTrigger;
+
 	/*
 	**	Dialog & button dimensions
 	*/
@@ -2397,25 +2457,25 @@ int MapEditClass::Select_Trigger(void)
 	/*
 	**	Dialog variables:
 	*/
-	bool edit_trig = false;						// true = user wants to edit
-	bool new_trig = false;						// true = user wants to new
-	bool del_trig = false;						// true = user wants to new
+	//bool edit_trig = false;						// true = user wants to edit
+	//bool new_trig = false;						// true = user wants to new
+	//bool del_trig = false;						// true = user wants to new
 	int i;											// loop counter
 
 	/*
 	**	Buttons
 	*/
-	ControlClass * commands = NULL;				// the button list
+	//ControlClass * commands = NULL;				// the button list
 
-	TListClass<const TriggerTypeClass *> triggerlist(TRIGGER_LIST, D_LIST_X, D_LIST_Y, D_LIST_W, D_LIST_H,
-		TPF_EFNT|TPF_NOSHADOW,
-		MFCD::Retrieve("EBTN-UP.SHP"),
-		MFCD::Retrieve("EBTN-DN.SHP"));
-
-	TextButtonClass editbtn(BUTTON_EDIT, "Edit", TPF_EBUTTON, D_EDIT_X, D_EDIT_Y, D_EDIT_W, D_EDIT_H);
-	TextButtonClass newbtn(BUTTON_NEW, "New", TPF_EBUTTON, D_NEW_X, D_NEW_Y, D_NEW_W, D_NEW_H);
-	TextButtonClass deletebtn(BUTTON_DELETE, "Delete", TPF_EBUTTON, D_DELETE_X, D_DELETE_Y, D_DELETE_W, D_DELETE_H);
-	TextButtonClass okbtn(BUTTON_OK, TXT_OK, TPF_EBUTTON, D_OK_X, D_OK_Y, D_OK_W, D_OK_H);
+	//TListClass<const TriggerTypeClass *> triggerlist(TRIGGER_LIST, D_LIST_X, D_LIST_Y, D_LIST_W, D_LIST_H,
+	//	TPF_EFNT|TPF_NOSHADOW,
+	//	MFCD::Retrieve("EBTN-UP.SHP"),
+	//	MFCD::Retrieve("EBTN-DN.SHP"));
+	//
+	//TextButtonClass editbtn(BUTTON_EDIT, "Edit", TPF_EBUTTON, D_EDIT_X, D_EDIT_Y, D_EDIT_W, D_EDIT_H);
+	//TextButtonClass newbtn(BUTTON_NEW, "New", TPF_EBUTTON, D_NEW_X, D_NEW_Y, D_NEW_W, D_NEW_H);
+	//TextButtonClass deletebtn(BUTTON_DELETE, "Delete", TPF_EBUTTON, D_DELETE_X, D_DELETE_Y, D_DELETE_W, D_DELETE_H);
+	//TextButtonClass okbtn(BUTTON_OK, TXT_OK, TPF_EBUTTON, D_OK_X, D_OK_Y, D_OK_W, D_OK_H);
 
 	/*
 	**	Initialize
@@ -2425,45 +2485,43 @@ int MapEditClass::Select_Trigger(void)
 	/*
 	**	Fill in the list box
 	*/
-	for (i = 0; i < TriggerTypes.Count(); i++) {
-		triggerlist.Add_Item(TriggerTypes.Ptr(i));
-	}
-
-	PNBubble_Sort(&triggerlist[0], triggerlist.Count());
-
-	if (CurTrigger) {
-		triggerlist.Set_Selected_Index(CurTrigger);
-	} else {
-		triggerlist.Set_Selected_Index(0);
-	}
+	//for (i = 0; i < TriggerTypes.Count(); i++) {
+	//	triggerlist.Add_Item(TriggerTypes.Ptr(i));
+	//}
+	//
+	//PNBubble_Sort(&triggerlist[0], triggerlist.Count());
+	//
+	//if (CurTrigger) {
+	//	triggerlist.Set_Selected_Index(CurTrigger);
+	//} else {
+	//	triggerlist.Set_Selected_Index(0);
+	//}
 
 	/*
 	**	Set CurTrigger if it isn't
 	*/
-	if (TriggerTypes.Count()==0) {
-		CurTrigger = NULL;
-	} else {
-		CurTrigger = (TriggerTypeClass *)triggerlist.Current_Item();
-//		if (!CurTrigger) {
-//			CurTrigger = &*triggerlist.Current_Item();
-//		}
-	}
+	//	if (TriggerTypes.Count()==0) {
+	//		CurTrigger = NULL;
+	//	} else {
+	//		CurTrigger = (TriggerTypeClass *)triggerlist.Current_Item();
+	////		if (!CurTrigger) {
+	////			CurTrigger = &*triggerlist.Current_Item();
+	////		}
+	//	}
 
 	/*
 	**	Create the list
 	*/
-	commands = &triggerlist;
-	editbtn.Add_Tail(*commands);
-	newbtn.Add_Tail(*commands);
-	deletebtn.Add_Tail(*commands);
-	okbtn.Add_Tail(*commands);
+	//commands = &triggerlist;
+	//editbtn.Add_Tail(*commands);
+	//newbtn.Add_Tail(*commands);
+	//deletebtn.Add_Tail(*commands);
+	//okbtn.Add_Tail(*commands);
 
 	/*
 	**	Main Processing Loop
 	*/
-	bool display = true;
-	bool process = true;
-	while (process) {
+	while (selectTriggerButtonState == SELECT_TRIGGER_BUTTON_NONE) {
 		/*
 		**	Invoke game callback
 		*/
@@ -2472,54 +2530,60 @@ int MapEditClass::Select_Trigger(void)
 		/*
 		**	Refresh display if requested.
 		*/
-		if (display /*&& LogicPage->Lock()*/) {
-			Hide_Mouse();
-			Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
-			Draw_Caption(TXT_TRIGGER_EDITOR, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
-			commands->Flag_List_To_Redraw();
-			commands->Draw_All();
-			Show_Mouse();
-			display = false;
-//			LogicPage->Unlock();
-		}
+//		if (display /*&& LogicPage->Lock()*/) {
+//			Hide_Mouse();
+//			Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
+//			Draw_Caption(TXT_TRIGGER_EDITOR, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
+//			//commands->Flag_List_To_Redraw();
+//			//commands->Draw_All();
+//			Show_Mouse();
+//			display = false;
+////			LogicPage->Unlock();
+//		}
+
+		KeyNumType _key;
+		int _flags;
+		WWSDL_ProcessEvents(_key, _flags);
 
 		/*
 		**	Get user input
 		*/
-		KeyNumType input = commands->Input();
-
-		/*
-		**	Process input
-		*/
-		switch (input) {
-			case (TRIGGER_LIST | KN_BUTTON):
-				CurTrigger = (TriggerTypeClass *)&*triggerlist.Current_Item();
-//				CurTrigger = (TriggerTypeClass *)&*triggerlist.Current_Item();
-				break;
-
-			case (BUTTON_EDIT | KN_BUTTON):
-				if (CurTrigger) {		// only allow if there's one selected
-					process = false;
-					edit_trig = true;
-				}
-				break;
-
-			case (BUTTON_NEW | KN_BUTTON):
-				process = false;
-				new_trig = true;
-				break;
-
-			case (BUTTON_DELETE | KN_BUTTON):
-				process = false;
-				del_trig = true;
-				break;
-
-			case (KN_RETURN):
-			case (BUTTON_OK | KN_BUTTON):
-				process = false;
-				break;
-		}
+		//KeyNumType input = commands->Input();
+		//
+		///*
+		//**	Process input
+		//*/
+		//switch (input) {
+		//	case (TRIGGER_LIST | KN_BUTTON):
+		//		CurTrigger = (TriggerTypeClass *)&*triggerlist.Current_Item();
+//		//		CurTrigger = (TriggerTypeClass *)&*triggerlist.Current_Item();
+		//		break;
+		//
+		//	case (BUTTON_EDIT | KN_BUTTON):
+		//		if (CurTrigger) {		// only allow if there's one selected
+		//			process = false;
+		//			edit_trig = true;
+		//		}
+		//		break;
+		//
+		//	case (BUTTON_NEW | KN_BUTTON):
+		//		process = false;
+		//		new_trig = true;
+		//		break;
+		//
+		//	case (BUTTON_DELETE | KN_BUTTON):
+		//		process = false;
+		//		del_trig = true;
+		//		break;
+		//
+		//	case (KN_RETURN):
+		//	case (BUTTON_OK | KN_BUTTON):
+		//		process = false;
+		//		break;
+		//}
 	}
+
+	CurTrigger = TriggerTypes.Ptr(select_trigger_seleceted);
 
 	/*
 	**	Redraw the display
@@ -2528,9 +2592,11 @@ int MapEditClass::Select_Trigger(void)
 	Flag_To_Redraw(true);
 	Render();
 
-	if (edit_trig) return(1);
-	if (new_trig) return(2);
-	if (del_trig) return(3);
+	Imgui_Dialog_Function = nullptr;
+
+	if (selectTriggerButtonState == SELECT_TRIGGER_BUTTON_EDIT) return(1);
+	if (selectTriggerButtonState == SELECT_TRIGGER_BUTTON_NEW) return(2);
+	if (selectTriggerButtonState == SELECT_TRIGGER_BUTTON_DELETE) return(3);
 	return(0);
 }
 
