@@ -9,6 +9,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(src_win32lib
+	./REDALERT/WIN32LIB/TOBUFF.cpp
 	./RedAlert/WIN32LIB/ALLOC.CPP
 	./RedAlert/WIN32LIB/AUDIO.H
 	./RedAlert/WIN32LIB/BUFFER.CPP
@@ -711,27 +712,9 @@ set(src_external
 
 )
 
-ADD_CUSTOM_COMMAND(OUTPUT TOBUFF.obj
-	COMMAND ml -c
-	${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/WIN32LIB/TOBUFF.ASM
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/WIN32LIB/TOBUFF.ASM
-	COMMENT "generate TOBUFF.obj") 
-	
-ADD_CUSTOM_COMMAND(OUTPUT KEYFBUFF.obj
-	COMMAND ml.exe /c /nolog /Zi /Zm /Cx
-	${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/KEYFBUFF.ASM /Fl"" /Cp /W3 /errorReport:prompt 
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/KEYFBUFF.ASM
-	COMMENT "generate KEYFBUFF.obj") 
-	
-ADD_CUSTOM_COMMAND(OUTPUT MMX.obj
-	COMMAND ml.exe /c /nolog /Zi 
-	${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/MMX.ASM /Fl"" /Cp /W3 /errorReport:prompt 
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/MMX.ASM
-	COMMENT "generate MMX.obj") 
-
 add_definitions(-DCHEAT_KEYS -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
-add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external} TOBUFF.obj KEYFBUFF.obj MMX.obj "REDALERT/TXTPRNT.CPP")
+add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external})
 
 
 

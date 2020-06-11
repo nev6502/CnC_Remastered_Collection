@@ -2169,11 +2169,6 @@ Mono_Set_Cursor(0,0);
 	** Call the focus loss handler
 	*/
 	Check_For_Focus_Loss();
-
-	/*
-	** Allocate extra memory for uncompressed shapes as needed
-	*/
-	Reallocate_Big_Shape_Buffer();
 #endif
 
 	/*

@@ -28,6 +28,8 @@ class GraphicBufferClass;
 /* Define functions which have not under-gone name mangling						*/
 /*=========================================================================*/
 
+long __cdecl Buffer_To_Buffer(GraphicViewPortClass* vp, int x, int y, int w, int h, void* buffer, int length);
+
 extern "C" {
 	/*======================================================================*/
 	/* Externs for all of the common functions between the video buffer		*/
@@ -38,7 +40,6 @@ extern "C" {
 	 void	__cdecl Buffer_Put_Pixel(void * thisptr, int x, int y, unsigned char color);
 	 int	__cdecl Buffer_Get_Pixel(void * thisptr, int x, int y);
 	 void	__cdecl Buffer_Clear(void *thisptr, unsigned char color);
-	 long	__cdecl Buffer_To_Buffer(void *thisptr, int x, int y, int w, int h, void *buff, long size);
 	 long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *Buffer, void *view);
 	 BOOL	__cdecl Linear_Blit_To_Linear(	void *thisptr, void * dest, int x_pixel, int y_pixel, int dx_pixel,
 			 										int dy_pixel, int pixel_width, int pixel_height, BOOL trans);

@@ -96,59 +96,59 @@ typedef struct tShapeHeaderType{
 
 static int Length;
 
-void *Get_Shape_Header_Data(void *ptr)
-{
-	if (UseBigShapeBuffer) {
-
-		ShapeHeaderType *header = (ShapeHeaderType*) ptr;
-		return ((void*)  (header->shape_data + (long)(header->shape_buffer ? TheaterShapeBufferStart : BigShapeBufferStart) ) );
-
-	} else {
-		return (ptr);
-	}
-}
-
-int Get_Last_Frame_Length(void)
-{
-	return(Length);
-}
-
-
-void Reset_Theater_Shapes (void)
-{
-	/*
-	** Delete any previously allocated slots
-	*/
-	for (int i=THEATER_SLOT_START ; i<TheaterSlotsUsed ; i++) {
-		delete [] KeyFrameSlots [i];
-	}
-
-	TheaterShapeBufferPtr = TheaterShapeBufferStart;
-	TotalTheaterShapes = 0;
-	TheaterSlotsUsed = THEATER_SLOT_START;
-}
+//void *Get_Shape_Header_Data(void *ptr)
+//{
+//	if (UseBigShapeBuffer) {
+//
+//		ShapeHeaderType *header = (ShapeHeaderType*) ptr;
+//		return ((void*)  (header->shape_data + (long)(header->shape_buffer ? TheaterShapeBufferStart : BigShapeBufferStart) ) );
+//
+//	} else {
+//		return (ptr);
+//	}
+//}
+//
+//int Get_Last_Frame_Length(void)
+//{
+//	return(Length);
+//}
 
 
-void Reallocate_Big_Shape_Buffer(void)
-{
-	if (ReallocShapeBufferFlag) {
-		BigShapeBufferLength += 2000000;							//Extra 2 Mb of uncompressed shape space
-		BigShapeBufferPtr -= (unsigned)BigShapeBufferStart;
-		Memory_Error = NULL;
-		BigShapeBufferStart = (char*)Resize_Alloc(BigShapeBufferStart, BigShapeBufferLength);
-		Memory_Error = &Memory_Error_Handler;
-		/*
-		** If we have run out of memory then disable the uncompressed shapes
-		** It may still be possible to continue with compressed shapes
-		*/
-		if (!BigShapeBufferStart) {
-			UseBigShapeBuffer = false;
-			return;
-		}
-		BigShapeBufferPtr += (unsigned)BigShapeBufferStart;
-		ReallocShapeBufferFlag = FALSE;
-	}
-}
+//void Reset_Theater_Shapes (void)
+//{
+//	/*
+//	** Delete any previously allocated slots
+//	*/
+//	for (int i=THEATER_SLOT_START ; i<TheaterSlotsUsed ; i++) {
+//		delete [] KeyFrameSlots [i];
+//	}
+//
+//	TheaterShapeBufferPtr = TheaterShapeBufferStart;
+//	TotalTheaterShapes = 0;
+//	TheaterSlotsUsed = THEATER_SLOT_START;
+//}
+
+
+//void Reallocate_Big_Shape_Buffer(void)
+//{
+//	if (ReallocShapeBufferFlag) {
+//		BigShapeBufferLength += 2000000;							//Extra 2 Mb of uncompressed shape space
+//		BigShapeBufferPtr -= (unsigned)BigShapeBufferStart;
+//		Memory_Error = NULL;
+//		BigShapeBufferStart = (char*)Resize_Alloc(BigShapeBufferStart, BigShapeBufferLength);
+//		Memory_Error = &Memory_Error_Handler;
+//		/*
+//		** If we have run out of memory then disable the uncompressed shapes
+//		** It may still be possible to continue with compressed shapes
+//		*/
+//		if (!BigShapeBufferStart) {
+//			UseBigShapeBuffer = false;
+//			return;
+//		}
+//		BigShapeBufferPtr += (unsigned)BigShapeBufferStart;
+//		ReallocShapeBufferFlag = FALSE;
+//	}
+//}
 
 
 //#ifdef FIXIT_SCORE_CRASH
@@ -166,10 +166,10 @@ void Reallocate_Big_Shape_Buffer(void)
  * HISTORY:                                                                                    *
  *    11/19/96 2:37PM ST : Created                                                             *
  *=============================================================================================*/
-void Disable_Uncompressed_Shapes (void)
-{
-	UseBigShapeBuffer = false;
-}
+//void Disable_Uncompressed_Shapes (void)
+//{
+//	UseBigShapeBuffer = false;
+//}
 
 
 
@@ -187,10 +187,10 @@ void Disable_Uncompressed_Shapes (void)
  * HISTORY:                                                                                    *
  *    11/19/96 2:37PM ST : Created                                                             *
  *=============================================================================================*/
-void Enable_Uncompressed_Shapes (void)
-{
-	UseBigShapeBuffer = OriginalUseBigShapeBuffer;
-}
+//void Enable_Uncompressed_Shapes (void)
+//{
+//	UseBigShapeBuffer = OriginalUseBigShapeBuffer;
+//}
 //#endif	//FIXIT
 
 void Check_Use_Compressed_Shapes (void)
@@ -222,266 +222,266 @@ void Check_Use_Compressed_Shapes (void)
 
 
 
-unsigned long Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr)
-{
-#ifdef FIXIT_SCORE_CRASH
-	char *ptr;
-	unsigned long offcurr, offdiff;
-#else
-	char *ptr, *lockptr;//, *uncomp_ptr;
-	unsigned long offcurr, off16, offdiff;
-#endif
-	unsigned long offset[SUBFRAMEOFFS];
-	KeyFrameHeaderType *keyfr;
-	unsigned short buffsize, currframe, subframe;
-	unsigned long length = 0;
-	char frameflags;
-	unsigned long return_value;
-	char *temp_shape_ptr;
-
-	//
-	// valid pointer??
-	//
-	Length = 0;
-	if ( !dataptr || !buffptr ) {
-		return(0);
-	}
-
-	//
-	// look at header then check that frame to build is not greater
-	// than total frames
-	//
-	keyfr = (KeyFrameHeaderType *) dataptr;
-
-	if ( framenumber >= keyfr->frames ) {
-		return(0);
-	}
-
-
-	if (UseBigShapeBuffer) {
-		/*
-		** If we havnt yet allocated memory for uncompressed shapes then do so now.
-		**
-		*/
-		if (!BigShapeBufferStart) {
-			BigShapeBufferStart = (char*)Alloc(BigShapeBufferLength, MEM_NORMAL);
-			BigShapeBufferPtr = BigShapeBufferStart;
-
-			/*
-			** Allocate memory for theater specific uncompressed shapes
-			*/
-			TheaterShapeBufferStart = (char*) Alloc (TheaterShapeBufferLength, MEM_NORMAL);
-			TheaterShapeBufferPtr = TheaterShapeBufferStart;
-		}
-
-		/*
-		** If we are running out of memory (<10k left) for uncompressed shapes
-		** then allocate some more.
-		*/
-		if (( (unsigned)BigShapeBufferStart + BigShapeBufferLength) - (unsigned)BigShapeBufferPtr < 128000) {
-			ReallocShapeBufferFlag = TRUE;
-		}
-
-		/*
-		** If this animation was not previously uncompressed then
-		** allocate memory to keep the pointers to the uncompressed data
-		** for these animation frames
-		*/
-		if (keyfr->x != UNCOMPRESS_MAGIC_NUMBER) {
-			keyfr->x = UNCOMPRESS_MAGIC_NUMBER;
-			if (IsTheaterShape) {
-				keyfr->y = TheaterSlotsUsed;
-				TheaterSlotsUsed++;
-			} else {
-				keyfr->y = TotalSlotsUsed;
-				TotalSlotsUsed++;
-			}
-			/*
-			** Allocate and clear the memory for the shape info
-			*/
-			KeyFrameSlots[keyfr->y]= new char *[keyfr->frames];
-			memset (KeyFrameSlots[keyfr->y] , 0 , keyfr->frames*4);
-		}
-
-		/*
-		** If this frame was previously uncompressed then just return
-		** a pointer to the raw data
-		*/
-		if (*(KeyFrameSlots[keyfr->y]+framenumber)) {
-			if (IsTheaterShape) {
-				return ((unsigned long)TheaterShapeBufferStart + (unsigned long)*(KeyFrameSlots[keyfr->y]+framenumber));
-			} else {
-				return ((unsigned long)BigShapeBufferStart + (unsigned long)*(KeyFrameSlots[keyfr->y]+framenumber));
-			}
-		}
-	}
-
-	// calc buff size
-	buffsize = keyfr->width * keyfr->height;
-
-	// get offset into data
-	ptr = (char *)Add_Long_To_Pointer( dataptr, (((unsigned long)framenumber << 3) + sizeof(KeyFrameHeaderType)) );
-	Mem_Copy( ptr, &offset[0], 12L );
-	frameflags = (char)(offset[0] >> 24);
-
-
-	if ( (frameflags & KF_KEYFRAME) ) {
-
-		ptr = (char *)Add_Long_To_Pointer( dataptr, (offset[0] & 0x00FFFFFFL) );
-
-		if (keyfr->flags & 1 ) {
-			ptr = (char *)Add_Long_To_Pointer( ptr, 768L );
-		}
-		length = LCW_Uncompress( ptr, buffptr, buffsize );
-	} else {	// key delta or delta
-
-		if ( (frameflags & KF_DELTA) ) {
-			currframe = (unsigned short)offset[1];
-
-			ptr = (char *)Add_Long_To_Pointer( dataptr, (((unsigned long)currframe << 3) + sizeof(KeyFrameHeaderType)) );
-			Mem_Copy( ptr, &offset[0], (long)(SUBFRAMEOFFS * sizeof(unsigned long)) );
-		}
-
-		// key frame
-		offcurr = offset[1] & 0x00FFFFFFL;
-
-		// key delta
-		offdiff = (offset[0] & 0x00FFFFFFL) - offcurr;
-
-		ptr = (char *)Add_Long_To_Pointer( dataptr, offcurr );
-
-		if (keyfr->flags & 1 ) {
-			ptr = (char *)Add_Long_To_Pointer( ptr, 768L );
-		}
-
-#ifndef FIXIT_SCORE_CRASH
-		off16 = (unsigned long)lockptr & 0x00003FFFL;
-#endif
-
-		length = LCW_Uncompress( ptr, buffptr, buffsize );
-
-		if (length > buffsize) {
-			return(0);
-		}
-
-#ifndef FIXIT_SCORE_CRASH
-		if ( ((offset[2] & 0x00FFFFFFL) - offcurr) >= (0x00010000L - off16) ) {
-
-			ptr = (char *)Add_Long_To_Pointer( ptr, offdiff );
-			off16 = (unsigned long)ptr & 0x00003FFFL;
-
-			offcurr += offdiff;
-			offdiff = 0;
-		}
-#endif
-
-		length = buffsize;
-		Apply_Delta(buffptr, Add_Long_To_Pointer(ptr, offdiff));
-
-		if ( (frameflags & KF_DELTA) ) {
-			// adjust to delta after the keydelta
-
-			currframe++;
-			subframe = 2;
-
-			while (currframe <= framenumber) {
-				offdiff = (offset[subframe] & 0x00FFFFFFL) - offcurr;
-
-#ifndef FIXIT_SCORE_CRASH
-				if ( ((offset[subframe+2] & 0x00FFFFFFL) - offcurr) >= (0x00010000L - off16) ) {
-
-					ptr = (char *)Add_Long_To_Pointer( ptr, offdiff );
-					off16 = (unsigned long)lockptr & 0x00003FFFL;
-
-					offcurr += offdiff;
-					offdiff = 0;
-				}
-#endif
-
-				length = buffsize;
-				Apply_Delta(buffptr, Add_Long_To_Pointer(ptr, offdiff));
-
-				currframe++;
-				subframe += 2;
-
-				if ( subframe >= (SUBFRAMEOFFS - 1) &&
-					currframe <= framenumber ) {
-					Mem_Copy( Add_Long_To_Pointer( dataptr,
-									(((unsigned long)currframe << 3) +
-									sizeof(KeyFrameHeaderType)) ),
-						&offset[0], (long)(SUBFRAMEOFFS * sizeof(unsigned long)) );
-					subframe = 0;
-				}
-			}
-		}
-	}
-
-
-	if (UseBigShapeBuffer) {
-		/*
-		** Save the uncompressed shape data so we dont have to uncompress it
-		** again next time its drawn.
-		** We keep a space free before the raw shape data so we can add line
-		** header info before the shape is drawn for the first time
-		*/
-
-		if (IsTheaterShape) {
-			/*
-			** Shape is a theater specific shape
-			*/
-			return_value = (unsigned long) TheaterShapeBufferPtr;
-			temp_shape_ptr = TheaterShapeBufferPtr + keyfr->height+sizeof(ShapeHeaderType);
-			/*
-			** align the actual shape data
-			*/
-			if (3 & (unsigned)temp_shape_ptr) {
-				temp_shape_ptr = (char *) ((unsigned)(temp_shape_ptr + 3) & 0xfffffffc);
-			}
-
-			memcpy (temp_shape_ptr , buffptr , length);
-			((ShapeHeaderType *)TheaterShapeBufferPtr)->draw_flags = -1;						//Flag that headers need to be generated
-			((ShapeHeaderType *)TheaterShapeBufferPtr)->shape_data = temp_shape_ptr - (unsigned)TheaterShapeBufferStart;		//pointer to old raw shape data
-			((ShapeHeaderType *)TheaterShapeBufferPtr)->shape_buffer = 1;	//Theater buffer
-			*(KeyFrameSlots[keyfr->y]+framenumber) = TheaterShapeBufferPtr - (unsigned)TheaterShapeBufferStart;
-			TheaterShapeBufferPtr = (char*)(length + (unsigned)temp_shape_ptr);
-			/*
-			** Align the next shape
-			*/
-			if (3 & (unsigned)TheaterShapeBufferPtr) {
-				TheaterShapeBufferPtr = (char *)((unsigned)(TheaterShapeBufferPtr + 3) & 0xfffffffc);
-			}
-			Length = length;
-			return (return_value);
-
-		} else {
-
-
-			return_value=(unsigned long)BigShapeBufferPtr;
-			temp_shape_ptr = BigShapeBufferPtr + keyfr->height+sizeof(ShapeHeaderType);
-			/*
-			** align the actual shape data
-			*/
-			if (3 & (unsigned)temp_shape_ptr) {
-				temp_shape_ptr = (char *) ((unsigned)(temp_shape_ptr + 3) & 0xfffffffc);
-			}
-			memcpy (temp_shape_ptr , buffptr , length);
-			((ShapeHeaderType *)BigShapeBufferPtr)->draw_flags = -1;						//Flag that headers need to be generated
-			((ShapeHeaderType *)BigShapeBufferPtr)->shape_data = temp_shape_ptr - (unsigned)BigShapeBufferStart;		//pointer to old raw shape data
-			((ShapeHeaderType *)BigShapeBufferPtr)->shape_buffer = 0;	//Normal Big Shape Buffer
-			*(KeyFrameSlots[keyfr->y]+framenumber) = BigShapeBufferPtr - (unsigned)BigShapeBufferStart;
-			BigShapeBufferPtr = (char*)(length + (unsigned)temp_shape_ptr);
-			// Align the next shape
-			if (3 & (unsigned)BigShapeBufferPtr) {
-				BigShapeBufferPtr = (char *)((unsigned)(BigShapeBufferPtr + 3) & 0xfffffffc);
-			}
-			Length = length;
-			return (return_value);
-		}
-
-	} else {
-		return ((unsigned long)buffptr);
-	}
-}
+//unsigned long Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr)
+//{
+//#ifdef FIXIT_SCORE_CRASH
+//	char *ptr;
+//	unsigned long offcurr, offdiff;
+//#else
+//	char *ptr, *lockptr;//, *uncomp_ptr;
+//	unsigned long offcurr, off16, offdiff;
+//#endif
+//	unsigned long offset[SUBFRAMEOFFS];
+//	KeyFrameHeaderType *keyfr;
+//	unsigned short buffsize, currframe, subframe;
+//	unsigned long length = 0;
+//	char frameflags;
+//	unsigned long return_value;
+//	char *temp_shape_ptr;
+//
+//	//
+//	// valid pointer??
+//	//
+//	Length = 0;
+//	if ( !dataptr || !buffptr ) {
+//		return(0);
+//	}
+//
+//	//
+//	// look at header then check that frame to build is not greater
+//	// than total frames
+//	//
+//	keyfr = (KeyFrameHeaderType *) dataptr;
+//
+//	if ( framenumber >= keyfr->frames ) {
+//		return(0);
+//	}
+//
+//
+//	if (UseBigShapeBuffer) {
+//		/*
+//		** If we havnt yet allocated memory for uncompressed shapes then do so now.
+//		**
+//		*/
+//		if (!BigShapeBufferStart) {
+//			BigShapeBufferStart = (char*)Alloc(BigShapeBufferLength, MEM_NORMAL);
+//			BigShapeBufferPtr = BigShapeBufferStart;
+//
+//			/*
+//			** Allocate memory for theater specific uncompressed shapes
+//			*/
+//			TheaterShapeBufferStart = (char*) Alloc (TheaterShapeBufferLength, MEM_NORMAL);
+//			TheaterShapeBufferPtr = TheaterShapeBufferStart;
+//		}
+//
+//		/*
+//		** If we are running out of memory (<10k left) for uncompressed shapes
+//		** then allocate some more.
+//		*/
+//		if (( (unsigned)BigShapeBufferStart + BigShapeBufferLength) - (unsigned)BigShapeBufferPtr < 128000) {
+//			ReallocShapeBufferFlag = TRUE;
+//		}
+//
+//		/*
+//		** If this animation was not previously uncompressed then
+//		** allocate memory to keep the pointers to the uncompressed data
+//		** for these animation frames
+//		*/
+//		if (keyfr->x != UNCOMPRESS_MAGIC_NUMBER) {
+//			keyfr->x = UNCOMPRESS_MAGIC_NUMBER;
+//			if (IsTheaterShape) {
+//				keyfr->y = TheaterSlotsUsed;
+//				TheaterSlotsUsed++;
+//			} else {
+//				keyfr->y = TotalSlotsUsed;
+//				TotalSlotsUsed++;
+//			}
+//			/*
+//			** Allocate and clear the memory for the shape info
+//			*/
+//			KeyFrameSlots[keyfr->y]= new char *[keyfr->frames];
+//			memset (KeyFrameSlots[keyfr->y] , 0 , keyfr->frames*4);
+//		}
+//
+//		/*
+//		** If this frame was previously uncompressed then just return
+//		** a pointer to the raw data
+//		*/
+//		if (*(KeyFrameSlots[keyfr->y]+framenumber)) {
+//			if (IsTheaterShape) {
+//				return ((unsigned long)TheaterShapeBufferStart + (unsigned long)*(KeyFrameSlots[keyfr->y]+framenumber));
+//			} else {
+//				return ((unsigned long)BigShapeBufferStart + (unsigned long)*(KeyFrameSlots[keyfr->y]+framenumber));
+//			}
+//		}
+//	}
+//
+//	// calc buff size
+//	buffsize = keyfr->width * keyfr->height;
+//
+//	// get offset into data
+//	ptr = (char *)Add_Long_To_Pointer( dataptr, (((unsigned long)framenumber << 3) + sizeof(KeyFrameHeaderType)) );
+//	Mem_Copy( ptr, &offset[0], 12L );
+//	frameflags = (char)(offset[0] >> 24);
+//
+//
+//	if ( (frameflags & KF_KEYFRAME) ) {
+//
+//		ptr = (char *)Add_Long_To_Pointer( dataptr, (offset[0] & 0x00FFFFFFL) );
+//
+//		if (keyfr->flags & 1 ) {
+//			ptr = (char *)Add_Long_To_Pointer( ptr, 768L );
+//		}
+//		length = LCW_Uncompress( ptr, buffptr, buffsize );
+//	} else {	// key delta or delta
+//
+//		if ( (frameflags & KF_DELTA) ) {
+//			currframe = (unsigned short)offset[1];
+//
+//			ptr = (char *)Add_Long_To_Pointer( dataptr, (((unsigned long)currframe << 3) + sizeof(KeyFrameHeaderType)) );
+//			Mem_Copy( ptr, &offset[0], (long)(SUBFRAMEOFFS * sizeof(unsigned long)) );
+//		}
+//
+//		// key frame
+//		offcurr = offset[1] & 0x00FFFFFFL;
+//
+//		// key delta
+//		offdiff = (offset[0] & 0x00FFFFFFL) - offcurr;
+//
+//		ptr = (char *)Add_Long_To_Pointer( dataptr, offcurr );
+//
+//		if (keyfr->flags & 1 ) {
+//			ptr = (char *)Add_Long_To_Pointer( ptr, 768L );
+//		}
+//
+//#ifndef FIXIT_SCORE_CRASH
+//		off16 = (unsigned long)lockptr & 0x00003FFFL;
+//#endif
+//
+//		length = LCW_Uncompress( ptr, buffptr, buffsize );
+//
+//		if (length > buffsize) {
+//			return(0);
+//		}
+//
+//#ifndef FIXIT_SCORE_CRASH
+//		if ( ((offset[2] & 0x00FFFFFFL) - offcurr) >= (0x00010000L - off16) ) {
+//
+//			ptr = (char *)Add_Long_To_Pointer( ptr, offdiff );
+//			off16 = (unsigned long)ptr & 0x00003FFFL;
+//
+//			offcurr += offdiff;
+//			offdiff = 0;
+//		}
+//#endif
+//
+//		length = buffsize;
+//		Apply_Delta(buffptr, Add_Long_To_Pointer(ptr, offdiff));
+//
+//		if ( (frameflags & KF_DELTA) ) {
+//			// adjust to delta after the keydelta
+//
+//			currframe++;
+//			subframe = 2;
+//
+//			while (currframe <= framenumber) {
+//				offdiff = (offset[subframe] & 0x00FFFFFFL) - offcurr;
+//
+//#ifndef FIXIT_SCORE_CRASH
+//				if ( ((offset[subframe+2] & 0x00FFFFFFL) - offcurr) >= (0x00010000L - off16) ) {
+//
+//					ptr = (char *)Add_Long_To_Pointer( ptr, offdiff );
+//					off16 = (unsigned long)lockptr & 0x00003FFFL;
+//
+//					offcurr += offdiff;
+//					offdiff = 0;
+//				}
+//#endif
+//
+//				length = buffsize;
+//				Apply_Delta(buffptr, Add_Long_To_Pointer(ptr, offdiff));
+//
+//				currframe++;
+//				subframe += 2;
+//
+//				if ( subframe >= (SUBFRAMEOFFS - 1) &&
+//					currframe <= framenumber ) {
+//					Mem_Copy( Add_Long_To_Pointer( dataptr,
+//									(((unsigned long)currframe << 3) +
+//									sizeof(KeyFrameHeaderType)) ),
+//						&offset[0], (long)(SUBFRAMEOFFS * sizeof(unsigned long)) );
+//					subframe = 0;
+//				}
+//			}
+//		}
+//	}
+//
+//
+//	if (UseBigShapeBuffer) {
+//		/*
+//		** Save the uncompressed shape data so we dont have to uncompress it
+//		** again next time its drawn.
+//		** We keep a space free before the raw shape data so we can add line
+//		** header info before the shape is drawn for the first time
+//		*/
+//
+//		if (IsTheaterShape) {
+//			/*
+//			** Shape is a theater specific shape
+//			*/
+//			return_value = (unsigned long) TheaterShapeBufferPtr;
+//			temp_shape_ptr = TheaterShapeBufferPtr + keyfr->height+sizeof(ShapeHeaderType);
+//			/*
+//			** align the actual shape data
+//			*/
+//			if (3 & (unsigned)temp_shape_ptr) {
+//				temp_shape_ptr = (char *) ((unsigned)(temp_shape_ptr + 3) & 0xfffffffc);
+//			}
+//
+//			memcpy (temp_shape_ptr , buffptr , length);
+//			((ShapeHeaderType *)TheaterShapeBufferPtr)->draw_flags = -1;						//Flag that headers need to be generated
+//			((ShapeHeaderType *)TheaterShapeBufferPtr)->shape_data = temp_shape_ptr - (unsigned)TheaterShapeBufferStart;		//pointer to old raw shape data
+//			((ShapeHeaderType *)TheaterShapeBufferPtr)->shape_buffer = 1;	//Theater buffer
+//			*(KeyFrameSlots[keyfr->y]+framenumber) = TheaterShapeBufferPtr - (unsigned)TheaterShapeBufferStart;
+//			TheaterShapeBufferPtr = (char*)(length + (unsigned)temp_shape_ptr);
+//			/*
+//			** Align the next shape
+//			*/
+//			if (3 & (unsigned)TheaterShapeBufferPtr) {
+//				TheaterShapeBufferPtr = (char *)((unsigned)(TheaterShapeBufferPtr + 3) & 0xfffffffc);
+//			}
+//			Length = length;
+//			return (return_value);
+//
+//		} else {
+//
+//
+//			return_value=(unsigned long)BigShapeBufferPtr;
+//			temp_shape_ptr = BigShapeBufferPtr + keyfr->height+sizeof(ShapeHeaderType);
+//			/*
+//			** align the actual shape data
+//			*/
+//			if (3 & (unsigned)temp_shape_ptr) {
+//				temp_shape_ptr = (char *) ((unsigned)(temp_shape_ptr + 3) & 0xfffffffc);
+//			}
+//			memcpy (temp_shape_ptr , buffptr , length);
+//			((ShapeHeaderType *)BigShapeBufferPtr)->draw_flags = -1;						//Flag that headers need to be generated
+//			((ShapeHeaderType *)BigShapeBufferPtr)->shape_data = temp_shape_ptr - (unsigned)BigShapeBufferStart;		//pointer to old raw shape data
+//			((ShapeHeaderType *)BigShapeBufferPtr)->shape_buffer = 0;	//Normal Big Shape Buffer
+//			*(KeyFrameSlots[keyfr->y]+framenumber) = BigShapeBufferPtr - (unsigned)BigShapeBufferStart;
+//			BigShapeBufferPtr = (char*)(length + (unsigned)temp_shape_ptr);
+//			// Align the next shape
+//			if (3 & (unsigned)BigShapeBufferPtr) {
+//				BigShapeBufferPtr = (char *)((unsigned)(BigShapeBufferPtr + 3) & 0xfffffffc);
+//			}
+//			Length = length;
+//			return (return_value);
+//		}
+//
+//	} else {
+//		return ((unsigned long)buffptr);
+//	}
+//}
 
 
 /***********************************************************************************************

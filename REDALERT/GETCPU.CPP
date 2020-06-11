@@ -51,13 +51,13 @@
 ** Prototypes for linkage to assembly module
 */
 
-extern "C" {
-	bool __cdecl Detect_MMX_Availability(void);
-	void __cdecl Init_MMX(void);
-
-	extern char CPUType;
-	extern char VendorID;
-}
+//extern "C" {
+//	bool __cdecl Detect_MMX_Availability(void);
+//	void __cdecl Init_MMX(void);
+//
+//	extern char CPUType;
+//	extern char VendorID;
+//}
 
 
 /***********************************************************************************************
@@ -82,13 +82,13 @@ void Get_CPU_Type(int & cpu_type, bool & mmx, char * vendor_id, int vendor_id_le
 	/*
 	** Call the asm CPU detection code
 	*/
-	mmx = Detect_MMX_Availability();
+	mmx = 1; //Detect_MMX_Availability();
 
 	/*
 	** Return the promised results
 	*/
-	cpu_type = (int)CPUType;
-	char * vendor_ptr = &VendorID;
+	cpu_type = 1; //(int)CPUType;
+	char* vendor_ptr = "Fake CPU"; //&VendorID;
 	strncpy(vendor_id, vendor_ptr, vendor_id_length);
 }
 

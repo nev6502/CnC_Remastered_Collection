@@ -176,6 +176,7 @@ BOOL WINAPI DllMain(HINSTANCE instance, unsigned int fdwReason, void *lpvReserve
  * HISTORY:                                                                                    *
  *   03/20/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
+void Reallocate_Big_Shape_Buffer(void);
 int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int command_show )
 {
 #ifdef WIN32
@@ -186,7 +187,7 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 	//char command_line[1024];
 	//strcpy(command_line, command_line_in);
 
-
+	Reallocate_Big_Shape_Buffer();
 
 	#ifndef MPEGMOVIE // Denzil 6/10/98
 	//PG DDSCAPS	surface_capabilities;
