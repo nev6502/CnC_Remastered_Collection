@@ -420,16 +420,17 @@ bool Start_Scenario(char * name, bool briefing)
 	return(true);
 }
 
-void Scenario_PlayMapStart(void) {
+void Scenario_MapScriptFrame(void) {
 	if (!mapScript)
 		return;
 
-	if (!mapScriptPlayStart)
+	if (mapScriptPlayStart) {
+		mapScript->CallFunction("map_start");
+		mapScriptPlayStart = false;
 		return;
+	}
 
-	mapScript->CallFunction("map_start");
-
-	mapScriptPlayStart = false;
+	mapScript->CallFunction("map_frame");
 }
 
 
