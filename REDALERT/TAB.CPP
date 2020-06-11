@@ -93,8 +93,6 @@ void TabClass::Draw_It(bool complete)
 		return;
 	}
 
-// Disable tab drawing for menu, credits buttons etc. ST - 5/27/2019
-#if (0)
 	/*
 	**	Redraw the top bar imagery if flagged to do so or if the entire display needs
 	**	to be redrawn.
@@ -136,7 +134,7 @@ void TabClass::Draw_It(bool complete)
 		LogicPage->Unlock();
 	}
 	Credits.Graphic_Logic(complete || IsToRedraw);
-#endif
+
 	IsToRedraw = false;
 }
 

@@ -125,7 +125,7 @@ void CreditClass::Graphic_Logic(bool forced)
 			long hours = mins / 60;
 			secs %= 60;
 			mins %= 60;
-#if (0) //Moved to LOGIC.CPP
+
 			/*
 			**	Speak mission timer reminders.
 			*/
@@ -143,15 +143,13 @@ void CreditClass::Graphic_Logic(bool forced)
 				Speak(vox);
 				Map.FlasherTimer = 7;
 			}
-#endif
 #ifdef WIN32
-#if (0) //PG
+
 			if (hours) {
 				Fancy_Text_Print(TXT_TIME_FORMAT_HOURS, 200 * RESFACTOR, 0, &MetalScheme, TBLACK, TPF_METAL12|TPF_CENTER|TPF_USE_GRAD_PAL, hours, mins, secs);
 			} else {
 				Fancy_Text_Print(TXT_TIME_FORMAT_NO_HOURS, 200 * RESFACTOR, 0, &MetalScheme, TBLACK, TPF_METAL12|TPF_CENTER|TPF_USE_GRAD_PAL, mins, secs);
 			}
-#endif
 #else
 			if (hours) {
 				Fancy_Text_Print("%02d:%02d:%02d", 120 * RESFACTOR, 0, &ColorRemaps[PCOLOR_GREY], TBLACK, TPF_NOSHADOW|TPF_6PT_GRAD|TPF_CENTER|TPF_BRIGHT_COLOR, hours, mins, secs);

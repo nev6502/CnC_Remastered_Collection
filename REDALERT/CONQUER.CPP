@@ -2465,6 +2465,8 @@ Mono_Set_Cursor(0,0);
 #endif
 	BEnd(BENCH_GAME_FRAME);
 
+	Scenario_PlayMapStart();
+
 	Sync_Delay();
 	return(!GameActive);
 }

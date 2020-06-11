@@ -60,6 +60,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
+#include    "MapScript.h"
 #ifdef WIN32
 #include "tcpip.h"
 #include "ccdde.h"
@@ -109,6 +110,9 @@ int _build_tech[11] = {
 bool Is_Mission_Counterstrike (char *file_name);
 bool Is_Mission_Aftermath (char *file_name);
 #endif
+
+MapScript* mapScript = nullptr;
+bool mapScriptPlayStart = false;
 
 /***********************************************************************************************
  * ScenarioClass::ScenarioClass -- Constructor for the scenario control object.                *
@@ -312,11 +316,25 @@ bool ScenarioClass::Set_Global_To(int global, bool value)
 bool Start_Scenario(char * name, bool briefing)
 {
 //BG	Theme.Queue_Song(THEME_QUIET);
-Theme.Stop();
+	Theme.Stop();
 	IsTanyaDead = SaveTanya;
 	if (!Read_Scenario(name)) {
 		return(false);
 	}
+
+// jmarshall: map scripts
+	if (mapScript) {
+		delete mapScript;
+	}
+	mapScript = new MapScript();
+	if (!mapScript->Init(name)) {
+		delete mapScript;
+		mapScript = nullptr;
+	}
+	else {
+		mapScriptPlayStart = true;
+	}
+// jmarshall end
 
 	/*
 	**	Play the winning movie and then start the next scenario.
@@ -351,15 +369,21 @@ Theme.Stop();
 
 //   	}
 	Theme.Stop();
-
-	if (briefing) {
+// jmarshall - map scripts
+	if (mapScript) {
+		Hide_Mouse();
+		VisiblePage.Clear();
+		Show_Mouse();
+		mapScript->CallFunction("map_briefing");
+	}
+	else if (briefing) {
 		Hide_Mouse();
 		VisiblePage.Clear();
 		Show_Mouse();
 		Play_Movie(Scen.IntroMovie);
 		Play_Movie(Scen.BriefMovie);
 	}
-
+// jmarshall end
 	/*
 	** If there's no briefing movie, restate the mission at the beginning.
 	*/
@@ -394,6 +418,18 @@ Theme.Stop();
 	Options.Set();
 
 	return(true);
+}
+
+void Scenario_PlayMapStart(void) {
+	if (!mapScript)
+		return;
+
+	if (!mapScriptPlayStart)
+		return;
+
+	mapScript->CallFunction("map_start");
+
+	mapScriptPlayStart = false;
 }
 
 

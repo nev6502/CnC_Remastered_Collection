@@ -617,6 +617,7 @@ set(src_redalert
 	./RedAlert/XSTRAW.H
 	./RedAlert/_WSPROTO.CPP
 	./RedAlert/_WSPROTO.H
+	./REDALERT/MapScript.cpp
 )
 
 set(src_external
@@ -647,6 +648,68 @@ set(src_external
 	./external/imgui/examples/imgui_impl_dx9.h
 	./external/imgui/examples/imgui_impl_sdl.cpp
 	./external/imgui/examples/imgui_impl_sdl.h
+
+	#lua
+	./external/lua/lapi.c
+	./external/lua/lapi.h
+	./external/lua/lauxlib.c
+	./external/lua/lauxlib.h
+	./external/lua/lbaselib.c
+	./external/lua/lbitlib.c
+	./external/lua/lcode.c
+	./external/lua/lcode.h
+	./external/lua/lcorolib.c
+	./external/lua/lctype.c
+	./external/lua/lctype.h
+	./external/lua/ldblib.c
+	./external/lua/ldebug.c
+	./external/lua/ldebug.h
+	./external/lua/ldo.c
+	./external/lua/ldo.h
+	./external/lua/ldump.c
+	./external/lua/lfunc.c
+	./external/lua/lfunc.h
+	./external/lua/lgc.c
+	./external/lua/lgc.h
+	./external/lua/linit.c
+	./external/lua/liolib.c
+	./external/lua/llex.c
+	./external/lua/llex.h
+	./external/lua/llimits.h
+	./external/lua/lmathlib.c
+	./external/lua/lmem.c
+	./external/lua/lmem.h
+	./external/lua/loadlib.c
+	./external/lua/lobject.c
+	./external/lua/lobject.h
+	./external/lua/lopcodes.c
+	./external/lua/lopcodes.h
+	./external/lua/loslib.c
+	./external/lua/lparser.c
+	./external/lua/lparser.h
+	./external/lua/lprefix.h
+	./external/lua/lstate.c
+	./external/lua/lstate.h
+	./external/lua/lstring.c
+	./external/lua/lstring.h
+	./external/lua/lstrlib.c
+	./external/lua/ltable.c
+	./external/lua/ltable.h
+	./external/lua/ltablib.c
+	./external/lua/ltm.c
+	./external/lua/ltm.h
+	./external/lua/lua.h
+	./external/lua/lua.hpp
+	./external/lua/luaconf.h
+	./external/lua/lualib.h
+	./external/lua/lundump.c
+	./external/lua/lundump.h
+	./external/lua/lutf8lib.c
+	./external/lua/lvm.c
+	./external/lua/lvm.h
+	./external/lua/lzio.c
+	./external/lua/lzio.h
+
 )
 
 ADD_CUSTOM_COMMAND(OUTPUT TOBUFF.obj
@@ -675,10 +738,10 @@ ADD_CUSTOM_COMMAND(OUTPUT MMX.obj
 
 add_definitions(-DCHEAT_KEYS -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
-add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external} TOBUFF.obj KEYFBUFF.obj TXTPRNT.obj MMX.obj )
+add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external} TOBUFF.obj KEYFBUFF.obj TXTPRNT.obj MMX.obj)
 
 
 
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS")
-target_include_directories(RedAlert PRIVATE ./redalert/win32lib ./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
+target_include_directories(RedAlert PRIVATE ./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
 target_link_libraries(RedAlert "d3d9.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/dxsdk/Lib/x86/d3dx9.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
