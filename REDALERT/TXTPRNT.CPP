@@ -88,8 +88,8 @@ void* __cdecl Set_Font(void const* fontptr)
     if (fontptr) {
         g_FontPtr = (char*)(fontptr);
         g_fontWidthBlockPtr = (char*)(fontptr) + le16toh(header->width_list);
-        g_FontHeight = le16toh(header->max_height);
-        g_FontWidth = le16toh(header->max_width);
+		FontHeight = g_FontHeight = le16toh(header->max_height);
+        FontWidth = g_FontWidth = le16toh(header->max_width);
     }
 
     return header;
