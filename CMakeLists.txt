@@ -69,7 +69,6 @@ set(src_win32lib
 	./RedAlert/WIN32LIB/PROFILE.H
 	./RedAlert/WIN32LIB/PROFILE.INC
 	./RedAlert/WIN32LIB/RAWFILE.H
-	./RedAlert/WIN32LIB/SET_FONT.CPP
 	./RedAlert/WIN32LIB/SHAPE.H
 	./RedAlert/WIN32LIB/SHAPE.INC
 	./RedAlert/WIN32LIB/SOS.H
@@ -618,6 +617,7 @@ set(src_redalert
 	./RedAlert/_WSPROTO.CPP
 	./RedAlert/_WSPROTO.H
 	./REDALERT/MapScript.cpp
+	./REDALERT/TXTPRNT.cpp
 )
 
 set(src_external
@@ -718,12 +718,6 @@ ADD_CUSTOM_COMMAND(OUTPUT TOBUFF.obj
 	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/WIN32LIB/TOBUFF.ASM
 	COMMENT "generate TOBUFF.obj") 
 	
-ADD_CUSTOM_COMMAND(OUTPUT TXTPRNT.obj
-	COMMAND ml -c
-	${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/TXTPRNT.ASM
-	DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/TXTPRNT.ASM
-	COMMENT "generate TXTPRNT.obj") 
-	
 ADD_CUSTOM_COMMAND(OUTPUT KEYFBUFF.obj
 	COMMAND ml.exe /c /nolog /Zi /Zm /Cx
 	${CMAKE_CURRENT_SOURCE_DIR}/RedAlert/KEYFBUFF.ASM /Fl"" /Cp /W3 /errorReport:prompt 
@@ -738,7 +732,7 @@ ADD_CUSTOM_COMMAND(OUTPUT MMX.obj
 
 add_definitions(-DCHEAT_KEYS -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
-add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external} TOBUFF.obj KEYFBUFF.obj TXTPRNT.obj MMX.obj)
+add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external} TOBUFF.obj KEYFBUFF.obj MMX.obj "REDALERT/TXTPRNT.CPP")
 
 
 

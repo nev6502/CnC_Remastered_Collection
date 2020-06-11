@@ -57,14 +57,14 @@
  *   01/31/1992 DRD : Created.                                             *
  *   06/30/1994 SKB : Converted to 32 bit library.                         *
  *=========================================================================*/
-int __cdecl Char_Pixel_Width(char chr)
-{
-	int	width;
-
-	width = (unsigned char)*(FontWidthBlockPtr + (unsigned char)chr) + FontXSpacing;
-
-	return(width);
-}
+//int __cdecl Char_Pixel_Width(char chr)
+//{
+//	int	width;
+//
+//	width = (unsigned char)*(FontWidthBlockPtr + (unsigned char)chr) + FontXSpacing;
+//
+//	return(width);
+//}
 
 
 /***************************************************************************
@@ -84,26 +84,26 @@ int __cdecl Char_Pixel_Width(char chr)
  *   01/31/1992 DRD : Use Char_Pixel_Width.                                *
  *   06/30/1994 SKB : Converted to 32 bit library.                         *
  *=========================================================================*/
-unsigned int __cdecl String_Pixel_Width(char const *string)
-{
-	WORD	width;				// Working accumulator of string width.
-	WORD	largest = 0;		// Largest recorded width of the string.
-
-	if (!string) return(0);
-
-	width = 0;
-	while (*string) {
-		if (*string == '\r') {
-			string++;
-			largest = MAX(largest, width);
-			width = 0;
-		} else {
-			width += Char_Pixel_Width(*string++);	// add each char's width
-		}
-	}
-	largest = MAX(largest, width);
-	return(largest);
-}
+//unsigned int __cdecl String_Pixel_Width(char const *string)
+//{
+//	WORD	width;				// Working accumulator of string width.
+//	WORD	largest = 0;		// Largest recorded width of the string.
+//
+//	if (!string) return(0);
+//
+//	width = 0;
+//	while (*string) {
+//		if (*string == '\r') {
+//			string++;
+//			largest = MAX(largest, width);
+//			width = 0;
+//		} else {
+//			width += Char_Pixel_Width(*string++);	// add each char's width
+//		}
+//	}
+//	largest = MAX(largest, width);
+//	return(largest);
+//}
 
 
 

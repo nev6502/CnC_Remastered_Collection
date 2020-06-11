@@ -83,11 +83,6 @@ extern	int	CachedIconsDrawn;
 extern	int	UnCachedIconsDrawn;
 
 
-extern "C" void __cdecl Set_Font_Palette_Range(void const *palette, INT start_idx, INT end_idx)
-{
-}		  
-
-
 /*
 ;***************************************************************************
 ;* VVC::DRAW_LINE -- Scales a virtual viewport to another virtual viewport *
