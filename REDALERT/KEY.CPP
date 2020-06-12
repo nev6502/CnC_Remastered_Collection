@@ -517,7 +517,8 @@ bool WWKeyboardClass::Is_Buffer_Empty(void) const
  *=============================================================================================*/
 void WWKeyboardClass::Fill_Buffer_From_System(void)
 {
-	if (!Is_Buffer_Full()) {
+	if (!Is_Buffer_Full()) 
+	{
 		MSG	msg;
 		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
 		  	if (!GetMessage( &msg, NULL, 0, 0 )) {

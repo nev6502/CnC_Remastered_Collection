@@ -1007,6 +1007,7 @@ ArmorType Armor_From_Name(char const * name);
 ** Winstub.cpp
 */
 void Load_Title_Screen(char *name, GraphicViewPortClass *video_page, unsigned char *palette);
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 /*
 ** Egos.CPP
