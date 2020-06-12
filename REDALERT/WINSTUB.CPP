@@ -45,7 +45,6 @@
 #include	"examples/imgui_impl_sdl.h"
 #include	"function.h"
 
-
 #ifdef WINSOCK_IPX
 #include "WSProto.h"
 #else	//WINSOCK_IPX
@@ -254,9 +253,8 @@ void Check_For_Focus_Loss(void)
 
 extern bool InMovie;
 
-long FAR PASCAL Windows_Procedure(HWND hwnd, UINT message, UINT wParam, LONG lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-
 	int	low_param = LOWORD(wParam);
 
 	if (message == CCFocusMessage) {
@@ -289,7 +287,7 @@ long FAR PASCAL Windows_Procedure(HWND hwnd, UINT message, UINT wParam, LONG lPa
 	**	was processed and requires no further action, then return with
 	**	this information.
 	*/
-	if (Keyboard->Message_Handler(hwnd, message, wParam, lParam)) {
+	if (Keyboard->Message_Handler(hWnd, message, wParam, lParam)) {
 		return(1);
 	}
 
@@ -422,14 +420,12 @@ long FAR PASCAL Windows_Procedure(HWND hwnd, UINT message, UINT wParam, LONG lPa
 		case WM_HOSTBYNAME:
 		case WM_ASYNCEVENT:
 		case WM_UDPASYNCEVENT:
-	 		Winsock.Message_Handler(hwnd, message, wParam, lParam);
+	 		Winsock.Message_Handler(hWnd, message, wParam, lParam);
 			return (0);
 #endif	//WINSOCK_IPX
 	}
 
-
-
-	return DefWindowProc (hwnd, message, wParam, lParam);
+	return DefWindowProc (hWnd, message, wParam, lParam);
 }
 
 
@@ -509,80 +505,34 @@ void WWDebugString (char *string)
 
 #define CC_ICON 1
 
-#if (ENGLISH)
 #define WINDOW_NAME		"Red Alert"
-#endif
-
-#if (FRENCH)
-#define WINDOW_NAME		"Alerte Rouge"
-#endif
-
-#if (GERMAN)
-#define WINDOW_NAME		"Alarmstufe Rot"
-#endif
-
 
 void Create_Main_Window ( HANDLE instance , int command_show , int width , int height )
 
 {	
 	HWND        	hwnd ;
-	WNDCLASS    	wndclass ;
-	//
-	// Register the window class
-	//
 
-	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
-	wndclass.lpfnWndProc   = Windows_Procedure ;
-	wndclass.cbClsExtra    = 0 ;
-	wndclass.cbWndExtra    = 0 ;
-	wndclass.hInstance     = (HINSTANCE)instance ;
-	wndclass.hIcon         = LoadIcon ((HINSTANCE)instance, MAKEINTRESOURCE(CC_ICON)) ;
-	wndclass.hCursor       = NULL;
-	wndclass.hbrBackground = NULL;
-	wndclass.lpszMenuName  = WINDOW_NAME;	//NULL
-	wndclass.lpszClassName = WINDOW_NAME;
-
-	RegisterClass (&wndclass) ;
-
-
-	//
-	// Create our main window
-	//
-//	hwnd = CreateWindowEx (
-//							WS_EX_TOPMOST,
-//							WINDOW_NAME,
-//							WINDOW_NAME,
-//							WS_POPUP, // Denzil | WS_MAXIMIZE,
-//							0,
-//							0,
-//							// Denzil 5/18/98 - Making window fullscreen prevents other apps
-//							// from getting WM_PAINT messages
-//// jmarshall
-//							width, //width,
-//							height, //height,
-//// jmarshall end
-//							// End Denzil
-//							NULL,
-//							NULL,
-//							(HINSTANCE)instance,
-//							NULL );
 	SDL_Init(SDL_INIT_VIDEO);
 	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);	
 	game_context = SDL_GL_CreateContext(game_window);
+
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(game_window, &wmInfo);
+
+	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
+
 	hwnd = wmInfo.info.win.window;
 	GameInFocus = TRUE;
 
-	ShowWindow (hwnd, command_show );
+	ShowWindow(hwnd, command_show );
 	ShowCommand = command_show;
-	UpdateWindow (hwnd);
-	SetFocus (hwnd);
-	MainWindow=hwnd;			//Save the handle to our main window
+	UpdateWindow(hwnd);
+	SetFocus(hwnd);
+	MainWindow = hwnd;
 	hInstance = instance;
 
-	CCFocusMessage = RegisterWindowMessage ("CC_GOT_FOCUS");
+	CCFocusMessage = RegisterWindowMessage("CC_GOT_FOCUS");
 
 	//Audio_Focus_Loss_Function = &Focus_Loss;
 	Misc_Focus_Loss_Function = &Focus_Loss;
@@ -817,6 +767,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 	static int numFramesLMouse = 0;
 	extern int mousex, mousey;
 	bool leftMouseProcessed = false;
+
 	SDL_GetMouseState(&mousex, &mousey);
 
 	Keyboard->MouseQX = mousex;
@@ -829,46 +780,61 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 	while (SDL_PollEvent(&event)) {
 		switch (event.type)
 		{
-		case SDL_MOUSEBUTTONDOWN:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				flags = GadgetClass::LEFTPRESS;
-				leftMouseProcessed = true;
-				numFramesLMouse++;
-				key = KN_LMOUSE;
-			}
-			else if (event.button.button == SDL_BUTTON_RIGHT) {
-				numFramesLMouse = 0;
-				flags = GadgetClass::RIGHTPRESS;
-				key = KN_RMOUSE;
-			}
-			break;
+			case SDL_SYSWMEVENT:
+				WndProc( event.syswm.msg->msg.win.hwnd , event.syswm.msg->msg.win.msg, event.syswm.msg->msg.win.wParam, event.syswm.msg->msg.win.lParam );
+				break;
 
-		case SDL_MOUSEBUTTONUP:
-			if (event.button.button == SDL_BUTTON_LEFT) {
-				flags = GadgetClass::LEFTRELEASE;
-				numFramesLMouse = 0;
-			}
-			else if (event.button.button == SDL_BUTTON_RIGHT) {
-				flags = GadgetClass::RIGHTRELEASE;
-				numFramesLMouse = 0;
-			}
-			break;
-		case SDL_KEYDOWN:
-			const Uint8* state = SDL_GetKeyboardState(NULL);
+			case SDL_MOUSEBUTTONDOWN:
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					flags = GadgetClass::LEFTPRESS;
+					leftMouseProcessed = true;
+					numFramesLMouse++;
+					key = KN_LMOUSE;
+				}
+				else if (event.button.button == SDL_BUTTON_RIGHT) {
+					numFramesLMouse = 0;
+					flags = GadgetClass::RIGHTPRESS;
+					key = KN_RMOUSE;
+				}
+				break;
 
-			if(state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
-				Keyboard->Put_Element(event.key.keysym.sym | KN_ALT_BIT);
-			else
-				Keyboard->Put_Element(event.key.keysym.sym);
-			break;
+			case SDL_MOUSEBUTTONUP:
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					flags = GadgetClass::LEFTRELEASE;
+					numFramesLMouse = 0;
+				}
+				else if (event.button.button == SDL_BUTTON_RIGHT) {
+					flags = GadgetClass::RIGHTRELEASE;
+					numFramesLMouse = 0;
+				}
+				break;
+
+			case SDL_KEYDOWN:
+				const Uint8* state = SDL_GetKeyboardState(NULL);
+
+				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
+				{
+					Keyboard->Put_Element(event.key.keysym.sym | KN_ALT_BIT);
+				}
+				else
+				{
+					Keyboard->Put_Element(event.key.keysym.sym);
+				}
+
+				break;
 		}
 
 		if (Debug_Map)
+		{
 			ImGui_ImplSDL2_ProcessEvent(&event);
+		}
+
 	}
 
 	if (!leftMouseProcessed && numFramesLMouse != 0)
+	{
 		flags = GadgetClass::LEFTHELD;
+	}
 
 	Device_Present();
 }

@@ -495,7 +495,7 @@ int Main_Menu(unsigned long )
 #endif	//WIN32
 #endif	//FIXIT_VERSION_3
 	int	d_dialog_x = 85 * RESFACTOR;
-	int	d_dialog_y = 75 * RESFACTOR;
+	int	d_dialog_y = 85 * RESFACTOR;
 	int	d_dialog_cx = d_dialog_x + (d_dialog_w / 2);
 
 	int	d_start_w = 118 * RESFACTOR;
@@ -647,8 +647,7 @@ int Main_Menu(unsigned long )
 	TextButtonClass introbtn(BUTTON_INTRO, TXT_INTRO, TPF_BUTTON, d_intro_x, starty, d_intro_w, d_intro_h);
 	starty += ystep;
 
-	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON,
-		d_exit_x, starty, d_exit_w, d_exit_h);
+	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON, d_exit_x, starty, d_exit_w, d_exit_h);
 	starty += ystep;
 
 	/*
