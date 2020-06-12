@@ -55,11 +55,102 @@
 
 #include <SDL.h>
 #include <SDL_syswm.h>
+#include <gl/glew.h>
+
+#include <imgui.h>
+#include <examples/imgui_impl_opengl3.h>
+
+GLuint backbuffer_texture = -1;
+byte* backbuffer_data;
+byte* backbuffer_data_raw;
+byte backbuffer_palette[768];
+HWND MainWindow;
+SurfaceMonitorClass AllSurfaces;
+SDL_Window* game_window;
+SDL_GLContext game_context;
+int OverlappedVideoBlits = 0;
+
+void Video_Set_Data(unsigned char* buffer, int width, int height) {
+	memcpy(backbuffer_data_raw, buffer, width * height);
+}
+
+void (*Misc_Focus_Loss_Function)(void) = nullptr;
+void (*Misc_Focus_Restore_Function)(void) = nullptr;
+
+void (*Imgui_Dialog_Function)(void) = nullptr;
+
+BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
+	// Todo implement resoluton scaling.
+	return true; // Always return true;
+}
+
+unsigned int Get_Free_Video_Memory(void) {
+	return 64 * 1024 * 1024;
+}
+
+unsigned int Get_Video_Hardware_Capabilities() {
+	return 0;
+}
+
+void Reset_Video_Mode(void) {
+
+}
+
+void Set_DD_Palette(void* palette)
+{
+	char* palette_get = (char*)palette; //CCPalette.Get_Data();
+	for (int j = 0; j < 768; j++) {
+		backbuffer_palette[j] = palette_get[j] << 2;
+	}
+}
+
+void Device_Present(void) {
+	ImGuiIO& io = ImGui::GetIO();
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	io.DisplaySize = ImVec2(ScreenWidth, ScreenHeight);
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui_ImplSDL2_NewFrame(game_window);
+
+	// Rasterize the palette.
+	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
+		backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
+		backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
+		backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
+		backbuffer_data[(i * 4) + 3] = 255;
+	}
+	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+
+	// Use imgui to render the screenbuffer.
+	{
+		bool ScreenActive;
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.FramePadding = ImVec2(0, 0);
+		ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
+		ImGui::SetNextWindowPos(ImVec2(0, 0));		
+		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
+			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
+			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
+		ImGui::End();		
+	}
+
+	if (Imgui_Dialog_Function) {
+		Imgui_Dialog_Function();		
+	}
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	SDL_GL_SwapWindow(game_window);
+}
+
 
 void output(short,short)
 {}
-
-SDL_Window* game_window;
 
 unsigned long CCFocusMessage = WM_USER+50;	//Private message for receiving application focus
 extern	void VQA_PauseAudio(void);
@@ -480,7 +571,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 //							(HINSTANCE)instance,
 //							NULL );
 	SDL_Init(SDL_INIT_VIDEO);
-	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);	
+	game_context = SDL_GL_CreateContext(game_window);
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo(game_window, &wmInfo);
@@ -501,6 +593,18 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	Misc_Focus_Restore_Function = &Focus_Restore;
 	Gbuffer_Focus_Loss_Function = &Focus_Loss;
 
+	glGenTextures(1, &backbuffer_texture);
+	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+	// Give the image to OpenGL
+	backbuffer_data = new byte[width * height * 4];
+	memset(backbuffer_data, 0, width * height * 4);
+	backbuffer_data_raw = new byte[width * height];
+	memset(backbuffer_data_raw, 0, width * height);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	glewInit();
 }
 
 

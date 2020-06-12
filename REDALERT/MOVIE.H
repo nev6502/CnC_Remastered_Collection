@@ -32,7 +32,7 @@
 ****************************************************************************/
 
 #include <windows.h>
-#include <ddraw.h>
+//#include <ddraw.h>
 
 #ifdef MPGEXPORT		  
 #define DLLCALL __declspec(dllexport)

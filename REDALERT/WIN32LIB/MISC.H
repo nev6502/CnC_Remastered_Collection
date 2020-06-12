@@ -40,9 +40,7 @@
 #endif // _WIN32
 #include <windows.h>
 #include <windowsx.h>
-#include <ddraw.h>
-
-extern	LPDIRECTDRAWSURFACE	PaletteSurface;
+//#include <ddraw.h>
 
 /*========================= C++ Routines ==================================*/
 
@@ -52,6 +50,7 @@ extern	LPDIRECTDRAWSURFACE	PaletteSurface;
 /*=========================================================================*/
 void 		Process_DD_Result(HRESULT result, int display_ok_msg);
 BOOL 		Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel);
+void Video_Set_Data(unsigned char* buffer, int width, int height);
 void 		Reset_Video_Mode(void);
 unsigned 	Get_Free_Video_Memory(void);
 void 		Wait_Blit(void);
@@ -106,20 +105,20 @@ class SurfaceMonitorClass {
 
 	public:
 
-		SurfaceMonitorClass();
+		SurfaceMonitorClass()  { }
 
-		void	Add_DD_Surface (LPDIRECTDRAWSURFACE);
-		void	Remove_DD_Surface (LPDIRECTDRAWSURFACE);
-		BOOL	Got_Surface_Already (LPDIRECTDRAWSURFACE);
-		void	Restore_Surfaces (void);
-		void	Set_Surface_Focus ( BOOL in_focus );
-		void	Release(void);
+		void	Add_DD_Surface (void *) { }
+		void	Remove_DD_Surface (void*) { }
+		BOOL	Got_Surface_Already (void*) { }
+		void	Restore_Surfaces (void) { }
+		void	Set_Surface_Focus ( BOOL in_focus ) { }
+		void	Release(void) { }
 
 		BOOL	SurfacesRestored;
 
 	private:
 
-		LPDIRECTDRAWSURFACE	Surface[MAX_SURFACES];
+		void						*Surface[MAX_SURFACES];
 		BOOL						InFocus;
 
 };
@@ -130,8 +129,6 @@ extern	SurfaceMonitorClass	AllSurfaces;				//List of all direct draw surfaces
 /*=========================================================================*/
 /* The following variables are declared in: DDRAW.CPP								*/
 /*=========================================================================*/
-extern	LPDIRECTDRAW	DirectDrawObject;
-extern	LPDIRECTDRAW2	DirectDraw2Interface;
 extern	HWND				MainWindow;
 extern BOOL 				SystemToVideoBlits;
 extern BOOL				VideoToSystemBlits;

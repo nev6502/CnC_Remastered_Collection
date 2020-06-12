@@ -107,7 +107,7 @@
 #endif // _WIN32
 
 #define WIN32_LEAN_AND_MEAN
-#include <ddraw.h>
+//#include <ddraw.h>
 
 
 #ifndef GBUFFER_H
@@ -134,12 +134,48 @@
 #include "ww_win.h"
 #endif
 #include <stdlib.h>
-
+#include <assert.h>
 #include "iconcach.h"
 
-
-
 #ifndef FUNCTION_H
+
+__forceinline void Nearest_Fill(unsigned char source, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans)
+{
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int _x = x;
+			int _y = y;
+			int destPos = (destWidth * (_y + (destY))) + (_x + (destX));
+
+			dest[destPos] = source;
+		}
+	}
+}
+
+__forceinline void Nearest_CopyImage(unsigned char* source, int sourceX, int sourceY, int sourceWidth, int sourceHeight, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans)
+{
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int _x = x;
+			int _y = y;
+			int destPos = (destWidth * (_y + (destY))) + (_x + (destX));
+			int sourcePos = (sourceWidth * (_y + (sourceY))) + (_x + (sourceX));
+
+			if (sourcePos > sourceWidth * sourceHeight)
+				return;
+
+			if (destPos < 0)
+				return;
+
+			if (source[sourcePos] != 0 || trans == false)
+				dest[destPos] = source[sourcePos];
+		}
+	}
+}
 
 //#pragma off (unreferenced)
 
@@ -176,7 +212,6 @@ class TPoint2D
 // Defines for direct draw
 //
 //
-extern	LPDIRECTDRAW	DirectDrawObject;	//pointer to direct draw object
 extern	HWND			MainWindow;			//handle to programs main window
 
 /*
@@ -368,23 +403,29 @@ class GraphicBufferClass : public GraphicViewPortClass, public BufferClass {
 		void DD_Init(GBC_Enum flags);
 		void Init(int w, int h, void *buffer, long size, GBC_Enum flags);
 		void Un_Init(void);
-		void Attach_DD_Surface (GraphicBufferClass * attach_buffer);
+		//void Attach_DD_Surface (GraphicBufferClass * attach_buffer);
 		BOOL Lock(void);
 		BOOL Unlock(void);
 
 		void Scale_Rotate(BitmapClass &bmp,TPoint2D const &pt,long scale,unsigned char angle);
 
 		// Member to get a pointer to a direct draw surface
-		LPDIRECTDRAWSURFACE Get_DD_Surface ( void );
+		unsigned char* Get_DD_Surface(void) {
+			if (!rawCpuBuffer)
+				return (unsigned char* )Buffer;
+
+			return rawCpuBuffer;
+		}
 // jmarshall
 		void* GetMemoryBuffer(void) {
-			return VideoSurfaceDescription.lpSurface;
-		}
+			if (!rawCpuBuffer)
+				return Buffer;
+			return rawCpuBuffer;
+		}		
 // jmarshall end
-	protected:
-		LPDIRECTDRAWSURFACE	VideoSurfacePtr;		//Pointer to the related direct draw surface
-		DDSURFACEDESC			VideoSurfaceDescription;//Description of the said surface
 
+protected:
+	unsigned char* rawCpuBuffer;
 };
 
 
@@ -413,28 +454,6 @@ inline int GraphicViewPortClass::Get_LockCount(void)
 inline BOOL GraphicViewPortClass::Get_IsDirectDraw(void)
 {
 	return (IsDirectDraw);
-}
-
-
-
-/***********************************************************************************************
- * GBC::Get_DD_Surface -- returns a pointer to the buffer direct draw surface                  *
- *                                                                                             *
- *                                                                                             *
- *                                                                                             *
- * INPUT:    Nothing                                                                           *
- *                                                                                             *
- * OUTPUT:   ptr to direct draw surface                                                        *
- *                                                                                             *
- * WARNINGS: None                                                                              *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *    9/29/95 9:43AM ST : Created                                                              *
- *=============================================================================================*/
-inline LPDIRECTDRAWSURFACE GraphicBufferClass::Get_DD_Surface ( void )
-{
-	return ( VideoSurfacePtr );
-
 }
 
 
@@ -503,6 +522,10 @@ inline BOOL GraphicViewPortClass::Unlock(void)
  *=========================================================================*/
 inline long GraphicViewPortClass::Get_Offset(void)
 {
+	if(Offset == 0) {
+		return (long)Get_Graphic_Buffer()->GetMemoryBuffer();
+	}
+
 	return(Offset);
 }
 
@@ -1169,53 +1192,37 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
  *=========================================================================*/
 inline VOID GraphicViewPortClass::Fill_Rect(int sx, int sy, int dx, int dy, unsigned char color)
 {
-	if (  AllowHardwareBlitFills
-			&& IsDirectDraw
-			&& ( (dx-sx) * (dy-sy) >= (32*32) )
-			&& GraphicBuff->Get_DD_Surface()->GetBltStatus(DDGBS_CANBLT) == DD_OK){
-		DDBLTFX	blit_effects;
-		RECT	dest_rectangle;
+	void Nearest_Fill(unsigned char source, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans);
+	RECT	dest_rectangle;
 
-		dest_rectangle.left	=sx+XPos;
-		dest_rectangle.top	=sy+YPos;
-		dest_rectangle.right	=dx+XPos;
-		dest_rectangle.bottom=dy+YPos;
+	dest_rectangle.left = sx + XPos;
+	dest_rectangle.top = sy + YPos;
+	dest_rectangle.right = dx + XPos;
+	dest_rectangle.bottom = dy + YPos;
 
-		if (dest_rectangle.left<XPos){
-			dest_rectangle.left=XPos;
-		}
-
-		if (dest_rectangle.right >= Width + XPos){
-			dest_rectangle.right = Width +XPos -1;
-		}
-
-		if (dest_rectangle.top<YPos){
-			dest_rectangle.top=YPos;
-		}
-
-		if (dest_rectangle.bottom >= Height + YPos){
-			dest_rectangle.bottom = Height + YPos -1;
-		}
-
-		if (dest_rectangle.left >= dest_rectangle.right)  return;
-		if (dest_rectangle.top  >= dest_rectangle.bottom) return;
-
-		dest_rectangle.right++;
-		dest_rectangle.bottom++;
-
-		blit_effects.dwSize=sizeof(blit_effects);
-		blit_effects.dwFillColor = color;
-		GraphicBuff->Get_DD_Surface()->Blt(&dest_rectangle,
-														NULL,
-														NULL,
-														DDBLT_WAIT | DDBLT_ASYNC | DDBLT_COLORFILL,
-														&blit_effects);
-	} else {
-		if (Lock()){
-			Buffer_Fill_Rect(this, sx, sy, dx, dy, color);
-			Unlock();
-		}
+	if (dest_rectangle.left < XPos) {
+		dest_rectangle.left = XPos;
 	}
+
+	if (dest_rectangle.right >= Width + XPos) {
+		dest_rectangle.right = Width + XPos - 1;
+	}
+
+	if (dest_rectangle.top < YPos) {
+		dest_rectangle.top = YPos;
+	}
+
+	if (dest_rectangle.bottom >= Height + YPos) {
+		dest_rectangle.bottom = Height + YPos - 1;
+	}
+
+	if (dest_rectangle.left >= dest_rectangle.right)  return;
+	if (dest_rectangle.top >= dest_rectangle.bottom) return;
+
+	dest_rectangle.right++;
+	dest_rectangle.bottom++;
+
+	Nearest_Fill(color, (unsigned char *)Get_Graphic_Buffer()->GetMemoryBuffer(), dest_rectangle.left, dest_rectangle.top, Width, dest_rectangle.right - dest_rectangle.left, dest_rectangle.bottom - dest_rectangle.top, false);
 }
 
 

@@ -31,6 +31,7 @@
 ** 
 */
 
+#include <stdint.h>
 #include "gbuffer.h"
 #include "MISC.H"
 #include "WSA.H"
@@ -40,7 +41,7 @@ IconCacheClass::IconCacheClass (void)
 	IsCached			=FALSE;
 	SurfaceLost		=FALSE;
 	DrawFrequency	=0;
-	CacheSurface	=NULL;
+	//CacheSurface	=NULL;
 	IconSource		=NULL;
 }
 
@@ -75,7 +76,7 @@ extern "C" int __cdecl Get_Free_Index (void) {return 0;};
 extern "C" BOOL __cdecl Cache_New_Icon (int icon_index, void *icon_ptr) {return -1;};
 extern "C" int __cdecl Get_Free_Cache_Slot(void) {return -1;}
 
-void IconCacheClass::Draw_It (LPDIRECTDRAWSURFACE dest_surface , int x_pixel, int y_pixel, int window_left , int window_top , int window_width , int window_height) {}
+void IconCacheClass::Draw_It (void *dest_surface , int x_pixel, int y_pixel, int window_left , int window_top , int window_width , int window_height) {}
 
 
 
@@ -1302,76 +1303,11 @@ void __cdecl Buffer_Fill_Rect(void *thisptr, int sx, int sy, int dx, int dy, uns
 */
 void	__cdecl Buffer_Clear(void *this_object, unsigned char color)
 {
-	unsigned int local_color = color;
+	GraphicViewPortClass* cls = (GraphicViewPortClass*)this_object;
+	if (cls->Get_Graphic_Buffer()->GetMemoryBuffer() == NULL)
+		return;
 
-	__asm {
-
-		cld 		 				; always go forward
-
-		mov	ebx,[this_object]			; get a pointer to viewport
-		mov	edi,[ebx]GraphicViewPortClass.Offset	; get the correct offset
-		mov	edx,[ebx]GraphicViewPortClass.Height	; get height from viewport
-		mov	esi,[ebx]GraphicViewPortClass.Width		; get width from viewport
-		//push	[dword (GraphicViewPort ebx).GVPPitch]	; extra pitch of direct draw surface
-		push	[ebx]GraphicViewPortClass.Pitch
-
-		mov	ebx,[ebx]GraphicViewPortClass.XAdd		; esi = add for each line
-		add	ebx,[esp]				; Yes, I know its nasty but
-		add	esp,4					;      it works!
-
-		;*===================================================================
-		; Convert the color byte to a DWORD for fast storing
-		;*===================================================================
-		mov	al,[color]				; get color to clear to
-		mov	ah,al					; extend across WORD
-		mov	ecx,eax					; extend across DWORD in
-		shl	eax,16					;   several steps
-		mov	ax,cx
-
-		;*===================================================================
-		; Find out if we should bother to align the row.
-		;*===================================================================
-
-		cmp	esi , OPTIMAL_BYTE_COPY			; is it worth aligning them?
-		jl	byte_by_byte				;   if not then skip
-
-		;*===================================================================
-		; Figure out the alignment offset if there is any
-		;*===================================================================
-		push	ebx
-	
-	dword_aligned_loop:
-		    mov	ecx , edi
-		    mov	ebx , esi
-		    neg	ecx
-		    and	ecx , 3
-		    sub	ebx , ecx
-		    rep	stosb
-		    mov	ecx , ebx
-		    shr	ecx , 2
-		    rep	stosd
-		    mov	ecx , ebx
-		    and	ecx , 3
-		    rep	stosb
-		    add	edi , [ esp ]
-		    dec	edx					; decrement the height
-		    jnz	dword_aligned_loop				; if more to do than do it
-		    pop	eax
-			 jmp	done
-		    //ret
-
-		;*===================================================================
-		; If not enough bytes to bother aligning copy each line across a byte
-		;    at a time.
-		;*===================================================================
-	byte_by_byte:
-		mov	ecx,esi					; get total width in bytes
-		rep	stosb					; store the width
-		add	edi,ebx					; handle the xadd
-		dec	edx					; decrement the height
-		jnz	byte_by_byte				; if any left then next line
-	done:
-	}
+	memset(cls->Get_Graphic_Buffer()->GetMemoryBuffer(), color, cls->Get_Width() * cls->Get_Height());
 }
 
 /*
@@ -1392,33 +1328,12 @@ void	__cdecl Buffer_Clear(void *this_object, unsigned char color)
 */
 
 // jmarshall - ported to c
-void Nearest_CopyImage(byte* source, int sourceX, int sourceY, int sourceWidth, int sourceHeight, byte* dest, int destX, int destY, int destWidth, int width, int height, bool trans)
-{
-	for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			int _x = x;
-			int _y = y;
-			int destPos = (destWidth * (_y + (destY))) + (_x + (destX));
-			int sourcePos = (sourceWidth * (_y + (sourceY))) + (_x + (sourceX));
-
-			if (sourcePos > sourceWidth * sourceHeight)
-				return;
-
-			if(source[sourcePos] != 0 || trans == false)
-				dest[destPos] = source[sourcePos];
-		}
-	}
-}
-
-
-byte* Draw_Dropsample(const byte* in, int inwidth, int inheight, int outwidth, int outheight) {
+unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheight, int outwidth, int outheight) {
 	int		i, j, k;
-	const byte* inrow;
-	const byte* pix1;
-	byte* out, * out_p;
-	static byte ViewportPixelBuffer[4096 * 4096];
+	const unsigned char* inrow;
+	const unsigned char* pix1;
+	unsigned char* out, * out_p;
+	static unsigned char ViewportPixelBuffer[4096 * 4096];
 
 	out = &ViewportPixelBuffer[0];
 	out_p = out;
@@ -1442,13 +1357,13 @@ BOOL __cdecl Linear_Scale_To_Linear(void *this_object, void *dest, int src_x, in
 	GraphicViewPortClass* viewportClass = (GraphicViewPortClass*)this_object;
 	GraphicViewPortClass* destViewportClass = (GraphicViewPortClass*)dest;
 
-	byte* viewportBuffer = ((byte*)viewportClass->Get_Offset());
+	unsigned char* viewportBuffer = ((unsigned char*)viewportClass->Get_Offset());
 
 	// Scale the GraphicViewPortClass to dest_x, dest_y
-	byte* scaled_buffer = Draw_Dropsample((byte *)viewportBuffer, viewportClass->Get_Width(), viewportClass->Get_Height(), dst_width, dst_height);
+	unsigned char* scaled_buffer = Draw_Dropsample((unsigned char*)viewportBuffer, viewportClass->Get_Width(), viewportClass->Get_Height(), dst_width, dst_height);
 
 	// Blit the scaled_buffer to dest.
-	Nearest_CopyImage(scaled_buffer, src_x, src_y, dst_width, dst_height, (byte *)destViewportClass->Get_Offset(), dst_x, dst_y, destViewportClass->Get_Width(), dst_width, dst_height, trans);
+	Nearest_CopyImage(scaled_buffer, src_x, src_y, dst_width, dst_height, (unsigned char*)destViewportClass->Get_Offset(), dst_x, dst_y, destViewportClass->Get_Width(), dst_width, dst_height, trans);
 
 	return true;
 }
@@ -1460,11 +1375,11 @@ BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int x_pixel, i
 	bool needsUnlock = false;
 	bool sourceNeedsUnlock = false;
 
-	byte* viewportBuffer = NULL;
-	viewportBuffer = ((byte*)viewportClass->Get_Offset());
+	unsigned char* viewportBuffer = NULL;
+	viewportBuffer = ((unsigned char*)viewportClass->Get_Offset());
 
-	byte* destBuffer = NULL;
-	destBuffer = ((byte*)destViewportClass->Get_Offset());
+	unsigned char* destBuffer = NULL;
+	destBuffer = ((unsigned char*)destViewportClass->Get_Offset());
 
 	//if (destViewportClass->Get_Graphic_Buffer()->Get_Buffer() != NULL) {
 	//	destBuffer = (byte*)destViewportClass->Get_Graphic_Buffer()->Get_Buffer();
@@ -1482,7 +1397,7 @@ BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int x_pixel, i
 	//}
 		
 	// Blit the buffer to dest.
-	Nearest_CopyImage(viewportBuffer, x_pixel, y_pixel, viewportClass->Get_Width(), viewportClass->Get_Height(), (byte*)destBuffer, dest_x0, dest_y0, destViewportClass->Get_Width(), pixel_width, pixel_height, trans);
+	Nearest_CopyImage(viewportBuffer, x_pixel, y_pixel, viewportClass->Get_Width(), viewportClass->Get_Height(), (unsigned char*)destBuffer, dest_x0, dest_y0, destViewportClass->Get_Width(), pixel_width, pixel_height, trans);
 
 	//if (needsUnlock) {
 	//	destViewportClass->Get_Graphic_Buffer()->Unlock();
@@ -4064,242 +3979,52 @@ CODESEG
 ;*=========================================================================*
  */ 
 
-extern "C" long __cdecl Buffer_To_Page(int x_pixel, int y_pixel, int pixel_width, int pixel_height, void *src, void *dest)
+extern "C" long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *buffer, void *dest)
 {
+	GraphicViewPortClass& vp = *(GraphicViewPortClass*)dest;
+	// from chronoshift
+	int xstart = x;
+	int ystart = y;
+	int xend = x + w - 1;
+	int yend = y + h - 1;
 
-/*
-	PROC	Buffer_To_Page C near
-	USES	eax,ebx,ecx,edx,esi,edi
+	int xoffset = 0;
+	int yoffset = 0;
 
-	;*===================================================================
-	;* define the arguements that our function takes.
-	;*===================================================================
-	ARG	x_pixel     :DWORD		; x pixel position in source
-	ARG	y_pixel     :DWORD		; y pixel position in source
-	ARG	pixel_width :DWORD		; width of rectangle to blit
-	ARG	pixel_height:DWORD		; height of rectangle to blit
-	ARG    	src         :DWORD		; this is a member function
-	ARG	dest        :DWORD		; what are we blitting to
-
-;	ARG	trans       :DWORD			; do we deal with transparents?
-
-	;*===================================================================
-	; Define some locals so that we can handle things quickly
-	;*===================================================================
-	LOCAL 	x1_pixel :dword
-	LOCAL	y1_pixel :dword
-	local	scr_x 	: dword
-	local	scr_y 	: dword
-	LOCAL	dest_ajust_width:DWORD
-	LOCAL	scr_ajust_width:DWORD
-	LOCAL	dest_area   :  dword
-*/
-
-	unsigned long x1_pixel;
-	unsigned long y1_pixel;
-	unsigned long scr_x;
-	unsigned long scr_y;
-	unsigned long dest_ajust_width;
-	unsigned long scr_ajust_width;
-	//unsigned long dest_area;
-
-	__asm {
-	
-			cmp	[ src ] , 0
-			jz	real_out
-
-
-		; Clip dest Rectangle against source Window boundaries.
-
-			mov	[ scr_x ] , 0
-			mov	[ scr_y ] , 0
-			mov  	esi , [ dest ]	    ; get ptr to dest
-			xor 	ecx , ecx
-			xor 	edx , edx
-			mov	edi , [esi]GraphicViewPortClass.Width  ; get width into register
-			mov	ebx , [ x_pixel ]
-			mov	eax , [ x_pixel ]
-			add	ebx , [ pixel_width ]
-			shld	ecx , eax , 1
-			mov	[ x1_pixel ] , ebx
-			inc	edi
-			shld	edx , ebx , 1
-			sub	eax , edi
-			sub	ebx , edi
-			shld	ecx , eax , 1
-			shld	edx , ebx , 1
-
-			mov	edi, [esi]GraphicViewPortClass.Height ; get height into register
-			mov	ebx , [ y_pixel ]
-			mov	eax , [ y_pixel ]
-			add	ebx , [ pixel_height ]
-			shld	ecx , eax , 1
-			mov	[ y1_pixel ] , ebx
-			inc	edi
-			shld	edx , ebx , 1
-			sub	eax , edi
-			sub	ebx , edi
-			shld	ecx , eax , 1
-			shld	edx , ebx , 1
-
-			xor	cl , 5
-			xor	dl , 5
-			mov	al , cl
-			test	dl , cl
-			jnz	real_out
-			or	al , dl
-			jz	do_blit
-
-			test	cl , 1000b
-			jz	dest_left_ok
-			mov	eax , [ x_pixel ]
-			neg	eax
-			mov	[ x_pixel ] , 0
-			mov	[ scr_x ] , eax
-
-		dest_left_ok:
-			test	cl , 0010b
-			jz	dest_bottom_ok
-			mov	eax , [ y_pixel ]
-			neg	eax
-			mov	[ y_pixel ] , 0
-			mov	[ scr_y ] , eax
-
-		dest_bottom_ok:
-			test	dl , 0100b
-			jz	dest_right_ok
-			mov	eax , [esi]GraphicViewPortClass.Width  ; get width into register
-			mov	[ x1_pixel ] , eax
-		dest_right_ok:
-			test	dl , 0001b
-			jz	do_blit
-			mov	eax , [esi]GraphicViewPortClass.Height  ; get width into register
-			mov	[ y1_pixel ] , eax
-
-		do_blit:
-
-   		    cld
-
-   		    mov	eax , [esi]GraphicViewPortClass.XAdd
-   		    add	eax , [esi]GraphicViewPortClass.Width
-   		    add	eax , [esi]GraphicViewPortClass.Pitch
-   		    mov	edi , [esi]GraphicViewPortClass.Offset
-
-   		    mov	ecx , eax
-   		    mul	[ y_pixel ]
-   		    add	edi , [ x_pixel ]
-   		    add	edi , eax
-
-   		    add	ecx , [ x_pixel ]
-   		    sub	ecx , [ x1_pixel ]
-   		    mov	[ dest_ajust_width ] , ecx
-
-
-   		    mov	esi , [ src ]
-   		    mov	eax , [ pixel_width ]
-   		    sub	eax , [ x1_pixel ]
-   		    add	eax , [ x_pixel ]
-   		    mov	[ scr_ajust_width ] , eax
-
-   		    mov	eax , [ scr_y ]
-   		    mul 	[ pixel_width ]
-   		    add	eax , [ scr_x ]
-   		    add	esi , eax
-
-   		    mov	edx , [ y1_pixel ]
-   		    mov	eax , [ x1_pixel ]
-
-   		    sub	edx , [ y_pixel ]
-   		    jle	real_out
-   		    sub	eax , [ x_pixel ]
-   		    jle	real_out
-
-
-		; ********************************************************************
-		; Forward bitblit only
-
-		//IF TRANSP
-   	//	    test	[ trans ] , 1
-   	//	    jnz	forward_Blit_trans
-		//ENDIF
-
-
-		; the inner loop is so efficient that
-		; the optimal consept no longer apply because
-		; the optimal byte have to by a number greather than 9 bytes
-   		    cmp	eax , 10
-   		    jl	forward_loop_bytes
-
-		forward_loop_dword:
-   		    mov	ecx , edi
-   		    mov	ebx , eax
-   		    neg	ecx
-   		    and	ecx , 3
-   		    sub	ebx , ecx
-   		    rep	movsb
-   		    mov	ecx , ebx
-   		    shr	ecx , 2
-   		    rep	movsd
-   		    mov	ecx , ebx
-   		    and	ecx , 3
-   		    rep	movsb
-   		    add	esi , [ scr_ajust_width ]
-   		    add	edi , [ dest_ajust_width ]
-   		    dec	edx
-   		    jnz	forward_loop_dword
-   		    jmp	real_out	//ret
-
-		forward_loop_bytes:
-   		    mov	ecx , eax
-   		    rep	movsb
-   		    add	esi , [ scr_ajust_width ]
-   		    add	edi , [ dest_ajust_width ]
-   		    dec	edx					; decrement the height
-   		    jnz	forward_loop_bytes
-   		  //  ret
-
-		//IF  TRANSP
-		//
-		//
-		//forward_Blit_trans:
-		//
-		//
-   	//	    mov	ecx , eax
-   	//	    and	ecx , 01fh
-   	//	    lea	ecx , [ ecx + ecx * 4 ]
-   	//	    neg	ecx
-   	//	    shr	eax , 5
-   	//	    lea	ecx , [ transp_reference + ecx * 2 ]
-   	//	    mov	[ y1_pixel ] , ecx
-		//
-		//
-		//forward_loop_trans:
-   	//	    mov	ecx , eax
-   	//	    jmp	[ y1_pixel ]
-		//forward_trans_line:
-   	//	    REPT	32
-   	//	    local	transp_pixel
-   	//	    		mov	bl , [ esi ]
-   	//	    		inc	esi
-   	//	    		test	bl , bl
-   	//	    		jz	transp_pixel
-   	//	    		mov	[ edi ] , bl
-   	//	 	    transp_pixel:
-   	//	    		inc	edi
-		//	ENDM
-   	//	 transp_reference:
-   	//	    dec	ecx
-   	//	    jge	forward_trans_line
-   	//	    add	esi , [ scr_ajust_width ]
-   	//	    add	edi , [ dest_ajust_width ]
-   	//	    dec	edx
-   	//	    jnz	forward_loop_trans
-   	//	    ret
-		//ENDIF
-
-		real_out:
-   		    //ret
+	// If we aren't drawing within the viewport, return
+	if (!buffer || xstart >= vp.Get_Width() || ystart >= vp.Get_Height() || xend < 0 || yend < 0) {
 	}
+
+	// Clipping
+	if (xstart < 0) {
+		xoffset = -xstart;
+		xstart = 0;
+	}
+
+	if (ystart < 0) {
+		yoffset += h * (-ystart);
+		ystart = 0;
+	}
+
+	xend = min(xend, vp.Get_Width() - 1);
+	yend = min(yend, vp.Get_Height() - 1);
+
+	int pitch = vp.Get_Pitch() + vp.Get_Width() + vp.Get_XAdd();
+	uint8_t* dst = y * pitch + x + (uint8_t*)(vp.Get_Offset());
+	uint8_t* src = xoffset + w * yoffset + static_cast<uint8_t*>(buffer);
+	// int dst_pitch = x_pos + pitch - xend;
+	// int src_pitch = x_pos + width - xend;
+	int lines = yend - ystart + 1;
+	int blit_width = xend - xstart + 1;
+
+	// blit
+	while (lines--) {
+		memcpy(dst, src, blit_width);
+		src += w;
+		dst += pitch;
+	}
+
+	return 0;
 }
 
 			//ENDP	Buffer_To_Page

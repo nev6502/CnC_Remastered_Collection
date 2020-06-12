@@ -101,6 +101,8 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 	int currentFrame = 0;	
 	bool shouldSampleAudio = true;
 
+	return 0;
+
 	smk_first(vqaHandle->smacker_video);
 
 	while (currentFrame < vqaHandle->frame_count) {

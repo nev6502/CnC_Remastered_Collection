@@ -38,10 +38,7 @@
  // jmarshall - imgui
 #include "imgui.h"
 #include "examples/imgui_impl_sdl.h"
-#include "examples/imgui_impl_dx9.h"
-
-#include <d3d9.h>
-extern LPDIRECT3DDEVICE9 globald3d9Device;
+#include "examples/imgui_impl_opengl3.h"
 extern SDL_Window* game_window;
 // jmarshall end
 
@@ -577,7 +574,7 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 
 			// Setup Platform/Renderer bindings
 			ImGui_ImplSDL2_InitForD3D(game_window);
-			ImGui_ImplDX9_Init(globald3d9Device);
+			ImGui_ImplOpenGL3_Init();
 
 			io.Fonts->AddFontFromFileTTF("code/fonts/Roboto-Medium.ttf", 16.0f);
 // jmarshall end
@@ -599,18 +596,18 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 				/*
 				** Check that we really got a video memory page. Failure is fatal.
 				*/
-				DDSCAPS	surface_capabilities;
-				memset (&surface_capabilities, 0, sizeof(surface_capabilities));
-				VisiblePage.Get_DD_Surface()->GetCaps(&surface_capabilities);
-				if (surface_capabilities.dwCaps & DDSCAPS_SYSTEMMEMORY) {
-					/*
-					** Aaaarrgghh!
-					*/
-					WWDebugString(TEXT_DDRAW_ERROR);WWDebugString("\n");
-					MessageBox(MainWindow, TEXT_DDRAW_ERROR, TEXT_SHORT_TITLE, MB_ICONEXCLAMATION|MB_OK);
-					if (WindowsTimer) delete WindowsTimer;
-					return (EXIT_FAILURE);
-				}
+				//DDSCAPS	surface_capabilities;
+				//memset (&surface_capabilities, 0, sizeof(surface_capabilities));
+				//VisiblePage.Get_DD_Surface()->GetCaps(&surface_capabilities);
+				//if (surface_capabilities.dwCaps & DDSCAPS_SYSTEMMEMORY) {
+				//	/*
+				//	** Aaaarrgghh!
+				//	*/
+				//	WWDebugString(TEXT_DDRAW_ERROR);WWDebugString("\n");
+				//	MessageBox(MainWindow, TEXT_DDRAW_ERROR, TEXT_SHORT_TITLE, MB_ICONEXCLAMATION|MB_OK);
+				//	if (WindowsTimer) delete WindowsTimer;
+				//	return (EXIT_FAILURE);
+				//}
 
 				/*
 				** If we have enough left then put the hidpage in video memory unless...
@@ -628,27 +625,27 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 						!VideoBackBufferAllowed) {
 					HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)0);
 				} else {
-					//HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)0);
-					HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)GBC_VIDEOMEM);
+					HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)0);
+					//HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)GBC_VIDEOMEM);
 
 					/*
 					** Make sure we really got a video memory hid page. If we didnt then things
 					** will run very slowly.
 					*/
-					memset (&surface_capabilities, 0, sizeof(surface_capabilities));
-					HiddenPage.Get_DD_Surface()->GetCaps(&surface_capabilities);
-					if (surface_capabilities.dwCaps & DDSCAPS_SYSTEMMEMORY) {
-
-						/*
-						** Oh dear, big trub. This must be an IBM Aptiva or something similarly cruddy.
-						** We must redo the Hidden Page as system memory.
-						*/
-						AllSurfaces.Remove_DD_Surface(HiddenPage.Get_DD_Surface());  // Remove the old surface from the AllSurfaces list
-						HiddenPage.Get_DD_Surface()->Release();
-						HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)0);
-					} else {
-						VisiblePage.Attach_DD_Surface(&HiddenPage);
-					}
+					//memset (&surface_capabilities, 0, sizeof(surface_capabilities));
+					//HiddenPage.Get_DD_Surface()->GetCaps(&surface_capabilities);
+					//if (surface_capabilities.dwCaps & DDSCAPS_SYSTEMMEMORY) {
+					//
+					//	/*
+					//	** Oh dear, big trub. This must be an IBM Aptiva or something similarly cruddy.
+					//	** We must redo the Hidden Page as system memory.
+					//	*/
+					//	AllSurfaces.Remove_DD_Surface(HiddenPage.Get_DD_Surface());  // Remove the old surface from the AllSurfaces list
+					//	HiddenPage.Get_DD_Surface()->Release();
+					//	HiddenPage.Init (ScreenWidth , ScreenHeight , NULL , 0 , (GBC_Enum)0);
+					//} else {
+					//	VisiblePage.Attach_DD_Surface(&HiddenPage);
+					//}
 				}
 			}
 
@@ -838,7 +835,7 @@ bool InitDDraw(void)
 
 	VisiblePage.Init(ScreenWidth, ScreenHeight, NULL, 0, (GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM));
 	HiddenPage.Init(ScreenWidth, ScreenHeight, NULL, 0, (GBC_Enum)GBC_VIDEOMEM);
-	VisiblePage.Attach_DD_Surface(&HiddenPage);
+//	VisiblePage.Attach_DD_Surface(&HiddenPage);
 	SeenBuff.Attach(&VisiblePage, 0, 0, 3072, 3072);
 	HidPage.Attach(&HiddenPage, 0, 0, 3072, 3072);
 

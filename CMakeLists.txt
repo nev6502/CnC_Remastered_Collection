@@ -15,8 +15,6 @@ set(src_win32lib
 	./RedAlert/WIN32LIB/BUFFER.CPP
 	./RedAlert/WIN32LIB/BUFFER.H
 	./RedAlert/WIN32LIB/BUFFGLBL.CPP
-	./RedAlert/WIN32LIB/DDRAW.CPP
-	./RedAlert/WIN32LIB/DDRAW.H
 	./RedAlert/WIN32LIB/DEFINES.H
 	./RedAlert/WIN32LIB/DELAY.CPP
 	./RedAlert/WIN32LIB/DESCMGMT.H
@@ -621,14 +619,9 @@ set(src_redalert
 )
 
 set(src_external
-	#Direct Draw Wrapper
-	./ddraw/ddrawwrapper/ddraw2.cpp
-	./ddraw/ddrawwrapper/DirectDrawClipperWrapper.cpp
-	./ddraw/ddrawwrapper/DirectDrawPaletteWrapper.cpp
-	./ddraw/ddrawwrapper/DirectDrawSurfaceWrapper.cpp
-	./ddraw/ddrawwrapper/DirectDrawWrapper.cpp
-	./ddraw/ddrawwrapper/DirectDrawWrapper.h
-	
+	#glew
+	./external/gl/glew.c
+
 	#libsmacker
 	./external/libsmacker/smacker.c
 	./external/libsmacker/smacker.h
@@ -644,8 +637,8 @@ set(src_external
 	./external/imgui/imgui.h
 	./external/imgui/imgui_draw.cpp
 	./external/imgui/imgui_widgets.cpp
-	./external/imgui/examples/imgui_impl_dx9.cpp
-	./external/imgui/examples/imgui_impl_dx9.h
+	./external/imgui/examples/imgui_impl_opengl3.cpp
+	./external/imgui/examples/imgui_impl_opengl3.h
 	./external/imgui/examples/imgui_impl_sdl.cpp
 	./external/imgui/examples/imgui_impl_sdl.h
 
@@ -712,12 +705,12 @@ set(src_external
 
 )
 
-add_definitions(-DCHEAT_KEYS -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
+add_definitions(-DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
 add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external})
 
 
 
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS")
-target_include_directories(RedAlert PRIVATE ./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
-target_link_libraries(RedAlert "d3d9.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/dxsdk/Lib/x86/d3dx9.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
+target_include_directories(RedAlert PRIVATE ./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
+target_link_libraries(RedAlert "opengl32.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/dxsdk/Lib/x86/d3dx9.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
