@@ -734,7 +734,6 @@ int Main_Menu(unsigned long )
 	bool display = true;
 	bool process = true;
 	while (process) {
-
 #ifdef WIN32
 		/*
 		** If we have just received input focus again after running in the background then

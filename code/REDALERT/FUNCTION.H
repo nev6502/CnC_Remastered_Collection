@@ -1096,6 +1096,10 @@ void Console_Tick(void);
 typedef void (*xcommand_t) (void);
 void	Cmd_AddCommand(char* cmd_name, xcommand_t function);
 
+
+#include <setjmp.h>
+extern jmp_buf select_game_jump;
+
 /*
 ** Achievement event. ST - 11/11/2019 11:39AM
 */

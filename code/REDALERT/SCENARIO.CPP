@@ -186,6 +186,7 @@ ScenarioClass::ScenarioClass(void) :
 	memset(GlobalFlags, '\0', sizeof(GlobalFlags));
 	memset(Views, '\0', sizeof(Views));
 // jmarshall
+	warpIntoMap = false;
 	Cmd_AddCommand("map", Cmd_Map);
 // jmarshall end
 }
@@ -3759,6 +3760,7 @@ void Cmd_Map(void) {
 		Console_Printf("usage: map <map_name>\n");
 		return;
 	}
-
+	Scen.warpIntoMap = true;
 	Start_Scenario(Cmd_Argv(1));
+	longjmp(select_game_jump, 1);
 }
