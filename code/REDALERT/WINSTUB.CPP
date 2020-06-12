@@ -69,6 +69,8 @@ SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
 
+bool renderConsole = false;
+
 void (*Misc_Focus_Loss_Function)(void) = nullptr;
 void (*Misc_Focus_Restore_Function)(void) = nullptr;
 
@@ -91,11 +93,16 @@ void Reset_Video_Mode(void) {
 
 }
 
-void Set_DD_Palette(void* palette)
+void Set_DD_Palette(void* palette, bool raShift)
 {
 	char* palette_get = (char*)palette; //CCPalette.Get_Data();
 	for (int j = 0; j < 768; j++) {
-		backbuffer_palette[j] = palette_get[j] << 2;
+		if (raShift) {
+			backbuffer_palette[j] = palette_get[j] << 2;
+		}
+		else {
+			backbuffer_palette[j] = palette_get[j];
+		}
 	}
 }
 
@@ -137,10 +144,17 @@ void Device_Present(void) {
 		Imgui_Dialog_Function();		
 	}
 
+	if (renderConsole) {
+		Console_Render();
+	}
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_GL_SwapWindow(game_window);
+
+	// Last thing we do is execute any console commands
+	Console_Tick();
 }
 
 
@@ -450,34 +464,7 @@ HANDLE DebugFile = INVALID_HANDLE_VALUE;
  *=============================================================================================*/
 void WWDebugString (char *string)
 {
-#if (0)
-	char outstr[256];
-
-	sprintf (outstr, "%s", string);
-
-	DWORD	actual;
-	if (DebugFile == INVALID_HANDLE_VALUE){
-		DebugFile = CreateFile("debug.txt", GENERIC_WRITE, 0,
-												NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	}else{
-		DebugFile = CreateFile("debug.txt", GENERIC_WRITE, 0,
-												NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	}
-
-	if (DebugFile != INVALID_HANDLE_VALUE){
-		SetFilePointer (DebugFile, 0, NULL, FILE_END);
-		WriteFile(DebugFile, outstr, strlen(outstr)+1, &actual, NULL);
-		CloseHandle (DebugFile);
-	}
-
-	OutputDebugString (string);
-#else	//(0)
-
-	string = string;
-//	debugprint( string );
-
-#endif	//(0)
-
+	Console_Printf(string);
 }
 
 
@@ -810,6 +797,20 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 				break;
 
 			case SDL_KEYDOWN:
+				if (event.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
+					renderConsole = !renderConsole;
+
+					if (renderConsole) {
+						ShowCursor(TRUE);
+						Hide_Mouse();
+					}
+					else {
+						ShowCursor(FALSE);
+						Show_Mouse();
+					}
+					break;
+				}
+
 				const Uint8* state = SDL_GetKeyboardState(NULL);
 
 				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
@@ -824,7 +825,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 				break;
 		}
 
-		if (Debug_Map)
+		if (Debug_Map || renderConsole)
 		{
 			ImGui_ImplSDL2_ProcessEvent(&event);
 		}

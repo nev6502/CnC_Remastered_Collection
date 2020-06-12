@@ -319,7 +319,8 @@ void WWMouseClass::Hide_Mouse()
 void WWMouseClass::Low_Show_Mouse(int x, int y)
 {
 	extern bool Debug_Map;
-	if (Debug_Map)
+	extern bool renderConsole;
+	if (Debug_Map || renderConsole)
 		return;
 
 	//

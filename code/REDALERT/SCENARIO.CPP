@@ -114,6 +114,8 @@ bool Is_Mission_Aftermath (char *file_name);
 MapScript* mapScript = nullptr;
 bool mapScriptPlayStart = false;
 
+void Cmd_Map(void);
+
 /***********************************************************************************************
  * ScenarioClass::ScenarioClass -- Constructor for the scenario control object.                *
  *                                                                                             *
@@ -183,6 +185,9 @@ ScenarioClass::ScenarioClass(void) :
 	strcpy(BriefingText, "");
 	memset(GlobalFlags, '\0', sizeof(GlobalFlags));
 	memset(Views, '\0', sizeof(Views));
+// jmarshall
+	Cmd_AddCommand("map", Cmd_Map);
+// jmarshall end
 }
 
 
@@ -316,9 +321,12 @@ bool ScenarioClass::Set_Global_To(int global, bool value)
 bool Start_Scenario(char * name, bool briefing)
 {
 //BG	Theme.Queue_Song(THEME_QUIET);
+	Console_Printf("Start_Scenario: %s\n", name);
+
 	Theme.Stop();
 	IsTanyaDead = SaveTanya;
 	if (!Read_Scenario(name)) {
+		Console_Printf("Failed to load scenario!\n");
 		return(false);
 	}
 
@@ -3739,4 +3747,18 @@ void Disect_Scenario_Name(char const * name, int & scenario, ScenarioPlayerType 
 	*/
 	var = SCEN_VAR_A;
 	var = ScenarioVarType((name[6] - 'A') + SCEN_VAR_A);
+}
+
+/*
+=============
+Cmd_Map
+=============
+*/
+void Cmd_Map(void) {
+	if (Cmd_Argc() != 2) {
+		Console_Printf("usage: map <map_name>\n");
+		return;
+	}
+
+	Start_Scenario(Cmd_Argv(1));
 }

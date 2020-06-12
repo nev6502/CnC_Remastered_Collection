@@ -112,6 +112,7 @@ set(src_redalert
 	./RedAlert/AIRCRAFT.CPP
 	./RedAlert/AIRCRAFT.H
 	./RedAlert/ANIM.CPP
+	./RedAlert/CONSOLE.CPP
 	./RedAlert/ANIM.H
 	./RedAlert/AUDIO.CPP
 	./RedAlert/AUDIO.H

@@ -56,7 +56,7 @@ void 		Wait_Blit(void);
 unsigned 	Get_Video_Hardware_Capabilities(void);
 
 void Wait_Vert_Blank(void);
-void Set_DD_Palette (void *palette);
+void Set_DD_Palette (void *palette, bool raShift = true);
 
 /*
 ** Pointer to function to call if we detect a focus loss

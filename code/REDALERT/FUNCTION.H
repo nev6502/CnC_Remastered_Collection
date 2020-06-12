@@ -1085,6 +1085,17 @@ void GlyphX_Debug_Print(const char *debug_text);
 void Disable_Uncompressed_Shapes (void);
 void Enable_Uncompressed_Shapes (void);
 
+int Cmd_Argc();
+char* Cmd_Argv(int index);
+
+void Console_Init(void);
+void Console_Render(void);
+void Console_Printf(const char* fmt, ...);
+void Console_Tick(void);
+
+typedef void (*xcommand_t) (void);
+void	Cmd_AddCommand(char* cmd_name, xcommand_t function);
+
 /*
 ** Achievement event. ST - 11/11/2019 11:39AM
 */
