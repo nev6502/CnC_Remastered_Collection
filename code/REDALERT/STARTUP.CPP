@@ -560,7 +560,7 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 			ImGui_ImplSDL2_InitForD3D(game_window);
 			ImGui_ImplOpenGL3_Init();
 
-			io.Fonts->AddFontFromFileTTF("Roboto-Medium.ttf", 16.0f);
+			io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f);
 // jmarshall end
 
 			if (!video_success) {
