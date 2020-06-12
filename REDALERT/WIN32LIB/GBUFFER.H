@@ -1192,37 +1192,10 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
  *=========================================================================*/
 inline VOID GraphicViewPortClass::Fill_Rect(int sx, int sy, int dx, int dy, unsigned char color)
 {
-	void Nearest_Fill(unsigned char source, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans);
-	RECT	dest_rectangle;
-
-	dest_rectangle.left = sx + XPos;
-	dest_rectangle.top = sy + YPos;
-	dest_rectangle.right = dx + XPos;
-	dest_rectangle.bottom = dy + YPos;
-
-	if (dest_rectangle.left < XPos) {
-		dest_rectangle.left = XPos;
+	if (Lock()) {
+		Buffer_Fill_Rect(this, sx, sy, dx, dy, color);
+		Unlock();
 	}
-
-	if (dest_rectangle.right >= Width + XPos) {
-		dest_rectangle.right = Width + XPos - 1;
-	}
-
-	if (dest_rectangle.top < YPos) {
-		dest_rectangle.top = YPos;
-	}
-
-	if (dest_rectangle.bottom >= Height + YPos) {
-		dest_rectangle.bottom = Height + YPos - 1;
-	}
-
-	if (dest_rectangle.left >= dest_rectangle.right)  return;
-	if (dest_rectangle.top >= dest_rectangle.bottom) return;
-
-	dest_rectangle.right++;
-	dest_rectangle.bottom++;
-
-	Nearest_Fill(color, (unsigned char *)Get_Graphic_Buffer()->GetMemoryBuffer(), dest_rectangle.left, dest_rectangle.top, Width, dest_rectangle.right - dest_rectangle.left, dest_rectangle.bottom - dest_rectangle.top, false);
 }
 
 
