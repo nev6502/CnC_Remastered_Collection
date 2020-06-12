@@ -128,7 +128,7 @@ void Device_Present(void) {
 		style.FramePadding = ImVec2(0, 0);
 		ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
 		ImGui::SetNextWindowPos(ImVec2(0, 0));		
-		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar);
+		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
 			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
 		ImGui::End();		
