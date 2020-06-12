@@ -137,6 +137,8 @@
 #include <assert.h>
 #include "iconcach.h"
 
+extern unsigned char* backbuffer_data_raw;
+
 #ifndef FUNCTION_H
 
 __forceinline void Nearest_Fill(unsigned char source, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans)
@@ -414,13 +416,13 @@ class GraphicBufferClass : public GraphicViewPortClass, public BufferClass {
 			if (!rawCpuBuffer)
 				return (unsigned char* )Buffer;
 
-			return rawCpuBuffer;
+			return backbuffer_data_raw;
 		}
 // jmarshall
 		void* GetMemoryBuffer(void) {
 			if (!rawCpuBuffer)
 				return Buffer;
-			return rawCpuBuffer;
+			return backbuffer_data_raw;
 		}		
 // jmarshall end
 

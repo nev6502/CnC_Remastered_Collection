@@ -502,7 +502,7 @@ BOOL GraphicBufferClass::Lock(void)
 		return(TRUE);
 	}
 
-	Offset = (unsigned long)rawCpuBuffer; // 32bit to 64bit issue here.
+	Offset = (unsigned long)backbuffer_data_raw; // 32bit to 64bit issue here.
 	//Pitch = Width;
 
 	LockCount++;		// increment count so we can track if
@@ -528,7 +528,7 @@ BOOL GraphicBufferClass::Lock(void)
 
 BOOL GraphicBufferClass::Unlock(void)
 {
-	Video_Set_Data((unsigned char *)Get_Graphic_Buffer()->GetMemoryBuffer(), Width, Height);
+	//Video_Set_Data((unsigned char *)Get_Graphic_Buffer()->GetMemoryBuffer(), Width, Height);
 
 	//
 	// If there is no lock count or this is not a direct draw surface

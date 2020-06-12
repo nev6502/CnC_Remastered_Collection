@@ -62,17 +62,13 @@
 
 GLuint backbuffer_texture = -1;
 byte* backbuffer_data;
-byte* backbuffer_data_raw;
+unsigned char* backbuffer_data_raw;
 byte backbuffer_palette[768];
 HWND MainWindow;
 SurfaceMonitorClass AllSurfaces;
 SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
-
-void Video_Set_Data(unsigned char* buffer, int width, int height) {
-	memcpy(backbuffer_data_raw, buffer, width * height);
-}
 
 void (*Misc_Focus_Loss_Function)(void) = nullptr;
 void (*Misc_Focus_Restore_Function)(void) = nullptr;

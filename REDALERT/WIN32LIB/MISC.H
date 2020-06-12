@@ -50,7 +50,6 @@
 /*=========================================================================*/
 void 		Process_DD_Result(HRESULT result, int display_ok_msg);
 BOOL 		Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel);
-void Video_Set_Data(unsigned char* buffer, int width, int height);
 void 		Reset_Video_Mode(void);
 unsigned 	Get_Free_Video_Memory(void);
 void 		Wait_Blit(void);
