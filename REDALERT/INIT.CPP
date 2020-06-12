@@ -1391,6 +1391,10 @@ bool Select_Game(bool fade)
 				*/
 				case SEL_INTRO:
 					Theme.Fade_Out();
+
+					Show_Who_Was_Responsible();
+
+					/*
 					if (Debug_Flag) {
 						Play_Intro(Debug_Flag);
 					} else {
@@ -1403,10 +1407,13 @@ bool Select_Game(bool fade)
 						Play_Movie(VQ_SIZZLE2, THEME_NONE, true);
 //						Play_Movie(VQ_INTRO_MOVIE, THEME_NONE, false);		// has transitino picture to briefing
 					}
+					*/
+
 					Theme.Queue_Song(THEME_CRUS);
 					display = true;
 					fade = true;
 					selection = SEL_NONE;
+
 					break;
 
 				/*

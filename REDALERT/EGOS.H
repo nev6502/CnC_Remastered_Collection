@@ -40,9 +40,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 class EgoClass {
-
 	public:
-
 		EgoClass (int x, int y, char *text, TextPrintType flags);
 		~EgoClass ();
 
@@ -50,8 +48,7 @@ class EgoClass {
 		void Render (void);
 		void Wipe (GraphicBufferClass *background);
 
-
-		char				*Text;
+		char			*Text;
 		int				XPos;
 		int				YPos;
 		TextPrintType 	Flags;

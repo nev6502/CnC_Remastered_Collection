@@ -393,7 +393,8 @@ CELL Coord_Cell(COORDINATE coord);
 //#include	"nullmgr.h"			// Modem connection manager
 #include	"readline.h"
 #include	"vortex.h"
-#include "egos.h"
+#include    "egos.h"
+
 #ifdef WIN32
 //#include	"pcx.h"
 #endif
@@ -1071,8 +1072,6 @@ template <>class DynamicVectorClass<EventChoiceClass *>;
 extern DynamicVectorClass<EventChoiceClass *> xxx2;
 template <>class DynamicVectorClass<ActionChoiceClass *>;
 extern DynamicVectorClass<ActionChoiceClass *> xxx3;
-template <>class DynamicVectorClass<EgoClass *>;
-extern DynamicVectorClass<EgoClass *> whatever;
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags);
 void Device_Present(void);

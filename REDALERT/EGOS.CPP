@@ -36,9 +36,10 @@
  *-----------------------------------------------------------------------------------*
  * Functions:                                                                        *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
-#if(0)
+
 //PG_TO_FIX
-#include 	"function.h"
+#include "function.h"
+#include "memflag.h"
 
 /*
 ** List of Ego Class instances
@@ -344,14 +345,21 @@ void Set_Pal(char *palette)
  * HISTORY:                                                                                    *
  *    9/10/96 0:16AM ST : Created                                                              *
  *=============================================================================================*/
-void Slide_Show (int slide, int frame)
+void Copy_Palette(PaletteClass const & source, PaletteClass & destination)
+{
+	for (int index = 0; index < source.COLOR_COUNT; index++) {
+		destination[index] = source[index];
+	}
+}
+
+void Slide_Show(int slide, int frame)
 {
 
 	/*
 	** Temprary storage to save CCPalette to
 	*/
-	char save_palette[256*3];
-
+	//char save_palette[256*3];
+	PaletteClass save_palette;
 
 	if (frame >= 1 && frame <=4){
 		/*
@@ -379,9 +387,9 @@ void Slide_Show (int slide, int frame)
 		*/
 		for (int index = 0 ; index < 256 ; index++ ){
 			if (PaletteLUT[index]) {
-				ComboPalPtr[index*3] = SlidePals[slide][index*3];
-				ComboPalPtr[index*3+1] = SlidePals[slide][index*3+1];
-				ComboPalPtr[index*3+2] = SlidePals[slide][index*3+2];
+				ComboPalPtr[index * 3] = SlidePals[slide][index * 3];
+				ComboPalPtr[index * 3 + 1] = SlidePals[slide][index*3 + 1];
+				ComboPalPtr[index * 3 + 2] = SlidePals[slide][index*3 + 2];
 			}
 		}
 		return;
@@ -392,15 +400,21 @@ void Slide_Show (int slide, int frame)
 		/*
 		** Fade up the picture in the background. The text colors never fade.
 		*/
-		memcpy (save_palette, CCPalette, sizeof(save_palette));
+		Copy_Palette( CCPalette, save_palette );
+
 		//CCPalette.Partial_Adjust (MIN (6*(frame-5), 255), ComboPalette, PaletteLUT);
-		CCPalette.Partial_Adjust (MIN ((255/FADE_DELAY)*(frame-10), 255), ComboPalette, PaletteLUT);
-		Set_Pal ( (char *) &CCPalette);
-		if (frame != 9+FADE_DELAY){
-			memcpy (CCPalette, save_palette, sizeof(save_palette));
-		}else{
-			memcpy (CCPalette, CurrentPalette, sizeof (CCPalette));
+		int ratio = MIN( ( 255 / FADE_DELAY - 1 ) * (frame - 10), 255 );
+		CCPalette.Partial_Adjust ( ratio, ComboPalette, PaletteLUT);
+
+		//CCPalette.Partial_Adjust( 255, ComboPalette, PaletteLUT );
+
+		Set_Pal ( (char *) CCPalette.Get_Data() );
+
+		if (frame != 9+FADE_DELAY)
+		{
+			Copy_Palette( save_palette, CCPalette  );
 		}
+
 		return;
 	}
 
@@ -409,16 +423,23 @@ void Slide_Show (int slide, int frame)
 		/*
 		** Fade down the picture in the background. The text colors never fade.
 		*/
-		memcpy (save_palette, CCPalette, sizeof(save_palette));
-		CCPalette.Partial_Adjust (MIN ((255/FADE_DELAY)*(frame-FRAME_DELAY), 255), PaletteLUT);
-		if (frame != FRAME_DELAY+FADE_DELAY-1){
-			Set_Pal ( (char *) &CCPalette);
-			memcpy (CCPalette, save_palette, sizeof(save_palette));
+		Copy_Palette( CCPalette, save_palette );
+
+		CCPalette.Partial_Adjust ( 0, PaletteLUT );
+
+		int ratio = MIN( 255 / ( (FRAME_DELAY + FADE_DELAY) - FRAME_DELAY ) * (frame - FRAME_DELAY), 255);
+		CCPalette.Partial_Adjust( 255 - ratio, ComboPalette, PaletteLUT);
+		//CCPalette.Partial_Adjust( 0, ComboPalette, PaletteLUT );
+
+		if (frame != FRAME_DELAY+FADE_DELAY-1)
+		{
+			Set_Pal ( (char *) CCPalette.Get_Data() );
+			Copy_Palette( save_palette, CCPalette );
 		}else{
 			/*
 			** If this is the last fade down frame then zero the picture palette entries.
 			*/
-			unsigned char *ccpalptr = (unsigned char*)CCPalette;
+			unsigned char *ccpalptr = (unsigned char*)&CCPalette;
 			for (int index = 0 ; index < 256 ; index++){
 				if (PaletteLUT[index]){
 					ccpalptr[index*3] = 0;
@@ -426,15 +447,13 @@ void Slide_Show (int slide, int frame)
 					ccpalptr[index*3+2] = 0;
 				}
 			}
-			Set_Pal ( (char *) &CCPalette);
+
+			Set_Pal ( (char *) CCPalette.Get_Data() );
 		}
 
 	}
 
 }
-
-
-
 
 /***********************************************************************************************
  * Show_Who_Was_Responsible -- Main function to print the credits.                             *
@@ -691,25 +710,16 @@ void Show_Who_Was_Responsible (void)
 	/*
 	** Load the reference palette for the font.
 	*/
-	//Load_Title_Page(true);
-//#ifdef WIN32
-//	Load_Picture("EGOPAL.CPS", SysMemPage, SysMemPage, CCPalette, BM_DEFAULT);
-//#else	//WIN32
-//	Load_Picture("EGOPAL.CPS", HidPage, HidPage, CCPalette, BM_DEFAULT);
-//#endif	//WIN32
-
-
 	CCFileClass("EGOPAL.PAL").Read(&CCPalette, sizeof(CCPalette));
 
 	/*
 	** Copy the font palette entries into the combo palette.
 	*/
-	PaletteClass credit_palette;
-	ComboPalPtr = (unsigned char *) &ComboPalette;
-	unsigned char *creditpal_ptr = (unsigned char *) &credit_palette;
-	memcpy (ComboPalette, CCPalette, sizeof (ComboPalette));
+	Copy_Palette( CCPalette, ComboPalette );
+	ComboPalPtr = (unsigned char*)&ComboPalette;
 
-	for (index = 0 ; index < 256 ; index++ ){
+	for (index = 0 ; index < 256 ; index++ )
+	{
 		if (PaletteLUT[index]) {
 			ComboPalPtr[index*3] = 0;
 			ComboPalPtr[index*3+1] = 0;
@@ -726,33 +736,25 @@ void Show_Who_Was_Responsible (void)
 	/*
 	** Set the font palette.
 	*/
-	memcpy ( CCPalette, ComboPalette, sizeof (ComboPalette) );
+	Copy_Palette( ComboPalette, CCPalette );
 	CCPalette.Set();
 
 	/*
 	** Loop through and load up all the slideshow pictures
 	*/
-	for (index = 0 ; index < NUM_SLIDES ; index++){
-#ifdef WIN32
+	for (index = 0 ; index < NUM_SLIDES ; index++)
+	{
 		SlideBuffers[index] = new GraphicBufferClass;
 		SlideBuffers[index]->Init (SeenBuff.Get_Width(), SeenBuff.Get_Height(), NULL , 0 , (GBC_Enum)0);
-		Load_Title_Screen(&SlideNames[index][0], SlideBuffers[index], (unsigned char*) &SlidePals[index][0]);
-#else	//WIN32
-		SlideBuffers[index] = new GraphicBufferClass (SeenBuff.Get_Width(), SeenBuff.Get_Height(), (void*)NULL);
-		Load_Picture(&LoresSlideNames[index][0], *SlideBuffers[index], *SlideBuffers[index], (unsigned char *)&SlidePals[index][0], BM_DEFAULT);
-#endif	//WIN32
+		Load_Title_Screen( &SlideNames[index][0], SlideBuffers[index], (unsigned char*) &SlidePals[index][0] );
 	}
 
 	/*
 	** Create a new graphic buffer to restore the background from. Initialise it to black so
 	** we can start scrolling before the first slideshow picture is blitted.
 	*/
-#ifdef WIN32
 	BackgroundPage = new GraphicBufferClass;
-	BackgroundPage->Init (SeenBuff.Get_Width(), SeenBuff.Get_Height(), NULL , 0 , (GBC_Enum)(GBC_VIDEOMEM));
-#else	//WIN32
-	BackgroundPage = new GraphicBufferClass (SeenBuff.Get_Width(), SeenBuff.Get_Height(), (void*)NULL );
-#endif	//WIN32
+	BackgroundPage->Init (SeenBuff.Get_Width(), SeenBuff.Get_Height(), NULL , 0 , (GBC_Enum)0);
 
 	SeenBuff.Blit(*BackgroundPage);
 
@@ -782,26 +784,15 @@ void Show_Who_Was_Responsible (void)
 
 	Hide_Mouse();
 
-	/*
-	** Save the priority of this process so we can change it back later
-	*/
-	//DWORD process_priority = GetPriorityClass(GetCurrentProcess());
+	key = KN_NONE;
 
 	/*
 	** Main scrolling loop.
 	** Keeps going until all the EgoClass objects are deleted or esc is pressed.
 	*/
-	while ( EgoList.Count() ){
-
+	while ( EgoList.Count() )
+	{
 		frame++;
-
-		/*
-		** Once we have been running for a few frames, and Windows has time to do its virtual
-		** memory stuff, increase our priority level.
-		*/
-		//if (frame == 30){
-		//	SetPriorityClass (GetCurrentProcess() , HIGH_PRIORITY_CLASS);
-		//}
 
 		/*
 		** Update the slideshow frame and switch to the next picture if its time.
@@ -823,24 +814,17 @@ void Show_Who_Was_Responsible (void)
 		*/
 		Slide_Show (slide_number, picture_frame);
 
-
 		/*
 		** Scroll the text. If any text goes off the top then delete that object.
 		*/
-#ifndef WIN32
-		scroll_now = !scroll_now;
-		if (scroll_now){
-#endif	//WIN32
-			for (i=EgoList.Count()-1 ; i>=0 ; i--){
-				EgoList[i]->Wipe(BackgroundPage);
-				if ( EgoList[i]->Scroll(1) ){
-					EgoList.Delete(i);
-					break;
-				}
+		for (i=EgoList.Count()-1 ; i>=0 ; i--){
+			EgoList[i]->Wipe(BackgroundPage);
+			if ( EgoList[i]->Scroll(1) ){
+				EgoList.Delete(i);
+				break;
 			}
-#ifndef WIN32
 		}
-#endif	//WIN32
+
 		/*
 		** Render all the text strings in their new positions.
 		*/
@@ -859,11 +843,6 @@ void Show_Who_Was_Responsible (void)
 		** Stop calling Theme.AI after a while so a different song doesnt start playing
 		*/
 		Call_Back();
-//		if (frame <1000 ){
-//			Theme.AI();
-//		}else{
-//			Sound_Callback();
-//		}
 
 		/*
 		** Kill any spare time before blitting the hid page forward.
@@ -874,56 +853,35 @@ void Show_Who_Was_Responsible (void)
 		** Blit all but the top and bottom of the hid page. This is beacuse the text print doesn't
 		** clip vertically and looks ugly when it suddenly appears and disappears.
 		*/
-#ifndef WIN32
-		Wait_Vert_Blank(VertBlank);
-		//Vsync();
-#endif	//WIN32
-		HidPage.Blit(SeenBuff, 0, 8*RESFACTOR, 0, 8*RESFACTOR, SeenBuff.Get_Width(), SeenBuff.Get_Height() - 16*RESFACTOR, false);
-
-		/*
-		** Try and prevent Win95 from swapping out pictures we havnt used yet.
-		*/
-#ifdef WIN32
-		if (frame && 3 == 3){
-			for (i=slide_number+1 ; i<NUM_SLIDES ; i++){
-				if ( !SlideBuffers[i]->Get_IsDirectDraw() ){
-					Force_VM_Page_In ((void*)SlideBuffers[i]->Get_Offset(), SeenBuff.Get_Width() * SeenBuff.Get_Height() );
-				}
-			}
-		}
-#endif	//WIN32
+		HidPage.Blit(SeenBuff, 0, 8 * RESFACTOR, 0, 8*RESFACTOR, SeenBuff.Get_Width(), SeenBuff.Get_Height() - 16* RESFACTOR, false);
 
 		/*
 		** If user hits escape then break.
 		*/
-		key = KN_NONE;
-		if (Keyboard->Check()){
+
+		KeyNumType _key = KN_NONE;
+		int _flags;
+		WWSDL_ProcessEvents(_key, _flags);
+
+		key = Keyboard->Check();
+
+		if (key != 0)
+		{
 			key = Keyboard->Get();
+
 			if (key == KN_ESC){
 				break;
 			}
-#if (0)
-			if (key == KN_Z){
-				speed--;
-				if (speed <1 ) speed=1;
-				time = TickCount;
-				frame = 0;
-			}
-			if (key == KN_X){
-				speed++;
-				time = TickCount;
-				frame = 0;
-			}
-#endif	//(0)
-
 		}
-
 	}
 
-	if (key == KN_ESC){
+	if (key == KN_ESC)
+	{
 		Theme.Fade_Out();
 		BlackPalette.Set(TIMER_SECOND*2, Call_Back);
-	}else{
+	}
+	else
+	{
 		/*
 		** Wait for the picture to fade down
 		*/
@@ -934,7 +892,7 @@ void Show_Who_Was_Responsible (void)
 			frame++;
 			picture_frame++;
 
-			Slide_Show (slide_number, picture_frame);
+			Slide_Show(slide_number, picture_frame);
 
 			Call_Back();
 //			Sound_Callback();		//Theme.AI();
@@ -970,8 +928,6 @@ void Show_Who_Was_Responsible (void)
 
 	EgoList.Clear();
 }
-
-#endif
 
 
 
