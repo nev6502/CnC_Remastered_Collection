@@ -1002,7 +1002,6 @@ void Do_Win(void)
 		/*
 		** If this scenario is flagged as ending the game then print the credits and exit.
 		*/
-#if (0)//PG
 		if (Scen.IsEndOfGame) {
 			if (PlayerPtr->ActLike == HOUSE_USSR) {
 				Play_Movie(VQ_SOVFINAL);
@@ -1017,7 +1016,7 @@ void Do_Win(void)
 #endif
 			return;
 		}
-#endif
+
 		/*
 		** Hack section.  If it's allied scenario 10, variation A, then skip the
 		** score and map selection, don't increment scenario, and set it to
