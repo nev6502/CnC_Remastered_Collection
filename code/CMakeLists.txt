@@ -678,7 +678,7 @@ set(src_external
 	./external/lua/lopcodes.h
 	./external/lua/loslib.c
 	./external/lua/lparser.c
-	./external/lua/lparser.h
+        ./external/lua/lparser.h
 	./external/lua/lprefix.h
 	./external/lua/lstate.c
 	./external/lua/lstate.h
@@ -704,10 +704,19 @@ set(src_external
 
 )
 
-add_definitions(-DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 
 if (MSVC)
-set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.." )
-target_include_directories(RedAlert PRIVATE ./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
-target_link_libraries(RedAlert "opengl32.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
+    add_definitions(-DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
+    set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.." )
+    target_include_directories(RedAlert PRIVATE ./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
+    target_link_libraries(RedAlert "opengl32.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
 endif(MSVC)
+
+
+if (UNIX)
+    add_definitions(-DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DTRUE_FALSE_DEFINED -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
+    set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert"  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.." )
+    target_include_directories(RedAlert PRIVATE ./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./external/openal/include)
+    target_link_libraries(RedAlert "opengl32"  "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
+endif(UNIX)
+
