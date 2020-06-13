@@ -32,7 +32,7 @@
 */
 
 #include <stdint.h>
-#include "gbuffer.h"
+#include "GBUFFER.H"
 #include "MISC.H"
 #include "WSA.H"
 
