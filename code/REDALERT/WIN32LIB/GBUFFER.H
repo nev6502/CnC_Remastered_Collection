@@ -140,45 +140,6 @@
 extern unsigned char* backbuffer_data_raw;
 
 #ifndef FUNCTION_H
-
-__forceinline void Nearest_Fill(unsigned char source, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans)
-{
-	for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			int _x = x;
-			int _y = y;
-			int destPos = (destWidth * (_y + (destY))) + (_x + (destX));
-
-			dest[destPos] = source;
-		}
-	}
-}
-
-__forceinline void Nearest_CopyImage(unsigned char* source, int sourceX, int sourceY, int sourceWidth, int sourceHeight, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, bool trans)
-{
-	for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			int _x = x;
-			int _y = y;
-			int destPos = (destWidth * (_y + (destY))) + (_x + (destX));
-			int sourcePos = (sourceWidth * (_y + (sourceY))) + (_x + (sourceX));
-
-			if (sourcePos > sourceWidth * sourceHeight)
-				return;
-
-			if (destPos < 0)
-				return;
-
-			if (source[sourcePos] != 0 || trans == false)
-				dest[destPos] = source[sourcePos];
-		}
-	}
-}
-
 //#pragma off (unreferenced)
 
 #ifndef BITMAPCLASS
@@ -352,9 +313,6 @@ class GraphicViewPortClass {
 		inline BOOL 	Lock ();
 		inline BOOL 	Unlock();
 		inline int		Get_LockCount();
-
-		// Member to blit using direct draw access to hardware blitter
-		HRESULT DD_Linear_Blit_To_Linear ( GraphicViewPortClass &dest, int source_x, int source_y, int dest_x, int dest_y, int width	, int height, BOOL mask );
 
 		/*===================================================================*/
 		/* Define functions to attach the viewport to a graphicbuffer			*/
@@ -793,22 +751,15 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int x_pix
 {
 	HRESULT		return_code=0;
 
-	if ( IsDirectDraw && dest.IsDirectDraw ){
-	return(DD_Linear_Blit_To_Linear( dest, XPos+x_pixel, YPos+y_pixel
-								, dest.Get_XPos()+dx_pixel, dest.Get_YPos()+dy_pixel
-								, pixel_width, pixel_height, trans));
-	} else {
-
-		if (Lock()){
-			if (dest.Lock()){
-				return_code=(Linear_Blit_To_Linear(this, &dest, x_pixel, y_pixel
-														, dx_pixel, dy_pixel
-														, pixel_width, pixel_height, trans));
-			}
-			dest.Unlock();
+	if (Lock()) {
+		if (dest.Lock()) {
+			return_code = (Linear_Blit_To_Linear(this, &dest, x_pixel, y_pixel
+				, dx_pixel, dy_pixel
+				, pixel_width, pixel_height, trans));
 		}
-		Unlock();
+		dest.Unlock();
 	}
+	Unlock();
 
 	return ( return_code );
 }
@@ -830,22 +781,15 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int dx, i
 	HRESULT		return_code=0;
 
 
-	if ( IsDirectDraw && dest.IsDirectDraw ){
-	return(DD_Linear_Blit_To_Linear( dest, XPos, YPos
-								, dest.Get_XPos()+dx, dest.Get_YPos()+dy
-								, Width, Height, trans));
-	} else {
-
-		if (Lock()){
-			if (dest.Lock()){
-				return_code=(Linear_Blit_To_Linear(this, &dest, 0, 0
-														, dx, dy
-														, Width, Height, trans));
-			}
-			dest.Unlock();
+	if (Lock()) {
+		if (dest.Lock()) {
+			return_code = (Linear_Blit_To_Linear(this, &dest, 0, 0
+				, dx, dy
+				, Width, Height, trans));
 		}
-		Unlock();
+		dest.Unlock();
 	}
+	Unlock();
 
 	return (return_code);
 
@@ -868,24 +812,15 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, BOOL tran
 	HRESULT		return_code=0;
 
 
-	if ( IsDirectDraw && dest.IsDirectDraw ){
-		return (DD_Linear_Blit_To_Linear(dest, XPos, YPos
-			, dest.Get_XPos(), dest.Get_YPos()
-			, MAX(Width, dest.Get_Width())
-			, MAX(Height, dest.Get_Height())
-			, trans));
-	} else {
-
-		if (Lock()){
-			if (dest.Lock()){
-				return_code=(Linear_Blit_To_Linear(this, &dest, 0, 0
-														, 0, 0
-														, Width, Height, trans));
-			}
-			dest.Unlock();
+	if (Lock()) {
+		if (dest.Lock()) {
+			return_code = (Linear_Blit_To_Linear(this, &dest, 0, 0
+				, 0, 0
+				, Width, Height, trans));
 		}
-		Unlock();
+		dest.Unlock();
 	}
+	Unlock();
 
 	return (return_code);
 
