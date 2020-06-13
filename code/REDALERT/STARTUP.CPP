@@ -549,24 +549,6 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 				video_success = TRUE;
 			}
 
-// jmarshall
-			IMGUI_CHECKVERSION();
-			ImGui::CreateContext();
-			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-			//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-			// Setup Dear ImGui style
-			ImGui::StyleColorsDark();
-			//ImGui::StyleColorsClassic();
-
-			// Setup Platform/Renderer bindings
-			ImGui_ImplSDL2_InitForD3D(game_window);
-			ImGui_ImplOpenGL3_Init();
-
-			io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f);	
-// jmarshall end
-
 			if (!video_success) {
 				MessageBox(MainWindow, TEXT_VIDEO_ERROR, TEXT_SHORT_TITLE, MB_ICONEXCLAMATION|MB_OK);
 				if (WindowsTimer) delete WindowsTimer;

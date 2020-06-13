@@ -106,7 +106,7 @@ void Set_DD_Palette(void* palette, bool raShift)
 	}
 }
 
-void Device_Present(void) {
+void ImGui_NewFrame(void) {
 	ImGuiIO& io = ImGui::GetIO();
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -116,6 +116,10 @@ void Device_Present(void) {
 	ImGui::NewFrame();
 
 	ImGui_ImplSDL2_NewFrame(game_window);
+}
+
+void Device_Present(void) {
+
 
 	// Rasterize the palette.
 	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
@@ -155,6 +159,8 @@ void Device_Present(void) {
 
 	// Last thing we do is execute any console commands
 	Console_Tick();
+
+	ImGui_NewFrame();
 }
 
 
@@ -538,6 +544,24 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glewInit();
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplSDL2_InitForD3D(game_window);
+	ImGui_ImplOpenGL3_Init();
+
+	io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f);
+
+	ImGui_NewFrame();
 }
 
 
