@@ -15,7 +15,7 @@
  */
 
 #include <stdint.h>
-#include "GBUFFER.H"
+#include "gbuffer.h"
 #include "misc.h"
 
 long __cdecl Buffer_To_Buffer(GraphicViewPortClass* vp, int x, int y, int w, int h, void* buffer, int length)

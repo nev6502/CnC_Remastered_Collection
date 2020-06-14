@@ -41,10 +41,7 @@
 
 //#include	"function.h"
 //#include	"ems.h"
-#ifdef WINDOWS
 #include <keyboard.h>
-#endif
-
 #include "dipthong.h"
 
 /***************************************************************************

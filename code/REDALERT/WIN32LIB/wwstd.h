@@ -48,9 +48,8 @@
 #include <windows.h>
 #include <windowsx.h>
 #else
-// THIS BLOCK IS WHOLE WAYS OF WRONG
-// #include <windows.h>
-// #include <windowsx.h>
+#include <windows.h>
+#include <windowsx.h>
 #endif
 
 // Note: SKB 4/11/94

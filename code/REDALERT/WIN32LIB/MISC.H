@@ -34,18 +34,13 @@
 #ifndef MISC_H
 #define MISC_H
 
-
-#ifndef _WIN32 // Denzil 6/2/98 Watcom 11.0 complains without this check
-// NO! This is wtong
-//#define _WIN32
-#endif // _WIN32
-
-#ifdef WIN32
 #define WIN32_LEAN_AND_MEAN	// eliminates unecessary definitions in windows.h
+#ifndef _WIN32 // Denzil 6/2/98 Watcom 11.0 complains without this check
+#define _WIN32
+#endif // _WIN32
 #include <windows.h>
 #include <windowsx.h>
 //#include <ddraw.h>
-#endif
 
 /*========================= C++ Routines ==================================*/
 
