@@ -2,7 +2,6 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/CnC_Remastered_Collection/config
-/.vs/CnC_Remastered_Collection/v16/ipch/AutoPCH
-/.vs/CnC_Remastered_Collection/v16
-/out/build/x86-Debug
+/.vs/
+/out/
+/code/out/

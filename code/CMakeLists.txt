@@ -710,6 +710,6 @@ add_definitions(-DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
 add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external})
 
-set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.." )
+set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../../bin" )
 target_include_directories(RedAlert PRIVATE ./external/devil/;./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
 target_link_libraries(RedAlert "opengl32.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/devil/DevIL.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x86/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x86-Release/OpenAL32.lib")
