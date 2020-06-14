@@ -34,11 +34,13 @@
 
 #include <gbuffer.h>
 
+#define MAX_CURSOR_FRAMES			221
+
 class WWMouseClass {
 	public:
 		WWMouseClass(GraphicViewPortClass *scr, int mouse_max_width, int mouse_max_height);
 		~WWMouseClass();
-		void *Set_Cursor(int xhotspot, int yhotspot, void *cursor);
+		void *Set_Cursor(int xhotspot, int yhotspot, int cursor);
 		void Process_Mouse(void);
 		void Hide_Mouse(void);
 		void Show_Mouse(void);
@@ -77,6 +79,8 @@ class WWMouseClass {
 		char* Get_Image_Buff(void) { return MouseCursor; }
 		void* Get_Frame_Pointer() { return PrevCursor; }
 		void Set_Frame_Pointer(void* frame) { PrevCursor = (char *)frame; }
+
+		void RenderMouse(void);
 // jmarshall end
 	private:
 		enum 	{
@@ -120,7 +124,12 @@ class WWMouseClass {
 
 		CRITICAL_SECTION		MouseCriticalSection;  // Control for mouse re-enterancy
 		unsigned					TimerHandle;
-
+// jmarshall
+private:
+	struct	Image_t*			cursor_frames[MAX_CURSOR_FRAMES];
+	struct  Image_t*			current_cursor;
+	bool	isMouseVisible;
+// jmarshall end
 };
 
 void __cdecl Mouse_Shadow_Buffer(WWMouseClass& mouse, GraphicViewPortClass& viewport, void* buffer, int x_pos, int y_pos, int hspot_x, int hspot_y, BOOL save);
@@ -134,7 +143,7 @@ void Show_Mouse(bool clearPrevious = true);
 void Conditional_Hide_Mouse(int x1, int y1, int x2, int y2);
 void Conditional_Show_Mouse(void);
 int Get_Mouse_State(void);
-void *Set_Mouse_Cursor(int hotx, int hoty, void *cursor);
+void *Set_Mouse_Cursor(int hotx, int hoty, int cursor);
 int Get_Mouse_X(void);
 int Get_Mouse_Y(void);
 

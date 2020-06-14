@@ -446,6 +446,9 @@ bool Init_Game(int , char * [])
 extern bool Get_Broadcast_Addresses (void);
 #endif
 
+
+jmp_buf select_game_jump;
+
 /***********************************************************************************************
  * Select_Game -- The game's main menu                                                         *
  *                                                                                             *
@@ -515,6 +518,13 @@ bool Select_Game(bool fade)
 	int cdcheck = 0;
 	bool cs = Is_Counterstrike_Installed();
 #endif
+	
+	setjmp(select_game_jump);
+
+	if (Scen.warpIntoMap) {
+		Scen.warpIntoMap = false;
+		return true;
+	}	
 
 //	#ifndef DVD // Denzil - We want the menu screen			ajw No we don't
 //	if (Special.IsFromInstall) {
@@ -3399,7 +3409,7 @@ static void Init_Mouse(void)
 	if (MouseInstalled) {
 		void const * temp_mouse_shapes = MFCD::Retrieve("MOUSE.SHP");
 		if (temp_mouse_shapes) {
-			Set_Mouse_Cursor(0, 0, Extract_Shape(temp_mouse_shapes, 0));
+			Set_Mouse_Cursor(0, 0, 0);
 			while (Get_Mouse_State() > 1) Show_Mouse();
 		}
 	} else {

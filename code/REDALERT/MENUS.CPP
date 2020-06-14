@@ -33,6 +33,7 @@
  *   Main_Menu -- Menu processing                                                              *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include "imgui.h"
 #include "function.h"
 #ifdef WIN32
 #include "ccdde.h"
@@ -734,7 +735,6 @@ int Main_Menu(unsigned long )
 	bool display = true;
 	bool process = true;
 	while (process) {
-
 #ifdef WIN32
 		/*
 		** If we have just received input focus again after running in the background then

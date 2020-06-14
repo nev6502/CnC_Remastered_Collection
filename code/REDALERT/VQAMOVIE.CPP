@@ -101,8 +101,6 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 	int currentFrame = 0;	
 	bool shouldSampleAudio = true;
 
-	return 0;
-
 	smk_first(vqaHandle->smacker_video);
 
 	while (currentFrame < vqaHandle->frame_count) {
@@ -138,6 +136,7 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 		//}
 
 		raw_image_buffer = smk_get_palette(vqaHandle->smacker_video);
+		Set_DD_Palette(raw_image_buffer, false);
 		vqaHandle->video_graphics_buffer->Lock();
 
 		VQA_Dropsample(smk_get_video(vqaHandle->smacker_video), vqaHandle->width, vqaHandle->height, ScreenWidth, ScreenHeight);

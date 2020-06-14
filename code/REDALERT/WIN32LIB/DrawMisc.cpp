@@ -1352,60 +1352,219 @@ unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheigh
 	return out;
 }
 
-BOOL __cdecl Linear_Scale_To_Linear(void *this_object, void *dest, int src_x, int src_y, int dst_x, int dst_y, int src_width, int src_height, int dst_width, int dst_height, BOOL trans, char *remap)
+BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int src_w, int src_h, int dst_w, int dst_h, BOOL use_keysrc, char* fade)
 {
-	GraphicViewPortClass* viewportClass = (GraphicViewPortClass*)this_object;
-	GraphicViewPortClass* destViewportClass = (GraphicViewPortClass*)dest;
+	GraphicViewPortClass& src_vp = *(GraphicViewPortClass*)this_object;
+	GraphicViewPortClass& dst_vp = *(GraphicViewPortClass*)dest;
 
-	unsigned char* viewportBuffer = ((unsigned char*)viewportClass->Get_Offset());
+	// If there is nothing to scale, just return.
+	if (src_w <= 0 || src_h <= 0 || dst_w <= 0 || dst_h <= 0) {
+		return false;
+	}
 
-	// Scale the GraphicViewPortClass to dest_x, dest_y
-	unsigned char* scaled_buffer = Draw_Dropsample((unsigned char*)viewportBuffer, viewportClass->Get_Width(), viewportClass->Get_Height(), dst_width, dst_height);
+	int sx = src_x;
+	int sy = src_y;
+	int dx = dst_x;
+	int dy = dst_y;
+	int dw = dst_w + dst_x;
+	int dh = dst_h + dst_y;
 
-	// Blit the scaled_buffer to dest.
-	Nearest_CopyImage(scaled_buffer, src_x, src_y, dst_width, dst_height, (unsigned char*)destViewportClass->Get_Offset(), dst_x, dst_y, destViewportClass->Get_Width(), dst_width, dst_height, trans);
+	// These ifs are all for clipping purposes incase coords are outside
+	// the expected area.
+	if (src_x < 0) {
+		sx = 0;
+		dx = dst_x + ((dst_w * -src_x) / src_w);
+	}
+
+	if (src_y < 0) {
+		sy = 0;
+		dy = dst_y + ((dst_h * -src_y) / src_h);
+	}
+
+	if (src_x + src_w > src_vp.Get_Width() + 1) {
+		dw = dst_x + (dst_w * (src_vp.Get_Width() - src_x) / src_w);
+	}
+
+	if (src_y + src_h > src_vp.Get_Height() + 1) {
+		dh = dst_y + (dst_h * (src_vp.Get_Height() - src_y) / src_h);
+	}
+
+	if (dx < 0) {
+		dx = 0;
+		sx = src_x + ((src_w * -dst_x) / dst_w);
+	}
+
+	if (dy < 0) {
+		dy = 0;
+		sy = src_y + ((src_h * -dst_y) / dst_h);
+	}
+
+	if (dw > dst_vp.Get_Width() + 1) {
+		dw = dst_vp.Get_Width();
+	}
+
+	if (dh > dst_vp.Get_Height() + 1) {
+		dh = dst_vp.Get_Height();
+	}
+
+	if (dy > dh || dx > dw) {
+		return false;
+	}
+
+	uint8_t* src = sy * src_vp.Get_Full_Pitch() + sx + (uint8_t*)(src_vp.Get_Offset());
+	uint8_t* dst = dy * dst_vp.Get_Full_Pitch() + dx + (uint8_t*)(dst_vp.Get_Offset());
+	dw -= dx;
+	dh -= dy;
+	int x_ratio = ((src_w << 16) / dw) + 1;
+	int y_ratio = ((src_h << 16) / dh) + 1;
+
+	// keysrc basically means do we skip index 0 entries, thus treating them as
+	// transparent?
+	if (use_keysrc) {
+		if (fade != nullptr) {
+			for (int i = 0; i < dh; ++i) {
+				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
+				int xrat = 0;
+
+				for (int j = 0; j < dw; ++j) {
+					uint8_t tmp = s[xrat >> 16];
+
+					if (tmp != 0) {
+						*d = ((uint8_t*)(fade))[tmp];
+					}
+
+					++d;
+					xrat += x_ratio;
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < dh; ++i) {
+				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
+				int xrat = 0;
+
+				for (int j = 0; j < dw; ++j) {
+					uint8_t tmp = s[xrat >> 16];
+
+					if (tmp != 0) {
+						*d = tmp;
+					}
+
+					++d;
+					xrat += x_ratio;
+				}
+			}
+		}
+	}
+	else {
+		if (fade != nullptr) {
+			for (int i = 0; i < dh; ++i) {
+				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
+				int xrat = 0;
+
+				for (int j = 0; j < dw; ++j) {
+					*d++ = ((uint8_t*)(fade))[s[xrat >> 16]];
+					xrat += x_ratio;
+				}
+			}
+		}
+		else {
+			for (int i = 0; i < dh; ++i) {
+				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
+				int xrat = 0;
+
+				for (int j = 0; j < dw; ++j) {
+					*d++ = s[xrat >> 16];
+					xrat += x_ratio;
+				}
+			}
+		}
+	}
 
 	return true;
 }
 
-BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int x_pixel, int y_pixel, int dest_x0, int dest_y0, int pixel_width, int pixel_height, BOOL trans)
+BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int w, int h, BOOL use_key)
 {
-	GraphicViewPortClass* viewportClass = (GraphicViewPortClass*)this_object;
-	GraphicViewPortClass* destViewportClass = (GraphicViewPortClass*)dest;
-	bool needsUnlock = false;
-	bool sourceNeedsUnlock = false;
+	GraphicViewPortClass& src_vp = *(GraphicViewPortClass *)this_object;
+	GraphicViewPortClass& dst_vp = *(GraphicViewPortClass*)dest;
 
-	unsigned char* viewportBuffer = NULL;
-	viewportBuffer = ((unsigned char*)viewportClass->Get_Offset());
+	uint8_t* src = (uint8_t*)(src_vp.Get_Offset());
+	uint8_t* dst = (uint8_t*)(dst_vp.Get_Offset());
+	int src_pitch = src_vp.Get_Full_Pitch();
+	int dst_pitch = dst_vp.Get_Full_Pitch();
 
-	unsigned char* destBuffer = NULL;
-	destBuffer = ((unsigned char*)destViewportClass->Get_Offset());
+	if (src_x >= src_vp.Get_Width() || src_y >= src_vp.Get_Height() || dst_x >= dst_vp.Get_Width()
+		|| dst_y >= dst_vp.Get_Height() || h < 0 || w < 1) {
+		return 0;
+	}
 
-	//if (destViewportClass->Get_Graphic_Buffer()->Get_Buffer() != NULL) {
-	//	destBuffer = (byte*)destViewportClass->Get_Graphic_Buffer()->Get_Buffer();
-	//}
-	//else {
-	//	destViewportClass->Get_Graphic_Buffer()->Lock();
-	//	destBuffer = ((byte*)destViewportClass->Get_Graphic_Buffer()->GetMemoryBuffer());
-	//	needsUnlock = true;
-	//}
-	//
-	//if (viewportBuffer == NULL) {
-	//	viewportClass->Get_Graphic_Buffer()->Lock();
-	//	viewportBuffer = ((byte*)viewportClass->Get_Graphic_Buffer()->GetMemoryBuffer());
-	//	sourceNeedsUnlock = true;
-	//}
-		
-	// Blit the buffer to dest.
-	Nearest_CopyImage(viewportBuffer, x_pixel, y_pixel, viewportClass->Get_Width(), viewportClass->Get_Height(), (unsigned char*)destBuffer, dest_x0, dest_y0, destViewportClass->Get_Width(), pixel_width, pixel_height, trans);
+	src_x = max(0, src_x);
+	src_y = max(0, src_y);
+	dst_x = max(0, dst_x);
+	dst_y = max(0, dst_y);
 
-	//if (needsUnlock) {
-	//	destViewportClass->Get_Graphic_Buffer()->Unlock();
-	//}
-	//
-	//if (sourceNeedsUnlock) {
-	//	viewportClass->Get_Graphic_Buffer()->Unlock();
-	//}
+	h = (dst_y + h) > dst_vp.Get_Height() ? dst_vp.Get_Height() - 1 - dst_y : h;
+	w = (dst_x + w) > dst_vp.Get_Width() ? dst_vp.Get_Width() - 1 - dst_x : w;
+
+	// move our pointers to the start locations
+	src += src_x + src_y * src_pitch;
+	dst += dst_x + dst_y * dst_pitch;
+
+	// If src is before dst, we run the risk of overlapping memory regions so we
+	// need to move src and dst to the last line and work backwards
+	if (src < dst) {
+		uint8_t* esrc = src + (h - 1) * src_pitch;
+		uint8_t* edst = dst + (h - 1) * dst_pitch;
+		if (use_key) {
+			char key_colour = 0;
+			while (h-- != 0) {
+				// Can't optimize as we need to check every pixel against key colour :(
+				for (int i = w - 1; i >= 0; --i) {
+					if (esrc[i] != key_colour) {
+						edst[i] = esrc[i];
+					}
+				}
+
+				edst -= dst_pitch;
+				esrc -= src_pitch;
+			}
+		}
+		else {
+			while (h-- != 0) {
+				memmove(edst, esrc, w);
+				edst -= dst_pitch;
+				esrc -= src_pitch;
+			}
+		}
+	}
+	else {
+		if (use_key) {
+			uint8_t key_colour = 0;
+			while (h-- != 0) {
+				// Can't optimize as we need to check every pixel against key colour :(
+				for (int i = 0; i < w; ++i) {
+					if (src[i] != key_colour) {
+						dst[i] = src[i];
+					}
+				}
+
+				dst += dst_pitch;
+				src += src_pitch;
+			}
+		}
+		else {
+			while (h-- != 0) {
+				memmove(dst, src, w);
+				dst += dst_pitch;
+				src += src_pitch;
+			}
+		}
+	}
 	return true;
 }
 

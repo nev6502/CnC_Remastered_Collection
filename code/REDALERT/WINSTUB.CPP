@@ -44,6 +44,8 @@
 #include    "imgui.h"
 #include	"examples/imgui_impl_sdl.h"
 #include	"function.h"
+#include	"il/il.h"
+#include	"image.h"
 
 #ifdef WINSOCK_IPX
 #include "WSProto.h"
@@ -69,10 +71,55 @@ SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
 
+bool renderConsole = false;
+
 void (*Misc_Focus_Loss_Function)(void) = nullptr;
 void (*Misc_Focus_Restore_Function)(void) = nullptr;
 
 void (*Imgui_Dialog_Function)(void) = nullptr;
+
+Image_t* Image_LoadImage(const char* name) {
+	ILuint ImageName;
+	ilGenImages(1, &ImageName);
+	ilBindImage(ImageName);
+	if (!ilLoadImage(name)) {
+		return NULL;
+	}
+
+	ILuint Width, Height, Bpp;
+	Width = ilGetInteger(IL_IMAGE_WIDTH);
+	Height = ilGetInteger(IL_IMAGE_HEIGHT);
+	Bpp = ilGetInteger(IL_IMAGE_BPP);
+	ILubyte* Data = ilGetData();
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	if (Bpp == 4) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
+	}
+	else if (Bpp == 3) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
+	}
+	else if (Bpp == 1) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_R, GL_UNSIGNED_BYTE, Data);
+	}
+	else {
+		assert(!"Unknown BPP in image!");
+	}
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	ilDeleteImages(1, &ImageName);
+
+	Image_t* image = new Image_t();
+	image->image = texture;
+	image->width = Width;
+	image->height = Height;
+	return image;
+}
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
 	// Todo implement resoluton scaling.
@@ -91,15 +138,20 @@ void Reset_Video_Mode(void) {
 
 }
 
-void Set_DD_Palette(void* palette)
+void Set_DD_Palette(void* palette, bool raShift)
 {
 	char* palette_get = (char*)palette; //CCPalette.Get_Data();
 	for (int j = 0; j < 768; j++) {
-		backbuffer_palette[j] = palette_get[j] << 2;
+		if (raShift) {
+			backbuffer_palette[j] = palette_get[j] << 2;
+		}
+		else {
+			backbuffer_palette[j] = palette_get[j];
+		}
 	}
 }
 
-void Device_Present(void) {
+void ImGui_NewFrame(void) {
 	ImGuiIO& io = ImGui::GetIO();
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -109,6 +161,10 @@ void Device_Present(void) {
 	ImGui::NewFrame();
 
 	ImGui_ImplSDL2_NewFrame(game_window);
+}
+
+void Device_Present(void) {
+
 
 	// Rasterize the palette.
 	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
@@ -129,7 +185,7 @@ void Device_Present(void) {
 		ImGui::SetNextWindowPos(ImVec2(0, 0));		
 		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
-			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
+			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);			
 		ImGui::End();		
 	}
 
@@ -137,10 +193,21 @@ void Device_Present(void) {
 		Imgui_Dialog_Function();		
 	}
 
+	if (renderConsole) {
+		Console_Render();
+	}
+
+	WWMouse->RenderMouse();
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	SDL_GL_SwapWindow(game_window);
+
+	// Last thing we do is execute any console commands
+	Console_Tick();
+
+	ImGui_NewFrame();
 }
 
 
@@ -450,34 +517,7 @@ HANDLE DebugFile = INVALID_HANDLE_VALUE;
  *=============================================================================================*/
 void WWDebugString (char *string)
 {
-#if (0)
-	char outstr[256];
-
-	sprintf (outstr, "%s", string);
-
-	DWORD	actual;
-	if (DebugFile == INVALID_HANDLE_VALUE){
-		DebugFile = CreateFile("debug.txt", GENERIC_WRITE, 0,
-												NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	}else{
-		DebugFile = CreateFile("debug.txt", GENERIC_WRITE, 0,
-												NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	}
-
-	if (DebugFile != INVALID_HANDLE_VALUE){
-		SetFilePointer (DebugFile, 0, NULL, FILE_END);
-		WriteFile(DebugFile, outstr, strlen(outstr)+1, &actual, NULL);
-		CloseHandle (DebugFile);
-	}
-
-	OutputDebugString (string);
-#else	//(0)
-
-	string = string;
-//	debugprint( string );
-
-#endif	//(0)
-
+	Console_Printf(string);
 }
 
 
@@ -511,6 +551,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 {	
 	HWND        	hwnd ;
+
+	ilInit();
 
 	SDL_Init(SDL_INIT_VIDEO);
 	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);	
@@ -551,6 +593,24 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glewInit();
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
+
+	// Setup Platform/Renderer bindings
+	ImGui_ImplSDL2_InitForD3D(game_window);
+	ImGui_ImplOpenGL3_Init();
+
+	io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f);
+
+	ImGui_NewFrame();
 }
 
 
@@ -810,6 +870,20 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 				break;
 
 			case SDL_KEYDOWN:
+				if (event.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
+					renderConsole = !renderConsole;
+
+					if (renderConsole) {
+						ShowCursor(TRUE);
+						Hide_Mouse();
+					}
+					else {
+						ShowCursor(FALSE);
+						Show_Mouse();
+					}
+					break;
+				}
+
 				const Uint8* state = SDL_GetKeyboardState(NULL);
 
 				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
@@ -824,7 +898,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 				break;
 		}
 
-		if (Debug_Map)
+		if (Debug_Map || renderConsole)
 		{
 			ImGui_ImplSDL2_ProcessEvent(&event);
 		}
