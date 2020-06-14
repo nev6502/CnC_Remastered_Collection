@@ -434,7 +434,7 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	ImGui_ImplSDL2_InitForD3D(game_window);
 	ImGui_ImplOpenGL3_Init();
 
-	io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f);
+	io.Fonts->AddFontFromFileTTF("fonts/Arial.ttf", 16.0f);
 
 	ImGui_NewFrame();
 }
