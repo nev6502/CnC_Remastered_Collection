@@ -8,6 +8,16 @@
 extern byte backbuffer_palette[768];
 extern uint8_t g_ColorXlat[16];
 
+void GL_SetClipRect(int x, int y, int width, int height) {
+	ImVec2 mi(x, y);
+	ImVec2 ma(x + width, y + height);
+	ImGui::GetForegroundDrawList()->PushClipRect(mi, ma);
+}
+
+void GL_ResetClipRect(void) {
+	ImGui::GetForegroundDrawList()->PopClipRect();
+}
+
 void GL_RenderImage(Image_t* image, int x, int y, int width, int height) {
 	ImVec2 mi(x, y);
 	ImVec2 ma(x + width, y + height);

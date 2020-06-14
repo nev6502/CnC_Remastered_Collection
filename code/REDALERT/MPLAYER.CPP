@@ -293,7 +293,7 @@ GameType Select_MPlayer_Game (void)
 			//	Redraw buttons
 			//..................................................................
 			{
-				commands->Flag_List_To_Redraw();
+				commands->Draw_All(); // jmarshall: force redraw everything.
 			}
 			Show_Mouse();
 			display = REDRAW_NONE;

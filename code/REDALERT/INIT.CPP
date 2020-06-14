@@ -658,7 +658,6 @@ bool Select_Game(bool fade)
 #endif
 
 		while (process) {
-
 			/*
 			**	Redraw the title page if needed
 			*/

@@ -532,8 +532,10 @@ int Fetch_Difficulty(void)
 	while (process) {
 
 		{
+// jmarshall
 		//	redraw = false;
-
+			Load_Title_Screen("TITLE.PCX", NULL, NULL);
+// jmarshall end
 			/*
 			**	Draw the background of the dialog.
 			*/

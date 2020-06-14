@@ -2,6 +2,7 @@
 //
 
 struct Image_t {
+	char name[512];
 	unsigned int image;
 	int width;
 	int height;

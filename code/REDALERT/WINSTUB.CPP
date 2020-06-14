@@ -61,6 +61,8 @@
 #include <imgui.h>
 #include <examples/imgui_impl_opengl3.h>
 
+#include <vector>
+
 GLuint backbuffer_texture = -1;
 byte* backbuffer_data;
 unsigned char* backbuffer_data_raw;
@@ -78,7 +80,16 @@ void (*Misc_Focus_Restore_Function)(void) = nullptr;
 
 void (*Imgui_Dialog_Function)(void) = nullptr;
 
+std::vector<Image_t *> loaded_images;
+
 Image_t* Image_LoadImage(const char* name) {
+	// Check to see if the image is already loaded.
+	for (int i = 0; i < loaded_images.size(); i++) {
+		if (!strcmp(loaded_images[i]->name, name)) {
+			return loaded_images[i];
+		}
+	}
+
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
@@ -112,12 +123,14 @@ Image_t* Image_LoadImage(const char* name) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	ilDeleteImages(1, &ImageName);
+	ilDeleteImages(1, &ImageName);	
 
 	Image_t* image = new Image_t();
+	strcpy(image->name, name);
 	image->image = texture;
 	image->width = Width;
 	image->height = Height;
+	loaded_images.push_back(image);
 	return image;
 }
 
@@ -851,17 +864,23 @@ void Memory_Error_Handler(void)
 
 
 GraphicBufferClass* Read_PCX_File(char* name, char* Palette, void *Buff, long Size);
-void Load_Title_Screen(char *name, GraphicViewPortClass *video_page, unsigned char *palette)
-{
+void Load_Title_Screen(char *name, GraphicViewPortClass *video_page, unsigned char *palette) {
+	char filename[512];
+	sprintf(filename, "ui/%s", name);
+	COM_SetExtension(filename, sizeof(filename), ".png");
+	Image_t* image = Image_LoadImage(filename);
 
-	GraphicBufferClass *load_buffer;
+	GL_RenderImage(image, 0, 0, ScreenWidth, ScreenHeight);
 
-
-	load_buffer = Read_PCX_File (name, (char*)palette, NULL, 0);
-
-	if (load_buffer) {
-		load_buffer->Scale(*video_page, 0, 0, 0, 0, load_buffer->Get_Width(), load_buffer->Get_Height(), ScreenWidth, ScreenHeight, NULL);
+	// We still have to do this for palette reasons. 
+	{
+		GraphicBufferClass* load_buffer;
+		load_buffer = Read_PCX_File(name, (char*)palette, NULL, 0);
 		delete load_buffer;
+		//if (load_buffer) {
+		//	load_buffer->Scale(*video_page, 0, 0, 0, 0, load_buffer->Get_Width(), load_buffer->Get_Height(), ScreenWidth, ScreenHeight, NULL);
+		//	delete load_buffer;
+		//}
 	}
 }
 
