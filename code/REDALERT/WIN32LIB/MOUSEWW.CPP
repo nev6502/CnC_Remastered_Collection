@@ -238,8 +238,10 @@ void WWMouseClass::RenderMouse(void) {
 
 	//ImVec2 size(current_cursor->width, current_cursor->height);
 	//ImGui::Image((ImTextureID)current_cursor->image, size);
-	ImVec2 mi(mousex, mousey);
-	ImVec2 ma(mousex + current_cursor->width, mousey + current_cursor->height);
+
+	int _my = mousey + (current_cursor->height * 0.25);
+	ImVec2 mi(mousex, _my);
+	ImVec2 ma(mousex + current_cursor->width, _my + current_cursor->height);
 	
 	
 	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
@@ -248,7 +250,7 @@ void WWMouseClass::RenderMouse(void) {
 
 void WWMouseClass::Low_Show_Mouse(int x, int y)
 {
-	
+
 }
 
 void WWMouseClass::Show_Mouse()
