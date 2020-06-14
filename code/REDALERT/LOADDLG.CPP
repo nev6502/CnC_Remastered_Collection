@@ -258,7 +258,9 @@ int LoadOptionsClass::Process(void)
 	bool display = true;
 	bool process = true;
 	while (process) {
-		Load_Title_Screen("TITLE.PCX", NULL, NULL);
+		if (g_inMainMenu) {
+			Load_Title_Screen("TITLE.PCX", NULL, NULL);
+		}
 
 		/*
 		**	Invoke game callback.
