@@ -689,8 +689,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 							break;
 					}
 				}
-				//WndProc( event.syswm.msg->msg.win.hwnd , event.syswm.msg->msg.win.msg, event.syswm.msg->msg.win.wParam, event.syswm.msg->msg.win.lParam );
-				event = event;
+
 				break;
 
 			case SDL_MOUSEMOTION:
