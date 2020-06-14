@@ -7,10 +7,10 @@
 /***********************************************************************************************
  * Script_GiveCreditsToPlayer - Gives a given player a given amount of credits                 *
  *                                                                                             *
- *   SCRIPT INPUT:	houseType (int) - The player (house) index to count buildings for          *
+ *   SCRIPT INPUT:	houseType (int) - The player (house) index to give credits to              *
  *                	cashToGive (int) - The amount of cold hard credits to give the player      *
  *                                                                                             *
- *   SCRIPT OUTPUT:  result (number) - The amount of the given buildings for that player       *
+ *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
  * INPUT:  lua_State - The current Lua state                                                   *
  *                                                                                             *
@@ -45,7 +45,7 @@ static int Script_GiveCreditsToPlayer(lua_State* L) {
  *   SCRIPT INPUT:	houseType (int) - The player (house) index to count buildings for          *
  *                	structType (int) - The structure index to count buildings for              *
  *                                                                                             *
- *   SCRIPT OUTPUT:  result (number) - The amount of the given buildings for that player       *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
  *                                                                                             *
  * INPUT:  lua_State - The current Lua state                                                   *
  *                                                                                             *
@@ -72,10 +72,11 @@ static int Script_NumBuildingTypeForPlayer(lua_State* L) {
     return 1;
 }
 
+
 /***********************************************************************************************
- * Script_StartMissionTimer - Starts the in-game mission timer                                 *
+ * Script_Win - The specified player wins                                                      *
  *                                                                                             *
- *   SCRIPT INPUT:	ret (int) - amount of time in tenths of a minute                           *
+ *   SCRIPT INPUT:	houseType (int) - The player (house that wins)                             *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -86,18 +87,35 @@ static int Script_NumBuildingTypeForPlayer(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_StartMissionTimer(lua_State* L) {
-    int ret = lua_tointeger(L, -1);
-    Scen.MissionTimer = Scen.MissionTimer + (ret * (TICKS_PER_MINUTE / 10));
-    Scen.MissionTimer.Start();
-    Map.Redraw_Tab();
+static int Script_Win(lua_State* L) {
+
+    int houseType = lua_tointeger(L, -1);
+
+    if (houseType != HOUSE_NONE) {
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+
+            if (this_house->ID == PlayerPtr->Class->House) {
+                PlayerPtr->Flag_To_Win();
+            }
+            else {
+                PlayerPtr->Flag_To_Lose();
+            }
+
+            bool success = this_house->Fire_Sale();
+            lua_pushboolean(L, int(success));
+        }
+    }
+
     return 1;
 }
 
 /***********************************************************************************************
- * Script_StopMissionTimer - Stops the in-game mission timer                                   *
+ * Script_Lose - The specified player loses                                                    *
  *                                                                                             *
- *   SCRIPT INPUT:	none                                                                       *
+ *   SCRIPT INPUT:	ret (int) - The waypoint index of which to reveal                          *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -108,8 +126,59 @@ static int Script_StartMissionTimer(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_StopMissionTimer(lua_State* L) {
-    Scen.MissionTimer.Start();
+static int Script_Lose(lua_State* L) {
+
+    int houseType = lua_tointeger(L, -1);
+
+    if (houseType != HOUSE_NONE) {
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+
+            if (this_house->ID == PlayerPtr->Class->House) {
+                PlayerPtr->Flag_To_Lose();
+            }
+            else {
+                PlayerPtr->Flag_To_Win();
+            }
+
+            bool success = this_house->Fire_Sale();
+            lua_pushboolean(L, int(success));
+        }
+    }
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_BeginProduction - This will enable production to begin for the house specified       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int) - The AI player (house) index to allow winning for         *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_BeginProduction(lua_State* L) {
+
+    int houseType = lua_tointeger(L, -1);
+
+    if (houseType != HOUSE_NONE) {
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+            this_house->Begin_Production();
+        }
+    }
+
     return 1;
 }
 
@@ -119,7 +188,7 @@ static int Script_StopMissionTimer(lua_State* L) {
  *                                                                                             *
  *   SCRIPT INPUT:	teamType (int) - The team index to attempt to create                       *
  *                                                                                             *
- *   SCRIPT OUTPUT:  void                                                                      *
+ *   SCRIPT OUTPUT:  success (bool) - Did a team get created?                                  *
  *                                                                                             *
  * INPUT:  lua_State - The current Lua state                                                   *
  *                                                                                             *
@@ -130,19 +199,181 @@ static int Script_StopMissionTimer(lua_State* L) {
  *=============================================================================================*/
 static int Script_CreateTeam(lua_State* L) {
 
-    const char* teamType = lua_tostring(L, -1);
+    const char* teamType = lua_tostring(L, 1);
 
     TeamTypeClass* teamPtr = TeamTypeClass::From_Name(teamType);
-    assert(teamPtr != NULL);
+    
+    if (teamPtr != NULL) {
+        ScenarioInit++;
 
-    ScenarioInit++;
-    teamPtr->Create_One_Of();
-    ScenarioInit--;
+        bool success = false;
 
+        TeamClass *new_team = teamPtr->Create_One_Of();
+        
+        if (new_team != NULL) {
+            success = true;
+        }
 
+        lua_pushboolean(L, int(success));
+
+        ScenarioInit--;
+    }
 
     return 1;
 }
+
+
+/***********************************************************************************************
+ * Script_DestroyTeam - Destroy all teams of the type specified                                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	teamType (int) - The team index to attempt to destroy                      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_DestroyTeam(lua_State* L) {
+
+    const char* teamType = lua_tostring(L, 1);
+
+    TeamTypeClass* teamPtr = TeamTypeClass::From_Name(teamType);
+
+    if (teamPtr != NULL) {
+
+         teamPtr->Destroy_All_Of();
+
+    }
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_AllHunt - Force all units of specified house to go into hunt mode                    *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int) - The AI player (house) index to allow winning for         *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AllHunt(lua_State* L) {
+
+    int houseType = lua_tointeger(L, -1);
+
+    if (houseType != HOUSE_NONE) {
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+            this_house->Do_All_To_Hunt();
+        }
+    }
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_Reinforcements - Attempts to create reinforcements as defined by team                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	teamType (int) - The team index to attempt to create                       *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  success (bool) - Did Do_Reinforcements return true?                       *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_Reinforcements(lua_State* L) {
+
+    const char* teamType = lua_tostring(L, 1);
+
+    TeamTypeClass* teamPtr = TeamTypeClass::From_Name(teamType);
+
+    if (teamPtr != NULL) {
+        bool success = Do_Reinforcements(teamPtr);
+        lua_pushboolean(L, int(success));
+    }
+    else {
+        lua_pushboolean(L, 0);
+    }
+
+    
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_DropZoneFlare - Places drop down smoke at specified waypoint location                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	ret (int) - The waypoint index of which to drop the smoke                  *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_DropZoneFlare(lua_State* L) {
+    int ret = lua_tointeger(L, -1);
+
+    if (ret > 0 && ret < sizeof(Scen.Waypoint)) {
+        new AnimClass(ANIM_LZ_SMOKE, Cell_Coord(Scen.Waypoint[ret]));
+    }
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_FireSale - Make AI house give up, selling everything and going all in on attack      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int) - The AI player (house) index to allow winning for         *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  success (bool) - Did the action get performed?                            *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_FireSale(lua_State* L) {
+
+    int houseType = lua_tointeger(L, -1);
+
+    if (houseType != HOUSE_NONE) {
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+            bool success = this_house->Fire_Sale();
+            lua_pushboolean(L, int(success));
+        }
+    }
+
+    return 1;
+}
+
 
 /***********************************************************************************************
  * Script_PlayMovie - Plays the given movie                                                    *
@@ -163,6 +394,7 @@ static int Script_PlayMovie(lua_State* L) {
     Play_Movie((VQType)ret);
     return 1;
 }
+
 
 /***********************************************************************************************
  * Script_TriggerText - Triggers text to display in-game                                       *
@@ -185,14 +417,12 @@ static int Script_TriggerText(lua_State* L) {
 
     // JJQUESTION: This appears right but doesn't do anything. Is text broken at the moment?
     if (textIndex > 0 && textIndex < sizeof(TutorialText)) {
+
         Session.Messages.Add_Message(NULL, textIndex, (char*)TutorialText[textIndex], PCOLOR_GREEN, TPF_6PT_GRAD | TPF_USE_GRAD_PAL | TPF_FULLSHADOW, Rule.MessageDelay * TICKS_PER_MINUTE);
     }
 
     return 1;
 }
-
-
-
 
 
 /***********************************************************************************************
@@ -249,24 +479,31 @@ static int Script_DestroyTrigger(lua_State* L) {
  *=============================================================================================*/
 static int Script_AutoCreate(lua_State* L) {
 
-
-
     int houseType = 0;
-    bool createEnabled = true;
+    bool autoCreateEnabled = true;
 
     houseType = lua_tointeger(L, 1);
 
+    // If there is a second argument given, process it
     if (lua_gettop(L) == 2) {
-        createEnabled = lua_toboolean(L, 2);
-    }
-
-    if (createEnabled) {
-        HouseClass::As_Pointer((HousesType)houseType)->AlertTime = 0;
+        autoCreateEnabled = lua_toboolean(L, 2);
     }
 
     if (houseType != HOUSE_NONE) {
-        HouseClass* specified_house = HouseClass::As_Pointer((HousesType)houseType);
-        specified_house->IsAlerted = createEnabled;
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+
+            // If we are enabling auto creation by the house, clear alert
+            if (autoCreateEnabled) {
+                this_house->AlertTime = 0; // TODO - don't assume successful pointer
+            }
+
+            // Now set the parameter
+            this_house->IsAlerted = autoCreateEnabled;
+
+        }
 
     }
 
@@ -274,7 +511,7 @@ static int Script_AutoCreate(lua_State* L) {
 }
 
 /***********************************************************************************************
- * Script_AllowWin - Allows a win...ire map                                                    *
+ * Script_AllowWin - Allows a win                                                              *
  *                                                                                             *
  *   Used when you want a specific objective                                                   *
  *   to be met before the mission is accomplished.  In other words, if the                     *
@@ -298,7 +535,12 @@ static int Script_AllowWin(lua_State* L) {
     int houseType = lua_tointeger(L, -1);
 
     if (houseType != HOUSE_NONE) {
-        HouseClass::As_Pointer((HousesType)houseType)->Blockage++;
+
+        HouseClass* this_house = HouseClass::As_Pointer((HousesType)houseType);
+
+        if (this_house != NULL) {
+            this_house->Blockage++;
+        }
     }
 
     return 1;
@@ -415,9 +657,11 @@ static int Script_PlaySound(lua_State* L) {
 /***********************************************************************************************
  * Script_PlayMusic - Plays the given Music score.                                             *
  *                                                                                             *
- *   SCRIPT INPUT:	ret (int) - The music index of which to play                               *
+ *   Plays music score at given index. Negative numbers stop any music playing.                *
  *                                                                                             *
- *   SCRIPT OUTPUT:  void                                                                      *
+ *     SCRIPT INPUT:	ret (int) - The music index of which to play                           *
+ *                                                                                             *
+ *     SCRIPT OUTPUT:  void                                                                    *
  *                                                                                             *
  * INPUT:  lua_State - The current Lua state                                                   *
  *                                                                                             *
@@ -428,7 +672,14 @@ static int Script_PlaySound(lua_State* L) {
  *=============================================================================================*/
 static int Script_PlayMusic(lua_State* L) {
     int ret = lua_tointeger(L, -1);
-    Theme.Play_Song((ThemeType)ret);
+
+    if (ret < 0) {
+        Theme.Stop();
+    }
+    else {
+        Theme.Play_Song((ThemeType)ret);
+    }
+
     return 1;
 }
 
@@ -450,6 +701,49 @@ static int Script_PlayMusic(lua_State* L) {
 static int Script_PlaySpeech(lua_State* L) {
     int ret = lua_tointeger(L, -1);
     Speak((VoxType)ret);
+    return 1;
+}
+
+
+
+/***********************************************************************************************
+ * Script_StartMissionTimer - Starts the in-game mission timer                                 *
+ *                                                                                             *
+ *   SCRIPT INPUT:	ret (int) - amount of time in tenths of a minute                           *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_StartMissionTimer(lua_State* L) {
+    int ret = lua_tointeger(L, -1);
+    Scen.MissionTimer = Scen.MissionTimer + (ret * (TICKS_PER_MINUTE / 10));
+    Scen.MissionTimer.Start();
+    Map.Redraw_Tab();
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_StopMissionTimer - Stops the in-game mission timer                                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	none                                                                       *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_StopMissionTimer(lua_State* L) {
+    Scen.MissionTimer.Start();
     return 1;
 }
 
@@ -516,17 +810,15 @@ bool MapScript::Init(const char* mapName) {
     * Red Alert Vanilla Actions                                                                   *
     *=============================================================================================*/
 
-    // player wins!
-    // player loses.
-    // computer begins factory production.
-    lua_register(L, "CreateTeam", Script_CreateTeam);    // computer creates a certain type of team
-        // destroy team (comment was redacted. was something offensive originally written?)
-        // all enemy units go into hunt mode (teams destroyed).
-        // player gets reinforcements
-        // (house that gets them is determined by
-        // the Reinforcement instance)
-        // Deploy drop zone smoke.
-        // Sell all buildings and go on rampage.
+    lua_register(L, "Win", Script_Win);                                             // player wins!
+    lua_register(L, "Lose", Script_Lose);                                           // player loses.
+    lua_register(L, "BeginProduction", Script_BeginProduction);                     // computer begins factory production.
+    lua_register(L, "CreateTeam", Script_CreateTeam);                               // computer creates a certain type of team
+    lua_register(L, "DestroyTeam", Script_DestroyTeam);                             // destroy team (comment was redacted. was something offensive originally written?)
+    lua_register(L, "AllHunt", Script_AllHunt);                                     // all enemy units go into hunt mode (teams destroyed).
+    lua_register(L, "Reinforcements", Script_Reinforcements);                       // player gets reinforcements (house that gets them is determined by the Reinforcement instance)
+    lua_register(L, "DropZoneFlare", Script_DropZoneFlare);                         // Deploy drop zone smoke.
+    lua_register(L, "FireSale", Script_FireSale);	                                // Sell all buildings and go on rampage.
     lua_register(L, "PlayMovie", Script_PlayMovie);							        // Play movie (temporarily suspend game).
     lua_register(L, "TriggerText", Script_TriggerText);                             // Triggers a text message display.
     lua_register(L, "DestroyTrigger", Script_DestroyTrigger);                       // Destroy specified trigger.
@@ -540,7 +832,7 @@ bool MapScript::Init(const char* mapName) {
     lua_register(L, "PlaySound", Script_PlaySound);                                 // Play sound effect.
     lua_register(L, "PlayMusic", Script_PlayMusic);                                 // Play musical score.
     lua_register(L, "PlaySpeech", Script_PlaySpeech);						        // Play EVA speech.
-        // Force trigger to activate.
+        // TODO: Force trigger to activate.
     lua_register(L, "StartMissionTimer", Script_StartMissionTimer);			        // Start mission timer.
     lua_register(L, "StopMissionTimer", Script_StopMissionTimer);			        // Stop mission timer.
 
