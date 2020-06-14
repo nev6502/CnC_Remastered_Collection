@@ -181,9 +181,7 @@ MixFileClass<T>::MixFileClass(char const * filename, PKey const * key) :
 	*/
 	if (!Force_CD_Available(RequiredCD)) {
 		Prog_End("MixFileClass Force_CD_Available failed", true);
-		if (!RunningAsDLL) {	//PG
-			Emergency_Exit(EXIT_FAILURE);
-		}
+		Emergency_Exit(EXIT_FAILURE);
 	}
 
 	T file(filename);		// Working file object.

@@ -760,65 +760,41 @@ int Main_Menu(unsigned long )
 		Call_Back();
 
 		/*
-		**	Refresh display if needed.
+		**	Load the background picture.
 		*/
-// jmarshall
-		//if (display) {
-// jmarshall end
-			/*
-			**	Load the background picture.
-			*/
-			Load_Title_Page();
-			CCPalette.Set();
+		Load_Title_Page();
+		CCPalette.Set();
 
-			/*
-			**	Display the title and text overlay for the menu.
-			*/
-			Set_Logic_Page(HidPage);
-//			Dialog_Box(d_dialog_x, d_dialog_y, d_dialog_w, d_dialog_h);
-//			Draw_Caption (TXT_NONE, d_dialog_x, d_dialog_y, d_dialog_w);
-			commands->Draw_All();
+		/*
+		**	Display the title and text overlay for the menu.
+		*/
+		Set_Logic_Page(HidPage);
+		commands->Draw_All();
+
 #ifdef FIXIT_VERSION_3
-#if (0)//PG
-			Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
-				d_dialog_y+d_dialog_h-(5 * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
-				TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-				Version_Name());
-#endif
-#else
-#ifndef WIN32
-			Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
-				d_dialog_y+d_dialog_h-(8  * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
-				TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-				Version_Name());
+
+		Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
+			d_dialog_y+d_dialog_h-(5 * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
+			TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
+			Version_Name());
 
 #else
-			Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
-				d_dialog_y+d_dialog_h-(11 * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
-				TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-				Version_Name());
+		Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
+			d_dialog_y+d_dialog_h-(11 * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
+			TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
+			Version_Name());
 
 #endif
-#endif
 
-			/*
-			**	Copy the menu to the visible page.
-			*/
-			Hide_Mouse();
-			HidPage.Blit(SeenPage);
-			Show_Mouse();
+		/*
+		**	Copy the menu to the visible page.
+		*/
+		Hide_Mouse();
+		HidPage.Blit(SeenPage);
+		Show_Mouse();
 
-			Set_Logic_Page(SeenBuff);
-			display = false;
-// jmarshall
-		//}
-		//else {
-		//	if (RunningAsDLL) {	//PG
-		//		retval = -1;
-		//		process = false;
-		//	}
-		//}
-// jmarshall end
+		Set_Logic_Page(SeenBuff);
+		display = false;
 
 		/*
 		**	Get and process player input.

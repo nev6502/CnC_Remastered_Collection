@@ -553,9 +553,7 @@ bool Read_Scenario(char * name)
 						}
 					#endif
 #endif
-					if (!RunningAsDLL) {	//PG
-						Emergency_Exit(EXIT_FAILURE);
-					}
+					Emergency_Exit(EXIT_FAILURE);
 		     	}
 			}
 			CCINIClass ini;
@@ -2195,9 +2193,7 @@ bool Read_Scenario_INI(char * fname, bool )
 #endif
 		if (!Force_CD_Available(RequiredCD)) {
 			Prog_End("Read_Scenario_INI Force_CD_Available failed", true);
-			if (!RunningAsDLL) {	//PG
-				Emergency_Exit(EXIT_FAILURE);
-			}
+			Emergency_Exit(EXIT_FAILURE);
      	}
 	} else {
 		/*
