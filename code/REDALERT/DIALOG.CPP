@@ -109,15 +109,28 @@ void Dialog_Box(int x, int y, int w, int h)
 //	CC_Draw_Shape(shapedata, 0, cx-156, cy-96, WINDOW_PARTIAL, SHAPE_WIN_REL);
 //#endif
 	GL_SetClipRect(x, y, w, h);
-
-	Image_t* ddbkgrnd = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0000.png");
-	Image_t* ddbkgrnd_1 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0001.png");
-	Image_t* ddbkgrnd_2 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0002.png");
-	Image_t* ddbkgrnd_3 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0003.png");
-	GL_RenderImage(ddbkgrnd, x, y, ddbkgrnd->width, ddbkgrnd->height);
-	GL_RenderImage(ddbkgrnd_1, x + 312, y, ddbkgrnd->width, ddbkgrnd->height);
-	GL_RenderImage(ddbkgrnd_2, x, y + 192, ddbkgrnd->width, ddbkgrnd->height);
-	GL_RenderImage(ddbkgrnd_3, x + 312, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+	if (g_inMainMenu)
+	{
+		Image_t* ddbkgrnd = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0000.png");
+		Image_t* ddbkgrnd_1 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0001.png");
+		Image_t* ddbkgrnd_2 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0002.png");
+		Image_t* ddbkgrnd_3 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0003.png");
+		GL_RenderImage(ddbkgrnd, x, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_1, x + 312, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_2, x, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_3, x + 312, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+	}
+	else
+	{
+		Image_t* ddbkgrnd = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0000.png");
+		Image_t* ddbkgrnd_1 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0001.png");
+		Image_t* ddbkgrnd_2 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0002.png");
+		Image_t* ddbkgrnd_3 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0003.png");
+		GL_RenderImage(ddbkgrnd, x, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_1, x + 312, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_2, x, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_3, x + 312, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+	}
 // jmarshall end
 	/*
 	**	Draw the side strips.

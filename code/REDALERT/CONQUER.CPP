@@ -232,7 +232,6 @@ void Main_Game(int argc, char * argv[])
 	**	2) Invoke either the main-loop routine, or the editor-loop routine,
 	**		until they indicate that the user wants to exit the scenario.
 	*/
-	g_inMainMenu = true;
 	while (Select_Game(fade)) {
 
 		// ST 5/14/2019
