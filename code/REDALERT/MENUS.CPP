@@ -33,6 +33,7 @@
  *   Main_Menu -- Menu processing                                                              *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#include "imgui.h"
 #include "function.h"
 #ifdef WIN32
 #include "ccdde.h"
