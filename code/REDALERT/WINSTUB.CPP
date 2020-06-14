@@ -319,188 +319,7 @@ void Check_For_Focus_Loss(void)
 #endif
 }
 
-
-
 extern bool InMovie;
-
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	int	low_param = LOWORD(wParam);
-
-	if (message == CCFocusMessage) {
-		Start_Primary_Sound_Buffer(TRUE);
-		if (!InMovie) {
-			Theme.Stop();
-			Theme.Queue_Song(THEME_PICK_ANOTHER);
-		}
-		return(0);
-	}
-
-#ifdef WINSOCK_IPX
-	/*
-	** Pass on any messages intended for the winsock message handler.
-	*/
-	if ( PacketTransport ) {
-		if ( message == (UINT) PacketTransport->Protocol_Event_Message() ) {
-			if ( PacketTransport->Message_Handler (hwnd, message, wParam, lParam) ){
-				return ( DefWindowProc (hwnd, message, wParam, lParam) );
-			}else{
-				return (0);
-			}
-		}
-	}
-#endif	//WINSOCK_IPX
-
-	
-	/*
-	**	Pass this message through to the keyboard handler. If the message
-	**	was processed and requires no further action, then return with
-	**	this information.
-	*/
-	if (Keyboard->Message_Handler(hWnd, message, wParam, lParam)) {
-		return(1);
-	}
-
-	switch ( message ) {
-//		case WM_SYSKEYDOWN:
-//			Mono_Printf("wparam=%08X lparam=%08X\n", (long)wParam, (long)lParam);
-			// fall through
-
-//		case WM_MOUSEMOVE:
-//		case WM_KEYDOWN:
-//		case WM_SYSKEYUP:
-//		case WM_KEYUP:
-//		case WM_LBUTTONDOWN:
-//		case WM_LBUTTONUP:
-//		case WM_LBUTTONDBLCLK:
-//		case WM_MBUTTONDOWN:
-//		case WM_MBUTTONUP:
-//		case WM_MBUTTONDBLCLK:
-//		case WM_RBUTTONDOWN:
-//		case WM_RBUTTONUP:
-//		case WM_RBUTTONDBLCLK:
-//	 		Keyboard->Message_Handler(hwnd, message, wParam, lParam);
-//			return(0);
-
-			/*
-			** Windoze message says we have to shut down. Try and do it cleanly.
-			*/
-		case WM_DESTROY:
-			Prog_End("WM_DESTROY", false);
-			Invalidate_Cached_Icons();
-			VisiblePage.Un_Init();
-			HiddenPage.Un_Init();
-			AllSurfaces.Release();
-			if (!InDebugger) Reset_Video_Mode();
-			//Stop_Profiler();
-			PostQuitMessage( 0 );
-
-			/*
-			** If we are shutting down gracefully than flag that the message loop has finished.
-			** If this is a forced shutdown (ReadyToQuit == 0) then try and close down everything
-			** before we exit.
-			*/
-			switch (ReadyToQuit) {
-				case 1:
-					ReadyToQuit = 2;
-					break;
-
-				case 0:
-					//Shutdown_Network();
-#ifndef WINSOCK_IPX
-					if (Winsock.Get_Connected()) Winsock.Close();
-					/*
-					** Free the THIPX32 dll
-					*/
-					//Unload_IPX_Dll();
-#endif	//WINSOCK_IPX
-					ExitProcess(0);
-					break;
-				case 3:
-					//Shutdown_Network();
-#ifndef WINSOCK_IPX
-					/*
-					** Call the function to disable the IPX callback as horrible things can
-					** happen if we get a callback after the process has exited!
-					*/
-					if (Session.Type == GAME_IPX){
-						IPX_Shut_Down95();
-					}
-					/*
-					** Free the THIPX32 dll
-					*/
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-#else
-					Unload_IPX_Dll();
-#endif
-
-					if (Winsock.Get_Connected()) Winsock.Close();
-#endif	//WINSOCK_IPX
-					ReadyToQuit = 2;
-					break;
-
-			}
-			return(0);
-
-		case WM_ACTIVATEAPP:
-			GameInFocus=(BOOL)wParam;
-			if (!GameInFocus) Focus_Loss();
-			AllSurfaces.Set_Surface_Focus (GameInFocus);
-			AllSurfaces.Restore_Surfaces();
-//			if (GameInFocus) {
-//				Restore_Cached_Icons();
-//				Map.Flag_To_Redraw(true);
-//				Start_Primary_Sound_Buffer(TRUE);
-//				if (WWMouse) WWMouse->Set_Cursor_Clip();
-//			}
-			return(0);
-#ifdef NEVER
-		case WM_ACTIVATE:
-			if (low_param == WA_INACTIVE) {
-				GameInFocus = FALSE;
-				Focus_Loss();
-			}
-			return(0);
-#endif	//NEVER
-
-
-		case WM_SYSCOMMAND:
-			switch ( wParam ) {
-
-				case SC_CLOSE:
-					/*
-					** Windows sent us a close message. Probably in response to Alt-F4. Ignore it by
-					** pretending to handle the message and returning true;
-					*/
-					return (0);
-
-				case SC_SCREENSAVE:
-					/*
-					** Windoze is about to start the screen saver. If we just return without passing
-					** this message to DefWindowProc then the screen saver will not be allowed to start.
-					*/
-					return (0);
-			}
-			break;
-
-
-#ifndef WINSOCK_IPX
-		case WM_ACCEPT:
-		case WM_HOSTBYADDRESS:
-		case WM_HOSTBYNAME:
-		case WM_ASYNCEVENT:
-		case WM_UDPASYNCEVENT:
-	 		Winsock.Message_Handler(hWnd, message, wParam, lParam);
-			return (0);
-#endif	//WINSOCK_IPX
-	}
-
-	return DefWindowProc (hWnd, message, wParam, lParam);
-}
-
-
-
-
 
 HANDLE DebugFile = INVALID_HANDLE_VALUE;
 
@@ -846,7 +665,32 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 		switch (event.type)
 		{
 			case SDL_SYSWMEVENT:
-				WndProc( event.syswm.msg->msg.win.hwnd , event.syswm.msg->msg.win.msg, event.syswm.msg->msg.win.wParam, event.syswm.msg->msg.win.lParam );
+				if ( event.syswm.msg->msg.win.msg == WM_DESTROY )
+				{
+					Invalidate_Cached_Icons();
+					VisiblePage.Un_Init();
+					HiddenPage.Un_Init();
+					AllSurfaces.Release();
+					if (!InDebugger) Reset_Video_Mode();
+
+					/*
+					** If we are shutting down gracefully than flag that the message loop has finished.
+					** If this is a forced shutdown (ReadyToQuit == 0) then try and close down everything
+					** before we exit.
+					*/
+					PostQuitMessage(0);
+
+					switch (ReadyToQuit) {
+						case 1:
+							ReadyToQuit = 2;
+							break;
+						case 0:
+							ExitProcess(0);
+							break;
+					}
+				}
+				//WndProc( event.syswm.msg->msg.win.hwnd , event.syswm.msg->msg.win.msg, event.syswm.msg->msg.win.wParam, event.syswm.msg->msg.win.lParam );
+				event = event;
 				break;
 
 			case SDL_MOUSEMOTION:
@@ -976,13 +820,9 @@ void Assert_Failure (char *expression, int line, char *file)
 	}
 
 	WWMessageBox().Process(assertbuf);
-//	WWMessageBox().Process("Red Alert demo timed out - Aborting");
-	//Get_Key();
 
 	Prog_End(assertbuf, false);
 	Invalidate_Cached_Icons();
-	//PostQuitMessage( 0 );
-	//ExitProcess(0);
 }
 #endif
 
