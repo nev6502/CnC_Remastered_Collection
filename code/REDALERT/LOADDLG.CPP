@@ -258,6 +258,7 @@ int LoadOptionsClass::Process(void)
 	bool display = true;
 	bool process = true;
 	while (process) {
+		Load_Title_Screen("TITLE.PCX", NULL, NULL);
 
 		/*
 		**	Invoke game callback.
@@ -305,7 +306,7 @@ int LoadOptionsClass::Process(void)
 			**	Redraw the buttons.
 			*/
 			{
-				commands->Flag_List_To_Redraw();
+				commands->Draw_All(); // jmarshall draw all
 			}
 			Show_Mouse();
 			display = false;
