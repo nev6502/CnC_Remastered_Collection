@@ -163,9 +163,8 @@ void ImGui_NewFrame(void) {
 	ImGui_ImplSDL2_NewFrame(game_window);
 }
 
-void Device_Present(void) {
-
-
+void Device_Present(void) 
+{
 	// Rasterize the palette.
 	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
 		backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
@@ -173,6 +172,7 @@ void Device_Present(void) {
 		backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
 		backbuffer_data[(i * 4) + 3] = 255;
 	}
+
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
 
@@ -181,8 +181,11 @@ void Device_Present(void) {
 		bool ScreenActive;
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.FramePadding = ImVec2(0, 0);
-		ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
-		ImGui::SetNextWindowPos(ImVec2(0, 0));		
+
+		// @@ wtf? padding?
+		ImGui::SetNextWindowSize(ImVec2(ScreenWidth+12, ScreenHeight + 12));
+		ImGui::SetNextWindowPos(ImVec2(-8, -8));		
+
 		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
 			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
 			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);			
@@ -583,11 +586,13 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 	glGenTextures(1, &backbuffer_texture);
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+
 	// Give the image to OpenGL
 	backbuffer_data = new byte[width * height * 4];
 	memset(backbuffer_data, 0, width * height * 4);
 	backbuffer_data_raw = new byte[width * height];
 	memset(backbuffer_data_raw, 0, width * height);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

@@ -188,7 +188,7 @@ DisplayClass::DisplayClass(void) :
 	ShadowShapes = 0;
 	TransIconset = 0;
 
-	Set_View_Dimensions(0, 8, 320/CELL_PIXEL_W, 200/CELL_PIXEL_H);
+	Set_View_Dimensions(0, 0, ScreenWidth, ScreenHeight);
 }
 
 
@@ -240,7 +240,6 @@ void DisplayClass::One_Time(void)
 		ShadowShapes = MFCD::Retrieve("SHADOW.SHP");
 	#endif
 
-	//PG Set_View_Dimensions(0, 8 * RESFACTOR);
 	Set_View_Dimensions(0, 0);
 }
 

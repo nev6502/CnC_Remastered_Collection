@@ -109,11 +109,12 @@ void TabClass::Draw_It(bool complete)
 		** Use the new sidebar art for 640x400
 		*/
 		CC_Draw_Shape(TabShape, 0, 0, 0, WINDOW_MAIN, SHAPE_NORMAL);
+		Fancy_Text_Print(TXT_TAB_BUTTON_CONTROLS, (EVA_WIDTH / 2) * RESFACTOR, 0, &MetalScheme, TBLACK, TPF_METAL12 | TPF_CENTER | TPF_USE_GRAD_PAL);
 
 		Draw_Credits_Tab();
+		
 		LogicPage->Draw_Line(0, tab_height-(1* RESFACTOR), rightx, tab_height-(1 * RESFACTOR), BLACK);
-
-		Fancy_Text_Print(TXT_TAB_BUTTON_CONTROLS, (EVA_WIDTH/2) * RESFACTOR, 0, &MetalScheme, TBLACK, TPF_METAL12 | TPF_CENTER | TPF_USE_GRAD_PAL);
+		
 
 		if (!IsSidebarActive) 
 		{

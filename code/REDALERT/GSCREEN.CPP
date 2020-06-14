@@ -270,6 +270,8 @@ void GScreenClass::Flag_To_Redraw(bool complete)
  *=============================================================================================*/
 void GScreenClass::Input(KeyNumType & key, int & x, int & y)
 {
+	if (this == NULL) return;
+
 	key = Keyboard->Check();
 
 	x = Keyboard->Mouse_X();

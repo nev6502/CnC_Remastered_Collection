@@ -652,10 +652,6 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 
 			Main_Game(argc, argv);
 
-			if (RunningAsDLL) {	//PG
-				return (EXIT_SUCCESS);
-			}
-
 			#ifdef MPEGMOVIE // Denzil 6/15/98
 			if (MpgSettings != NULL)
 				delete MpgSettings;
@@ -666,16 +662,11 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 			#endif
 			#endif
 			
-#ifdef WIN32
 			VisiblePage.Clear();
 			HiddenPage.Clear();
-#else	//WIN32
-			SeenPage.Clear();
-			Set_Video_Mode(RESET_MODE);
-#endif	//WIN32
+
 			Memory_Error_Exit = Print_Error_Exit;
 
-#ifdef WIN32
 			/*
 			** Flag that this is a clean shutdown (not killed with Ctrl-Alt-Del)
 			*/
@@ -699,11 +690,6 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 			} while (ReadyToQuit == 1);
 
 			return (EXIT_SUCCESS);
-
-#else	//WIN32
-			Remove_Mouse();
-			Sound_End();
-#endif	//WIN32
 		} else {
 			if (!RunningFromEditor)
 			{
