@@ -201,6 +201,9 @@ void WWMouseClass::Process_Mouse(void)
 
 void *WWMouseClass::Set_Cursor(int xhotspot, int yhotspot, int cursor)
 {
+	Set_Hotspot_X(xhotspot);
+	Set_Hotspot_Y(yhotspot);
+
 	if (cursor >= MAX_CURSOR_FRAMES) {
 		assert(!"Max_Cursor_Frames out of range!");
 	}
@@ -238,10 +241,14 @@ void WWMouseClass::RenderMouse(void) {
 
 	//ImVec2 size(current_cursor->width, current_cursor->height);
 	//ImGui::Image((ImTextureID)current_cursor->image, size);
-
 	int _my = mousey + (current_cursor->height * 0.25);
-	ImVec2 mi(mousex, _my);
-	ImVec2 ma(mousex + current_cursor->width, _my + current_cursor->height);
+	int xstart = mousex - Get_Hotspot_X();
+	int ystart = _my - Get_Hotspot_Y();
+	int yend = current_cursor->height + ystart - 1;
+	int xend = current_cursor->width + xstart - 1;
+
+	ImVec2 mi(xstart, ystart);
+	ImVec2 ma(xend, yend);
 	
 	
 	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
