@@ -3402,7 +3402,7 @@ static void Init_Mouse(void)
 	if (MouseInstalled) {
 		void const * temp_mouse_shapes = MFCD::Retrieve("MOUSE.SHP");
 		if (temp_mouse_shapes) {
-			Set_Mouse_Cursor(0, 0, Extract_Shape(temp_mouse_shapes, 0));
+			Set_Mouse_Cursor(0, 0, 0);
 			while (Get_Mouse_State() > 1) Show_Mouse();
 		}
 	} else {

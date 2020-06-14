@@ -240,7 +240,7 @@ bool Init_Game(int , char *[])
 	if (MouseInstalled) {
 		temp_mouse_shapes = MixFileClass::Retrieve("MOUSE.SHP");
 		if (temp_mouse_shapes) {
-			Set_Mouse_Cursor(0, 0, Extract_Shape(temp_mouse_shapes,0));
+			Set_Mouse_Cursor(0, 0, 0);
 			while (Get_Mouse_State() > 1) {
 				Show_Mouse();
 			}

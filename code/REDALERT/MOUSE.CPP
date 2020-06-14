@@ -151,12 +151,12 @@ void MouseClass::Mouse_Small(bool wsmall)
 
 	if (wsmall) {
 		if (control->SmallFrame != -1) {
-			Set_Mouse_Cursor(control->X, control->Y, Extract_Shape(MouseShapes, control->SmallFrame + Frame/4));
+			Set_Mouse_Cursor(control->X, control->Y, control->SmallFrame + Frame / 4);
 		} else {
-			Set_Mouse_Cursor(MouseControl[MOUSE_NORMAL].X, MouseControl[MOUSE_NORMAL].Y, Extract_Shape(MouseShapes, MOUSE_NORMAL));
+			Set_Mouse_Cursor(MouseControl[MOUSE_NORMAL].X, MouseControl[MOUSE_NORMAL].Y, MOUSE_NORMAL);
 		}
 	} else {
-		Set_Mouse_Cursor(control->X, control->Y, Extract_Shape(MouseShapes, control->StartFrame + Frame/4));
+		Set_Mouse_Cursor(control->X, control->Y, control->StartFrame + Frame / 4);
 	}
 }
 
@@ -217,7 +217,7 @@ bool MouseClass::Override_Mouse_Shape(MouseType mouse, bool wsmall)
 			baseshp = control->StartFrame;
 		}
 
-		Set_Mouse_Cursor(control->X, control->Y, Extract_Shape(MouseShapes, baseshp));
+		Set_Mouse_Cursor(control->X, control->Y, baseshp);
 		CurrentMouseShape = mouse;
 		IsSmall = wsmall;
 		return(true);
@@ -260,7 +260,7 @@ void MouseClass::AI(KeyNumType &input, int x, int y)
 		if (!IsSmall || control->SmallFrame != -1) {
 			int baseframe = (IsSmall) ? control->SmallFrame : control->StartFrame;
 			if (baseframe == -1) baseframe = control->StartFrame;
-			Set_Mouse_Cursor(control->X, control->Y, Extract_Shape(MouseShapes, baseframe + Frame));
+			Set_Mouse_Cursor(control->X, control->Y, baseframe + Frame);
 		}
 	}
 
