@@ -505,6 +505,7 @@ set(src_redalert
 	./RedAlert/SOUNDDLG.H
 	./RedAlert/SPECIAL.CPP
 	./RedAlert/SPECIAL.H
+	./RedAlert/NewBlit.cpp
 	./RedAlert/SPRITE.CPP
 	./RedAlert/STAGE.H
 	./RedAlert/STARTUP.CPP

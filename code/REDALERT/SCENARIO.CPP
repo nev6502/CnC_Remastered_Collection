@@ -1707,7 +1707,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 			}
 			#endif
 
-			if (display) {
+			{
 				display = false;
 
 				Hide_Mouse();

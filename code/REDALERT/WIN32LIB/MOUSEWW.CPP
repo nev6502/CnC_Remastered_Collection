@@ -240,7 +240,7 @@ void WWMouseClass::RenderMouse(void) {
 		return;
 
 	//ImVec2 size(current_cursor->width, current_cursor->height);
-	//ImGui::Image((ImTextureID)current_cursor->image, size);
+	// Image((ImTextureID)current_cursor->image, size);
 	int _my = mousey + (current_cursor->height * 0.25);
 	int xstart = mousex - Get_Hotspot_X();
 	int ystart = _my - Get_Hotspot_Y();

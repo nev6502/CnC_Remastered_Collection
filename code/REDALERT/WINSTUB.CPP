@@ -823,7 +823,7 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 }
 
 
-void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	static int numFramesLMouse = 0;
 	extern int mousex, mousey;
 	bool leftMouseProcessed = false;
@@ -910,7 +910,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 		flags = GadgetClass::LEFTHELD;
 	}
 
-	Device_Present();
+	if (presentBuffer) {
+		Device_Present();
+	}
 }
 
 

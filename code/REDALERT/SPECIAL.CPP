@@ -567,7 +567,7 @@ int Fetch_Difficulty(void)
 		*/
 		Call_Back();
 
-		Device_Present();
+	//	Device_Present();
 
 #ifdef WIN32
 		/*

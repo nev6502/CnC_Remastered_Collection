@@ -136,6 +136,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "iconcach.h"
+#include "../NEWBLIT.H"
 
 extern unsigned char* backbuffer_data_raw;
 
@@ -1109,10 +1110,12 @@ inline void GraphicViewPortClass::Draw_Stamp(void const * icondata, int icon, in
  *=========================================================================*/
 inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsigned char color)
 {
-	if (Lock()){
-		Buffer_Draw_Line(this, sx, sy, dx, dy, color);
-	}
-	Unlock();
+	//if (Lock()){
+	//	Buffer_Draw_Line(this, sx, sy, dx, dy, color);
+	//}
+	//Unlock();
+
+	GL_DrawLine(color, sx, sy, dx, dy);
 }
 
 /***************************************************************************
@@ -1129,10 +1132,14 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
  *=========================================================================*/
 inline VOID GraphicViewPortClass::Fill_Rect(int sx, int sy, int dx, int dy, unsigned char color)
 {
+// jmarshall
+	// Still needed for gameplay.
 	if (Lock()) {
 		Buffer_Fill_Rect(this, sx, sy, dx, dy, color);
 		Unlock();
 	}
+	//GL_FillRect(color, sx, sy, dx - sx, dy - sy);
+// jmarshall end
 }
 
 

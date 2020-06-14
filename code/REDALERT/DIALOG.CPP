@@ -207,7 +207,10 @@ void Draw_Box(int x, int y, int w, int h, BoxStyleEnum up, bool filled)
 	BoxStyleType const &style = ButtonColors[up];
 
 	if (filled) {
-		LogicPage->Fill_Rect( x, y, x+w, y+h, style.Filler);
+// jmarshall
+		//LogicPage->Fill_Rect( x, y, x+w, y+h, style.Filler);
+		GL_FillRect(style.Filler, x, y, w, h);
+// jmarshall end
 	}
 
 	switch (up) {

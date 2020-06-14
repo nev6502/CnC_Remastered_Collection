@@ -285,13 +285,13 @@ int LoadOptionsClass::Process(void)
 		/*
 		**	Refresh display if needed.
 		*/
-		if (display) {
+		{
 
 			/*
 			**	Display the dialog box.
 			*/
 			Hide_Mouse();
-			if (display) {
+			{
 				Dialog_Box(d_dialog_x, d_dialog_y, d_dialog_w, d_dialog_h);
 				Draw_Caption(caption, d_dialog_x, d_dialog_y, d_dialog_w);
 
@@ -304,7 +304,7 @@ int LoadOptionsClass::Process(void)
 			/*
 			**	Redraw the buttons.
 			*/
-			if (display) {
+			{
 				commands->Flag_List_To_Redraw();
 			}
 			Show_Mouse();
