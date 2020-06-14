@@ -3103,22 +3103,15 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 	**	or release event, special mouse queuing storage variables are used. Other
 	**	events must use the current mouse position globals.
 	*/
-// jmarshall
-	//if (flags & (LEFTPRESS|LEFTRELEASE|RIGHTPRESS|RIGHTRELEASE)) {
-	//	x = Keyboard->MouseQX;
-	//	y = Keyboard->MouseQY;
-	//} else {
-	//	x = Get_Mouse_X();
-	//	y = Get_Mouse_Y();
-	//}
 	x = Get_Mouse_X();
 	y = Get_Mouse_Y();
-// jmarshall end
+
+
 	bool edge = (y == 0 || x == 0 || x == SeenBuff.Get_Width()-1 || y == SeenBuff.Get_Height()-1);
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
-	if (coord) {
-
+	if (coord) 
+	{
 		//shadow = (!Map[cell].IsMapped && !Debug_Unshroud);
 		shadow = (!Map[cell].Is_Mapped(PlayerPtr) && !Debug_Unshroud);		// Use PlayerPtr since we won't be rendering in MP. ST - 8/6/2019 10:49AM
 		x -= Map.TacPixelX;
@@ -3754,7 +3747,7 @@ void DisplayClass::Mouse_Left_Up(CELL cell, bool shadow, ObjectClass * object, A
 				break;
 		}
 	}
-#if 0
+
 	/*
 	**	Never display help text if the mouse is held over the radar map.
 	*/
@@ -3766,11 +3759,7 @@ void DisplayClass::Mouse_Left_Up(CELL cell, bool shadow, ObjectClass * object, A
 	**	Give a generic help message when over shadow terrain.
 	*/
 	if (shadow) {
-//		if (Scen.Scenario < 4) {
-			Help_Text(TXT_SHADOW);
-//		} else {
-//			Help_Text(TXT_NONE);
-//		}
+		Help_Text(TXT_SHADOW);
 	} else {
 
 		/*
@@ -3800,10 +3789,11 @@ void DisplayClass::Mouse_Left_Up(CELL cell, bool shadow, ObjectClass * object, A
 			**	the exact identity is glossed over with a generic text.
 			*/
 			text = object->Full_Name();
-			if (object->Is_Techno() && !((TechnoTypeClass const &)object->Class_Of()).IsNominal) {
+			if (object->Is_Techno() && !((TechnoTypeClass const &)object->Class_Of()).IsNominal)
+			{
 
-				if (!((TechnoClass *)object)->House->Is_Ally(PlayerPtr)) {
-//				if (!PlayerPtr->Is_Ally(object)) {
+				if (!((TechnoClass *)object)->House->Is_Ally(PlayerPtr)) 
+				{
 					switch (object->What_Am_I()) {
 						case RTTI_INFANTRY:
 							text = TXT_ENEMY_SOLDIER;
@@ -3820,7 +3810,7 @@ void DisplayClass::Mouse_Left_Up(CELL cell, bool shadow, ObjectClass * object, A
 				}
 			}
 
-			if (/*Scen.Scenario > 3 ||*/ object->What_Am_I() != RTTI_TERRAIN) {
+			if ( object->What_Am_I() != RTTI_TERRAIN ) {
 				Help_Text(text, -1, -1, color);
 			} else {
 				Help_Text(TXT_NONE);
@@ -3833,7 +3823,6 @@ void DisplayClass::Mouse_Left_Up(CELL cell, bool shadow, ObjectClass * object, A
 			}
 		}
 	}
-#endif
 }
 
 

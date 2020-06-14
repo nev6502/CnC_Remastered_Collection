@@ -844,6 +844,10 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 				WndProc( event.syswm.msg->msg.win.hwnd , event.syswm.msg->msg.win.msg, event.syswm.msg->msg.win.wParam, event.syswm.msg->msg.win.lParam );
 				break;
 
+			case SDL_MOUSEMOTION:
+				flags = GadgetClass::LEFTUP;
+				break;
+
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					flags = GadgetClass::LEFTPRESS;
