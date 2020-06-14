@@ -257,7 +257,7 @@ char const * Map_Selection(void)
 			frame++;
 			frame %= count;
 			timer = delay;
-			Set_Mouse_Cursor(xspot, yspot, Extract_Shape(MouseClass::MouseShapes, start + frame));
+			Set_Mouse_Cursor(xspot, yspot, start + frame);
 		}
 		if (_flags == KN_LMOUSE) {
 			{
@@ -287,7 +287,7 @@ char const * Map_Selection(void)
 	** Restore the mouse to normal shape before leaving this routine.
 	*/
 	Set_Mouse(MOUSE_NORMAL, start, count, delay, xspot, yspot);
-	Set_Mouse_Cursor(xspot, yspot, Extract_Shape(MouseClass::MouseShapes, start));
+	Set_Mouse_Cursor(xspot, yspot, start);
 
 	Keyboard->Clear();
 //	BlackPalette.Set(FADE_PALETTE_SLOW, Call_Back);
