@@ -78,7 +78,22 @@ void (*Misc_Focus_Restore_Function)(void) = nullptr;
 
 void (*Imgui_Dialog_Function)(void) = nullptr;
 
+bool show_oldframebuffer = true;
+void Show_OldFrameBuffer(bool show) {
+	show_oldframebuffer = show;
+	memset(backbuffer_data, 0, ScreenWidth * ScreenHeight * 4);
+}
+
+std::vector<Image_t*> loaded_images;
+
 Image_t* Image_LoadImage(const char* name) {
+	// Check to see if the image is already loaded.
+	for (int i = 0; i < loaded_images.size(); i++) {
+		if (!strcmp(loaded_images[i]->name, name)) {
+			return loaded_images[i];
+		}
+	}
+
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
@@ -176,21 +191,24 @@ void Device_Present(void)
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
 
-	// Use imgui to render the screenbuffer.
+	bool ScreenActive;
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+
+	ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
+	ImGui::SetNextWindowPos(ImVec2(0,0));
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs);
+	ImGui::PopStyleVar();
+
+	if (show_oldframebuffer)
 	{
-		bool ScreenActive;
-		ImGuiStyle& style = ImGui::GetStyle();
-		style.FramePadding = ImVec2(0, 0);
-
-		// @@ wtf? padding?
-		ImGui::SetNextWindowSize(ImVec2(ScreenWidth+12, ScreenHeight + 12));
-		ImGui::SetNextWindowPos(ImVec2(-8, -8));		
-
-		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
-			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
-			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);			
-		ImGui::End();		
+		ImVec2 desktopSize(ScreenWidth, ScreenHeight);
+		ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
 	}
+
+	ImGui::End();
 
 	if (Imgui_Dialog_Function) {
 		Imgui_Dialog_Function();		
