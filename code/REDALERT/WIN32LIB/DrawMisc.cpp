@@ -1911,8 +1911,6 @@ proc_out:
 */	
 void __cdecl Buffer_Draw_Stamp_Clip(void const *this_object, void const *icondata, int icon, int x_pixel, int y_pixel, void const *remap, int min_x, int min_y, int max_x, int max_y)
 {
-	
-	
 	unsigned int	modulo = 0;
 	unsigned int	iwidth = 0;
 	unsigned int	skip = 0;
