@@ -1435,17 +1435,14 @@ bool Select_Game(bool fade)
 
 		if (selection != SEL_START_NEW_GAME) {
 			BlackPalette.Set(FADE_PALETTE_MEDIUM, Call_Back);
-#ifdef WIN32
 			HiddenPage.Clear();
 			VisiblePage.Clear();
-#else
-			HidPage.Clear();
-			SeenPage.Clear();
-#endif	//WIN32
+
 		}
 		Show_Mouse();
-//Mono_Printf("About to call Start Scenario with %s\n", Scen.ScenarioName);
-		if (!Start_Scenario(Scen.ScenarioName)) {
+
+		if ( !Start_Scenario(Scen.ScenarioName, Session.Type != GAME_SKIRMISH ) ) 
+		{
 			return(false);
 		}
 		if (Special.IsFromInstall) Show_Mouse();

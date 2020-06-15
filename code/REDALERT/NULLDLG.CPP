@@ -123,22 +123,10 @@ int Com_Scenario_Dialog(bool skirmish)
 	int d_name_x = d_dialog_x + (d_dialog_w / 4) - (d_name_w / 2);
 	int d_name_y = d_dialog_y + d_margin2 + d_txt6_h + 1 * RESFACTOR;
 
-#ifdef OLDWAY
-	int d_gdi_w = 40 * RESFACTOR;
-	int d_gdi_h = 9 * RESFACTOR;
-	int d_gdi_x = d_dialog_cx - d_gdi_w;
-	int d_gdi_y = d_name_y;
-
-	int d_nod_w = 40 * RESFACTOR;
-	int d_nod_h = 9 * RESFACTOR;
-	int d_nod_x = d_dialog_cx;
-	int d_nod_y = d_name_y;
-#else
 	int d_house_w = 60 * RESFACTOR;
 	int d_house_h = (8 * 5 * RESFACTOR);
 	int d_house_x = d_dialog_cx - (d_house_w / 2);
 	int d_house_y = d_name_y;
-#endif
 
 	int d_color_w = 10 * RESFACTOR;
 	int d_color_h = 9 * RESFACTOR;
