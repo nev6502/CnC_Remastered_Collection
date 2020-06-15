@@ -1607,6 +1607,8 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 	*/
 	Hide_Mouse();
 
+	Show_OldFrameBuffer(false);
+
 	PaletteClass temp;
 #ifdef WIN32
 	char *filename = "SOVPAPER.PCX";
@@ -1864,6 +1866,8 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 	Show_Mouse();
 
 	GadgetClass::Set_Color_Scheme(&ColorRemaps[PCOLOR_DIALOG_BLUE]);
+
+	Show_OldFrameBuffer(true);
 
 	return(retval);
 }

@@ -83,8 +83,6 @@ void (*Imgui_Dialog_Function)(void) = nullptr;
 bool show_oldframebuffer = true;
 void Show_OldFrameBuffer(bool show) {
 	show_oldframebuffer = show;
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
 	memset(backbuffer_data, 0, ScreenWidth * ScreenHeight * 4);
 }
 
@@ -174,40 +172,42 @@ void Set_DD_Palette(void* palette, bool raShift)
 
 void ImGui_NewFrame(void) {
 	ImGuiIO& io = ImGui::GetIO();
-	//glClearColor(0, 0, 0, 1);
-	//glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
 
 	io.DisplaySize = ImVec2(ScreenWidth, ScreenHeight);
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui::NewFrame();
+	ImGui::NewFrame(show_oldframebuffer);
 
 	ImGui_ImplSDL2_NewFrame(game_window);
 }
 
 void Device_Present(void) {	
-	// Use imgui to render the screenbuffer.
-	if(show_oldframebuffer)
-	{		
-		// Rasterize the palette.
-		for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
-			backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
-			backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
-			backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
-			backbuffer_data[(i * 4) + 3] = 255;
-		}
-		glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
 
-		bool ScreenActive;
-		ImGuiStyle& style = ImGui::GetStyle();
-		style.FramePadding = ImVec2(0, 0);
-		ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
-		ImGui::SetNextWindowPos(ImVec2(0, 0));		
-		ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs);
-			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
-			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);			
-		ImGui::End();		
+	// Rasterize the palette.
+	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
+		backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
+		backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
+		backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
+		backbuffer_data[(i * 4) + 3] = 255;
 	}
+	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+
+	bool ScreenActive;
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.FramePadding = ImVec2(0, 0);
+	ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs);
+		if (show_oldframebuffer)
+		{
+			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
+			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
+		}
+
+	ImGui::End();
+
 
 	if (Imgui_Dialog_Function) {
 		Imgui_Dialog_Function();		

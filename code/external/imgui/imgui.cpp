@@ -3734,7 +3734,7 @@ ImGuiKeyModFlags ImGui::GetMergedKeyModFlags()
     return key_mod_flags;
 }
 
-void ImGui::NewFrame()
+void ImGui::NewFrame(bool clearCmdList)
 {
     IM_ASSERT(GImGui != NULL && "No current context. Did you call ImGui::CreateContext() and ImGui::SetCurrentContext() ?");
     ImGuiContext& g = *GImGui;
@@ -3777,16 +3777,21 @@ void ImGui::NewFrame()
     if (g.IO.BackendFlags & ImGuiBackendFlags_RendererHasVtxOffset)
         g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AllowVtxOffset;
 
-    g.BackgroundDrawList.ResetForNewFrame();
-    g.BackgroundDrawList.PushTextureID(g.IO.Fonts->TexID);
-    g.BackgroundDrawList.PushClipRectFullScreen();
 
-    g.ForegroundDrawList.ResetForNewFrame();
-    g.ForegroundDrawList.PushTextureID(g.IO.Fonts->TexID);
-    g.ForegroundDrawList.PushClipRectFullScreen();
 
     // Mark rendering data as invalid to prevent user who may have a handle on it to use it.
-    g.DrawData.Clear();
+    if (clearCmdList) {
+        g.BackgroundDrawList.ResetForNewFrame();        
+        g.BackgroundDrawList.PushClipRectFullScreen();
+
+        g.ForegroundDrawList.ResetForNewFrame();        
+        g.ForegroundDrawList.PushClipRectFullScreen();
+
+        g.DrawData.Clear();
+    }
+
+    g.BackgroundDrawList.PushTextureID(g.IO.Fonts->TexID);
+    g.ForegroundDrawList.PushTextureID(g.IO.Fonts->TexID);
 
     // Drag and drop keep the source ID alive so even if the source disappear our state is consistent
     if (g.DragDropActive && g.DragDropPayload.SourceId == g.ActiveId)
