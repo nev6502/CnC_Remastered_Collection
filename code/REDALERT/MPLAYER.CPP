@@ -160,7 +160,7 @@ GameType Select_MPlayer_Game (void)
 	//	Initialize
 	//------------------------------------------------------------------------
 	Set_Logic_Page(SeenBuff);
-	VisiblePage.Blit(seen_buff_save);
+	//VisiblePage.Blit(seen_buff_save);
 
 	//------------------------------------------------------------------------
 	//	Fill array of button ptrs

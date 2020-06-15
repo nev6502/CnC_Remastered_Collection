@@ -129,7 +129,7 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
     if (icon_index < IconCount) {
 
         int32_t fullpitch = viewport.Get_Full_Pitch(); //(viewport.Get_Pitch() + viewport.Get_XAdd() + viewport.Get_Width());
-        uint8_t* dst = x + y * fullpitch + (uint8_t*)(viewport.Get_Offset());
+        uint8_t* dst = (x * 4) + (y * 4) * fullpitch + (uint8_t*)(viewport.Get_Offset());
         int32_t blitpitch = fullpitch - IconWidth;
         uint8_t* src = &StampPtr[IconSize * icon_index];
 
@@ -140,10 +140,13 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
                     uint8_t cur_byte = remap[*src++];
 
                     if (cur_byte) {
-                        *dst = cur_byte;
+                        dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
+                        dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
+                        dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
+                        dst[3] = 255;
                     }
 
-                    ++dst;
+                    dst+=4;
                 }
 
                 dst += blitpitch;
@@ -155,11 +158,14 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
                 for (int j = 0; j < IconWidth; ++j) {
                     uint8_t cur_byte = *src++;
 
-                    if (cur_byte) {
-                        *dst = cur_byte;
-                    }
+					if (cur_byte) {
+						dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
+						dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
+						dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
+						dst[3] = 255;
+					}
 
-                    ++dst;
+					dst += 4;
                 }
 
                 dst += blitpitch;
@@ -167,9 +173,9 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
         }
         else {
             for (int32_t i = 0; i < IconHeight; ++i) {
-                memcpy(dst, src, IconWidth);
+                FastScanlinePaletteBlit(dst, src, IconWidth);
                 dst += fullpitch;
-                src += IconWidth;
+                src += IconWidth * 4;
             }
         }
     }
@@ -221,7 +227,7 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, IconControl
             }
 
             int full_pitch = viewport.Get_Full_Pitch(); //(viewport.Get_Pitch() + viewport.Get_XAdd() + viewport.Get_Width());
-            uint8_t* dst = xstart + ystart * full_pitch + (uint8_t*)(viewport.Get_Offset());
+            uint8_t* dst = (xstart * 4) + (ystart * 4) * full_pitch + (uint8_t*)(viewport.Get_Offset());
             int dst_pitch = full_pitch - blit_width;
 
             if (remapper) {
@@ -229,13 +235,16 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, IconControl
                 for (int i = 0; i < blit_height; ++i) {
                     for (int j = 0; j < blit_width; ++j) {
                         uint8_t cur_byte = remap[*src++];
-                        if (cur_byte) {
-                            *dst = cur_byte;
-                        }
+						if (cur_byte) {
+							dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
+							dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
+							dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
+							dst[3] = 255;
+						}
 
-                        ++dst;
+						dst += 4;
                     }
-                    dst += dst_pitch;
+                    dst += dst_pitch * 4;
                 }
 
             }
@@ -243,21 +252,24 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, IconControl
                 for (int i = 0; i < blit_height; ++i) {
                     for (int j = 0; j < blit_width; ++j) {
                         uint8_t cur_byte = *src++;
-                        if (cur_byte) {
-                            *dst = cur_byte;
-                        }
+						if (cur_byte) {
+							dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
+							dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
+							dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
+							dst[3] = 255;
+						}
 
-                        ++dst;
+						dst += 4;
                     }
                     src += src_pitch;
-                    dst += dst_pitch;
+                    dst += dst_pitch * 4;
                 }
 
             }
             else {
                 for (int i = 0; i < blit_height; ++i) {
-                    memcpy(dst, src, blit_width);
-                    dst += full_pitch;
+                    FastScanlinePaletteBlit(dst, src, blit_width);
+                    dst += full_pitch * 4;
                     src += IconWidth;
                 }
             }

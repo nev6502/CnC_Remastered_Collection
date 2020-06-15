@@ -138,7 +138,31 @@
 #include "iconcach.h"
 #include "../NEWBLIT.H"
 
+#include <stdint.h>
+
 extern unsigned char* backbuffer_data_raw;
+extern unsigned char backbuffer_palette[768];
+__forceinline void FastScanlinePaletteBlit(uint8_t* dst, uint8_t* src, int length) {
+	for (int i = 0; i < length; i++) {
+		uint8_t color = src[i];
+		if (color == 0)
+			continue;
+
+		dst[(i * 4) + 0] = backbuffer_palette[(color * 3) + 0];
+		dst[(i * 4) + 1] = backbuffer_palette[(color * 3) + 1];
+		dst[(i * 4) + 2] = backbuffer_palette[(color * 3) + 2];
+		dst[(i * 4) + 3] = 255;
+	}
+}
+
+__forceinline void FastScanlinePaletteBlit(uint8_t* dst, uint8_t color, int length) {
+	for (int i = 0; i < length; i++) {
+		dst[(i * 4) + 0] = backbuffer_palette[(color * 3) + 0];
+		dst[(i * 4) + 1] = backbuffer_palette[(color * 3) + 1];
+		dst[(i * 4) + 2] = backbuffer_palette[(color * 3) + 2];
+		dst[(i * 4) + 3] = 255;
+	}
+}
 
 #ifndef FUNCTION_H
 //#pragma off (unreferenced)
@@ -268,6 +292,7 @@ class GraphicViewPortClass {
 						int dy_pixel, int pixel_width, int pixel_height, BOOL trans = FALSE);
 		HRESULT	Blit(	GraphicViewPortClass& dest, int dx, int dy, BOOL trans = FALSE);
 		HRESULT	Blit(	GraphicViewPortClass& dest, BOOL trans = FALSE);
+		HRESULT	BlitLegacy(GraphicViewPortClass& dest, BOOL trans = FALSE);
 		HRESULT	Blit(	VideoViewPortClass& dest, int x_pixel, int y_pixel, int dx_pixel,
 						int dy_pixel, int pixel_width, int pixel_height, BOOL trans = FALSE);
 		HRESULT	Blit(	VideoViewPortClass& dest, int dx, int dy, BOOL trans = FALSE);
@@ -808,9 +833,43 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int dx, i
  * HISTORY:                                                                *
  *   01/06/1995 PWG : Created.                                             *
  *=========================================================================*/
+inline HRESULT	GraphicViewPortClass::BlitLegacy(GraphicViewPortClass& dest, BOOL trans)
+{
+	HRESULT		return_code = 0;
+
+
+	if (Lock()) {
+		if (dest.Lock()) {
+
+				return_code = (Linear_Blit_To_Linear_Pal(this, &dest, 0, 0
+					, 0, 0
+					, Width, Height, trans));
+		
+		}
+		dest.Unlock();
+	}
+	Unlock();
+
+	return (return_code);
+
+}
+
+
+/***************************************************************************
+ * GVPC::BLIT -- stub 3 to call curr graphic mode Blit to GVPC					*
+ *                                                                         *
+ * INPUT:                                                                  *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   01/06/1995 PWG : Created.                                             *
+ *=========================================================================*/
 inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, BOOL trans)
 {
-	HRESULT		return_code=0;
+	HRESULT		return_code = 0;
 
 
 	if (Lock()) {

@@ -166,7 +166,9 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 	*/
 	Set_Logic_Page(SeenBuff);
 	#ifdef WIN32
-	VisiblePage.Blit(seen_buff_save);
+// jmarshall - not needed
+	//VisiblePage.Blit(seen_buff_save);
+// jmarshall end
 	#endif
 
 	/*

@@ -1054,231 +1054,34 @@ CODESEG
 #define OPTIMAL_BYTE_COPY	14
 
 
-void __cdecl Buffer_Fill_Rect(void *thisptr, int sx, int sy, int dx, int dy, unsigned char color)
+void __cdecl Buffer_Fill_Rect(void *thisptr, int x, int y, int w, int h, unsigned char color)
 {
-/*
-	;*===================================================================
-	;* define the arguements that our function takes.
-	;*===================================================================
-	ARG    	this_object:DWORD			; this is a member function
-	ARG	x1_pixel:WORD
-	ARG	y1_pixel:WORD
-	ARG	x2_pixel:WORD
-	ARG	y2_pixel:WORD
-	ARG    	color:BYTE			; what color should we clear to
-*/
-	
-	void *this_object = thisptr;
-	int x1_pixel = sx;
-	int y1_pixel = sy;
-	int x2_pixel = dx;
-	int y2_pixel = dy;
-	
-/*
-	;*===================================================================
-	; Define some locals so that we can handle things quickly
-	;*===================================================================
-	LOCAL	VPwidth:DWORD		; the width of the viewport
-	LOCAL	VPheight:DWORD		; the height of the viewport
-	LOCAL	VPxadd:DWORD		; the additional x offset of viewport
-	LOCAL	VPbpr:DWORD		; the number of bytes per row of viewport
-*/
+	GraphicViewPortClass& vp = (*(GraphicViewPortClass *)thisptr);
 
-	int VPwidth;
-	int VPheight;
-	int VPxadd;
-	int VPbpr;
+	// If we aren't drawing within the viewport, return
+	if (x >= vp.Get_Width() || y >= vp.Get_Height() || w < 0 || h < 0) {
+		return;
+	}
 
-	int local_ebp;	                      // Can't use ebp
+	// Clipping
+	if (x < 0) {
+		x = 0;
+	}
 
-	__asm {
+	if (y < 0) {
+		y = 0;
+	}
 
-		;*===================================================================
-		;* save off the viewport characteristics on the stack
-		;*===================================================================
-		mov	ebx,[this_object]				; get a pointer to viewport
-		mov	eax,[ebx]GraphicViewPortClass.Width		; get width from viewport
-		mov	ecx,[ebx]GraphicViewPortClass.Height	; get height from viewport
-		mov	edx,[ebx]GraphicViewPortClass.XAdd		; get xadd from viewport
-		add	edx,[ebx]GraphicViewPortClass.Pitch		; extra pitch of direct draw surface
-		mov	[VPwidth],eax				; store the width of locally
-		mov	[VPheight],ecx
-		mov	[VPxadd],edx
-		add	eax,edx
-		mov	[VPbpr],eax
+	w = min(w, vp.Get_Width() - 1);
+	h = min(h, vp.Get_Height() - 1);
 
-		;*===================================================================
-		;* move the important parameters into local registers
-		;*===================================================================
-		mov	eax,[x1_pixel]
-		mov	ebx,[y1_pixel]
-		mov	ecx,[x2_pixel]
-		mov	edx,[y2_pixel]
+	uint8_t* offset = (y * 4) * vp.Get_Full_Pitch() + (x * 4) + (uint8_t*)(vp.Get_Offset());
+	int height = h - y + 1;
+	int width = w - x + 1;
 
-		;*===================================================================
-		;* Convert the x2 and y2 pixel to a width and height
-		;*===================================================================
-		cmp	eax,ecx
-		jl	no_swap_x
-		xchg	eax,ecx
-
-	no_swap_x:
-		sub	ecx,eax
-		cmp	ebx,edx
-		jl	no_swap_y
-		xchg	ebx,edx
-	no_swap_y:
-		sub	edx,ebx
-		inc	ecx
-		inc	edx
-
-		;*===================================================================
-		;* Bounds check source X.
-		;*===================================================================
-		cmp	eax, [VPwidth]			; compare with the max
-		jge	done				; starts off screen, then later
-		jb	short sx_done			; if it's not negative, it's ok
-
-		;------ Clip source X to left edge of screen.
-		add	ecx, eax			; Reduce width (add in negative src X).
-		xor	eax, eax			; Clip to left of screen.
-	sx_done:
-
-		;*===================================================================
-		;* Bounds check source Y.
-		;*===================================================================
-		cmp	ebx, [VPheight]			; compare with the max
-		jge	done				; starts off screen, then later
-		jb	short sy_done			; if it's not negative, it's ok
-
-		;------ Clip source Y to top edge of screen.
-		add	edx, ebx			; Reduce height (add in negative src Y).
-		xor	ebx, ebx			; Clip to top of screen.
-
-	sy_done:
-		;*===================================================================
-		;* Bounds check width versus width of source and dest view ports
-		;*===================================================================
-		push	ebx				; save off ebx for later use
-		mov	ebx,[VPwidth]			; get the source width
-		sub	ebx, eax			; Maximum allowed pixel width (given coordinates).
-		sub	ebx, ecx			; Pixel width undershoot.
-		jns	short width_ok		; if not signed no adjustment necessary
-		add	ecx, ebx			; Reduce width to screen limits.
-
-	width_ok:
-		pop	ebx				; restore ebx to old value
-
-		;*===================================================================
-		;* Bounds check height versus height of source view port
-		;*===================================================================
-		push	eax				; save of eax for later use
-		mov	eax, [VPheight]			; get the source height
-		sub	eax, ebx			; Maximum allowed pixel height (given coordinates).
-		sub	eax, edx			; Pixel height undershoot.
-		jns	short height_ok		; if not signed no adjustment necessary
-		add	edx, eax			; Reduce height to screen limits.
-	height_ok:
-		pop	eax				; restore eax to old value
-
-		;*===================================================================
-		;* Perform the last minute checks on the width and height
-		;*===================================================================
-		or	ecx,ecx
-		jz	done
-
-		or	edx,edx
-		jz	done
-
-		cmp	ecx,[VPwidth]
-		ja	done
-		cmp	edx,[VPheight]
-		ja	done
-
-		;*===================================================================
-		;* Get the offset into the virtual viewport.
-		;*===================================================================
-		xchg	edi,eax			; save off the contents of eax
-		xchg	esi,edx			;   and edx for size test
-		mov	eax,ebx			; move the y pixel into eax
-		mul	[VPbpr]			; multiply by bytes per row
-		add	edi,eax			; add the result into the x position
-		mov	ebx,[this_object]
-		add	edi,[ebx]GraphicViewPortClass.Offset
-
-		mov	edx,esi			; restore edx back to real value
-		mov	eax,ecx			; store total width in ecx
-		sub	eax,[VPwidth]		; modify xadd value to include clipped
-		sub	[VPxadd],eax		;   width bytes (subtract a negative number)
-
-		;*===================================================================
-		; Convert the color byte to a DWORD for fast storing
-		;*===================================================================
-		mov	al,[color]				; get color to clear to
-		mov	ah,al					; extend across WORD
-		mov	ebx,eax					; extend across DWORD in
-		shl	eax,16					;   several steps
-		mov	ax,bx
-
-		;*===================================================================
-		; If there is no row offset then adjust the width to be the size of
-		;   the entire viewport and adjust the height to be 1
-		;*===================================================================
-		mov	esi,[VPxadd]
-		or	esi,esi					; set the flags for esi
-		jnz	row_by_row_aligned			;   and act on them
-
-		xchg	eax,ecx					; switch bit pattern and width
-		mul	edx					; multiply by edx to get size
-		xchg	eax,ecx					; switch size and bit pattern
-		mov	edx,1					; only 1 line off view port size to do
-
-		;*===================================================================
-		; Find out if we should bother to align the row.
-		;*===================================================================
-	row_by_row_aligned:
-		mov	[local_ebp],ecx					; width saved in ebp
-		cmp	ecx,OPTIMAL_BYTE_COPY			; is it worth aligning them?
-		jl	row_by_row				;   if not then skip
-
-		;*===================================================================
-		; Figure out the alignment offset if there is any
-		;*===================================================================
-		mov	ebx,edi					; get output position
-		and	ebx,3					;   is there a remainder?
-		jz	aligned_loop				;   if not we are aligned
-		xor	ebx,3					; find number of align bytes
-		inc	ebx					; this number is off by one
-		sub	[local_ebp],ebx					; subtract from width
-
-		;*===================================================================
-		; Now that we have the alignment offset copy each row
-		;*===================================================================
-	aligned_loop:
-		mov	ecx,ebx					; get number of bytes to align
-		rep	stosb					;   and move them over
-		mov	ecx,[local_ebp]					; get number of aligned bytes
-		shr	ecx,2					;   convert to DWORDS
-		rep	stosd					;   and move them over
-		mov	ecx,[local_ebp]					; get number of aligned bytes
-		and	ecx,3					;   find the remainder
-		rep	stosb					;   and move it over
-		add	edi,esi					; fix the line offset
-		dec	edx					; decrement the height
-		jnz	aligned_loop				; if more to do than do it
-		jmp	done					; we are all done
-
-		;*===================================================================
-		; If not enough bytes to bother aligning copy each line across a byte
-		;    at a time.
-		;*===================================================================
-	row_by_row:
-		mov	ecx,[local_ebp]					; get total width in bytes
-		rep	stosb					; store the width
-		add	edi,esi					; handle the xadd
-		dec	edx					; decrement the height
-		jnz	row_by_row				; if any left then next line
-	done:
+	for (int i = 0; i < height; ++i) {
+		FastScanlinePaletteBlit(offset, color, width);
+		offset += vp.Get_Full_Pitch() * 4;
 	}
 }
 
@@ -1491,6 +1294,86 @@ BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, in
 BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int w, int h, BOOL use_key)
 {
 	GraphicViewPortClass& src_vp = *(GraphicViewPortClass *)this_object;
+	GraphicViewPortClass& dst_vp = *(GraphicViewPortClass*)dest;
+
+	uint8_t* src = (uint8_t*)(src_vp.Get_Offset());
+	uint8_t* dst = (uint8_t*)(dst_vp.Get_Offset());
+	int src_pitch = src_vp.Get_Full_Pitch();
+	int dst_pitch = dst_vp.Get_Full_Pitch() * 4;
+
+	if (src_x >= src_vp.Get_Width() || src_y >= src_vp.Get_Height() || dst_x >= dst_vp.Get_Width()
+		|| dst_y >= dst_vp.Get_Height() || h < 0 || w < 1) {
+		return 0;
+	}
+
+	src_x = max(0, src_x);
+	src_y = max(0, src_y);
+	dst_x = max(0, dst_x);
+	dst_y = max(0, dst_y);
+
+	h = (dst_y + h) > dst_vp.Get_Height() ? dst_vp.Get_Height() - 1 - dst_y : h;
+	w = (dst_x + w) > dst_vp.Get_Width() ? dst_vp.Get_Width() - 1 - dst_x : w;
+
+	// move our pointers to the start locations
+	src += src_x + src_y * src_pitch;
+	dst += dst_x + dst_y * dst_pitch;
+
+	// If src is before dst, we run the risk of overlapping memory regions so we
+	// need to move src and dst to the last line and work backwards
+	if (src < dst) {
+		uint8_t* esrc = src + (h - 1) * src_pitch;
+		uint8_t* edst = dst + (h - 1) * dst_pitch;
+		if (use_key) {
+			char key_colour = 0;
+			while (h-- != 0) {
+				// Can't optimize as we need to check every pixel against key colour :(
+				for (int i = w - 1; i >= 0; --i) {
+					if (esrc[i] != key_colour) {
+						edst[i] = esrc[i];
+					}
+				}
+
+				edst -= dst_pitch;
+				esrc -= src_pitch;
+			}
+		}
+		else {
+			while (h-- != 0) {
+				FastScanlinePaletteBlit(edst, esrc, w);
+				edst -= dst_pitch;
+				esrc -= src_pitch;
+			}
+		}
+	}
+	else {
+		if (use_key) {
+			uint8_t key_colour = 0;
+			while (h-- != 0) {
+				// Can't optimize as we need to check every pixel against key colour :(
+				for (int i = 0; i < w; ++i) {
+					if (src[i] != key_colour) {
+						dst[i] = src[i];
+					}
+				}
+
+				dst += dst_pitch;
+				src += src_pitch;
+			}
+		}
+		else {
+			while (h-- != 0) {
+				FastScanlinePaletteBlit(dst, src, w);
+				dst += dst_pitch;
+				src += src_pitch;
+			}
+		}
+	}
+	return true;
+}
+
+BOOL __cdecl Linear_Blit_To_Linear_Pal(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int w, int h, BOOL use_key)
+{
+	GraphicViewPortClass& src_vp = *(GraphicViewPortClass*)this_object;
 	GraphicViewPortClass& dst_vp = *(GraphicViewPortClass*)dest;
 
 	uint8_t* src = (uint8_t*)(src_vp.Get_Offset());
@@ -3651,7 +3534,7 @@ extern "C" long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *buffer,
 
 	int pitch = vp.Get_Pitch() + vp.Get_Width() + vp.Get_XAdd();
 	uint8_t* dst = y * pitch + x + (uint8_t*)(vp.Get_Offset());
-	uint8_t* src = xoffset + w * yoffset + static_cast<uint8_t*>(buffer);
+	uint8_t* src = (xoffset * 4) + w * (yoffset * 4) + static_cast<uint8_t*>(buffer);
 	// int dst_pitch = x_pos + pitch - xend;
 	// int src_pitch = x_pos + width - xend;
 	int lines = yend - ystart + 1;
@@ -3659,9 +3542,9 @@ extern "C" long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *buffer,
 
 	// blit
 	while (lines--) {
-		memcpy(dst, src, blit_width);
+		FastScanlinePaletteBlit(dst, src, blit_width);
 		src += w;
-		dst += pitch;
+		dst += pitch * 4;
 	}
 
 	return 0;

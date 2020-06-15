@@ -114,20 +114,23 @@ void BF_Copy(int width, int height, uint8_t* dst, uint8_t* src, int dst_pitch, i
 void BF_Trans(int width, int height, uint8_t* dst, uint8_t* src, int dst_pitch, int src_pitch, uint8_t* ghost_lookup,
     uint8_t* ghost_tab, uint8_t* fade_tab, int count)
 {
-    while (height--) {
-        for (int i = width; i > 0; --i) {
-            uint8_t sbyte = *src++;
+	while (height--) {
+		for (int i = width; i > 0; --i) {
+			uint8_t sbyte = *src++;
 
-            if (sbyte) {
-                *dst = sbyte;
-            }
+			if (sbyte) {
+				dst[0] = backbuffer_palette[(sbyte * 3) + 0];
+                dst[1] = backbuffer_palette[(sbyte * 3) + 1];
+                dst[2] = backbuffer_palette[(sbyte * 3) + 2];
+                dst[3] = 255;
+			}
 
-            ++dst;
-        }
+			dst+=4;
+		}
 
-        src += src_pitch;
-        dst += dst_pitch;
-    }
+		src += src_pitch;
+		dst += dst_pitch * 4;
+	}
 }
 
 // Fading table based shadow and transparency
@@ -166,14 +169,17 @@ void BF_Ghost_Trans(int width, int height, uint8_t* dst, uint8_t* src, int dst_p
                     sbyte = ghost_tab[*dst + fbyte * 256];
                 }
 
-                *dst = sbyte;
+                dst[0] = backbuffer_palette[(sbyte * 3) + 0];
+                dst[1] = backbuffer_palette[(sbyte * 3) + 1];
+                dst[2] = backbuffer_palette[(sbyte * 3) + 2];
+                dst[3] = 255;
             }
 
-            ++dst;
+           dst += 4;
         }
 
         src += src_pitch;
-        dst += dst_pitch;
+        dst += dst_pitch * 4;
     }
 }
 
@@ -258,14 +264,17 @@ void BF_Ghost_Fading_Trans(int width, int height, uint8_t* dst, uint8_t* src, in
                     sbyte = fade_tab[sbyte];
                 }
 
-                *dst = sbyte;
+                dst[0] = backbuffer_palette[(sbyte * 3) + 0];
+                dst[1] = backbuffer_palette[(sbyte * 3) + 1];
+                dst[2] = backbuffer_palette[(sbyte * 3) + 2];
+                dst[3] = 255;
             }
 
-            ++dst;
+            dst += 4;
         }
 
         src += src_pitch;
-        dst += dst_pitch;
+        dst += dst_pitch * 4;
     }
 }
 
@@ -1508,7 +1517,7 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, void* shape, Grap
     int blit_height = yend - ystart + 1;
 
     int pitch = viewport.Get_Full_Pitch();
-    uint8_t* dst = ystart * pitch + xstart + (uint8_t*)(viewport.Get_Offset());
+    uint8_t* dst = (ystart *  pitch * 4) + (xstart * 4) + (uint8_t*)(viewport.Get_Offset());
     uint8_t* src = frame_data + ms_img_offset;
     int dst_pitch = pitch - blit_width;
     int src_pitch = width - blit_width;
@@ -1525,7 +1534,7 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, void* shape, Grap
         for (int i = 0; i < blit_height; ++i) {
             NewShapeJumpTable[line_flags[i] & 0x1F](blit_width, dst, src, ghost_lookup, ghost_table, fade_table, fade_count);
             src += width;
-            dst += pitch;
+            dst += pitch * 4;
         }
 
         return 0;

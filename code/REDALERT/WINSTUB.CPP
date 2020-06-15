@@ -64,7 +64,7 @@
 #include <vector>
 
 GLuint backbuffer_texture = -1;
-byte* backbuffer_data;
+//byte* backbuffer_data;
 unsigned char* backbuffer_data_raw;
 byte backbuffer_palette[768];
 HWND MainWindow;
@@ -83,7 +83,7 @@ void (*Imgui_Dialog_Function)(void) = nullptr;
 bool show_oldframebuffer = true;
 void Show_OldFrameBuffer(bool show) {
 	show_oldframebuffer = show;
-	memset(backbuffer_data, 0, ScreenWidth * ScreenHeight * 4);
+	memset(backbuffer_data_raw, 0, ScreenWidth * ScreenHeight * 4);
 }
 
 std::vector<Image_t *> loaded_images;
@@ -185,14 +185,14 @@ void ImGui_NewFrame(void) {
 void Device_Present(void) {	
 
 	// Rasterize the palette.
-	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
-		backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
-		backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
-		backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
-		backbuffer_data[(i * 4) + 3] = 255;
-	}
+	//for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
+	//	backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
+	//	backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
+	//	backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
+	//	backbuffer_data[(i * 4) + 3] = 255;
+	//}
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data_raw);
 
 	bool ScreenActive;
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -422,15 +422,13 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 	glGenTextures(1, &backbuffer_texture);
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+	// Give the image to OpenGL	
+	backbuffer_data_raw = new byte[width * height * 4];
+	memset(backbuffer_data_raw, 0, width * height * 4);
 
-	// Give the image to OpenGL
-	backbuffer_data = new byte[width * height * 4];
-	memset(backbuffer_data, 0, width * height * 4);
-	backbuffer_data_raw = new byte[width * height];
-	memset(backbuffer_data_raw, 0, width * height);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data_raw);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glewInit();

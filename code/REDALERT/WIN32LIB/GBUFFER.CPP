@@ -172,7 +172,7 @@ void GraphicViewPortClass::Attach(GraphicBufferClass *gbuffer, int x, int y, int
 	/*======================================================================*/
 	/* Get a pointer to the top left edge of the buffer.							*/
 	/*======================================================================*/
- 	Offset 		= gbuffer->Get_Offset() + ((gbuffer->Get_Width()+gbuffer->Get_Pitch()) * y) + x;
+ 	Offset 		= gbuffer->Get_Offset() + ((gbuffer->Get_Width()+gbuffer->Get_Pitch()) * y * 4) + (x * 4);
 
 	/*======================================================================*/
 	/* Copy over all of the variables that we need to store.						*/
@@ -237,7 +237,7 @@ BOOL GraphicViewPortClass::Change(int x, int y, int w, int h)
  *=========================================================================*/
 void GraphicBufferClass::DD_Init(GBC_Enum flags)
 {
-	rawCpuBuffer = new unsigned char[Width * Height];
+	rawCpuBuffer = new unsigned char[Width * Height * 4];
 
 	Allocated		= FALSE;			//	even if system alloced, dont flag it cuz
 											//   we dont want it freed.
@@ -280,7 +280,7 @@ void GraphicBufferClass::Init(int w, int h, void *buffer, long size, GBC_Enum fl
 			Buffer= (BYTE *)buffer;				//		point to it and mark
 			Allocated	= FALSE;							//		it as user allocated
 		} else {
-			if (!Size) Size = w*h;
+			if (!Size) Size = w*h*4;
 			Buffer		= new BYTE[Size];				// otherwise allocate it and
 			Allocated	= TRUE;							//		mark it system alloced
 		}

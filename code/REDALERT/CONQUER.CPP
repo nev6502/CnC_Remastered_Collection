@@ -3626,9 +3626,9 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 
 			predoffset = Frame;
 
-			if (x > ( WindowList[window][WINDOWWIDTH] << 2)) {
-				predoffset = -predoffset;
-			}
+			//if (x > ( WindowList[window][WINDOWWIDTH] << 2)) {
+			//	predoffset = -predoffset;
+			//}
 
 			if (draw_window.Lock()) {
 				if ((flags & (SHAPE_GHOST|SHAPE_FADING)) == (SHAPE_GHOST|SHAPE_FADING)) {
