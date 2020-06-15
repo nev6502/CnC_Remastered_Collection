@@ -1030,7 +1030,8 @@ bool SidebarClass::Activate(int control)
 		**	activate it on the left side of the screen.
 		*/
 		if (IsSidebarActive /*&& X*/) {
-			Set_View_Dimensions(0, 0, (((ScreenWidth/2)-SIDE_WIDTH)/ICON_PIXEL_W) * RESFACTOR);
+			Set_View_Dimensions( 0, 0, SeenBuff.Get_Width() - ( SIDE_WIDTH * RESFACTOR ) );
+
 			IsToRedraw = true;
 			Help_Text(TXT_NONE);
 			Repair.Zap();

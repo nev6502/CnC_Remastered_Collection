@@ -84,7 +84,7 @@ void Show_OldFrameBuffer(bool show) {
 	memset(backbuffer_data, 0, ScreenWidth * ScreenHeight * 4);
 }
 
-std::vector<Image_t*> loaded_images;
+std::vector<Image_t *> loaded_images;
 
 Image_t* Image_LoadImage(const char* name) {
 	// Check to see if the image is already loaded.
