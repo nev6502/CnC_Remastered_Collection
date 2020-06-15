@@ -729,10 +729,13 @@ oh_dear_its_a_label:
 			..................................................................*/
 			{
 				for (i = 0; i < MAX_MPLAYER_COLORS; i++) {
-					LogicPage->Fill_Rect(cbox_x[i] + 1, d_color_y + 1,
-						cbox_x[i] + 1 + d_color_w - 2, d_color_y + 1 + d_color_h - 2,
-						ColorRemaps[i].Box);
+// jmarshall
+					//LogicPage->Fill_Rect(cbox_x[i] + 1, d_color_y + 1,
+					//	cbox_x[i] + 1 + d_color_w - 2, d_color_y + 1 + d_color_h - 2,
+					//	ColorRemaps[i].Box);
 					//						(i == PCOLOR_DIALOG_BLUE) ? ColorRemaps[PCOLOR_REALLY_BLUE].Box : ColorRemaps[i].Box);
+					GL_FillRect(ColorRemaps[i].Box, cbox_x[i] + 1, d_color_y + 1, 1 + d_color_w - 2, 1 + d_color_h - 2);
+// jmarshall end
 
 					if (i == Session.ColorIdx) {
 						Draw_Box(cbox_x[i], d_color_y, d_color_w, d_color_h, BOXSTYLE_DOWN, false);
