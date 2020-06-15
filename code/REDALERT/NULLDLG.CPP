@@ -804,6 +804,8 @@ oh_dear_its_a_label:
 		bool droplist_is_dropped = housebtn.IsDropped;
 		input = commands->Input();
 
+		Load_Title_Page(true);
+
 		/*
 		** Sort out the input focus between the name edit box and the message system
 		*/
