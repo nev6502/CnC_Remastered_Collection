@@ -336,14 +336,7 @@ void Check_For_Focus_Loss(void)
 #endif
 }
 
-
-
 extern bool InMovie;
-
-
-
-
-
 
 HANDLE DebugFile = INVALID_HANDLE_VALUE;
 
@@ -429,11 +422,13 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 	glGenTextures(1, &backbuffer_texture);
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+
 	// Give the image to OpenGL
 	backbuffer_data = new byte[width * height * 4];
 	memset(backbuffer_data, 0, width * height * 4);
 	backbuffer_data_raw = new byte[width * height];
 	memset(backbuffer_data_raw, 0, width * height);
+
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -686,9 +681,38 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	while (SDL_PollEvent(&event)) {
 		switch (event.type)
 		{
-			//case SDL_SYSWMEVENT:
-			//	WndProc( event.syswm.msg->msg.win.hwnd , event.syswm.msg->msg.win.msg, event.syswm.msg->msg.win.wParam, event.syswm.msg->msg.win.lParam );
-			//	break;
+			case SDL_SYSWMEVENT:
+				if ( event.syswm.msg->msg.win.msg == WM_DESTROY )
+				{
+					Invalidate_Cached_Icons();
+					VisiblePage.Un_Init();
+					HiddenPage.Un_Init();
+					AllSurfaces.Release();
+					if (!InDebugger) Reset_Video_Mode();
+
+					/*
+					** If we are shutting down gracefully than flag that the message loop has finished.
+					** If this is a forced shutdown (ReadyToQuit == 0) then try and close down everything
+					** before we exit.
+					*/
+					PostQuitMessage(0);
+
+					switch (ReadyToQuit) {
+						case 1:
+							ReadyToQuit = 2;
+							break;
+						case 0:
+							ExitProcess(0);
+							break;
+					}
+				}
+
+				break;
+
+			case SDL_MOUSEMOTION:
+				flags = GadgetClass::LEFTUP;
+				break;
+
 
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT) {
@@ -815,13 +839,9 @@ void Assert_Failure (char *expression, int line, char *file)
 	}
 
 	WWMessageBox().Process(assertbuf);
-//	WWMessageBox().Process("Red Alert demo timed out - Aborting");
-	//Get_Key();
 
 	Prog_End(assertbuf, false);
 	Invalidate_Cached_Icons();
-	//PostQuitMessage( 0 );
-	//ExitProcess(0);
 }
 #endif
 

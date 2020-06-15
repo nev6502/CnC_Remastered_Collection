@@ -407,19 +407,16 @@ void PaletteClass::Set(int time, void (* callback)(void)) const
 		**	Set the palette to this intermediate palette and then loop back
 		**	to calculate and set a new intermediate palette.
 		*/
-#ifdef WIN32
 		Set_Palette((void*)&palette[0]);
-#else
-		palette.Set();
-#endif	//WIN32
+
+		// This updates the screen
+		Device_Present();
 
 		/*
 		**	If the callback routine was specified, then call it once per palette
 		**	setting loop.
 		*/
-		if (callback) {
-			callback();
-		}
+		if (callback) callback();
 
 		/*
 		**	This loop ensures that the palette won't be set more than once per game tick. Setting
@@ -435,16 +432,5 @@ void PaletteClass::Set(int time, void (* callback)(void)) const
 	**	Ensure that the final palette exactly matches the requested
 	**	palette before exiting the fading routine.
 	*/
-#ifndef WIN32
-	Vsync();
-	RGBClass const * rgbptr = &Palette[0];
-	RGBClass::Raw_Color_Prep(0);
-	for (int index = 0; index < COLOR_COUNT; index++) {
-		rgbptr->Raw_Set();
-		rgbptr++;
-	}
-	((PaletteClass &)CurrentPalette) = *this;
-#else	//WIN32
 	Set_Palette((void*)&Palette[0]);
-#endif
 }

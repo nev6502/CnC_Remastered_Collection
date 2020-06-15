@@ -875,6 +875,7 @@ bool Select_Game(bool fade)
 								break;
 						}
 					}
+
 					Scen.CarryOverMoney = 0;
 					BuildLevel = 10;
 					IsTanyaDead = false;
@@ -882,12 +883,9 @@ bool Select_Game(bool fade)
 					Whom = HOUSE_GOOD;
 
 					if (!Special.IsFromInstall) {
-#ifdef FIXIT_ANTS
 						if (AntsEnabled)  {
 							Scen.Set_Scenario_Name("SCA01EA.INI");
 						} else {
-#endif
-#ifdef FIXIT_VERSION_3
 							switch (WWMessageBox().Process(TXT_CHOOSE, TXT_ALLIES, TXT_CANCEL, TXT_SOVIET)) {
 								case 2:
 									Scen.Set_Scenario_Name("SCU01EA.INI");
@@ -895,32 +893,21 @@ bool Select_Game(bool fade)
 								default:
 									selection = SEL_NONE;
 									continue;
-#else
-							switch (WWMessageBox().Process(TXT_CHOOSE, TXT_ALLIES, TXT_SOVIET)) {
-								case 1:
-									Scen.Set_Scenario_Name("SCU01EA.INI");
-									break;
-								default:
-#endif
 								case 0:
 									Scen.Set_Scenario_Name("SCG01EA.INI");
 									break;
 
 							}
-#ifdef FIXIT_ANTS
 						}
-#endif
+
 						Theme.Fade_Out();
 						Load_Title_Page();
 					} else {
 						Theme.Fade_Out();
-#ifdef DVD // Denzil			ajw Presumably a bug fix.
+
 						Choose_Side();
 						Hide_Mouse();
-#else
-						Hide_Mouse();
-						Choose_Side();
-#endif
+
 						if (CurrentCD == 0) {
 							Scen.Set_Scenario_Name("SCG01EA.INI");
 						} else {
@@ -931,43 +918,6 @@ bool Select_Game(bool fade)
 					Session.Type = GAME_NORMAL;
 					process = false;
 					break;
-
-#ifndef FIXIT_VERSION_3			//	Removed button from main menu.
-				#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - Internet play
-				/*
-				** Internet game is requested
-				*/
-				case SEL_INTERNET:
-					/*
-					** Only call up the internet menu code if we dont already have connect info from WChat
-					*/
-					if (!DDEServer.Get_MPlayer_Game_Info()) {
-						if (Do_The_Internet_Menu_Thang() && DDEServer.Get_MPlayer_Game_Info()) {
-							Check_From_WChat(NULL);
-							selection = SEL_MULTIPLAYER_GAME;
-							display = false;
-							Session.Type = GAME_INTERNET;
-						} else {
-							selection = SEL_NONE;
-							display = true;
-						}
-					} else {
-						Check_From_WChat(NULL);
-						display = false;
-						Session.Type = GAME_INTERNET;
-						selection = SEL_MULTIPLAYER_GAME;
-					}
-					break;
-				#endif	//WIN32
-#endif
-
-//				#if defined(MPEGMOVIE) // Denzil 6/25/98
-//				case SEL_MOVIESETTINGS:
-//					MpgSettings->Dialog();
-//					display = true;
-//					selection = SEL_NONE;
-//				break;
-//				#endif
 
 				/*
 				**	Load a saved game.
@@ -988,10 +938,6 @@ bool Select_Game(bool fade)
 				**	network play.
 				*/
 				case SEL_MULTIPLAYER_GAME:
-#ifdef WOLAPI_INTEGRATION
-					if( !pWolapi )
-					{
-#endif
 					switch (Session.Type) {
 
 						/*
@@ -1001,6 +947,7 @@ bool Select_Game(bool fade)
 						*/
 						case GAME_NORMAL:
 							Session.Type = Select_MPlayer_Game();
+
 							if (Session.Type == GAME_NORMAL) {		// 'Cancel'
 								display = true;
 								selection = SEL_NONE;
@@ -1232,13 +1179,7 @@ bool Select_Game(bool fade)
 #endif	//	!WOLAPI_INTEGRATION
 
 					}
-#ifdef WOLAPI_INTEGRATION
-					}	//	if( !pWolapi )
 
-					if( pWolapi )
-						Session.Type = GAME_INTERNET;
-#endif
-//debugprint( "Session.Type = %i\n", Session.Type );
 					switch (Session.Type) {
 						/*
 						**	Modem, Null-Modem or internet
@@ -1251,11 +1192,7 @@ bool Select_Game(bool fade)
 						case GAME_SKIRMISH:
 							Theme.Fade_Out();
 							process = false;
-#ifdef FIXIT_VERSION_3
 							Options.ScoreVolume = Options.MultiScoreVolume;
-#else
-							Options.ScoreVolume = 0;
-#endif
 							break;
 
 #ifdef WOLAPI_INTEGRATION		//	implies also WINSOCK_IPX
@@ -1351,48 +1288,6 @@ bool Select_Game(bool fade)
 							}
 							break;
 
-#if(TEN)
-						/*
-						**	TEN: jump straight into the game
-						*/
-						case GAME_TEN:
-							if (Init_TEN()) {
-#ifdef FIXIT_VERSION_3
-								Options.ScoreVolume = Options.MultiScoreVolume;
-#else
-								Options.ScoreVolume = 0;
-#endif
-								process = false;
-								Theme.Fade_Out();
-							} else {
-								WWMessageBox().Process("Unable to initialize TEN!");
-								//Prog_End();
-								Emergency_Exit(1);
-							}
-							break;
-#endif	// TEN
-
-#if(MPATH)
-						/*
-						**	MPATH: jump straight into the game
-						*/
-						case GAME_MPATH:
-							if (Init_MPATH()) {
-#ifdef FIXIT_VERSION_3
-								Options.ScoreVolume = Options.MultiScoreVolume;
-#else
-								Options.ScoreVolume = 0;
-#endif
-								process = false;
-								Theme.Fade_Out();
-							} else {
-								WWMessageBox().Process("Unable to initialize MPATH!");
-								//Prog_End();
-								Emergency_Exit(1);
-							}
-							break;
-#endif	// MPATH
-
 					}
 					break;
 
@@ -1401,6 +1296,7 @@ bool Select_Game(bool fade)
 				*/
 				case SEL_INTRO:
 					Theme.Fade_Out();
+
 					if (Debug_Flag) {
 						Play_Intro(Debug_Flag);
 					} else {
@@ -1411,12 +1307,14 @@ bool Select_Game(bool fade)
 						Keyboard->Clear();
 						Play_Movie(VQ_SIZZLE, THEME_NONE, true);
 						Play_Movie(VQ_SIZZLE2, THEME_NONE, true);
-//						Play_Movie(VQ_INTRO_MOVIE, THEME_NONE, false);		// has transitino picture to briefing
 					}
+
 					Theme.Queue_Song(THEME_CRUS);
+
 					display = true;
 					fade = true;
 					selection = SEL_NONE;
+
 					break;
 
 				/*
@@ -1537,17 +1435,14 @@ bool Select_Game(bool fade)
 
 		if (selection != SEL_START_NEW_GAME) {
 			BlackPalette.Set(FADE_PALETTE_MEDIUM, Call_Back);
-#ifdef WIN32
 			HiddenPage.Clear();
 			VisiblePage.Clear();
-#else
-			HidPage.Clear();
-			SeenPage.Clear();
-#endif	//WIN32
+
 		}
 		Show_Mouse();
-//Mono_Printf("About to call Start Scenario with %s\n", Scen.ScenarioName);
-		if (!Start_Scenario(Scen.ScenarioName)) {
+
+		if ( !Start_Scenario(Scen.ScenarioName, Session.Type != GAME_SKIRMISH ) ) 
+		{
 			return(false);
 		}
 		if (Special.IsFromInstall) Show_Mouse();

@@ -553,9 +553,7 @@ bool Read_Scenario(char * name)
 						}
 					#endif
 #endif
-					if (!RunningAsDLL) {	//PG
-						Emergency_Exit(EXIT_FAILURE);
-					}
+					Emergency_Exit(EXIT_FAILURE);
 		     	}
 			}
 			CCINIClass ini;
@@ -1011,7 +1009,6 @@ void Do_Win(void)
 		/*
 		** If this scenario is flagged as ending the game then print the credits and exit.
 		*/
-#if (0)//PG
 		if (Scen.IsEndOfGame) {
 			if (PlayerPtr->ActLike == HOUSE_USSR) {
 				Play_Movie(VQ_SOVFINAL);
@@ -1026,7 +1023,7 @@ void Do_Win(void)
 #endif
 			return;
 		}
-#endif
+
 		/*
 		** Hack section.  If it's allied scenario 10, variation A, then skip the
 		** score and map selection, don't increment scenario, and set it to
@@ -2200,9 +2197,7 @@ bool Read_Scenario_INI(char * fname, bool )
 #endif
 		if (!Force_CD_Available(RequiredCD)) {
 			Prog_End("Read_Scenario_INI Force_CD_Available failed", true);
-			if (!RunningAsDLL) {	//PG
-				Emergency_Exit(EXIT_FAILURE);
-			}
+			Emergency_Exit(EXIT_FAILURE);
      	}
 	} else {
 		/*

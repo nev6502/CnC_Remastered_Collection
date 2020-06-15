@@ -138,7 +138,7 @@ void PowerClass::One_Time(void)
 	PowerButton.X = ScreenWidth - (640 - (POWER_X * RESFACTOR));
 	PowerButton.Y = POWER_Y * RESFACTOR;
 	PowerButton.Width = (POWER_WIDTH * RESFACTOR)-1;
-	PowerButton.Height = POWER_HEIGHT * RESFACTOR;
+	PowerButton.Height = ScreenHeight - ( POWER_Y * RESFACTOR ) ;// POWER_HEIGHT* RESFACTOR;
 	PowerShape = MFCD::Retrieve("POWER.SHP");
 	PowerBarShape = MFCD::Retrieve("POWERBAR.SHP");
 }
@@ -180,24 +180,29 @@ void PowerClass::Draw_It(bool complete)
 					remap = Map.FadingRed;
 				}
 
-//				LogicPage->Fill_Rect(POWER_X, POWER_Y, POWER_X+POWER_WIDTH-1, POWER_Y+POWER_HEIGHT-1, LTGREY);
-				CC_Draw_Shape(PowerBarShape, 0, ScreenWidth - (640 - (240 * RESFACTOR)), 88 * RESFACTOR, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
-
-#ifdef WIN32
 				/*
 				** Hires power strip is too big to fit into a shape so it is in two parts
 				*/
-				CC_Draw_Shape(PowerBarShape, 1, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR) + (56*RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
-#endif
+				CC_Draw_Shape(PowerBarShape, 0, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+
+				int bottomOfBar = (88 * RESFACTOR) + 56;
+
+				while(bottomOfBar < PowerButton.Height + 34 )
+				{
+					CC_Draw_Shape(PowerBarShape, 1, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+					bottomOfBar += 8 * RESFACTOR;
+				}
+
+				int bottom = ( PowerButton.Y * RESFACTOR ) + PowerButton.Height;
+
 				/*
 				**	Determine how much the power production exceeds or falls short
 				**	of power demands.
 				*/
-				int bottom       = (POWER_Y + POWER_HEIGHT - 1) * RESFACTOR;
 				int power_height  = (PowerHeight == DesiredPowerHeight) ? PowerHeight + (_modtable[PowerBounce] * PowerDir) : PowerHeight;
 				int drain_height  = (DrainHeight == DesiredDrainHeight) ? DrainHeight + (_modtable[DrainBounce] * DrainDir) : DrainHeight;
-				power_height = Bound(power_height, 0, POWER_HEIGHT - 2);
-				drain_height = Bound(drain_height, 0, POWER_HEIGHT - 2);
+				power_height = Bound(power_height, 0, PowerButton.Height - 2);
+				drain_height = Bound(drain_height, 0, PowerButton.Height - 2);
 
 				/*
 				**	Draw the power output graphic on top of the power bar framework.
@@ -222,14 +227,13 @@ void PowerClass::Draw_It(bool complete)
 					**
 					** ST - 5/2/96 11:23AM
 					*/
-#ifdef WIN32
+
 					power_height = (power_height*(76*RESFACTOR+1)) / (53*RESFACTOR+1);
 					drain_height = (drain_height*(76*RESFACTOR+1)) / (53*RESFACTOR+1);
-#endif
-					bottom = (175*RESFACTOR)+1;
 
-					LogicPage->Fill_Rect(ScreenWidth - (640 - (245*RESFACTOR)), bottom-power_height, ScreenWidth - (640 - (245*RESFACTOR+1)), bottom, color2);
-					LogicPage->Fill_Rect(ScreenWidth - (640 - (246*RESFACTOR)), bottom-power_height, ScreenWidth - (640 - (246*RESFACTOR+1)), bottom, color1);
+					//bottom = (175*RESFACTOR)+1;
+					LogicPage->Fill_Rect(ScreenWidth - (640 - (245*RESFACTOR)), bottom - power_height, ScreenWidth - (640 - (245*RESFACTOR+1)), bottom, color2 );
+					LogicPage->Fill_Rect(ScreenWidth - (640 - (246*RESFACTOR)), bottom - power_height, ScreenWidth - (640 - (246*RESFACTOR+1)), bottom, color1 );
 				}
 
 				/*

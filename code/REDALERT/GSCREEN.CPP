@@ -270,6 +270,8 @@ void GScreenClass::Flag_To_Redraw(bool complete)
  *=============================================================================================*/
 void GScreenClass::Input(KeyNumType & key, int & x, int & y)
 {
+	if (this == NULL) return;
+
 	key = Keyboard->Check();
 
 	x = Keyboard->Mouse_X();
@@ -468,17 +470,11 @@ extern "C" {
 void GScreenClass::Blit_Display(void)
 {
 	BStart(BENCH_BLIT_DISPLAY);
-	#ifdef WIN32
-		if (SeenBuff.Get_Width()!=320) {
-			WWMouse->Draw_Mouse(&HidPage);
-			HidPage.Blit(SeenBuff , 0 , 0 , 0 , 0 , HidPage.Get_Width() , HidPage.Get_Height() , (BOOL) FALSE );
-			WWMouse->Erase_Mouse(&HidPage, FALSE);
-		} else {
-			//PG ModeX_Blit(&HiddenPage);
-		}
-	#else
-		Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, ShadowPage->Get_Buffer());
-	#endif
+
+	WWMouse->Draw_Mouse(&HidPage);
+	HidPage.Blit(SeenBuff , 0 , 0 , 0 , 0 , HidPage.Get_Width() , HidPage.Get_Height() , (BOOL) FALSE );
+	WWMouse->Erase_Mouse(&HidPage, FALSE);
+
 	BEnd(BENCH_BLIT_DISPLAY);
 }
 

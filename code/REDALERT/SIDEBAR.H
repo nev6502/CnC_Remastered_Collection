@@ -51,7 +51,7 @@ extern int ScreenWidth;
 #define COLUMN_ONE_X (int)((SIDE_X) + 8)			// Sidestrip upper left coordinates...
 #define COLUMN_ONE_Y (int)(SIDE_Y + (TOP_HEIGHT))
 #define COLUMN_TWO_X (int)((SIDE_X) + 8 + ((80 - 16) / 2) + 3)
-#define COLUMN_TWO_Y (int)(7 + 70 + 13)
+#define COLUMN_TWO_Y (int)(SIDE_Y + (TOP_HEIGHT))
 #define BUTTON_ONE_WIDTH  32				// Button width.
 #define BUTTON_TWO_WIDTH  20				// Button width.
 #define BUTTON_THREE_WIDTH  20			// Button width.
@@ -62,6 +62,7 @@ extern int ScreenWidth;
 #define BUTTON_TWO_Y  (int)(SIDE_Y + 2)			// Right button Y coordinate.
 #define BUTTON_THREE_X  (int)(SIDE_X + 58)			// Right button X coordinate.
 #define BUTTON_THREE_Y  (int)(SIDE_Y + 2)			// Right button Y coordinate.
+
 class SidebarClass: public PowerClass
 {
 	public:
@@ -190,37 +191,34 @@ class SidebarClass: public PowerClass
 					BUTTON_UP=200,
 					BUTTON_DOWN=210,
 					BUTTON_SELECT=220,
-					MAX_BUILDABLES=75,			// Maximum number of object types in sidebar.
+					MAX_BUILDABLES=75,				// Maximum number of object types in sidebar.
 					OBJECT_HEIGHT=24,				// Pixel height of each buildable object.
 					OBJECT_WIDTH=32,				// Pixel width of each buildable object.
-					STRIP_WIDTH=35,				// Width of strip (not counting border lines).
-					MAX_VISIBLE=4,					// Number of object slots visible at any one time.
-#ifdef WIN32
-					SCROLL_RATE=12,				// The pixel jump while scrolling (larger is faster).
-#else
-					SCROLL_RATE=8,					// The pixel jump while scrolling (larger is faster).
-#endif
+					STRIP_WIDTH=35,					// Width of strip (not counting border lines).
+					MAX_VISIBLE=24,					// Number of object slots visible at any one time (theoretical, actual is calculated later)
+					SCROLL_RATE=12,					// The pixel jump while scrolling (larger is faster).
+
 					UP_X_OFFSET=2,					// Scroll up arrow coordinates.
-#ifdef WIN32
-					UP_Y_OFFSET=int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
-#else
-					UP_Y_OFFSET=int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+2,
-#endif
+					//UP_Y_OFFSET=int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
 					DOWN_X_OFFSET=18,				// Scroll down arrow coordinates.
-					DOWN_Y_OFFSET=UP_Y_OFFSET,//BGint(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
+					//DOWN_Y_OFFSET=UP_Y_OFFSET,		// BGint(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
+
 					SBUTTON_WIDTH=16,				// Width of the mini-scroll button.
 					SBUTTON_HEIGHT=12,				// Height of the mini-scroll button.
-					LEFT_EDGE_OFFSET=2,			// Offset from left edge for building shapes.
+
+					LEFT_EDGE_OFFSET=2,				// Offset from left edge for building shapes.
 					TEXT_X_OFFSET=18,				// X offset to print "ready" text.
 					TEXT_Y_OFFSET=15,				// Y offset to print "ready" text.
 					TEXT_COLOR=255					// Color to use for the "Ready" text.
 				};
 
+				int MaxButtonsVisible;
+
 				/*
 				**	This is the coordinate of the upper left corner that this side strip
 				**	uses for rendering.
 				*/
-				int X,Y;
+				int X,Y,HEIGHT;
 
 				/*
 				**	This is a unique identifier for the sidebar strip. Using this identifier,

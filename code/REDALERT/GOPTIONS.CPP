@@ -320,17 +320,6 @@ void GameOptionsClass::Process(void)
 			/*
 			**	Display the version number at the bottom of the dialog box.
 			*/
-#ifndef WIN32
-			Fancy_Text_Print("%s\rV%s",
-					(OptionX+OptionWidth)-(17 * RESFACTOR),
-					OptionY+OptionHeight-((Session.Type == GAME_NORMAL) ? (32 * RESFACTOR) : (24 * RESFACTOR)),
-					GadgetClass::Get_Color_Scheme(), TBLACK,
-					TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-					Scen.ScenarioName,
-					Version_Name());
-
-#else
-#if (0)//PG
 			Fancy_Text_Print("%s\rV%s",
 					(OptionX+OptionWidth)-(25 * RESFACTOR),
 					OptionY+OptionHeight-((Session.Type == GAME_NORMAL) ? (32 * RESFACTOR) : (24 * RESFACTOR)),
@@ -338,8 +327,6 @@ void GameOptionsClass::Process(void)
 					TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
 					Scen.ScenarioName,
 					Version_Name());
-#endif
-#endif
 
 			buttons->Draw_All();
 			TabClass::Hilite_Tab(0);

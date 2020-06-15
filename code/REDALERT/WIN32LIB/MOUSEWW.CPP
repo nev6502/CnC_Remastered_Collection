@@ -236,7 +236,7 @@ void WWMouseClass::Hide_Mouse()
 }
 
 void WWMouseClass::RenderMouse(void) {
-	if (!isMouseVisible)
+	if( this == NULL || !isMouseVisible)
 		return;
 
 	//ImVec2 size(current_cursor->width, current_cursor->height);

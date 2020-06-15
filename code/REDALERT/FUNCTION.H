@@ -393,7 +393,8 @@ CELL Coord_Cell(COORDINATE coord);
 //#include	"nullmgr.h"			// Modem connection manager
 #include	"readline.h"
 #include	"vortex.h"
-#include "egos.h"
+#include    "egos.h"
+
 #ifdef WIN32
 //#include	"pcx.h"
 #endif
@@ -568,7 +569,6 @@ void Shake_The_Screen(int shakes, HousesType house = HOUSE_NONE);
 **	COORD.CPP
 */
 short const * Coord_Spillage_List(COORDINATE coord, Rect const & rect, bool nocenter=true);
-void Normal_Move_Point(short &x, short &y, register DirType dir, unsigned short distance);
 void Move_Point(short &x, short &y, register DirType dir, unsigned short distance);
 COORDINATE Coord_Move(COORDINATE start, DirType facing, unsigned short distance);
 COORDINATE Coord_Scatter(COORDINATE coord, unsigned distance, bool lock=false);
@@ -1071,8 +1071,6 @@ template <>class DynamicVectorClass<EventChoiceClass *>;
 extern DynamicVectorClass<EventChoiceClass *> xxx2;
 template <>class DynamicVectorClass<ActionChoiceClass *>;
 extern DynamicVectorClass<ActionChoiceClass *> xxx3;
-template <>class DynamicVectorClass<EgoClass *>;
-extern DynamicVectorClass<EgoClass *> whatever;
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer = true);
 void Device_Present(void);

@@ -65,6 +65,8 @@ class TextButtonClass : public ToggleClass
 		**	This is the print flags to use when rendering this button's text.
 		*/
 		TextPrintType PrintFlags;
+
+		int RegularButtonHeight = FontHeight + FontYSpacing + 2;
 };
 
 #endif

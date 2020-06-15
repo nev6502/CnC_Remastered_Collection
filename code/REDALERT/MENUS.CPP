@@ -43,8 +43,11 @@
 
 #include <sdl.h>
 
-#undef RESFACTOR
-#define RESFACTOR (2 + (ScreenWidth / 640))
+// this makes buttons larger on a larger screen
+// necessary??
+
+//#undef RESFACTOR
+//#define RESFACTOR (2 + (ScreenWidth / 640))
 
 /*****************************
 **	Function prototypes
@@ -481,74 +484,23 @@ int Main_Menu(unsigned long )
 	**	Dialog & button dimensions
 	*/
 	int	d_dialog_w = 152 * RESFACTOR;
-#ifdef FIXIT_VERSION_3
 	int	d_dialog_h = 100 * RESFACTOR;
-#else
-//#ifdef WIN32	//Extra 'Internet' option on WIN32 menu
-#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - No internet play
-	int	d_dialog_h = 100 * RESFACTOR;
-#else
-//	#if defined(MPEGMOVIE) // Denzil 6/25/98 - Video settings
-//	int	d_dialog_h = 100 * RESFACTOR;
-//	#else
-	int	d_dialog_h = 80 * RESFACTOR;
-//	#endif
-#endif	//WIN32
-#endif	//FIXIT_VERSION_3
-	int	d_dialog_x = 85 * RESFACTOR;
-	int	d_dialog_y = 85 * RESFACTOR;
-	int	d_dialog_cx = d_dialog_x + (d_dialog_w / 2);
 
-	int	d_start_w = 118 * RESFACTOR;
-	int	d_start_h = 9 * RESFACTOR;
-	int	d_start_x = 102 * RESFACTOR;
-#ifndef FIXIT_VERSION_3			//	Removed button from main menu.
-#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - no internet play
-	int	d_internet_w = 118 * RESFACTOR;
-	int	d_internet_h = 9 * RESFACTOR;
-	int	d_internet_x = 102 * RESFACTOR;
-#endif	//WIN32
-#endif
+	int	d_dialog_x = ((SeenBuff.Get_Width() - d_dialog_w) / 2);
+	int	d_dialog_y = ((SeenBuff.Get_Height() - d_dialog_h) / 2);
 
-//#if defined(MPEGMOVIE) // Denzil 6/26/98 Video settings
-//	int	d_movie_w = 118 * RESFACTOR;
-//	int	d_movie_h = 9 * RESFACTOR;
-//	int	d_movie_x = 102 * RESFACTOR;
-//#endif
+	int d_button_w = 140 * RESFACTOR;
+	int d_button_h = 11 * RESFACTOR;
+	int d_button_dy = d_button_h + 4 * RESFACTOR;		// spacing between top of two buttons
+	int d_button_x = d_dialog_x + ( ( d_dialog_w - d_button_w ) / 2 );
+	int d_button_y = d_dialog_y + (24 * RESFACTOR);
 
-	int	d_load_w = 118 * RESFACTOR;
-	int	d_load_h = 9 * RESFACTOR;
-	int	d_load_x = 102 * RESFACTOR;
-
-	int	d_multi_w = 118 * RESFACTOR;
-	int	d_multi_h = 9 * RESFACTOR;
-	int	d_multi_x = 102 * RESFACTOR;
-
-	int	d_intro_w = 118 * RESFACTOR;
-	int	d_intro_h = 9 * RESFACTOR;
-	int	d_intro_x = 102 * RESFACTOR;
-
-	int	d_exit_w = 118 * RESFACTOR;    //changed value to 118 V.Grippi
-	int	d_exit_h = 9 * RESFACTOR;
-	int     d_exit_x = 102 *RESFACTOR;   //Added V.Grippi
-
-	int starty = d_dialog_y + (12 * RESFACTOR);
-
-//#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - No internet play
-//#ifndef FIXIT_VERSION_3
 	static int	max_buttons = 7;
-//#else
-//	static int	max_buttons = 6;
-//#endif
 
-//#if defined(MPEGMOVIE) // Denzil 6/26/98 Video settings
-//	max_buttons++;
-//#endif
 	/*
 	**	Button enumerations:
 	*/
 	//	Enums in Select_Game() must match order of buttons in Main_Menu().
-#ifdef FIXIT_VERSION_3
 	enum {
 		BUTTON_EXPAND=100,			//	(CS)
 		BUTTON_EXPAND_AM,
@@ -558,36 +510,13 @@ int Main_Menu(unsigned long )
 		BUTTON_INTRO,
 		BUTTON_EXIT,
 	};
-#else	//	FIXIT_VERSION_3
-	enum {
-		BUTTON_EXPAND=100,
-		BUTTON_START,
-#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - No internet play
-		BUTTON_INTERNET,
-#endif	//WIN32
-//#if defined(MPEGMOVIE) // Denzil 6/26/98 Video settings
-//		BUTTON_MOVIE,
-//#endif
-		BUTTON_LOAD,
-		BUTTON_MULTI,
-		BUTTON_INTRO,
-		BUTTON_EXIT,
-	};
-#endif	//	FIXIT_VERSION_3
 
 	/*
 	**	Dialog variables:
 	*/
-#ifdef FIXIT_VERSION_3
 	bool bExpansionCS = Expansion_CS_Present();
 	bool bExpansionAM = Expansion_AM_Present();
-#else
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-	bool expansions = Expansion_CS_Present() | Expansion_AM_Present();
-#else
-	bool expansions = Expansion_CS_Present();
-#endif
-#endif
+
 	KeyNumType input;								// input from user
 	int retval;										// return value
 	int curbutton;
@@ -599,57 +528,32 @@ int Main_Menu(unsigned long )
 	*/
 	ControlClass * commands = NULL;				// the button list
 
-#ifdef FIXIT_VERSION_3
-	int ystep = 14 * RESFACTOR;
-	if( bExpansionCS )
-	{
-		if( bExpansionAM )
-			ystep = 12 * RESFACTOR;
-		else
-			ystep = 13 * RESFACTOR;
-	}
-	else if( bExpansionAM )
-		ystep = 13 * RESFACTOR;
+	TextButtonClass expandbtnCS( BUTTON_EXPAND, TXT_WOL_CS_MISSIONS, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h );
 
-	TextButtonClass expandbtnCS( BUTTON_EXPAND, TXT_WOL_CS_MISSIONS, TPF_BUTTON, d_start_x, starty, d_start_w, d_start_h );
 	if( bExpansionCS )
-		starty += ystep;
-	TextButtonClass expandbtnAM( BUTTON_EXPAND_AM, TXT_WOL_AM_MISSIONS, TPF_BUTTON, d_start_x, starty, d_start_w, d_start_h );
+		d_button_y += d_button_dy;
+	TextButtonClass expandbtnAM( BUTTON_EXPAND_AM, TXT_WOL_AM_MISSIONS, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+
 	if( bExpansionAM )
-		starty += ystep;
-#else
-	int ystep = 12 * RESFACTOR;
-	if (expansions) ystep = 10 * RESFACTOR;
-	
-	TextButtonClass expandbtn (BUTTON_EXPAND, TXT_NEW_MISSIONS, TPF_BUTTON, d_start_x, starty, d_start_w, d_start_h);
-	if (expansions) starty += ystep;
-#endif
+		d_button_y += d_button_dy;
 
-	TextButtonClass startbtn(BUTTON_START, TXT_START_NEW_GAME, TPF_BUTTON, d_start_x, starty, d_start_w, d_start_h);
-	starty += ystep;
-#ifndef FIXIT_VERSION_3
-#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - no internet play
-	TextButtonClass internetbutton (BUTTON_INTERNET, TXT_INTERNET, TPF_BUTTON, d_internet_x, starty, d_internet_w, d_internet_h);
-	starty += ystep;
-#endif	//WIN32
-#endif
+	TextButtonClass startbtn(BUTTON_START, TXT_START_NEW_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-//#if defined(MPEGMOVIE) // Denzil 6/26/98 Video settings
-//	TextButtonClass moviebutton(BUTTON_MOVIE, "Movie Settings", TPF_BUTTON, d_movie_x, starty, d_movie_w, d_movie_h);
-//	starty += ystep;
-//#endif	//WIN32
+	TextButtonClass loadbtn(BUTTON_LOAD, TXT_LOAD_MISSION, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass loadbtn(BUTTON_LOAD, TXT_LOAD_MISSION, TPF_BUTTON, d_load_x, starty, d_load_w, d_load_h);
-	starty += ystep;
+	TextButtonClass multibtn(BUTTON_MULTI, TXT_MULTIPLAYER_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass multibtn(BUTTON_MULTI, TXT_MULTIPLAYER_GAME, TPF_BUTTON, d_multi_x, starty, d_multi_w, d_multi_h);
-	starty += ystep;
+	TextButtonClass introbtn(BUTTON_INTRO, TXT_INTRO, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass introbtn(BUTTON_INTRO, TXT_INTRO, TPF_BUTTON, d_intro_x, starty, d_intro_w, d_intro_h);
-	starty += ystep;
+	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON, d_exit_x, starty, d_exit_w, d_exit_h);
-	starty += ystep;
+	int version_x = d_button_x + d_button_w;
+	int version_y = d_button_y + ( 5 * RESFACTOR );
 
 	/*
 	**	Initialize
@@ -666,22 +570,12 @@ int Main_Menu(unsigned long )
 	**	Create the list
 	*/
 	commands = &startbtn;
-#ifdef FIXIT_VERSION_3
+
 	if( bExpansionCS )
 		expandbtnCS.Add_Tail(*commands);
 	if( bExpansionAM )
 		expandbtnAM.Add_Tail(*commands);
-#else
-	if (expansions) {
-		expandbtn.Add_Tail(*commands);
-	}
-#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - No internet play
-	internetbutton.Add_Tail(*commands);
-#endif	//WIN32
-#endif
-//#if defined(MPEGMOVIE) // Denzil 6/26/98 Video settings
-//	moviebutton.Add_Tail(*commands);
-//#endif
+
 	loadbtn.Add_Tail(*commands);
 	multibtn.Add_Tail(*commands);
 	introbtn.Add_Tail(*commands);
@@ -690,7 +584,6 @@ int Main_Menu(unsigned long )
 	/*
 	**	Fill array of button ptrs
 	*/
-#ifdef FIXIT_VERSION_3
 	curbutton = bExpansionCS ? 0 : ( bExpansionAM ? 1 : 2 );
 
 	buttons[0] = &expandbtnCS;
@@ -700,28 +593,12 @@ int Main_Menu(unsigned long )
 	buttons[4] = &multibtn;
 	buttons[5] = &introbtn;
 	buttons[6] = &exitbtn;
-#else
-	if (expansions) {
-		curbutton = 0;
-	} else {
-		curbutton = 1;
-	}
-	
-	buttons[0] = &expandbtn;
-	buttons[1] = &startbtn;
-	buttons[2] = &internetbutton;
-	buttons[3] = &loadbtn;
-	buttons[4] = &multibtn;
-	buttons[5] = &introbtn;
-	buttons[6] = &exitbtn;
-#endif
 
 	buttons[curbutton]->Turn_On();
 
 	Keyboard->Clear();
 
-	Fancy_Text_Print(TXT_NONE, 0, 0, GadgetClass::Get_Color_Scheme(),
-		TBLACK, TPF_CENTER|TPF_6PT_GRAD|TPF_USE_GRAD_PAL|TPF_NOSHADOW);
+	Fancy_Text_Print(TXT_NONE, 0, 0, GadgetClass::Get_Color_Scheme(), TBLACK, TPF_CENTER|TPF_6PT_GRAD|TPF_USE_GRAD_PAL|TPF_NOSHADOW);
 
 	fixed oldvolume = Options.ScoreVolume;
 	if (oldvolume == 0) {
@@ -735,7 +612,6 @@ int Main_Menu(unsigned long )
 	bool display = true;
 	bool process = true;
 	while (process) {
-#ifdef WIN32
 		/*
 		** If we have just received input focus again after running in the background then
 		** we need to redraw.
@@ -744,15 +620,6 @@ int Main_Menu(unsigned long )
 			AllSurfaces.SurfacesRestored=FALSE;
 			display = true;
 		}
-#endif
-
-		/*
-		**	If timeout expires, bail
-		*/
-//		if (timeout && TickCount - starttime > timeout) {
-//			retval = -1;
-//			process = false;
-//		}
 
 		/*
 		**	Invoke game callback.
@@ -760,65 +627,33 @@ int Main_Menu(unsigned long )
 		Call_Back();
 
 		/*
-		**	Refresh display if needed.
+		**	Load the background picture.
 		*/
-// jmarshall
-		//if (display) {
-// jmarshall end
-			/*
-			**	Load the background picture.
-			*/
-			Load_Title_Page();
-			CCPalette.Set();
+		Load_Title_Page();
+		CCPalette.Set();
 
-			/*
-			**	Display the title and text overlay for the menu.
-			*/
-			Set_Logic_Page(HidPage);
-//			Dialog_Box(d_dialog_x, d_dialog_y, d_dialog_w, d_dialog_h);
-//			Draw_Caption (TXT_NONE, d_dialog_x, d_dialog_y, d_dialog_w);
-			commands->Draw_All();
-#ifdef FIXIT_VERSION_3
-#if (0)//PG
-			Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
-				d_dialog_y+d_dialog_h-(5 * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
-				TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-				Version_Name());
-#endif
-#else
-#ifndef WIN32
-			Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
-				d_dialog_y+d_dialog_h-(8  * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
-				TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-				Version_Name());
+		/*
+		**	Display the title and text overlay for the menu.
+		*/
+		Set_Logic_Page(HidPage);
+		commands->Draw_All();
 
-#else
-			Fancy_Text_Print("V%s", d_dialog_x+d_dialog_w- (18 * RESFACTOR),
-				d_dialog_y+d_dialog_h-(11 * RESFACTOR), GadgetClass::Get_Color_Scheme(), TBLACK,
-				TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
-				Version_Name());
+		Fancy_Text_Print("V%s", 
+			version_x,
+			version_y,
+			GadgetClass::Get_Color_Scheme(), TBLACK,
+			TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT,
+			Version_Name());
 
-#endif
-#endif
+		/*
+		**	Copy the menu to the visible page.
+		*/
+		Hide_Mouse();
+		HidPage.Blit(SeenPage);
+		Show_Mouse();
 
-			/*
-			**	Copy the menu to the visible page.
-			*/
-			Hide_Mouse();
-			HidPage.Blit(SeenPage);
-			Show_Mouse();
-
-			Set_Logic_Page(SeenBuff);
-			display = false;
-// jmarshall
-		//}
-		//else {
-		//	if (RunningAsDLL) {	//PG
-		//		retval = -1;
-		//		process = false;
-		//	}
-		//}
-// jmarshall end
+		Set_Logic_Page(SeenBuff);
+		display = false;
 
 		/*
 		**	Get and process player input.
@@ -826,33 +661,14 @@ int Main_Menu(unsigned long )
 		input = (KeyNumType)0;
 		input = commands->Input();
 
-#ifndef FIXIT_VERSION_3
-#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - No Internet play
-		/*
-		** Check to see if WChat has told us to start playing an internet game
-		*/
-		if (DDEServer.Get_MPlayer_Game_Info()) {
-			retval = BUTTON_INTERNET - BUTTON_EXPAND;
-			process = false;
-			input = KN_NONE;
-		}
-#endif	//WIN32
-#endif
-
 		/*
 		**	If there is input, then take this opportunity to seed some bits
 		**	to the cryptographic random number generator.
 		*/
 		if (input != 0) {
-			#ifdef WIN32
-				SYSTEMTIME t;
-				GetSystemTime(&t);
-				CryptRandom.Seed_Byte(t.wMilliseconds);
-			#else
-				struct timeb t;
-				ftime(&t);
-				CryptRandom.Seed_Byte(t.millitm);
-			#endif
+			SYSTEMTIME t;
+			GetSystemTime(&t);
+			CryptRandom.Seed_Byte(t.wMilliseconds);
 		}
 
 		/*
@@ -864,34 +680,16 @@ int Main_Menu(unsigned long )
 				process = false;
 				break;
 
-#ifdef FIXIT_VERSION_3
 			case (BUTTON_EXPAND_AM | KN_BUTTON):
 				retval = (input & 0x7FFF) - BUTTON_EXPAND;
 				process = false;
 				break;
-#endif
 
 			case (BUTTON_START | KN_BUTTON):
 				retval = (input & 0x7FFF) - BUTTON_EXPAND;
 				process = false;
 				break;
 
-#ifndef FIXIT_VERSION_3
-			#if defined(WIN32) && !defined(INTERNET_OFF) // Denzil 5/1/98 - Internet play
-			case (BUTTON_INTERNET | KN_BUTTON):
-				retval = (input & 0x7FFF) - BUTTON_EXPAND;
-				process = false;
-				break;
-			#endif	//WIN32
-#endif
-
-//			#if defined(MPEGMOVIE)
-//			case (BUTTON_MOVIE | KN_BUTTON):
-//				retval = (input & 0x7FFF) - BUTTON_EXPAND;
-//				process = false;
-//			break;
-//			#endif
-			
 			case (BUTTON_LOAD | KN_BUTTON):
 				retval = (input & 0x7FFF) - BUTTON_EXPAND;
 				process = false;
@@ -911,18 +709,12 @@ int Main_Menu(unsigned long )
 				retval = (input & 0x7FFF) - BUTTON_EXPAND;
 				process = false;
 				break;
-#if (0)
-			case KN_BACKSPACE:
-				Show_Who_Was_Responsible ();
-				display = true;
-				Theme.Play_Song(THEME_INTRO);
-				break;
-#endif	//(0)
+
 			case KN_UP:
 				buttons[curbutton]->Turn_Off();
 				buttons[curbutton]->Flag_To_Redraw();
 				curbutton--;
-#ifdef FIXIT_VERSION_3
+
 				switch( curbutton )
 				{
 				case -1:
@@ -942,17 +734,7 @@ int Main_Menu(unsigned long )
 					}
 					break;
 				}
-#else
-				if (expansions) {
-					if (curbutton < 0) {
-						curbutton = max_buttons-1;
-					}
-				} else {
-					if (curbutton < 1) {
-						curbutton = max_buttons-1;
-					}
-				}
-#endif
+
 				buttons[curbutton]->Turn_On();
 				buttons[curbutton]->Flag_To_Redraw();
 				break;
@@ -961,7 +743,7 @@ int Main_Menu(unsigned long )
 				buttons[curbutton]->Turn_Off();
 				buttons[curbutton]->Flag_To_Redraw();
 				curbutton++;
-#ifdef FIXIT_VERSION_3
+
 				if( curbutton == max_buttons )
 				{
 					if( bExpansionCS )
@@ -971,17 +753,11 @@ int Main_Menu(unsigned long )
 					else
 						curbutton = 2;
 				}
-				else if( curbutton == 1 && !bExpansionAM )
+				else if (curbutton == 1 && !bExpansionAM)
+				{
 					curbutton = 2;
-#else
-				if (curbutton > (max_buttons - 1)) {
-					if (expansions) {
-						curbutton = 0;
-					} else {
-						curbutton = 1;
-					}
 				}
-#endif
+
 				buttons[curbutton]->Turn_On();
 				buttons[curbutton]->Flag_To_Redraw();
 				break;
@@ -996,7 +772,6 @@ int Main_Menu(unsigned long )
 
 
 			case KN_LMOUSE:
-#if (0)//PG
 				if (Coordinates_In_Region(Keyboard->MouseQX, Keyboard->MouseQY,
 
 													9*RESFACTOR, 10*RESFACTOR,
@@ -1007,26 +782,16 @@ int Main_Menu(unsigned long )
 
 					break;
 				}
-#endif
-#ifdef FIXIT_ANTS
-			#ifdef FIXIT_PATCH_108
-			if (Is_Counterstrike_Installed() == true)
-				{
-			#endif
-				if ((Keyboard->Down(KN_LSHIFT) || Keyboard->Down(KN_RSHIFT)) && Coordinates_In_Region(Keyboard->MouseQX, Keyboard->MouseQY, 260*RESFACTOR, 0, 320*RESFACTOR, 50*RESFACTOR))  {
-					AntsEnabled = true;
-					process = false;
-#ifdef FIXIT_VERSION_3
-					retval = 2;		//	To match SEL_START_NEW_GAME
-#else
-					retval = 1;
-#endif
-				}
-			#ifdef FIXIT_PATCH_108
-			}
-			#endif
-#endif
 
+				// secret ANT missions
+				if (Is_Counterstrike_Installed() == true)
+				{
+					if ((Keyboard->Down(KN_LSHIFT) || Keyboard->Down(KN_RSHIFT)) && Coordinates_In_Region(Keyboard->MouseQX, Keyboard->MouseQY, 260*RESFACTOR, 0, 320*RESFACTOR, 50*RESFACTOR))  {
+						AntsEnabled = true;
+						process = false;
+						retval = 2;		//	To match SEL_START_NEW_GAME
+					}
+				}
 
 			default:
 				break;

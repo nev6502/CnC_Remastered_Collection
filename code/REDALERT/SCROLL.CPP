@@ -89,7 +89,6 @@ ScrollClass::ScrollClass(void) :
 #define	EVA_WIDTH		80
 void ScrollClass::AI(KeyNumType &input, int x, int y)
 {
-#if 0
 	bool		player_scrolled=false;
 	static 	DirType	direction;
 	int		rate;
@@ -224,7 +223,7 @@ void ScrollClass::AI(KeyNumType &input, int x, int y)
 
 		}
 	}
-#endif
+
 	HelpClass::AI(input, x, y);
 }
 
