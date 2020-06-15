@@ -1294,5 +1294,6 @@ inline long BufferClass::To_Page(int x, int y, int w, int h, GraphicViewPortClas
 	return ( return_code );
 }
 
+void Show_OldFrameBuffer(bool show);
 
 #endif
