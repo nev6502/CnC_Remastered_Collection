@@ -1072,7 +1072,7 @@ extern DynamicVectorClass<EventChoiceClass *> xxx2;
 template <>class DynamicVectorClass<ActionChoiceClass *>;
 extern DynamicVectorClass<ActionChoiceClass *> xxx3;
 
-void WWSDL_ProcessEvents(KeyNumType& key, int& flags);
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer = true);
 void Device_Present(void);
 
 /*
@@ -1152,5 +1152,33 @@ extern const int NUM_EDIT_MISSIONS;
 
 extern void (*Imgui_Dialog_Function)(void);
 
+/*
+==================
+COM_SetExtension
+==================
+*/
+__forceinline void COM_SetExtension(char* path, int maxSize, const char* extension) {
+	char	oldPath[2048];
+	char* src;
+
+	//
+	// if path doesn't have a .EXT, append extension
+	// (extension should include the .)
+	//
+	src = path + strlen(path) - 1;
+
+	while (*src != '/' && src != path) {
+		if (*src == '.') {
+            *src = 0;
+            break;
+		}
+		src--;
+	}
+
+	strcpy(oldPath, path);
+	sprintf(path, "%s%s", oldPath, extension);
+}
+
+extern bool g_inMainMenu;
 
 #endif

@@ -505,6 +505,7 @@ set(src_redalert
 	./RedAlert/SOUNDDLG.H
 	./RedAlert/SPECIAL.CPP
 	./RedAlert/SPECIAL.H
+	./RedAlert/NewBlit.cpp
 	./RedAlert/SPRITE.CPP
 	./RedAlert/STAGE.H
 	./RedAlert/STARTUP.CPP
@@ -705,6 +706,7 @@ set(src_external
 	./external/lua/lzio.h
 
 )
+ 
 
 add_definitions(-DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)

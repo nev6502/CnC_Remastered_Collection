@@ -190,8 +190,6 @@ GameType Select_MPlayer_Game (void)
 	process = true;
 	pressed = false;
 	while (process) {
-			Device_Present();
-
 			#ifdef WIN32
 			/*
 			** If we have just received input focus again after running in the background then
@@ -212,9 +210,9 @@ GameType Select_MPlayer_Game (void)
 		//.....................................................................
 		//	Refresh display if needed
 		//.....................................................................
-		if (display) {
+		{
 			Hide_Mouse();
-			if (display >= REDRAW_BACKGROUND) {
+			{
 
 				//...............................................................
 				//	Refresh the backdrop
@@ -232,8 +230,8 @@ GameType Select_MPlayer_Game (void)
 			//..................................................................
 			//	Redraw buttons
 			//..................................................................
-			if (display >= REDRAW_BUTTONS) {
-				commands->Flag_List_To_Redraw();
+			{
+				commands->Draw_All(); // jmarshall: force redraw everything.
 			}
 			Show_Mouse();
 			display = REDRAW_NONE;

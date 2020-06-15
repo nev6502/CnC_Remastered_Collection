@@ -605,7 +605,6 @@ int Com_Scenario_Dialog(bool skirmish)
 oh_dear_its_a_label:
 
 	while (process) {
-		Device_Present();
 #if(SHOW_MONO)
 		if (!skirmish) {
 			NullModem.Mono_Debug_Print(0);
@@ -671,7 +670,7 @@ oh_dear_its_a_label:
 		/*
 		...................... Refresh display if needed ......................
 		*/
-		if (display) {
+		{
 			if (housebtn.IsDropped) {
 				housebtn.Collapse();
 				display = REDRAW_BACKGROUND;
@@ -681,7 +680,7 @@ oh_dear_its_a_label:
 			/*
 			.................. Redraw backgound & dialog box ...................
 			*/
-			if (display >= REDRAW_BACKGROUND) {
+			{
 				Dialog_Box(d_dialog_x, d_dialog_y, d_dialog_w, d_dialog_h);
 
 				// init font variables
@@ -716,12 +715,15 @@ oh_dear_its_a_label:
 			/*..................................................................
 			Draw the color boxes
 			..................................................................*/
-			if (display >= REDRAW_COLORS) {
+			{
 				for (i = 0; i < MAX_MPLAYER_COLORS; i++) {
-					LogicPage->Fill_Rect(cbox_x[i] + 1, d_color_y + 1,
-						cbox_x[i] + 1 + d_color_w - 2, d_color_y + 1 + d_color_h - 2,
-						ColorRemaps[i].Box);
+// jmarshall
+					//LogicPage->Fill_Rect(cbox_x[i] + 1, d_color_y + 1,
+					//	cbox_x[i] + 1 + d_color_w - 2, d_color_y + 1 + d_color_h - 2,
+					//	ColorRemaps[i].Box);
 					//						(i == PCOLOR_DIALOG_BLUE) ? ColorRemaps[PCOLOR_REALLY_BLUE].Box : ColorRemaps[i].Box);
+					GL_FillRect(ColorRemaps[i].Box, cbox_x[i] + 1, d_color_y + 1, 1 + d_color_w - 2, 1 + d_color_h - 2);
+// jmarshall end
 
 					if (i == Session.ColorIdx) {
 						Draw_Box(cbox_x[i], d_color_y, d_color_w, d_color_h, BOXSTYLE_DOWN, false);
@@ -744,7 +746,7 @@ oh_dear_its_a_label:
 			//..................................................................
 			// Update game parameter labels
 			//..................................................................
-			if (display >= REDRAW_PARMS) {
+			{
 
 				//				LogicPage->Fill_Rect(d_count_x + d_count_w + 2, d_count_y, d_count_x + d_count_w + 35 * RESFACTOR, d_aiplayers_y + d_aiplayers_h+RESFACTOR, BLACK);
 
@@ -777,13 +779,13 @@ oh_dear_its_a_label:
 			/*
 			.......................... Redraw buttons ..........................
 			*/
-			if (display >= REDRAW_BUTTONS) {
+			{
 				commands->Flag_List_To_Redraw();
 				commands->Draw_All();
 			}
 
 			Show_Mouse();
-			display = REDRAW_NONE;
+			//display = REDRAW_NONE;
 		}
 
 		/*
@@ -792,6 +794,8 @@ oh_dear_its_a_label:
 		messages_have_focus = Session.Messages.Has_Edit_Focus();
 		bool droplist_is_dropped = housebtn.IsDropped;
 		input = commands->Input();
+
+		Load_Title_Page(true);
 
 		/*
 		** Sort out the input focus between the name edit box and the message system

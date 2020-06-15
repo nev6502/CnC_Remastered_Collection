@@ -797,7 +797,7 @@ int Main_Menu(unsigned long )
 				break;
 		}
 
-		Device_Present();
+		//Device_Present();
 	}
 
 	Options.Set_Score_Volume(oldvolume, false);

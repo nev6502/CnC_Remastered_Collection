@@ -497,7 +497,7 @@ bool Expansion_Dialog(void)
 
 		Call_Back();
 
-		if (display) {
+		{
 			display = false;
 
 			Hide_Mouse();

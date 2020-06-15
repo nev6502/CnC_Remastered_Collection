@@ -286,6 +286,7 @@ int __cdecl Buffer_Print2(GraphicViewPortClass& vp, const char* string, int x, i
 
 extern "C" LONG __cdecl Buffer_Print(void* thisptr, const char* str, int x, int y, int fcolor, int bcolor)
 {
-	Buffer_Print2(*(GraphicViewPortClass*)thisptr, str, x, y, fcolor, bcolor);
+	//Buffer_Print2(*(GraphicViewPortClass*)thisptr, str, x, y, fcolor, bcolor);
+	GL_DrawText(fcolor, x, y, (char *)str);
     return 0;
 }

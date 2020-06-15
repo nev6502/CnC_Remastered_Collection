@@ -174,6 +174,9 @@ char TeamEvent = 0;			// 0 = no event, 1,2,3 = team event type
 char TeamNumber = 0;			// which team was selected? (1-9)
 char FormationEvent = 0;	// 0 = no event, 1 = formation was toggled
 
+bool g_inMainMenu = false;
+
+
 
 	/* -----------------10/14/96 7:29PM------------------
 
@@ -278,6 +281,7 @@ void Main_Game(int argc, char * argv[])
 #endif	//	!WOLAPI_INTEGRATION
 		}
 #endif	//WIN32
+		g_inMainMenu = false;
 
 #ifdef SCENARIO_EDITOR
 		/*
