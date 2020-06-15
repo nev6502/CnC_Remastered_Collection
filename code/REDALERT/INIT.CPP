@@ -658,7 +658,6 @@ bool Select_Game(bool fade)
 #endif
 
 		while (process) {
-
 			/*
 			**	Redraw the title page if needed
 			*/
@@ -734,6 +733,7 @@ bool Select_Game(bool fade)
 #ifdef FIXIT_ANTS
 				AntsEnabled = false;
 #endif
+				g_inMainMenu = true;
 				selection = Main_Menu(ATTRACT_MODE_TIMEOUT);
 			}
 			Call_Back();

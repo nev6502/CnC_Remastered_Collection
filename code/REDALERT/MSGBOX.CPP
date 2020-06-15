@@ -258,8 +258,12 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 		process = true;
 		pressed = false;
 		while (process) {
-
-			Device_Present();
+// jmarshall
+			// If not in game, display the title screen.
+			if (g_inMainMenu) {
+				Load_Title_Screen("TITLE.PCX", NULL, NULL);
+			}
+// jmarshall end
 
 			#ifdef WIN32
 			/*

@@ -265,7 +265,7 @@ void GameOptionsClass::Process(void)
 	bool process = true;
 	pressed = false;
 	while (process) {
-		Device_Present();
+		//Device_Present();
 
 		/*
 		**	Invoke game callback.
@@ -292,7 +292,7 @@ void GameOptionsClass::Process(void)
 		/*
 		**	Refresh display if needed.
 		*/
-		if (display || RedrawOptionsMenu) {
+		{
 
 			/*
 			**	Redraw the map.

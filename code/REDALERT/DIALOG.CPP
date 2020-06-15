@@ -46,7 +46,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-
+#include	"Image.h"
 #include   "defines.h"   //VG 10/17/96
 
 unsigned char * Font_Palette(int color);
@@ -98,55 +98,104 @@ void Dialog_Box(int x, int y, int w, int h)
 	*/
 	int cx = w/2;
 	int cy = h/2;
+// jmarshall
 	void const * shapedata = MFCD::Retrieve("DD-BKGND.SHP");
-#ifdef WIN32
-	CC_Draw_Shape(shapedata, 0, cx-312, cy-192, WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 1, cx,     cy-192, WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 2, cx-312, cy,     WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 3, cx,     cy,     WINDOW_PARTIAL, SHAPE_WIN_REL);
-#else
-	CC_Draw_Shape(shapedata, 0, cx-156, cy-96, WINDOW_PARTIAL, SHAPE_WIN_REL);
-#endif
+//#ifdef WIN32
+//	CC_Draw_Shape(shapedata, 0, cx-312, cy-192, WINDOW_PARTIAL, SHAPE_WIN_REL);
+//	CC_Draw_Shape(shapedata, 1, cx,     cy-192, WINDOW_PARTIAL, SHAPE_WIN_REL);
+//	CC_Draw_Shape(shapedata, 2, cx-312, cy,     WINDOW_PARTIAL, SHAPE_WIN_REL);
+//	CC_Draw_Shape(shapedata, 3, cx,     cy,     WINDOW_PARTIAL, SHAPE_WIN_REL);
+//#else
+//	CC_Draw_Shape(shapedata, 0, cx-156, cy-96, WINDOW_PARTIAL, SHAPE_WIN_REL);
+//#endif
+	GL_SetClipRect(x, y, w, h);
+	if (g_inMainMenu)
+	{
+		Image_t* ddbkgrnd = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0000.png");
+		Image_t* ddbkgrnd_1 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0001.png");
+		Image_t* ddbkgrnd_2 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0002.png");
+		Image_t* ddbkgrnd_3 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-red-0003.png");
+		GL_RenderImage(ddbkgrnd, x, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_1, x + 312, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_2, x, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_3, x + 312, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+	}
+	else
+	{
+		Image_t* ddbkgrnd = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0000.png");
+		Image_t* ddbkgrnd_1 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0001.png");
+		Image_t* ddbkgrnd_2 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0002.png");
+		Image_t* ddbkgrnd_3 = Image_LoadImage("ui/dd-bkgrnd/dd-bkgnd-0003.png");
+		GL_RenderImage(ddbkgrnd, x, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_1, x + 312, y, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_2, x, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+		GL_RenderImage(ddbkgrnd_3, x + 312, y + 192, ddbkgrnd->width, ddbkgrnd->height);
+	}
+// jmarshall end
 	/*
 	**	Draw the side strips.
 	*/
-	shapedata = MFCD::Retrieve("DD-EDGE.SHP");
+	//shapedata = MFCD::Retrieve("DD-EDGE.SHP");
+	Image_t* ddedge = Image_LoadImage("ui/dd-edge/dd-edge-0000.png");
+	Image_t* ddedge_1 = Image_LoadImage("ui/dd-edge/dd-edge-0001.png");
 	for (int yy = 0; yy < h; yy += 6) {
-		CC_Draw_Shape(shapedata, 0, 7*RESFACTOR,         yy, WINDOW_PARTIAL, SHAPE_WIN_REL);
-		CC_Draw_Shape(shapedata, 1, w-((7+8)*RESFACTOR), yy, WINDOW_PARTIAL, SHAPE_WIN_REL);
+		//CC_Draw_Shape(shapedata, 0, 7*RESFACTOR,         yy, WINDOW_PARTIAL, SHAPE_WIN_REL);
+		//CC_Draw_Shape(shapedata, 1, w-((7+8)*RESFACTOR), yy, WINDOW_PARTIAL, SHAPE_WIN_REL);
+		GL_RenderImage(ddedge, x + (7 * RESFACTOR), y + yy, ddedge->width, ddedge->height);
+		GL_RenderImage(ddedge_1, x + (w - ((7 + 8) * RESFACTOR)), y + yy, ddedge->width, ddedge->height);
 	}
 
 	/*
 	**	Draw the border bars.
 	*/
-	shapedata = MFCD::Retrieve("DD-LEFT.SHP");
-	CC_Draw_Shape(shapedata, 0, 0, cy-100*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 0, 0, cy, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//shapedata = MFCD::Retrieve("DD-LEFT.SHP");
+	Image_t* ddleft = Image_LoadImage("ui/dd-edge/dd-left-0000.png");
+	GL_RenderImage(ddleft, x, y + (cy - 100 * RESFACTOR), ddleft->width * 0.5, ddleft->height * 0.5);
+	GL_RenderImage(ddleft, x, y + cy, ddleft->width * 0.5, ddleft->height * 0.5);
+	//CC_Draw_Shape(shapedata, 0, 0, cy-100*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 0, 0, cy, WINDOW_PARTIAL, SHAPE_WIN_REL);
 
-	shapedata = MFCD::Retrieve("DD-RIGHT.SHP");
+	//shapedata = MFCD::Retrieve("DD-RIGHT.SHP");
+	Image_t* ddright = Image_LoadImage("ui/dd-edge/dd-right-0000.png");
 	int rightx = w - (7*RESFACTOR);
 #ifndef WIN32
 	rightx--;
 #endif
-	CC_Draw_Shape(shapedata, 0, rightx, cy-100*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 0, rightx, cy,					WINDOW_PARTIAL, SHAPE_WIN_REL);
+	GL_RenderImage(ddright, x + rightx, y + (cy - 100 * RESFACTOR), ddleft->width * 0.5, ddleft->height * 0.5);
+	GL_RenderImage(ddright, x + rightx, y + cy, ddleft->width * 0.5, ddleft->height * 0.5);
+	//CC_Draw_Shape(shapedata, 0, rightx, cy-100*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 0, rightx, cy,					WINDOW_PARTIAL, SHAPE_WIN_REL);
 
-	shapedata = MFCD::Retrieve("DD-BOTM.SHP");
-	CC_Draw_Shape(shapedata, 0, cx-160*RESFACTOR, h-8*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 0, cx, h-8*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//shapedata = MFCD::Retrieve("DD-BOTM.SHP");
+	Image_t* ddbotm = Image_LoadImage("ui/dd-edge/dd-botm-0000.png");
+	GL_RenderImage(ddbotm, x + (cx - 160 * RESFACTOR), y + (h - 8 * RESFACTOR), ddbotm->width / 2, ddbotm->height / 2);
+	GL_RenderImage(ddbotm, x + (cx), y + (h - 8 * RESFACTOR), ddbotm->width / 2, ddbotm->height / 2);
+	//CC_Draw_Shape(shapedata, 0, cx-160*RESFACTOR, h-8*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 0, cx, h-8*RESFACTOR, WINDOW_PARTIAL, SHAPE_WIN_REL);
 
-	shapedata = MFCD::Retrieve("DD-TOP.SHP");
-	CC_Draw_Shape(shapedata, 0, cx-160*RESFACTOR, 0, WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 0, cx, 0, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	Image_t* ddtop = Image_LoadImage("ui/dd-edge/dd-top-0000.png");
+	//CC_Draw_Shape(shapedata, 0, cx-160*RESFACTOR, 0, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 0, cx, 0, WINDOW_PARTIAL, SHAPE_WIN_REL);
+	GL_RenderImage(ddtop, x + (cx - 160 * RESFACTOR), y, ddtop->width / 2, ddtop->height / 2);
+	GL_RenderImage(ddtop, x + (cx), y, ddtop->width / 2, ddtop->height / 2);
 
 	/*
 	**	Draw the corner caps.
 	*/
-	shapedata = MFCD::Retrieve("DD-CRNR.SHP");
-	CC_Draw_Shape(shapedata, 0, 0,                  0, 					WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 1, w-(12*RESFACTOR-1), 0, 					WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 2, 0,                  h-(12*RESFACTOR), WINDOW_PARTIAL, SHAPE_WIN_REL);
-	CC_Draw_Shape(shapedata, 3, w-(12*RESFACTOR-1), h-(12*RESFACTOR), WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//shapedata = MFCD::Retrieve("DD-CRNR.SHP");
+	Image_t* ddcrnr0 = Image_LoadImage("ui/dd-edge/dd-crnr-0000.png");
+	Image_t* ddcrnr1 = Image_LoadImage("ui/dd-edge/dd-crnr-0001.png");
+	Image_t* ddcrnr2 = Image_LoadImage("ui/dd-edge/dd-crnr-0002.png");
+	Image_t* ddcrnr3 = Image_LoadImage("ui/dd-edge/dd-crnr-0003.png");
+	GL_RenderImage(ddcrnr0, x, y, 23, 24);
+	GL_RenderImage(ddcrnr1, x + (w - (12 * RESFACTOR - 1)), y, 23, 24);
+	GL_RenderImage(ddcrnr2, x, y + (h - (12 * RESFACTOR)), 23, 24);
+	GL_RenderImage(ddcrnr3, x + (w - (12 * RESFACTOR - 1)), y + (h - (12 * RESFACTOR)), 23, 24);
+
+	//CC_Draw_Shape(shapedata, 0, 0,                  0, 					WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 1, w-(12*RESFACTOR-1), 0, 					WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 2, 0,                  h-(12*RESFACTOR), WINDOW_PARTIAL, SHAPE_WIN_REL);
+	//CC_Draw_Shape(shapedata, 3, w-(12*RESFACTOR-1), h-(12*RESFACTOR), WINDOW_PARTIAL, SHAPE_WIN_REL);
 
 #ifdef WIN32
 	WWMouse->Draw_Mouse(&HidPage);
@@ -160,6 +209,8 @@ void Dialog_Box(int x, int y, int w, int h)
 //	Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, ((GraphicBufferClass*)Map.Shadow_Address())->Get_Buffer());
 #endif
 	Set_Logic_Page(oldpage);
+
+	GL_ResetClipRect();
 }
 
 
@@ -207,7 +258,10 @@ void Draw_Box(int x, int y, int w, int h, BoxStyleEnum up, bool filled)
 	BoxStyleType const &style = ButtonColors[up];
 
 	if (filled) {
-		LogicPage->Fill_Rect( x, y, x+w, y+h, style.Filler);
+// jmarshall
+		//LogicPage->Fill_Rect( x, y, x+w, y+h, style.Filler);
+		GL_FillRect(style.Filler, x, y, w, h);
+// jmarshall end
 	}
 
 	switch (up) {

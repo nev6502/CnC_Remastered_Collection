@@ -61,6 +61,8 @@
 #include <imgui.h>
 #include <examples/imgui_impl_opengl3.h>
 
+#include <vector>
+
 GLuint backbuffer_texture = -1;
 byte* backbuffer_data;
 unsigned char* backbuffer_data_raw;
@@ -127,12 +129,14 @@ Image_t* Image_LoadImage(const char* name) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	ilDeleteImages(1, &ImageName);
+	ilDeleteImages(1, &ImageName);	
 
 	Image_t* image = new Image_t();
+	strcpy(image->name, name);
 	image->image = texture;
 	image->width = Width;
 	image->height = Height;
+	loaded_images.push_back(image);
 	return image;
 }
 
@@ -173,13 +177,13 @@ void ImGui_NewFrame(void) {
 
 	io.DisplaySize = ImVec2(ScreenWidth, ScreenHeight);
 	ImGui_ImplOpenGL3_NewFrame();
-	ImGui::NewFrame();
+	ImGui::NewFrame(show_oldframebuffer);
 
 	ImGui_ImplSDL2_NewFrame(game_window);
 }
 
-void Device_Present(void) 
-{
+void Device_Present(void) {	
+
 	// Rasterize the palette.
 	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
 		backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
@@ -187,28 +191,23 @@ void Device_Present(void)
 		backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
 		backbuffer_data[(i * 4) + 3] = 255;
 	}
-
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
 
 	bool ScreenActive;
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
-
 	ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
-	ImGui::SetNextWindowPos(ImVec2(0,0));
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs);
-	ImGui::PopStyleVar();
-
-	if (show_oldframebuffer)
-	{
-		ImVec2 desktopSize(ScreenWidth, ScreenHeight);
-		ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
-	}
+		if (show_oldframebuffer)
+		{
+			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
+			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
+		}
 
 	ImGui::End();
+
 
 	if (Imgui_Dialog_Function) {
 		Imgui_Dialog_Function();		
@@ -450,7 +449,7 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	ImGui_ImplSDL2_InitForD3D(game_window);
 	ImGui_ImplOpenGL3_Init();
 
-	io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f);
+	io.Fonts->AddFontFromFileTTF("fonts/Arial.ttf", 16.0f);
 
 	ImGui_NewFrame();
 }
@@ -665,7 +664,7 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 }
 
 
-void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	static int numFramesLMouse = 0;
 	extern int mousex, mousey;
 	bool leftMouseProcessed = false;
@@ -713,6 +712,7 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 			case SDL_MOUSEMOTION:
 				flags = GadgetClass::LEFTUP;
 				break;
+
 
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT) {
@@ -780,7 +780,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
 		flags = GadgetClass::LEFTHELD;
 	}
 
-	Device_Present();
+	if (presentBuffer) {
+		Device_Present();
+	}
 }
 
 
@@ -889,17 +891,23 @@ void Memory_Error_Handler(void)
 
 
 GraphicBufferClass* Read_PCX_File(char* name, char* Palette, void *Buff, long Size);
-void Load_Title_Screen(char *name, GraphicViewPortClass *video_page, unsigned char *palette)
-{
+void Load_Title_Screen(char *name, GraphicViewPortClass *video_page, unsigned char *palette) {
+	char filename[512];
+	sprintf(filename, "ui/%s", name);
+	COM_SetExtension(filename, sizeof(filename), ".png");
+	Image_t* image = Image_LoadImage(filename);
 
-	GraphicBufferClass *load_buffer;
+	GL_RenderImage(image, 0, 0, ScreenWidth, ScreenHeight);
 
-
-	load_buffer = Read_PCX_File(name, (char*)palette, NULL, 0);
-
-	if (load_buffer) {
-		load_buffer->Scale(*video_page, 0, 0, 0, 0, load_buffer->Get_Width(), load_buffer->Get_Height(), ScreenWidth, ScreenHeight, NULL);
+	// We still have to do this for palette reasons. 
+	{
+		GraphicBufferClass* load_buffer;
+		load_buffer = Read_PCX_File(name, (char*)palette, NULL, 0);
 		delete load_buffer;
+		//if (load_buffer) {
+		//	load_buffer->Scale(*video_page, 0, 0, 0, 0, load_buffer->Get_Width(), load_buffer->Get_Height(), ScreenWidth, ScreenHeight, NULL);
+		//	delete load_buffer;
+		//}
 	}
 }
 

@@ -413,6 +413,7 @@ void ScoreClass::Presentation(void)
 #endif
 	BlackPalette.Set();
 
+	Show_OldFrameBuffer(false);
 
 	void const * country4 = MFCD::Retrieve("COUNTRY4.AUD");
 	void const * sfx4 = MFCD::Retrieve("SFX4.AUD");
@@ -866,6 +867,8 @@ Keyboard->Clear();
 #endif	//FIXIT
 
 #endif
+
+	Show_OldFrameBuffer(true);
 }
 
 

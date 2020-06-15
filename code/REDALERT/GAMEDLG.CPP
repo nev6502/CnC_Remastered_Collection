@@ -260,7 +260,7 @@ void GameControlsClass::Process(void)
 		/*
 		**	Refresh display if needed.
 		*/
-		if (display) {
+		{
 			Hide_Mouse();
 
 			Map.Flag_To_Redraw(true);
@@ -273,7 +273,7 @@ void GameControlsClass::Process(void)
 			refresh = true;
 		}
 
-		if (refresh) {
+		{
 			Hide_Mouse();
 
 			/*
