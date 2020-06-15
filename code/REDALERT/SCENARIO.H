@@ -36,6 +36,8 @@
 #ifndef SCENARIO_H
 #define SCENARIO_H
 
+#include    "MapScript.h"
+
 
 /*
 **	This class holds the information about the current game being played. This information is
@@ -328,6 +330,12 @@ class ScenarioClass {
 #endif
 
 		bool	warpIntoMap;
+
+
+		/*
+		**	MapScript storage, to be accessed by triggers etc.
+		*/
+		MapScript* mapScript = nullptr;
 };
 
 

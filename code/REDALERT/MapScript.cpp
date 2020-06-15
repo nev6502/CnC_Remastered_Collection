@@ -5,10 +5,12 @@
 #include "MapScript.h"
 
 /***********************************************************************************************
- * Script_GiveCreditsToPlayer - Gives a given player a given amount of credits                 *
+ * Script_GiveCredits - Gives a given player a given amount of credits                         *
  *                                                                                             *
- *   SCRIPT INPUT:	houseType (int) - The player (house) index to give credits to              *
- *                	cashToGive (int) - The amount of cold hard credits to give the player      *
+ *   SCRIPT INPUT:	cashToGive (int) - The amount of cold hard credits to give the player      *
+ *                                                                                             *
+ *                	houseType (int)  - The player (house) index to give credits to             *
+ *                                     or -1 to give to all players                            *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -22,16 +24,28 @@
  *   6/11/2020 - JM Created                                                                    *
  *   6/12/2020 - JJ Added player (house) index input                                           *
  *=============================================================================================*/
-static int Script_GiveCreditsToPlayer(lua_State* L) {
-    int houseType = lua_tointeger(L, 1);
-    int cashToGive = lua_tointeger(L, 2);
+static int Script_GiveCredits(lua_State* L) {
+    
+    int cashToGive = lua_tointeger(L, 1);
+
+    int houseType = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) == 2) {
+        houseType = lua_tointeger(L, 2);
+    }
 
     for (int h_index = 0; h_index < Houses.Count(); h_index++) {
 
         HouseClass* house = Houses.Ptr(h_index);
 
-        if (house->ID == houseType) {
+        if (house->ID == houseType || houseType == -1) {
             house->Refund_Money(cashToGive);
+
+            // Discontinue giving out free cash if a specific house was specified
+            if (houseType >= 0) {
+                break;
+            }
         }
 
     }
@@ -42,8 +56,11 @@ static int Script_GiveCreditsToPlayer(lua_State* L) {
 /***********************************************************************************************
  * Script_NumBuildingTypeForPlayer - Returns the amount of specific buildings for a player     *
  *                                                                                             *
- *   SCRIPT INPUT:	houseType (int) - The player (house) index to count buildings for          *
- *                	structType (int) - The structure index to count buildings for              *
+ *   SCRIPT INPUT:	structType (int) - The structure index to count buildings for              *
+ *                                     or -1 for all structures                                *
+ *                                                                                             *
+ *                	houseType (int)  - The player (house) index to count buildings for         *
+ *                	                   or -1 to for all players                                *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
  *                                                                                             *
@@ -54,15 +71,22 @@ static int Script_GiveCreditsToPlayer(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_NumBuildingTypeForPlayer(lua_State* L) {
-    int houseType = lua_tointeger(L, 1);
-    int structType = lua_tointeger(L, 2);
+static int Script_CountBuildings(lua_State* L) {
+    int structType = lua_tointeger(L, 1); 
+    
+    int houseType = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) == 2) {
+        houseType = lua_tointeger(L, 2);
+    }
+    
     int result = 0;
     for (int b_index = 0; b_index < Buildings.Count(); b_index++) {
         BuildingClass* building = Buildings.Ptr(b_index);
 
-        if (building->Owner() == houseType) {
-            if (building->Class->Type == structType) {
+        if (building->Owner() == houseType || houseType == -1) {
+            if (building->Class->Type == structType || structType == -1) {
                 result++;
             }
         }
@@ -71,6 +95,243 @@ static int Script_NumBuildingTypeForPlayer(lua_State* L) {
     lua_pushnumber(L, result);
     return 1;
 }
+
+
+/***********************************************************************************************
+ * Script_CountAircraft - Returns the amount of specific aircraft for a player                 *
+ *                                                                                             *
+ *   SCRIPT INPUT:	aircraftType (int) - The aircraft index to count aircraft for              *
+ *                                       or -1 for all aircraft                                *
+ *                                                                                             *
+ *                	houseType (int)    - The player (house) index to count aircraft for        *
+ *                                       or -1 for all players                                 *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching aircraft for that player         *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CountAircraft(lua_State* L) {
+    int aircraftType = lua_tointeger(L, 1); 
+    
+    int houseType = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) == 2) {
+        houseType = lua_tointeger(L, 2);
+    }
+    
+    int result = 0;
+    for (int a_index = 0; a_index < Aircraft.Count(); a_index++) {
+        AircraftClass* aircraft = Aircraft.Ptr(a_index);
+
+        if (aircraft->Owner() == houseType || houseType == -1) {
+            if (aircraft->Class->Type == aircraftType || aircraftType == -1) {
+                result++;
+            }
+        }
+    }
+
+    lua_pushnumber(L, result);
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_CountUnits - Returns the amount of specific units for a player                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	unitType (int)  - The unit index to count units for                        *
+ *                                    or -1 for all units                                      *
+ *                                                                                             *
+ *                	houseType (int) - The player (house) index to count units for              *
+ *                                    or -1 for all players                                    *
+ *                                                                                             *
+ *                  NOTE: -1 for either index input acts as ALL                                *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching units for that player            *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CountUnits(lua_State* L) {
+    int unitType = lua_tointeger(L, 1); 
+    
+    int houseType = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) == 2) {
+        houseType = lua_tointeger(L, 2);
+    }
+    
+    int result = 0;
+    for (int u_index = 0; u_index < Units.Count(); u_index++) {
+        UnitClass* unit = Units.Ptr(u_index);
+
+        if (unit->Owner() == houseType || houseType == -1) {
+            if (unit->Class->Type == unitType || unitType == -1) {
+                result++;
+            }
+        }
+    }
+
+    lua_pushnumber(L, result);
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_CountInfantry - Returns the amount of specific infantry for a player                 *
+ *                                                                                             *
+ *   SCRIPT INPUT:	infantryType (int) - The infantry index to count infantry for              *
+ *                                       or -1 for all infantry                                *
+ *                                                                                             *
+ *                	houseType (int)    - The player (house) index to count infantry for        *
+ *                                       or -1 for all players                                 *
+ *                                                                                             *
+ *                  NOTE: -1 for either index input acts as ALL                                *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching infantry for that player         *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CountInfantry(lua_State* L) {
+    int infantryType = lua_tointeger(L, 1);
+
+    int houseType = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) == 2) {
+        houseType = lua_tointeger(L, 2);
+    }
+    
+    int result = 0;
+    for (int u_index = 0; u_index < Infantry.Count(); u_index++) {
+        InfantryClass* infantry = Infantry.Ptr(u_index);
+
+        if (infantry->Owner() == houseType || houseType == -1) {
+            if (infantry->Class->Type == infantryType || infantryType == -1) {
+                result++;
+            }
+        }
+    }
+
+    lua_pushnumber(L, result);
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_CountVessels - Returns the amount of specific vessels for a player                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	vesselType (int) - The vessel index to count vessels for                   *
+ *                                     or -1 for all vessels                                   *
+ *                                                                                             *
+ *                	houseType (int) - The player (house) index to count vessels for            *
+ *                                     or -1 for all players                                   *
+ *                                                                                             *
+ *                  NOTE: -1 for either index input acts as ALL                                *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching vessels for that player          *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CountVessels(lua_State* L) {
+    int vesselType = lua_tointeger(L, 1);
+
+    int houseType = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) == 2) {
+        houseType = lua_tointeger(L, 2);        
+    }
+
+    int result = 0;
+    for (int u_index = 0; u_index < Vessels.Count(); u_index++) {
+        VesselClass* vessel = Vessels.Ptr(u_index);
+
+        if (vessel->Owner() == houseType || houseType == -1) {
+            if (vessel->Class->Type == vesselType || vesselType == -1) {
+                result++;
+            }
+        }
+    }
+
+    lua_pushnumber(L, result);
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_SetTriggerCallback - Adds a lua callback to an existing trigger                      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerName (string)     - The ININame of the trigger via its class        *
+ *                                                                                             *
+ *                	callbackName (string)    - The function name to be called when the         *
+ *                                             actions have been met                           *
+ *                                                                                             *
+ *                  actionIndex (int) (opt.) - 0: always callback on any of the given paths    *
+ *                                                of the trigger                               *
+ *                                             1: only callback on first action                *
+ *                                             2: only callback on second action               *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_SetTriggerCallback(lua_State* L) {
+
+    const char* triggerName = lua_tostring(L, 1);
+    const char* callbackName = lua_tostring(L, 2);
+    char actionIndex = 0;
+
+    // Optional actionIndex parameter
+    if (lua_gettop(L) == 3) {
+        actionIndex = lua_tointeger(L, 2);
+    }
+
+    // Find the trigger and set up callback
+    for (int t_index = 0; t_index < Triggers.Count(); t_index++) {
+        TriggerClass* trigger = Triggers.Ptr(t_index);
+
+        if (trigger != NULL) {
+            
+            if (strcmp(trigger->Name(), triggerName) == 0) {
+
+                strncpy(trigger->MapScriptCallback,callbackName,sizeof(trigger->MapScriptCallback ) - 1);
+                trigger->MapScriptActionIndex = actionIndex;
+
+                break;
+            }
+
+        }
+        
+    }
+
+    return 1;
+}
+
 
 
 /***********************************************************************************************
@@ -88,7 +349,7 @@ static int Script_NumBuildingTypeForPlayer(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 static int Script_Win(lua_State* L) {
-
+    
     int houseType = lua_tointeger(L, -1);
 
     if (houseType != HOUSE_NONE) {
@@ -779,9 +1040,45 @@ static int Script_SetBriefingText(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 void MapScript::CallFunction(const char* functionName) {
+
     lua_getglobal(L, functionName);
     lua_pcall(L, 0, 0, 0);
+    
 } //BriefingText
+
+
+/***********************************************************************************************
+ * MapScript::setLuaPath - Sets Lua's path / extensions to search for scripts                  *
+ *                                                                                             *
+ *   This helps Lua know where/how to look for files when using require(), otherwise we could  *
+ *   hard code path/extension as we did previously                                             *
+ *                                                                                             *
+ * INPUT:  pathvalue - See lua documentation RE: LUA_PATH to know how to deal with this        *
+ *                                                                                             *
+ * OUTPUT:  void                                                                               *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+void MapScript::SetLuaPath( const char* input_path)
+{
+
+    // Needs space to keep the initial paths
+    char new_path[1024];
+
+    // Set new GLOBALS.package.path
+    lua_getglobal(L, "package");
+    lua_getfield(L, -1, "path"); // get field "path" from table at top of stack (-1)
+    const char* cur_path = lua_tostring(L, -1); // grab path string from top of stack
+
+    sprintf(new_path, "%s;%s", cur_path, input_path);
+
+    lua_pop(L, 1);
+    lua_pushstring(L, new_path);
+    lua_setfield(L, -2, "path"); 
+    lua_pop(L, 1);
+}
+
 
 
 /***********************************************************************************************
@@ -798,10 +1095,28 @@ void MapScript::CallFunction(const char* functionName) {
  *=============================================================================================*/
 bool MapScript::Init(const char* mapName) {
     char scriptName[256];
+
+    // Build map path
     sprintf(scriptName, "scripts/%s.script", mapName);
     L = luaL_newstate();
 
-    if (luaL_loadfile(L, scriptName) || lua_pcall(L, 0, 0, 0)) {
+    luaL_openlibs(L);
+
+    // Load file
+    if (luaL_loadfile(L, scriptName)){
+        L = NULL;
+        return false;
+    }
+
+    // TODO: I've tried several combinations of paths (including "scripts/?"), 
+    // but I can only get "require 'basefilename'" to work within a 
+    // script, not "require 'basefilename.script'". This may be completely 
+    // normal within lua, but it seems odd.
+
+    // This allows require() to work
+    SetLuaPath(";scripts/?.script;");
+
+    if (lua_pcall(L, 0, 0, 0)) {
         L = NULL;
         return false;
     }
@@ -880,15 +1195,22 @@ bool MapScript::Init(const char* mapName) {
 *=============================================================================================*/
 
     lua_register(L, "SetBriefingText", Script_SetBriefingText);						// Sets the [text] on the mission briefing screen
-    lua_register(L, "GiveCreditsToPlayer", Script_GiveCreditsToPlayer);             // Give [player] [credits]
-    lua_register(L, "NumBuildingTypeForPlayer", Script_NumBuildingTypeForPlayer);	// Number of buildings of [type] for given [player]
+    lua_register(L, "GiveCredits", Script_GiveCredits);                             // Give [credits] to [player] 
+    
+    lua_register(L, "CountBuildings", Script_CountBuildings);	                    // Number of buildings of [type] for given [player]
+    lua_register(L, "CountAircraft", Script_CountAircraft);	                        // Number of units of [type] for given [player]
+    lua_register(L, "CountUnits", Script_CountUnits);	                            // Number of units of [type] for given [player]
+    lua_register(L, "CountInfantry", Script_CountInfantry);	                        // Number of infantry of [type] for given [player]
+    lua_register(L, "CountVessels", Script_CountVessels);	                        // Number of vessels of [type] for given [player]
 
+    lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	            // Initiates a given [callback] on an existing [trigger]
 
+    
 /**********************************************************************************************
 * Script Globals                                                                              *
 *=============================================================================================*/
 
-    lua_pushnumber(L, PlayerPtr->ID);                                                // Local (human) player
+    lua_pushnumber(L, PlayerPtr->ID);                                                // Local player (house) index
     lua_setglobal(L, "_localPlayer");
 
 
