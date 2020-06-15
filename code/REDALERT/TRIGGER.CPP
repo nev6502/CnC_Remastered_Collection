@@ -45,6 +45,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "function.h"
+#include "MapScript.h"
 
 
 #if defined(CHEAT_KEYS) || defined(SCENARIO_EDITOR)
@@ -228,6 +229,7 @@ bool TriggerClass::Spring(TEventType event, ObjectClass * obj, CELL cell, bool f
 	bool e1 = Class->Event1(Event1, event, Class->House, obj, forced);
 	bool e2 = false;
 	bool execute = false;
+    bool execute_mapScript = false;
 
 	/*
 	**	Forced triggers must presume that the cell parameter is invalid. It then
@@ -295,6 +297,13 @@ bool TriggerClass::Spring(TEventType event, ObjectClass * obj, CELL cell, bool f
 			}
 		}
 
+        /*
+        ** We need to execute this trigger, so is there an attached MapScript callback?
+        */
+        if (Scen.mapScript != NULL && strlen(MapScriptCallback) > 0) {
+            execute_mapScript = true;
+        }
+
 		/*
 		**	For linked trigger events, perform the action associated with the matching
 		**	trigger event. Otherwise perform the action for both events.
@@ -302,19 +311,45 @@ bool TriggerClass::Spring(TEventType event, ObjectClass * obj, CELL cell, bool f
 		bool ok = false;
 		HousesType hh = Class->House;
 		if (Class->EventControl == MULTI_LINKED) {
-			if (e1 || forced) ok |= Class->Action1(hh, obj, ID, cell);
-			if (e2 && !forced) ok |= Class->Action2(hh, obj, ID, cell);
+            if (e1 || forced) {
+                ok |= Class->Action1(hh, obj, ID, cell);
+
+                // Execute MapScript Callback for action 1?
+                if (ok && execute_mapScript && MapScriptActionIndex <= 1) {
+                    Scen.mapScript->CallFunction(MapScriptCallback);
+                }
+            }
+            if (e2 && !forced) {
+                ok |= Class->Action2(hh, obj, ID, cell);
+
+                // Execute MapScript Callback for action 2?
+                if (ok && execute_mapScript && MapScriptActionIndex != 1) {
+                    Scen.mapScript->CallFunction(MapScriptCallback);
+                }
+            }
 		} else {
 
 			switch (Class->ActionControl) {
 				case MULTI_ONLY:
 					ok |= Class->Action1(hh, obj, ID, cell);
+
+                    // Execute MapScript Callback for action 1?
+                    if (ok && execute_mapScript && MapScriptActionIndex <= 1) {
+                        Scen.mapScript->CallFunction(MapScriptCallback);
+                    }
+
 					break;
 
 				default:
 				case MULTI_AND:
 					ok |= Class->Action1(hh, obj, ID, cell);
 					ok |= Class->Action2(hh, obj, ID, cell);
+
+                    // Execute MapScript Callback for action?
+                    if (ok && execute_mapScript) {
+                        Scen.mapScript->CallFunction(MapScriptCallback);
+                    }
+
 					break;
 			}
 		}

@@ -72,6 +72,59 @@ static int Script_NumBuildingTypeForPlayer(lua_State* L) {
     return 1;
 }
 
+/***********************************************************************************************
+ * Script_SetTriggerCallback - Adds a lua callback to an existing trigger                      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerName (string) - The ININame of the trigger via its class            *
+ *                	callbackName (string) - The function name to be called when the actions    *
+ *                                          have been met                                      *
+ *                  actionIndex (int) (optional) - 0 (default): always callback on any of the  *
+ *                                                 given paths of the trigger                  *
+ *                                                 1: only callback on first action            *
+ *                                                 2: only callback on second action           *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_SetTriggerCallback(lua_State* L) {
+
+    const char* triggerName = lua_tostring(L, 1);
+    const char* callbackName = lua_tostring(L, 2);
+    char actionIndex = 0;
+
+    // Optional actionIndex parameter
+    if (lua_gettop(L) == 3) {
+        actionIndex = lua_tointeger(L, 2);
+    }
+
+    // Find the trigger and set up callback
+    for (int t_index = 0; t_index < Triggers.Count(); t_index++) {
+        TriggerClass* trigger = Triggers.Ptr(t_index);
+
+        if (trigger != NULL) {
+            
+            if (strcmp(trigger->Name(), triggerName) == 0) {
+
+                strncpy(trigger->MapScriptCallback,callbackName,sizeof(trigger->MapScriptCallback ) - 1);
+                trigger->MapScriptActionIndex = actionIndex;
+
+                break;
+            }
+
+        }
+        
+    }
+
+    return 1;
+}
+
+
 
 /***********************************************************************************************
  * Script_Win - The specified player wins                                                      *
@@ -779,9 +832,45 @@ static int Script_SetBriefingText(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 void MapScript::CallFunction(const char* functionName) {
+
     lua_getglobal(L, functionName);
     lua_pcall(L, 0, 0, 0);
+    
 } //BriefingText
+
+
+/***********************************************************************************************
+ * MapScript::setLuaPath - Sets Lua's path / extensions to search for scripts                  *
+ *                                                                                             *
+ *   This helps Lua know where/how to look for files when using require(), otherwise we could  *
+ *   hard code path/extension as we did previously                                             *
+ *                                                                                             *
+ * INPUT:  pathvalue - See lua documentation RE: LUA_PATH to know how to deal with this        *
+ *                                                                                             *
+ * OUTPUT:  void                                                                               *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+void MapScript::SetLuaPath( const char* input_path)
+{
+
+    // Needs space to keep the initial paths
+    char new_path[1024];
+
+    // Set new GLOBALS.package.path
+    lua_getglobal(L, "package");
+    lua_getfield(L, -1, "path"); // get field "path" from table at top of stack (-1)
+    const char* cur_path = lua_tostring(L, -1); // grab path string from top of stack
+
+    sprintf(new_path, "%s;%s", cur_path, input_path);
+
+    lua_pop(L, 1);
+    lua_pushstring(L, new_path);
+    lua_setfield(L, -2, "path"); 
+    lua_pop(L, 1);
+}
+
 
 
 /***********************************************************************************************
@@ -798,13 +887,34 @@ void MapScript::CallFunction(const char* functionName) {
  *=============================================================================================*/
 bool MapScript::Init(const char* mapName) {
     char scriptName[256];
+
+    
+    
     sprintf(scriptName, "scripts/%s.script", mapName);
     L = luaL_newstate();
 
-    if (luaL_loadfile(L, scriptName) || lua_pcall(L, 0, 0, 0)) {
+    luaL_openlibs(L);
+
+    if (luaL_loadfile(L, scriptName)){
         L = NULL;
         return false;
     }
+
+    // TODO: I've tried several combinations of paths (including "scripts/?"), 
+    // but I can only get "require 'basefilename'" to work within a 
+    // script, not "require 'basefilename.script'". This may be completely 
+    // normal within lua, but it seems odd.
+
+    // This allows require() to work
+    SetLuaPath(";scripts/?.script;");
+
+
+    if (lua_pcall(L, 0, 0, 0)) {
+        L = NULL;
+        return false;
+    }
+
+
 
     /**********************************************************************************************
     * Red Alert Vanilla Actions                                                                   *
@@ -882,6 +992,8 @@ bool MapScript::Init(const char* mapName) {
     lua_register(L, "SetBriefingText", Script_SetBriefingText);						// Sets the [text] on the mission briefing screen
     lua_register(L, "GiveCreditsToPlayer", Script_GiveCreditsToPlayer);             // Give [player] [credits]
     lua_register(L, "NumBuildingTypeForPlayer", Script_NumBuildingTypeForPlayer);	// Number of buildings of [type] for given [player]
+
+    lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	        // Initiates a given [callback] on an existing [trigger]
 
 
 /**********************************************************************************************
