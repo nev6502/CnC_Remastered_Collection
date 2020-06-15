@@ -40,7 +40,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-#include "textbtn.h"
+#include	"textbtn.h"
 
 
 /***********************************************************************************************
@@ -77,8 +77,6 @@ TextButtonClass::TextButtonClass(unsigned id, char const * text, TextPrintType s
 	IsBlackBorder = blackborder;
 
 	if (w == -1 || h == -1) {
-		//PG_TO_FIX
-		//Fancy_Text_Print(TXT_NONE, 0, 0, TBLACK, TBLACK, PrintFlags);
 		if (w == -1) {
 			Width = String_Pixel_Width(String)+8;
 		}
@@ -343,6 +341,13 @@ void TextButtonClass::Draw_Text(char const * text)
 			}
 		}
 
-		Fancy_Text_Print(text, X+(Width>>1)-1, Y+1, scheme, TBLACK, PrintFlags|flags|TPF_CENTER);
+		// if height of button is non-comformal, adjust Y
+		int drawY = Y + 1;
+		if ( Height != RegularButtonHeight )
+		{
+			drawY += ( Height - RegularButtonHeight) / 2;
+		}
+
+		Fancy_Text_Print(text, X+(Width>>1)-1, drawY, scheme, TBLACK, PrintFlags|flags|TPF_CENTER);
 	}
 }
