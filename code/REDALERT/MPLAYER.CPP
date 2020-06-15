@@ -68,50 +68,16 @@ GameType Select_MPlayer_Game (void)
 	//	Dialog & button dimensions
 	//------------------------------------------------------------------------
 	int d_dialog_w = 190 *RESFACTOR;
-#ifdef WOLAPI_INTEGRATION
-	int d_dialog_h = 89 * RESFACTOR;			//	ajw
-	int	d_dialog_y = (((255 * RESFACTOR) - d_dialog_h) / 2);
-#else
-	int d_dialog_h = 78 *RESFACTOR;
-	int d_dialog_y = 90 * RESFACTOR;
-#endif
-	int d_dialog_x = (((320*RESFACTOR) - d_dialog_w) / 2);
-	int d_dialog_cx = d_dialog_x + (d_dialog_w / 2);
+	int d_dialog_h = 78 * RESFACTOR;
 
-	int d_txt6_h = 7 *RESFACTOR;
-	int d_margin = 7 *RESFACTOR;
+	int	d_dialog_x = ((SeenBuff.Get_Width() - d_dialog_w) / 2);
+	int	d_dialog_y = ((SeenBuff.Get_Height() - d_dialog_h) / 2);
 
-	int d_modemserial_w = 80 *RESFACTOR;
-	int d_modemserial_h = 9 *RESFACTOR;
-	int d_modemserial_x = d_dialog_cx - d_modemserial_w / 2;
-	int d_modemserial_y = d_dialog_y + d_margin + d_txt6_h + d_margin;
-
-	int d_skirmish_w = 80 *RESFACTOR;
-	int d_skirmish_h = 9 *RESFACTOR;
-	int d_skirmish_x = d_dialog_cx - d_skirmish_w / 2;
-	int d_skirmish_y = d_modemserial_y + d_modemserial_h + 2*RESFACTOR;
-
-	int d_ipx_w = 80 *RESFACTOR;
-	int d_ipx_h = 9 *RESFACTOR;
-	int d_ipx_x = d_dialog_cx - d_ipx_w / 2;
-	int d_ipx_y = d_skirmish_y + d_skirmish_h + 2*RESFACTOR;
-
-#ifdef WOLAPI_INTEGRATION
-	//	ajw 7/2/98 - added button
-	int d_wol_w = 80 * RESFACTOR;
-	int d_wol_h = 9 * RESFACTOR;
-	int d_wol_x = d_dialog_cx - d_wol_w / 2;
-	int d_wol_y = d_ipx_y + d_ipx_h + 2*RESFACTOR;
-#endif
-
-	int d_cancel_w = 60 *RESFACTOR;
-	int d_cancel_h = 9 *RESFACTOR;
-	int d_cancel_x = d_dialog_cx - d_cancel_w / 2;
-#ifdef WOLAPI_INTEGRATION
-	int d_cancel_y = d_wol_y + d_wol_h + d_margin;
-#else
-	int d_cancel_y = d_ipx_y + d_ipx_h + d_margin;
-#endif
+	int d_button_w = 80 * RESFACTOR;
+	int d_button_h = 11 * RESFACTOR;
+	int d_button_x = d_dialog_x + ((d_dialog_w - d_button_w) / 2);
+	int d_button_dy = d_button_h + 4 * RESFACTOR;		// spacing between top of two buttons
+	int d_button_y = d_dialog_y + ( 24 * RESFACTOR );
 
 	#ifdef WIN32
 	GraphicBufferClass seen_buff_save(VisiblePage.Get_Width(), VisiblePage.Get_Height(), (void*)NULL);
@@ -172,49 +138,29 @@ GameType Select_MPlayer_Game (void)
 //		return( Select_Serial_Dialog() );
 //	}
 
+	TextButtonClass modemserialbtn (BUTTON_MODEMSERIAL, TXT_MODEM_SERIAL, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	commands = &modemserialbtn;
+	d_button_y += d_button_dy;
 
-	TextButtonClass modemserialbtn (BUTTON_MODEMSERIAL, TXT_MODEM_SERIAL, TPF_BUTTON,
-		d_modemserial_x, d_modemserial_y, d_modemserial_w, d_modemserial_h);
+	TextButtonClass skirmishbtn (BUTTON_SKIRMISH, TXT_SKIRMISH, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	skirmishbtn.Add_Tail(*commands);
+	d_button_y += d_button_dy;
 
-	TextButtonClass skirmishbtn (BUTTON_SKIRMISH, TXT_SKIRMISH, TPF_BUTTON,
-		d_skirmish_x, d_skirmish_y, d_skirmish_w, d_skirmish_h);
+	TextButtonClass ipxbtn(BUTTON_IPX, TXT_NETWORK, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
 
-	TextButtonClass ipxbtn (BUTTON_IPX, TXT_NETWORK, TPF_BUTTON,
-		d_ipx_x, d_ipx_y, d_ipx_w, d_ipx_h);
-
-#ifdef WOLAPI_INTEGRATION
-	//	ajw
-	TextButtonClass wolbtn(BUTTON_WOL, TXT_WOL_INTERNETBUTTON, TPF_BUTTON,
-		d_wol_x, d_wol_y, d_wol_w, d_wol_h);
-#endif
-
-	if(!Ipx.Is_IPX()) {
-		d_cancel_y = d_ipx_y;
-		d_dialog_h -= d_cancel_h;
+	if(Ipx.Is_IPX()) {
+		ipxbtn.Add_Tail(*commands);
+		d_button_y += d_button_dy;
 	}
 
-	TextButtonClass cancelbtn (BUTTON_CANCEL, TXT_CANCEL, TPF_BUTTON,
-		d_cancel_x, d_cancel_y, d_cancel_w, d_cancel_h);
+	TextButtonClass cancelbtn (BUTTON_CANCEL, TXT_CANCEL, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	cancelbtn.Add_Tail(*commands);
 
 	//------------------------------------------------------------------------
 	//	Initialize
 	//------------------------------------------------------------------------
 	Set_Logic_Page(SeenBuff);
-#ifdef WIN32
 	VisiblePage.Blit(seen_buff_save);
-#endif
-	//------------------------------------------------------------------------
-	//	Create the list
-	//------------------------------------------------------------------------
-	commands = &modemserialbtn;
-	skirmishbtn.Add_Tail(*commands);
-	if(Ipx.Is_IPX()) {
-		ipxbtn.Add_Tail(*commands);
-	}
-#ifdef WOLAPI_INTEGRATION
-	wolbtn.Add_Tail(*commands);			//	ajw
-#endif
-	cancelbtn.Add_Tail(*commands);
 
 	//------------------------------------------------------------------------
 	//	Fill array of button ptrs
@@ -222,22 +168,14 @@ GameType Select_MPlayer_Game (void)
 	curbutton = 0;
 	buttons[0] = &modemserialbtn;
 	buttons[1] = &skirmishbtn;
+
 	if(Ipx.Is_IPX()) {
 		buttons[2] = &ipxbtn;
-#ifdef WOLAPI_INTEGRATION
-		buttons[3] = &wolbtn;			//	ajw
-		buttons[4] = &cancelbtn;
-#else
 		buttons[3] = &cancelbtn;
-#endif
 	} else {
-#ifdef WOLAPI_INTEGRATION
-		buttons[2] = &wolbtn;			//	ajw
-		buttons[3] = &cancelbtn;
-#else
 		buttons[2] = &cancelbtn;
-#endif
 	}
+
 	buttons[curbutton]->Turn_On();
 
 	Keyboard->Clear();
@@ -325,13 +263,6 @@ GameType Select_MPlayer_Game (void)
 				pressed = true;
 				break;
 
-#ifdef WOLAPI_INTEGRATION
-			case (BUTTON_WOL | KN_BUTTON):			//	ajw
-				selection = BUTTON_WOL;
-				pressed = true;
-				break;
-#endif
-
 			case (KN_ESC):
 			case (BUTTON_CANCEL | KN_BUTTON):
 				selection = BUTTON_CANCEL;
@@ -402,11 +333,8 @@ GameType Select_MPlayer_Game (void)
 					if (Com_Scenario_Dialog(true)) {
 						retval = GAME_SKIRMISH;
 						process = false;
-#ifdef FIXIT_VERSION_3
 						bAftermathMultiplayer = Is_Aftermath_Installed();
-						//	ajw I'll bet this was needed before also...
 						Session.ScenarioIsOfficial = Session.Scenarios[Session.Options.ScenarioIndex]->Get_Official();
-#endif
 					} else {
 						buttons[curbutton]->IsPressed = false;
 						Session.Type = GAME_NORMAL;
@@ -418,13 +346,6 @@ GameType Select_MPlayer_Game (void)
 					retval = GAME_IPX;
 					process = false;
 					break;
-
-#ifdef WOLAPI_INTEGRATION
-				case (BUTTON_WOL):				//	ajw
-					retval = GAME_INTERNET;
-					process = false;
-					break;
-#endif
 
 				case (BUTTON_CANCEL):
 					retval = GAME_NORMAL;

@@ -43,8 +43,11 @@
 
 #include <sdl.h>
 
-#undef RESFACTOR
-#define RESFACTOR (2 + (ScreenWidth / 640))
+// this makes buttons larger on a larger screen
+// necessary??
+
+//#undef RESFACTOR
+//#define RESFACTOR (2 + (ScreenWidth / 640))
 
 /*****************************
 **	Function prototypes
@@ -486,11 +489,11 @@ int Main_Menu(unsigned long )
 	int	d_dialog_x = ((SeenBuff.Get_Width() - d_dialog_w) / 2);
 	int	d_dialog_y = ((SeenBuff.Get_Height() - d_dialog_h) / 2);
 
-	int d_button_w = 118 * RESFACTOR;
-	int d_button_h = 9 * RESFACTOR;
+	int d_button_w = 140 * RESFACTOR;
+	int d_button_h = 11 * RESFACTOR;
+	int d_button_dy = d_button_h + 4 * RESFACTOR;		// spacing between top of two buttons
 	int d_button_x = d_dialog_x + ( ( d_dialog_w - d_button_w ) / 2 );
-
-	int starty = d_dialog_y + (24 * RESFACTOR);
+	int d_button_y = d_dialog_y + (24 * RESFACTOR);
 
 	static int	max_buttons = 7;
 
@@ -525,43 +528,32 @@ int Main_Menu(unsigned long )
 	*/
 	ControlClass * commands = NULL;				// the button list
 
-	int ystep = 14 * RESFACTOR;
-	if( bExpansionCS )
-	{
-		if( bExpansionAM )
-			ystep = 12 * RESFACTOR;
-		else
-			ystep = 13 * RESFACTOR;
-	}
-	else if( bExpansionAM )
-		ystep = 13 * RESFACTOR;
-
-	TextButtonClass expandbtnCS( BUTTON_EXPAND, TXT_WOL_CS_MISSIONS, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h );
+	TextButtonClass expandbtnCS( BUTTON_EXPAND, TXT_WOL_CS_MISSIONS, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h );
 
 	if( bExpansionCS )
-		starty += ystep;
-	TextButtonClass expandbtnAM( BUTTON_EXPAND_AM, TXT_WOL_AM_MISSIONS, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h);
+		d_button_y += d_button_dy;
+	TextButtonClass expandbtnAM( BUTTON_EXPAND_AM, TXT_WOL_AM_MISSIONS, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
 
 	if( bExpansionAM )
-		starty += ystep;
+		d_button_y += d_button_dy;
 
-	TextButtonClass startbtn(BUTTON_START, TXT_START_NEW_GAME, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h);
-	starty += ystep;
+	TextButtonClass startbtn(BUTTON_START, TXT_START_NEW_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass loadbtn(BUTTON_LOAD, TXT_LOAD_MISSION, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h);
-	starty += ystep;
+	TextButtonClass loadbtn(BUTTON_LOAD, TXT_LOAD_MISSION, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass multibtn(BUTTON_MULTI, TXT_MULTIPLAYER_GAME, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h);
-	starty += ystep;
+	TextButtonClass multibtn(BUTTON_MULTI, TXT_MULTIPLAYER_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass introbtn(BUTTON_INTRO, TXT_INTRO, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h);
-	starty += ystep;
+	TextButtonClass introbtn(BUTTON_INTRO, TXT_INTRO, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
-	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON, d_button_x, starty, d_button_w, d_button_h);
-	starty += ystep;
+	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+	d_button_y += d_button_dy;
 
 	int version_x = d_button_x + d_button_w;
-	int version_y = starty + ( 5 * RESFACTOR );
+	int version_y = d_button_y + ( 5 * RESFACTOR );
 
 	/*
 	**	Initialize

@@ -923,10 +923,10 @@ void Read_Setup_Options( RawFileClass *config_file )
 		*/
 		VideoBackBufferAllowed = ini.Get_Bool("Options", "VideoBackBuffer", true);
 		AllowHardwareBlitFills = ini.Get_Bool("Options", "HardwareFills", true);
-// jmarshall
+
 		ScreenWidth = 1024;
-		ScreenHeight = 768; //ini.Get_Bool("Options", "Resolution", false) ? 3072 : 3072;
-// jmarshall end
+		ScreenHeight = 768;
+
 		/*
 		** See if an alternative socket number has been specified
 		*/
