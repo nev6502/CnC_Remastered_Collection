@@ -723,10 +723,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 					leftMouseProcessed = true;
 					numFramesLMouse++;
 					key = KN_LMOUSE;
+					Keyboard->Put_Element(KN_LMOUSE);
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					numFramesLMouse = 0;
 					flags = GadgetClass::RIGHTPRESS;
+					Keyboard->Put_Element(KN_RMOUSE);
 					key = KN_RMOUSE;
 				}
 				break;
