@@ -192,7 +192,6 @@ bool WWKeyboardClass::Put(unsigned short key)
 	return(false);
 }
 
-
 /***********************************************************************************************
  * WWKeyboardClass::Put_Key_Message -- Translates and inserts wParam into Keyboard Buffer      *
  *                                                                                             *
@@ -517,6 +516,7 @@ bool WWKeyboardClass::Is_Buffer_Empty(void) const
  *=============================================================================================*/
 void WWKeyboardClass::Fill_Buffer_From_System(void)
 {
+	/*
 	if (!Is_Buffer_Full()) 
 	{
 		MSG	msg;
@@ -528,6 +528,7 @@ void WWKeyboardClass::Fill_Buffer_From_System(void)
 			DispatchMessage(&msg);
 		}
 	}
+	*/
 }
 
 

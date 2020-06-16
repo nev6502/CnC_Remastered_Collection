@@ -33,10 +33,6 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#ifndef WIN32
-#include	"..\wwflat32\include\keyboard.h"
-#else
-
 #include	<windows.h>
 
 /*
@@ -44,18 +40,10 @@
 **	November of '94. Until the compiler supports this, use the following
 **	definition.
 */
-#ifndef __BORLANDC__
-#ifndef TRUE_FALSE_DEFINED
-#define TRUE_FALSE_DEFINED
-enum {false=0,true=1};
-typedef int bool;
-#endif
-#endif
-
 #pragma warning(disable : 4005)
 
 typedef enum {
-	WWKEY_SHIFT_BIT	= 0x100,
+	WWKEY_SHIFT_BIT		= 0x100,
 	WWKEY_CTRL_BIT		= 0x200,
 	WWKEY_ALT_BIT		= 0x400,
 	WWKEY_RLS_BIT		= 0x800,
@@ -656,4 +644,3 @@ typedef enum KeyNumType {
 //extern WWKeyboardClass *_Kbd;
 #endif
 
-#endif
