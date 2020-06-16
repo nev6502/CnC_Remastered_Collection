@@ -62,6 +62,8 @@
 
 #define	ARRAY_SIZE(x)		int(sizeof(x)/sizeof(x[0]))
 
+int WWKeyboardClass::Head = 0;
+int WWKeyboardClass::Tail = 0;
 
 /***********************************************************************************************
  * WWKeyboardClass::WWKeyBoardClass -- Construction for Westwood Keyboard Class                *
@@ -75,9 +77,7 @@
  *=============================================================================================*/
 WWKeyboardClass::WWKeyboardClass(void) :
 	MouseQX(0),
-	MouseQY(0),
-	Head(0),
-	Tail(0)
+	MouseQY(0)
 {
 //	_Kbd = this;
 

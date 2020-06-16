@@ -2547,7 +2547,7 @@ void Go_Editor(bool flag)
 	if (flag) {
 		AudMix_SetMusicState(false); // jmarshall: disable music if we are in editor mode
 		Hide_Mouse();
-		ShowCursor(TRUE);
+		//ShowCursor(TRUE);
 		Debug_Map = true;
 		Debug_Unshroud = true;
 
@@ -2580,7 +2580,7 @@ void Go_Editor(bool flag)
 	} else {
 		AudMix_SetMusicState(true); // jmarshall: enable music if we are going back into editor mode.
 		Show_Mouse();
-		ShowCursor(FALSE);
+		//ShowCursor(FALSE);
 
 		/*
 		**	Go into normal game mode

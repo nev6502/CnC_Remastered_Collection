@@ -3184,8 +3184,8 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 	for (index = 0; index < w*h; index++) {
 		if (map[index] != 0xFF) {
 			HidPage.Draw_Stamp(iconset, index, 0, 0, NULL, WINDOW_MAIN);
+			Buffer_Enable_HD_Texture(true); // At this point, Draw_Stamp creates a 32bit image.
 			if (scale) {
-
 				HidPage.Scale((*LogicPage), 0, 0,
 					x + ((index % w)*(ICON_PIXEL_W/2)),
 					y + ((index / w)*(ICON_PIXEL_H/2)),
@@ -3196,6 +3196,7 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 				HidPage.Blit((*LogicPage), 0, 0, x + ((index % w)*(ICON_PIXEL_W)),
 					y + ((index / w)*(ICON_PIXEL_H)), ICON_PIXEL_W, ICON_PIXEL_H);
 			}
+			Buffer_Enable_HD_Texture(false);
 		}
 	}
 }

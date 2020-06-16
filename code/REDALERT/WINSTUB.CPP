@@ -749,12 +749,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 					renderConsole = !renderConsole;
 
 					if (renderConsole) {
-						ShowCursor(TRUE);
-						Hide_Mouse();
+					//	ShowCursor(TRUE);
+					//	Hide_Mouse();
 					}
 					else {
-						ShowCursor(FALSE);
-						Show_Mouse();
+					//	ShowCursor(FALSE);
+					//	Show_Mouse();
 					}
 					break;
 				}

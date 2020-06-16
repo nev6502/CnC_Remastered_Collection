@@ -101,7 +101,7 @@ static uint8_t* g_PredatorLimit = nullptr;
 typedef void (*BF_Function)(int, int, uint8_t*, uint8_t*, int, int, uint8_t*, uint8_t*, uint8_t*, int);
 typedef void (*Single_Line_Function)(int, uint8_t*, uint8_t*, uint8_t*, uint8_t*, uint8_t*, int);
 
-static bool renderHDTexture = false;
+bool renderHDTexture = false;
 void Buffer_Enable_HD_Texture(bool hdTextureEnabled) {
     renderHDTexture = hdTextureEnabled;
 }

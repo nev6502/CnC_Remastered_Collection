@@ -428,14 +428,17 @@ int MapEditClass::Placement_Dialog(void)
 		/*
 		**	Refresh display if needed
 		*/
-		if (display) {
+		//if (display) {
 
 			/*
 			**	Display the dialog box
 			*/
 			Hide_Mouse();
-			Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
+		//	Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
 		//	Draw_Caption(TXT_PLACE_OBJECT, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
+// jmarshall - temp render a black background here so the tool works.
+			LogicPage->Fill_Rect(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_X + D_DIALOG_W, D_DIALOG_Y + D_DIALOG_H, 0);
+// jamrshall end
 
 			/*
 			**	Display the current object:
@@ -560,7 +563,7 @@ int MapEditClass::Placement_Dialog(void)
 			Show_Mouse();
 			display = false;
 
-		}
+	//	}
 				
 		display = true;
 
