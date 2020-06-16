@@ -1183,5 +1183,6 @@ __forceinline void COM_SetExtension(char* path, int maxSize, const char* extensi
 }
 
 extern bool g_inMainMenu;
-
+extern KeyNumType	g_globalKeyNumType;
+extern int			g_globalKeyFlags;
 #endif

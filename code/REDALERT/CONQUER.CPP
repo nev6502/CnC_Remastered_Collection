@@ -143,6 +143,9 @@ extern void Do_Draw(void);
 bool	bNoMovies = false;
 #endif
 
+KeyNumType	g_globalKeyNumType = KN_NONE;
+int			g_globalKeyFlags = 0;
+
 /****************************************
 **	Function prototypes for this module **
 *****************************************/
@@ -1635,6 +1638,8 @@ void Color_Cycle(void)
  *=============================================================================================*/
 void Call_Back(void)
 {
+	WWSDL_ProcessEvents(g_globalKeyNumType, g_globalKeyFlags);
+
 	/*
 	**	Music and speech maintenance
 	*/

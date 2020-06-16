@@ -679,7 +679,8 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
 	//		flags = 0;	
 
-	SDL_Event event;
+	static SDL_Event event;
+	memset(&event, 0, sizeof(SDL_Event));
 	while (SDL_PollEvent(&event)) {
 		switch (event.type)
 		{
