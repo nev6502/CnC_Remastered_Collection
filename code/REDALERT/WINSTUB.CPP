@@ -671,6 +671,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	extern int mousex, mousey;
 	bool leftMouseProcessed = false;
 
+	key = KN_NONE;
+	flags = 0;
+
 	SDL_GetMouseState(&mousex, &mousey);
 
 	Keyboard->MouseQX = mousex;
