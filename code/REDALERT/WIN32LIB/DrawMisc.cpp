@@ -1214,8 +1214,8 @@ BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, in
 		return false;
 	}
 
-	uint8_t* src = sy * src_vp.Get_Full_Pitch() + sx + (uint8_t*)(src_vp.Get_Offset());
-	uint8_t* dst = dy * dst_vp.Get_Full_Pitch() + dx + (uint8_t*)(dst_vp.Get_Offset());
+	uint8_t* src = (sy) * src_vp.Get_Full_Pitch() + (sx) + (uint8_t*)(src_vp.Get_Offset());
+	uint8_t* dst = (dy * 4) * dst_vp.Get_Full_Pitch() + (dx * 4) + (uint8_t*)(dst_vp.Get_Offset());
 	dw -= dx;
 	dh -= dy;
 	int x_ratio = ((src_w << 16) / dw) + 1;
@@ -1226,7 +1226,7 @@ BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, in
 	if (use_keysrc) {
 		if (fade != nullptr) {
 			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* d = dst + (i * 4) * dst_vp.Get_Full_Pitch();
 				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
 				int xrat = 0;
 
@@ -1234,17 +1234,21 @@ BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, in
 					uint8_t tmp = s[xrat >> 16];
 
 					if (tmp != 0) {
-						*d = ((uint8_t*)(fade))[tmp];
+						uint8_t color = ((uint8_t*)(fade))[tmp];
+						d[0] = backbuffer_palette[(color * 3) + 0];
+						d[1] = backbuffer_palette[(color * 3) + 1];
+						d[2] = backbuffer_palette[(color * 3) + 2];
+						d[3] = 255;
 					}
 
-					++d;
+					d+=4;
 					xrat += x_ratio;
 				}
 			}
 		}
 		else {
 			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* d = dst + (i * 4) * dst_vp.Get_Full_Pitch();
 				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
 				int xrat = 0;
 
@@ -1252,10 +1256,14 @@ BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, in
 					uint8_t tmp = s[xrat >> 16];
 
 					if (tmp != 0) {
-						*d = tmp;
+						uint8_t color = tmp;
+						d[0] = backbuffer_palette[(color * 3) + 0];
+						d[1] = backbuffer_palette[(color * 3) + 1];
+						d[2] = backbuffer_palette[(color * 3) + 2];
+						d[3] = 255;
 					}
 
-					++d;
+					d += 4;
 					xrat += x_ratio;
 				}
 			}
@@ -1264,24 +1272,34 @@ BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, in
 	else {
 		if (fade != nullptr) {
 			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* d = dst + (i * 4) * dst_vp.Get_Full_Pitch();
 				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
 				int xrat = 0;
 
 				for (int j = 0; j < dw; ++j) {
-					*d++ = ((uint8_t*)(fade))[s[xrat >> 16]];
+					uint8_t color = ((uint8_t*)(fade))[s[xrat >> 16]];
+					d[0] = backbuffer_palette[(color * 3) + 0];
+					d[1] = backbuffer_palette[(color * 3) + 1];
+					d[2] = backbuffer_palette[(color * 3) + 2];
+					d[3] = 255;
+					d += 4;
 					xrat += x_ratio;
 				}
 			}
 		}
 		else {
 			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
+				uint8_t* d = dst + (i * 4) * dst_vp.Get_Full_Pitch();
 				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
 				int xrat = 0;
 
 				for (int j = 0; j < dw; ++j) {
-					*d++ = s[xrat >> 16];
+					uint8_t color = s[xrat >> 16];
+					d[0] = backbuffer_palette[(color * 3) + 0];
+					d[1] = backbuffer_palette[(color * 3) + 1];
+					d[2] = backbuffer_palette[(color * 3) + 2];
+					d[3] = 255;
+					d += 4;
 					xrat += x_ratio;
 				}
 			}
