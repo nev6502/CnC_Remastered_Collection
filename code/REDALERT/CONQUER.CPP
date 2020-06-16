@@ -105,6 +105,7 @@ TcpipManagerClass	Winsock;
 #include	"vortex.h"
 #include    "VQAMOVIE.H"
 #include	"AUDIOMIX.H"
+#include "image.h"
 
 #ifdef WOLAPI_INTEGRATION
 //#include "WolDebug.h"
@@ -141,6 +142,9 @@ extern void Do_Draw(void);
 #ifdef CHEAT_KEYS
 bool	bNoMovies = false;
 #endif
+
+KeyNumType	g_globalKeyNumType = KN_NONE;
+int			g_globalKeyFlags = 0;
 
 /****************************************
 **	Function prototypes for this module **
@@ -1634,6 +1638,8 @@ void Color_Cycle(void)
  *=============================================================================================*/
 void Call_Back(void)
 {
+	WWSDL_ProcessEvents(g_globalKeyNumType, g_globalKeyFlags);
+
 	/*
 	**	Music and speech maintenance
 	*/
@@ -2541,7 +2547,7 @@ void Go_Editor(bool flag)
 	if (flag) {
 		AudMix_SetMusicState(false); // jmarshall: disable music if we are in editor mode
 		Hide_Mouse();
-		ShowCursor(TRUE);
+		//ShowCursor(TRUE);
 		Debug_Map = true;
 		Debug_Unshroud = true;
 
@@ -2574,7 +2580,7 @@ void Go_Editor(bool flag)
 	} else {
 		AudMix_SetMusicState(true); // jmarshall: enable music if we are going back into editor mode.
 		Show_Mouse();
-		ShowCursor(FALSE);
+		//ShowCursor(FALSE);
 
 		/*
 		**	Go into normal game mode
@@ -3468,6 +3474,140 @@ void CC_Draw_Pip(const ObjectClass *object, void const * shapefile, int shapenum
 
 	CC_Draw_Shape(shapefile, shapenum, x, y, window, flags, fadingdata, ghostdata, rotation);
 }
+
+// jmarshall - this is for hd textures
+void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const* fadingdata, void const* ghostdata, DirType rotation) {
+	int predoffset;
+
+	/*
+	** Special kludge for E3 to prevent crashes
+	*/
+	if ((flags & SHAPE_GHOST) && (!ghostdata)) {
+		ghostdata = DisplayClass::SpecialGhost;
+	}
+	if ((flags & SHAPE_FADING) && (!fadingdata)) {
+		fadingdata = DisplayClass::FadingShade;
+	}
+
+	static unsigned char* _xbuffer = 0;
+
+	if (!_xbuffer) {
+		_xbuffer = new unsigned char[SHAPE_BUFFER_SIZE];
+	}
+
+	if (image != NULL && shapenum != -1) {
+
+		int width = image->width;
+		int height = image->height;
+
+#ifdef NEVER
+		/*
+		**	Perform a quick clip check against the destination rectangle.
+		*/
+		if (flags & SHAPE_CENTER) {
+			if (x - width / 2 >= WindowList[window][WINDOWWIDTH]) return;
+			if (y - width / 2 >= WindowList[window][WINDOWHEIGHT]) return;
+			if (x + width / 2 < 0) return;
+			if (y + height / 2 < 0) return;
+
+		}
+		else {
+			if (x >= WindowList[window][WINDOWWIDTH]) return;
+			if (y >= WindowList[window][WINDOWHEIGHT]) return;
+			if (x + width < 0) return;
+			if (y + height < 0) return;
+		}
+#endif
+
+
+	
+		{
+			//GraphicViewPortClass draw_window(LogicPage->Get_Graphic_Buffer(),
+			//	WindowList[window][WINDOWX] + LogicPage->Get_XPos(),
+			//	WindowList[window][WINDOWY] + LogicPage->Get_YPos(),
+			//	WindowList[window][WINDOWWIDTH],
+			//	WindowList[window][WINDOWHEIGHT]);
+
+			UseOldShapeDraw = false;
+			/*
+			**	Rotation handler.
+			*/
+// jmarshall: todo HD rotation code!
+//			if (rotation != DIR_N) {
+//
+//				/*
+//				** Get the raw shape data without the new header and flag to use the old shape drawing
+//				*/
+//				UseOldShapeDraw = true;
+//
+//				if (Debug_Rotate) {
+//#if (0)//PG
+//					GraphicBufferClass src(width, height, buffer);
+//					width *= 2;
+//					height *= 2;
+//					memset(_xbuffer, '\0', SHAPE_BUFFER_SIZE);
+//					GraphicBufferClass dst(width, height, _xbuffer);
+//					Rotate_Bitmap(&src, &dst, rotation);
+//					buffer = _xbuffer;
+//#endif
+//				}
+//				else {
+//
+//					BitmapClass bm(width, height, buffer);
+//					width *= 2;
+//					height *= 2;
+//					memset(_xbuffer, '\0', SHAPE_BUFFER_SIZE);
+//					GraphicBufferClass gb(width, height, _xbuffer);
+//					TPoint2D pt(width / 2, height / 2);
+//
+//					gb.Scale_Rotate(bm, pt, 0x0100, (256 - (rotation - 64)));
+//					buffer = _xbuffer;
+//				}
+//			}
+// jmarshall end
+			/*
+			**	Special shadow drawing code (used for aircraft and bullets).
+			*/
+			if ((flags & (SHAPE_FADING | SHAPE_PREDATOR)) == (SHAPE_FADING | SHAPE_PREDATOR)) {
+				flags = flags & ~(SHAPE_FADING | SHAPE_PREDATOR);
+				flags = flags | SHAPE_GHOST;
+				ghostdata = DisplayClass::SpecialGhost;
+			}
+
+			predoffset = Frame;
+
+			//if (x > ( WindowList[window][WINDOWWIDTH] << 2)) {
+			//	predoffset = -predoffset;
+			//}
+
+			x = x + WindowList[window][WINDOWX] + LogicPage->Get_XPos();
+			y = y + WindowList[window][WINDOWY] + LogicPage->Get_YPos();
+
+			Buffer_Enable_HD_Texture(true);
+			//if (draw_window.Lock()) {
+				if ((flags & (SHAPE_GHOST | SHAPE_FADING)) == (SHAPE_GHOST | SHAPE_FADING)) {
+					Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+				}
+				else {
+					if (flags & SHAPE_FADING) {
+						Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
+					}
+					else {
+						if (flags & SHAPE_PREDATOR) {
+							Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, predoffset);
+						}
+						else {
+							Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, ghostdata, predoffset);
+						}
+					}
+				}
+			//	draw_window.Unlock();
+			//}
+			Buffer_Enable_HD_Texture(false);
+		}
+	}
+}
+// jmarshall end
 
 
 /***********************************************************************************************

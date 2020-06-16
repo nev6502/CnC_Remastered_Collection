@@ -100,6 +100,7 @@ Image_t* Image_LoadImage(const char* name) {
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
 	if (!ilLoadImage(name)) {
+		ilDeleteImages(1, &ImageName);
 		return NULL;
 	}
 
@@ -127,16 +128,19 @@ Image_t* Image_LoadImage(const char* name) {
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	ilDeleteImages(1, &ImageName);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	
 
 	Image_t* image = new Image_t();
 	strcpy(image->name, name);
 	image->image = texture;
 	image->width = Width;
 	image->height = Height;
+	image->buffer = new unsigned char[Width * Height * Bpp];
+	memcpy(image->buffer, Data, Width * Height * Bpp);
 	loaded_images.push_back(image);
+
+
+	ilDeleteImages(1, &ImageName);
 	return image;
 }
 
@@ -667,6 +671,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	extern int mousex, mousey;
 	bool leftMouseProcessed = false;
 
+	key = KN_NONE;
+	flags = 0;
+
 	SDL_GetMouseState(&mousex, &mousey);
 
 	Keyboard->MouseQX = mousex;
@@ -675,7 +682,8 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
 	//		flags = 0;	
 
-	SDL_Event event;
+	static SDL_Event event;
+	memset(&event, 0, sizeof(SDL_Event));
 	while (SDL_PollEvent(&event)) {
 		switch (event.type)
 		{
@@ -718,10 +726,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 					leftMouseProcessed = true;
 					numFramesLMouse++;
 					key = KN_LMOUSE;
+					Keyboard->Put_Element(KN_LMOUSE);
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					numFramesLMouse = 0;
 					flags = GadgetClass::RIGHTPRESS;
+					Keyboard->Put_Element(KN_RMOUSE);
 					key = KN_RMOUSE;
 				}
 				break;
@@ -742,12 +752,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 					renderConsole = !renderConsole;
 
 					if (renderConsole) {
-						ShowCursor(TRUE);
-						Hide_Mouse();
+					//	ShowCursor(TRUE);
+					//	Hide_Mouse();
 					}
 					else {
-						ShowCursor(FALSE);
-						Show_Mouse();
+					//	ShowCursor(FALSE);
+					//	Show_Mouse();
 					}
 					break;
 				}

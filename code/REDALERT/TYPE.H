@@ -257,7 +257,9 @@ class ObjectTypeClass : public AbstractTypeClass
 		**	The "mutable" keyword allows easy modification to this otherwise const object.
 		*/
 		void const * ImageData;
-
+// jmarshall
+		struct Image_t *HDImageData;
+// jmarshall end
 		/*
 		**	Points to the dimension data for each shape in the image list. By using this
 		**	data, the minimum number of cells will be redrawn when the object changes shape.
@@ -298,6 +300,9 @@ class ObjectTypeClass : public AbstractTypeClass
 		virtual short const * Overlap_List(void) const;
 		virtual BuildingClass * Who_Can_Build_Me(bool intheory, bool legal, HousesType house) const;
 		virtual void const * Get_Cameo_Data(void) const;
+// jmarshall
+		struct Image_t* Get_HDImage_Data(void) const { return HDImageData; }
+// jmarshall end
 		void const * Get_Image_Data(void) const {return ImageData;};
 		void const * Get_Radar_Data(void) const {return RadarIcon;};
 

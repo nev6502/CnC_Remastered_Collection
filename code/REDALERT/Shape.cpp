@@ -32,6 +32,8 @@
 #include <cstdarg>
 #include <cstring>
 
+#include "Image.h"
+
 #define le16toh(x) x
 #define le32toh(x) x
 
@@ -99,6 +101,13 @@ static uint8_t* g_PredatorLimit = nullptr;
 typedef void (*BF_Function)(int, int, uint8_t*, uint8_t*, int, int, uint8_t*, uint8_t*, uint8_t*, int);
 typedef void (*Single_Line_Function)(int, uint8_t*, uint8_t*, uint8_t*, uint8_t*, uint8_t*, int);
 
+bool renderHDTexture = false;
+void Buffer_Enable_HD_Texture(bool hdTextureEnabled) {
+    renderHDTexture = hdTextureEnabled;
+}
+
+#define ChannelBlend_Alpha(A,B,O)    ((uint8_t)((O / 255.0f) * A + (1 - (O / 255.0f)) * B))
+
 // Just copy source to dest as is.
 void BF_Copy(int width, int height, uint8_t* dst, uint8_t* src, int dst_pitch, int src_pitch, uint8_t* ghost_lookup,
     uint8_t* ghost_tab, uint8_t* fade_tab, int count)
@@ -120,12 +129,12 @@ void BF_Trans(int width, int height, uint8_t* dst, uint8_t* src, int dst_pitch, 
 
 			if (sbyte) {
 				dst[0] = backbuffer_palette[(sbyte * 3) + 0];
-                dst[1] = backbuffer_palette[(sbyte * 3) + 1];
-                dst[2] = backbuffer_palette[(sbyte * 3) + 2];
-                dst[3] = 255;
+				dst[1] = backbuffer_palette[(sbyte * 3) + 1];
+				dst[2] = backbuffer_palette[(sbyte * 3) + 2];
+				dst[3] = 255;
 			}
 
-			dst+=4;
+			dst += 4;
 		}
 
 		src += src_pitch;
@@ -1394,19 +1403,22 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, void* shape, Grap
 
     uint8_t* frame_data = static_cast<uint8_t*>(shape);
 
-    if (UseOldShapeDraw) {
-        use_old_drawer = true;
-    }
-    else if (UseBigShapeBuffer) {
-        draw_header = static_cast<ShapeBufferHeader*>(shape);
-        uint8_t* shape_buff = reinterpret_cast<uint8_t*>(BigShapeBufferStart);
-
-        if (draw_header->m_IsTheaterShape) {
-            shape_buff = reinterpret_cast<uint8_t*>(TheaterShapeBufferStart);
+    if (!renderHDTexture)
+    {
+        if (UseOldShapeDraw) {
+            use_old_drawer = true;
         }
+        else if (UseBigShapeBuffer) {
+            draw_header = static_cast<ShapeBufferHeader*>(shape);
+            uint8_t* shape_buff = reinterpret_cast<uint8_t*>(BigShapeBufferStart);
 
-        frame_data = shape_buff + draw_header->m_FrameOffset;
-        use_old_drawer = false;
+            if (draw_header->m_IsTheaterShape) {
+                shape_buff = reinterpret_cast<uint8_t*>(TheaterShapeBufferStart);
+            }
+
+            frame_data = shape_buff + draw_header->m_FrameOffset;
+            use_old_drawer = false;
+        }
     }
 
     va_list ap;
@@ -1435,8 +1447,10 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, void* shape, Grap
         use_old_drawer = true;
     }
 
-    if (use_old_drawer != true && (draw_header->m_DrawFlags == 0xFFFFFFFF || draw_header->m_DrawFlags != (flags & 0x1340))) {
-        Single_Line_Flagger(width, height, frame_data, draw_header, flags, ghost_table, ghost_lookup);
+    if (!renderHDTexture) {
+        if (use_old_drawer != true && (draw_header->m_DrawFlags == 0xFFFFFFFF || draw_header->m_DrawFlags != (flags & 0x1340))) {
+            Single_Line_Flagger(width, height, frame_data, draw_header, flags, ghost_table, ghost_lookup);
+        }
     }
 
     // Sets for BF_Fading functions
@@ -1519,11 +1533,16 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, void* shape, Grap
     int pitch = viewport.Get_Full_Pitch();
     uint8_t* dst = (ystart *  pitch * 4) + (xstart * 4) + (uint8_t*)(viewport.Get_Offset());
     uint8_t* src = frame_data + ms_img_offset;
+    if (renderHDTexture) {
+        Image_t* image = (Image_t*)shape;
+        src = image->buffer + (ms_img_offset * 4);
+    }
+
     int dst_pitch = pitch - blit_width;
     int src_pitch = width - blit_width;
 
     // Use "new" line drawing routines that appear to have been added during the windows port.
-    if (use_old_drawer != true) {
+    if (use_old_drawer != true && !renderHDTexture) {
         // DEBUG_SAY("Drawing with Single_Line draw functions\n");
 
         // Here we can use the individual line drawing routines
@@ -1544,8 +1563,33 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, void* shape, Grap
     // using the appropriate effects.
     if (blit_height > 0 && blit_width > 0) {
         // DEBUG_SAY("Drawing with BF draw functions\n");
-        OldShapeJumpTable[blit_style & 0xF](
-            blit_width, blit_height, dst, src, dst_pitch, src_pitch, ghost_lookup, ghost_table, fade_table, fade_count);
+        if (!renderHDTexture)
+        {
+            OldShapeJumpTable[blit_style & 0xF](blit_width, blit_height, dst, src, dst_pitch, src_pitch, ghost_lookup, ghost_table, fade_table, fade_count);
+        }
+        else
+        {     
+            int src_index = 0;
+            for (int f = 0; f < height; f++)
+            {
+                for (int i = width; i > 0; --i) {
+                    //if (src_index >= ((f + 1) * blit_height * 4))
+                    //    break;
+
+                    if (src[src_index + 3] > 0) {
+                        dst[0] = ChannelBlend_Alpha(src[(src_index) + 0], dst[0], src[(src_index) + 3]);
+                        dst[1] = ChannelBlend_Alpha(src[(src_index) + 1], dst[1], src[(src_index) + 3]);
+                        dst[2] = ChannelBlend_Alpha(src[(src_index) + 2], dst[2], src[(src_index) + 3]);
+                        dst[3] = 255;
+                    }
+                    src_index += 4;
+                    dst += 4;
+                }
+
+                src_index += src_pitch * 4;
+                dst += dst_pitch * 4;
+            }
+		}
     }
 
     return 0;

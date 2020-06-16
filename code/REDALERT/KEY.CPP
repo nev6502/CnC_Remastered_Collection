@@ -62,6 +62,8 @@
 
 #define	ARRAY_SIZE(x)		int(sizeof(x)/sizeof(x[0]))
 
+int WWKeyboardClass::Head = 0;
+int WWKeyboardClass::Tail = 0;
 
 /***********************************************************************************************
  * WWKeyboardClass::WWKeyBoardClass -- Construction for Westwood Keyboard Class                *
@@ -75,9 +77,7 @@
  *=============================================================================================*/
 WWKeyboardClass::WWKeyboardClass(void) :
 	MouseQX(0),
-	MouseQY(0),
-	Head(0),
-	Tail(0)
+	MouseQY(0)
 {
 //	_Kbd = this;
 
@@ -517,17 +517,7 @@ bool WWKeyboardClass::Is_Buffer_Empty(void) const
  *=============================================================================================*/
 void WWKeyboardClass::Fill_Buffer_From_System(void)
 {
-	//if (!Is_Buffer_Full()) 
-	//{
-	//	MSG	msg;
-	//	while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE)) {
-	//	  	if (!GetMessage( &msg, NULL, 0, 0 )) {
-	//			return;
-	//		}
-	//		TranslateMessage(&msg);
-	//		DispatchMessage(&msg);
-	//	}
-	//}
+
 }
 
 

@@ -451,6 +451,14 @@ void BuildingClass::Draw_It(int x, int y, WindowNumberType window) const
 {
 	assert(Buildings.ID(this) == ID);
 	assert(IsActive);
+// jmarshall
+	Image_t* hdimage = Get_HDImage_Data();
+	if (hdimage != NULL) {
+		Techno_Draw_Object_HD(hdimage, Shape_Number(), x, y, window);
+		TechnoClass::Draw_It(x, y, window);
+		return;
+	}
+// jmarshall end
 
 	/*
 	**	The shape file to use for rendering depends on whether the building
@@ -5919,6 +5927,13 @@ void const * BuildingClass::Get_Image_Data(void) const
 	return(TechnoClass::Get_Image_Data());
 }
 
+struct Image_t *BuildingClass::Get_HDImage_Data(void) const
+{
+	if (BState == BSTATE_CONSTRUCTION) {
+		return NULL;
+	}
+	return(TechnoClass::Get_HDImage_Data());
+}
 
 /***********************************************************************************************
  * BuildingClass::Value -- Determine the value of this building.                               *

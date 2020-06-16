@@ -117,8 +117,8 @@ class WWKeyboardClass
 		**	These are the tracking pointers to maintain the
 		**	circular keyboard list.
 		*/
-		int Head;
-		int Tail;
+		static int Head;
+		static int Tail;
 };
 
 #define RA_SCANCODE_MASK (1<<30)
