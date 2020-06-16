@@ -3434,8 +3434,8 @@ extern "C" long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *buffer,
 	yend = min(yend, vp.Get_Height() - 1);
 
 	int pitch = vp.Get_Pitch() + vp.Get_Width() + vp.Get_XAdd();
-	uint8_t* dst = y * pitch + x + (uint8_t*)(vp.Get_Offset());
-	uint8_t* src = (xoffset * 4) + w * (yoffset * 4) + static_cast<uint8_t*>(buffer);
+	uint8_t* dst = (y * 4) * pitch + (x * 4) + (uint8_t*)(vp.Get_Offset());
+	uint8_t* src = xoffset + w * yoffset + static_cast<uint8_t*>(buffer);
 	// int dst_pitch = x_pos + pitch - xend;
 	// int src_pitch = x_pos + width - xend;
 	int lines = yend - ystart + 1;
