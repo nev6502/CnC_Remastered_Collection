@@ -164,6 +164,11 @@ void const * ObjectClass::Get_Image_Data(void) const
 	return(Class_Of().Get_Image_Data());
 }
 
+struct Image_t *ObjectClass::Get_HDImage_Data(void) const
+{
+	return(Class_Of().Get_HDImage_Data());
+}
+
 
 /***********************************************************************************************
  * ObjectClass::Name -- Fetches the identification name of this object.                        *

@@ -100,6 +100,7 @@ Image_t* Image_LoadImage(const char* name) {
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
 	if (!ilLoadImage(name)) {
+		ilDeleteImages(1, &ImageName);
 		return NULL;
 	}
 
@@ -127,16 +128,19 @@ Image_t* Image_LoadImage(const char* name) {
 	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	ilDeleteImages(1, &ImageName);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	
 
 	Image_t* image = new Image_t();
 	strcpy(image->name, name);
 	image->image = texture;
 	image->width = Width;
 	image->height = Height;
+	image->buffer = new unsigned char[Width * Height * Bpp];
+	memcpy(image->buffer, Data, Width * Height * Bpp);
 	loaded_images.push_back(image);
+
+
+	ilDeleteImages(1, &ImageName);
 	return image;
 }
 

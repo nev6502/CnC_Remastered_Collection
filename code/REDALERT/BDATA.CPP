@@ -58,7 +58,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-
+#include    "Image.h"
 
 #define FATSHIP
 
@@ -3356,7 +3356,13 @@ void BuildingTypeClass::Init(TheaterType theater)
 			if (classptr->IsTheater) {
 				_makepath(fullname, NULL, NULL, classptr->Graphic_Name(), Theaters[theater].Suffix);
 				((void const *&)classptr->ImageData) = MFCD::Retrieve(fullname);
-
+// jmarshall				
+				{
+					char imageFileName[512];
+					sprintf(imageFileName, "textures/%s.png", fullname);
+					((BuildingTypeClass *)classptr)->HDImageData = Image_LoadImage(imageFileName);
+				}
+// jmarshall end
 				/*
 				**	Buildup data is probably theater specific as well. Fetch a pointer to the
 				**	data at this time as well.
