@@ -756,9 +756,6 @@ int MapEditClass::Placement_Dialog(void)
 		//	default:
 		//		break;
 		//}
-		KeyNumType _key;
-		int _type;
-		WWSDL_ProcessEvents(_key, _type);
 	}
 
 	/*
