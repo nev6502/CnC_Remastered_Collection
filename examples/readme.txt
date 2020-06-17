@@ -1,1 +1,0 @@
-To see HD textures in action, move the textures folder out of the examples folder. 
