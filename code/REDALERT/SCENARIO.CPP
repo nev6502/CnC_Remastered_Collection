@@ -1621,7 +1621,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 	HidPage.Blit(SeenPage);
 
 	#ifdef WIN32
-	VisiblePage.Blit(seen_buff_save);
+	//VisiblePage.Blit(seen_buff_save);
 	#endif
 
 	static unsigned char _scorepal[]={0,1,12,13,4,5,6,7,8,9,10,255,252,253,14,248};
