@@ -1472,6 +1472,9 @@ typedef enum StructType : char {
 	STRUCT_LARVA2,
 #endif
 
+#ifdef RA_AF
+	STRUCT_AFV01,
+#endif
 	STRUCT_COUNT,
 	STRUCT_FIRST=0
 } StructType;

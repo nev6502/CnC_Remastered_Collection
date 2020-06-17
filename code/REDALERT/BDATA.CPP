@@ -142,6 +142,9 @@ static short const OComList[] = {1, REFRESH_EOL};
 static short const OList12[] = {0, REFRESH_EOL};
 static short const OListTmpl[] = {0, 1, 2, REFRESH_EOL};
 
+#ifdef RA_AF
+#include	"BDATA_AF.H"
+#endif 
 
 /***************************************************************************
 */
@@ -3026,6 +3029,9 @@ void BuildingTypeClass::Init_Heap(void)
 	new BuildingTypeClass(ClassLarva2);			// STRUCT_LARVA2
 #endif
 
+#ifdef RA_AF
+	new BuildingTypeClass(ClassAFV01);			// STRUCT_AFV01
+#endif
 }
 
 
@@ -3206,13 +3212,24 @@ StructType BuildingTypeClass::From_Name(char const * name)
  *=============================================================================================*/
 void BuildingTypeClass::Display(int x, int y, WindowNumberType window, HousesType ) const
 {
-	void const * ptr = Get_Cameo_Data();
-	if (ptr == NULL) {
-		IsTheaterShape = IsTheater;
-		ptr = Get_Image_Data();
+// jmarshall - hd buildings.
+	Image_t* hdimage = Get_HDImage_Data();
+	if (hdimage != NULL) {
+		//CC_Draw_Shape((Image_t *)Get_HDImage_Data(), 0, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL, NULL, NULL, DIR_N);
+		x += WindowList[window][WINDOWX];
+		y += WindowList[window][WINDOWY];
+		GL_RenderImage(hdimage, x, y, hdimage->width, hdimage->height);
 	}
-	CC_Draw_Shape(ptr, 0, x, y, window, SHAPE_CENTER|SHAPE_WIN_REL);
-	IsTheaterShape = false;
+	else {
+		void const* ptr = Get_Cameo_Data();
+		if (ptr == NULL) {
+			IsTheaterShape = IsTheater;
+			ptr = Get_Image_Data();
+		}
+		CC_Draw_Shape(ptr, 0, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL);
+		IsTheaterShape = false;
+	}
+// jmarshall end
 }
 
 
@@ -3235,7 +3252,7 @@ void BuildingTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 void BuildingTypeClass::Prep_For_Add(void)
 {
 	for (StructType index = STRUCT_FIRST; index < STRUCT_COUNT; index++) {
-		if (As_Reference(index).Get_Image_Data()) {
+		if (As_Reference(index).Get_Image_Data() || As_Reference(index).Get_HDImage_Data()) {
 			Map.Add_To_List(&As_Reference(index));
 		}
 	}
