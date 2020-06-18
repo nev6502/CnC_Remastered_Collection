@@ -522,7 +522,8 @@ class HouseClass {
 		**	This records information about the location and size of
 		**	the base.
 		*/
-		COORDINATE Center;			// Center of the base.
+		COORDINATE Center;			// Center COORDINATE of the base.
+		CELL CenterCell;			// Center CELL of the base.
 		int Radius;				// Average building distance from center (leptons).
 		struct {
 			int AirDefense;

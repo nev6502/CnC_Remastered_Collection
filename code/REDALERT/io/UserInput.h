@@ -112,9 +112,6 @@ class UserInputClass
 				this->Shift = false;
 				this->Control = false;
 				this->Alt = false;
-
-				LastKey = SDLK_UNKNOWN;
-				ASCII = 0x0;
 			}
 		};
 

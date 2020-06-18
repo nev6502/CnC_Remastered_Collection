@@ -3,21 +3,9 @@
 
 extern KeyboardClass * Keyboard;
 
-/*
-auto utf8_decode = [](const std::string& str) -> std::wstring
-{
-	if (str.empty()) return std::wstring();
-	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-	std::wstring wstrTo(size_needed, 0);
-	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
-	return wstrTo;
-};
-*/
-
 void UserInputClass::Process_Input(KeyNumType& key, int& flags, bool presentBuffer)
 {
 	bool leftMouseProcessed = false;
-
 	SDL_GetMouseState(&Mouse.X, &Mouse.Y);
 
 	Keyboard->MouseQX = Mouse.X;
@@ -108,9 +96,18 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags, bool presentBuff
 				}
 
 				int keyFlags = 0x00;
-				if (state[SDL_SCANCODE_RSHIFT] || state[SDL_SCANCODE_LSHIFT]) keyFlags |= KN_SHIFT_BIT;
-				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT]) keyFlags |= KN_ALT_BIT;
-				if (state[SDL_SCANCODE_RCTRL] || state[SDL_SCANCODE_LCTRL]) keyFlags |= KN_CTRL_BIT;
+				if (state[SDL_SCANCODE_RSHIFT] || state[SDL_SCANCODE_LSHIFT]) {
+					KeyB.Shift = true;
+					keyFlags |= KN_SHIFT_BIT;
+				}
+				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT]) {
+					keyFlags |= KN_ALT_BIT;
+					KeyB.Alt = true;
+				}
+				if (state[SDL_SCANCODE_RCTRL] || state[SDL_SCANCODE_LCTRL]) {
+					keyFlags |= KN_CTRL_BIT;
+					KeyB.Control = true;
+				}
 
 				// handle match between SDL and internals (non-text keys)
 				auto element = sdl_keyMapping.find((SDL_KeyCode)event.key.keysym.sym);

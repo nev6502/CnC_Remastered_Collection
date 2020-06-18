@@ -3090,7 +3090,6 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 	x = Get_Mouse_X();
 	y = Get_Mouse_Y();
 
-
 	bool edge = (y == 0 || x == 0 || x == SeenBuff.Get_Width()-1 || y == SeenBuff.Get_Height()-1);
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
@@ -3344,7 +3343,7 @@ int DisplayClass::TacticalClass::Selection_At_Mouse(unsigned flags, KeyNumType &
 
 		if (object != nullptr)
 		{
-			bool shiftdown = UserInput.KeyB.Shift = true;
+			bool shiftdown = UserInput.KeyB.Shift == true;
 
 			if (shiftdown)
 			{

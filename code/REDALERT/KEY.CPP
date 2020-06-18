@@ -103,10 +103,12 @@ unsigned short WWKeyboardClass::Buff_Get(void)
 	while (!Check()) {}										// wait for key in buffer
 
 	unsigned short temp = Fetch_Element();
+	/*
 	if (Is_Mouse_Key(temp)) {
 		MouseQX = Fetch_Element();
 		MouseQY = Fetch_Element();
 	}
+	*/
 	return(temp);
 }
 

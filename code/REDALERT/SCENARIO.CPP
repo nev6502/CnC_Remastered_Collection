@@ -644,10 +644,14 @@ void Fill_In_Data(void)
 	*/
 	if (!Debug_Map) {
 		Map.SidebarClass::Activate(1);
-//		if (Session.Type == GAME_NORMAL) {
+		if (Session.Type == GAME_NORMAL) {
 			Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = Scen.Waypoint[WAYPT_HOME];
 			Map.Set_Tactical_Position(Cell_Coord((Scen.Waypoint[WAYPT_HOME] - (MAP_CELL_W * 4 * RESFACTOR)) - (5*RESFACTOR)));
-//		}
+		}
+		if (Session.Type == GAME_SKIRMISH) {
+			Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = PlayerPtr->CenterCell;
+			Map.Set_Tactical_Position( Cell_Coord( (PlayerPtr->CenterCell - (MAP_CELL_W * 4 * RESFACTOR) ) - (5 * RESFACTOR) ) );
+		}
 	}
 #endif
 
@@ -3240,6 +3244,7 @@ static void Create_Units(bool official)
 		**	Assign the center of this house to the waypoint location.
 		*/
 		hptr->Center = Cell_Coord(centroid);
+		hptr->CenterCell = centroid;
 
 		/*
 		**	If Bases are ON, human & computer houses are treated differently
