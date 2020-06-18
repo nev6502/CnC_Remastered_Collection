@@ -935,7 +935,9 @@ void ChronalVortexClass::Render (void)
 						** Draw the template
 						*/
 						if (ttype->Get_Image_Data()) {
-							RenderBuffer->Draw_Stamp(ttype->Get_Image_Data(), icon, x*CELL_PIXEL_W, y*CELL_PIXEL_H, NULL, WINDOW_MAIN);
+// jmarshall - send down the raw ttype
+							RenderBuffer->Draw_Stamp(ttype, icon, x*CELL_PIXEL_W, y*CELL_PIXEL_H, NULL, WINDOW_MAIN);
+// jmarshall end
 						}
 
 						/*

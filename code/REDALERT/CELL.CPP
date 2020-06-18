@@ -84,6 +84,11 @@
 */
 #include "SidebarGlyphx.h"
 
+std::vector<const ObjectClass*> renderedFrameObjects;
+
+bool HasRenderedObject(const ObjectClass* technoClass) {
+	return std::find(renderedFrameObjects.begin(), renderedFrameObjects.end(), technoClass) != renderedFrameObjects.end();
+}
 
 /***********************************************************************************************
  * CellClass::CellClass -- Constructor for cell objects.                                       *
@@ -993,8 +998,6 @@ bool CellClass::Get_Template_Info(char *template_name, int &icon, void *&image_d
 	return false;
 }
 
-
-
 /***********************************************************************************************
  * CellClass::Draw_It -- Draws the cell imagery at the location specified.                     *
  *                                                                                             *
@@ -1088,7 +1091,7 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 			**	This is the underlying terrain icon.
 			*/
 			if (ttype->Get_Image_Data()) {
-				LogicPage->Draw_Stamp(ttype->Get_Image_Data(), icon, x, y, NULL, WINDOW_TACTICAL);
+				LogicPage->Draw_Stamp(ttype, icon, x, y, NULL, WINDOW_TACTICAL);
 				if (remap) {
 					LogicPage->Remap(x+Map.TacPixelX, y+Map.TacPixelY, ICON_PIXEL_W, ICON_PIXEL_H, remap);
 				}
@@ -1210,7 +1213,9 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 								icon = (Cell_X(cell) - Cell_X(Map.ZoneCell + Map.ZoneOffset)) +
 									(Cell_Y(cell) - Cell_Y(Map.ZoneCell + Map.ZoneOffset)) *
 									tptr->Width;
-								LogicPage->Draw_Stamp(tptr->Get_Image_Data(), icon, x, y, NULL, WINDOW_TACTICAL);
+// jmarshall - pass in raw tptr
+								LogicPage->Draw_Stamp(tptr, icon, x, y, NULL, WINDOW_TACTICAL);
+// jmarshall end
 							}
 							break;
 
@@ -1334,6 +1339,10 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 		*/
 		for (int index = 0; index < count; index++) {
 			object = optr[index];
+			if (HasRenderedObject(object)) {
+				continue;
+			}
+			renderedFrameObjects.push_back(object);
 			int xx,yy;
 			if (object->IsToDisplay && (!object->Is_Techno() || ((TechnoClass *)object)->Visual_Character() == VISUAL_NORMAL) && Map.Coord_To_Pixel(object->Render_Coord(), xx, yy)) {
 				if (_Calc_Partial_Window(x, y, xx, yy)) {

@@ -189,8 +189,9 @@ class DisplayClass: public MapClass
 		void Repair_Mode_Control(int control);
 
 		virtual void Flag_Cell(CELL cell);
-		bool Is_Cell_Flagged(CELL cell) const {return CellRedraw.Is_True(cell);};
-
+// jmarshall
+		bool Is_Cell_Flagged(CELL cell) const { return true; }
+// jmarshall end
 		/*
 		** Computes starting position based on player's units' Coords.
 		*/

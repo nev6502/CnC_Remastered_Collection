@@ -13,8 +13,17 @@
  *            A full copy of the GNU General Public License can be found in
  *            LICENSE
  */
+ /*
+ ============================
+
+ This file has been heavily modified by IceColdDuke(Justin Marshall) to render with OpenGL.
+
+ ============================
+ */
+
 #include "FUNCTION.H"
 #include "gbuffer.h"
+#include "Image.h"
 #include <cstring>
 
 using std::memcpy;
@@ -22,6 +31,8 @@ using std::memcpy;
 class GraphicViewPortClass;
 
 #define TD_TILESET_CHECK 0x20
+
+Image_t* tileset_icon_cache[4096];
 
 /**
 * @brief union is to handle the parts of the header which vary between TD and RA format tiles.
@@ -93,6 +104,7 @@ static int IconCount;
 
 void __cdecl Init_Stamps(IconControlType* iconset)
 {
+    memset(&tileset_icon_cache, 0, sizeof(tileset_icon_cache));
     if (iconset && LastIconset != iconset) {
         IconCount = (iconset->count);
         IconWidth = (iconset->width);
@@ -181,8 +193,17 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
     }
 }
 
-void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, IconControlType* tileset, int icon, int x, int y, const void* remapper, int left, int top, int right, int bottom)
+void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void *icondata, int icon, int x, int y, const void* remapper, int left, int top, int right, int bottom)
 {
+    const TemplateTypeClass* ttype = (TemplateTypeClass const*)icondata;
+    IconControlType* tileset = (IconControlType * )ttype->Get_Image_Data();
+
+    // This is a awful hack, but need type info to generate unique id's for tileset generation.
+    if (icondata == DisplayClass::TransIconset) {
+        tileset = (IconControlType*)DisplayClass::TransIconset;
+        ttype = NULL;
+    }
+
     if (!tileset) {
         return;
     }
@@ -192,7 +213,7 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, IconControl
     }
 
     int icon_index = MapPtr != nullptr ? MapPtr[icon] : icon;
-
+    
     if (icon_index < IconCount) {
         int blit_height = IconHeight;
         int blit_width = IconWidth;
@@ -202,83 +223,103 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, IconControl
         int height = top + bottom;
         int ystart = top + y;
 
+		//
+		if (!tileset_icon_cache[icon_index]) {
+			char tmp[512];
+            if (ttype != NULL) {
+                sprintf(tmp, "icon_%d_%d", ttype->Type, icon_index);
+            }
+            else {
+                sprintf(tmp, "icon_%d_%d", icondata, icon_index);
+            }
+            tileset_icon_cache[icon_index] = Image_CreateImageFrom8Bit(tmp, IconWidth, IconHeight, (unsigned char *)src);
+		}
+    
         if (xstart < width && ystart < height && IconHeight + ystart > top && IconWidth + xstart > left) {
             if (xstart < left) {
                 src += left - xstart;
                 blit_width -= left - xstart;
                 xstart = left;
             }
-
+    
             int src_pitch = IconWidth - blit_width;
-
+    
             if (blit_width + xstart > width) {
                 src_pitch += blit_width - (width - xstart);
                 blit_width = width - xstart;
             }
-
+    
             if (top > ystart) {
                 blit_height = IconHeight - (top - ystart);
                 src += IconWidth * (top - ystart);
                 ystart = top;
             }
-
+    
             if (blit_height + ystart > height) {
                 blit_height = height - ystart;
             }
-
+    
             int full_pitch = viewport.Get_Full_Pitch(); //(viewport.Get_Pitch() + viewport.Get_XAdd() + viewport.Get_Width());
             uint8_t* dst = (xstart * 4) + (ystart * 4) * full_pitch + (uint8_t*)(viewport.Get_Offset());
             int dst_pitch = full_pitch - blit_width;
+    
+            //if (remapper) {
+            //    const uint8_t* remap = static_cast<const uint8_t*>(remapper);
+            //    for (int i = 0; i < blit_height; ++i) {
+            //        for (int j = 0; j < blit_width; ++j) {
+            //            uint8_t cur_byte = remap[*src++];
+			//			if (cur_byte) {
+			//				dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
+			//				dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
+			//				dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
+			//				dst[3] = 255;
+			//			}
+            //
+			//			dst += 4;
+            //        }
+            //        dst += dst_pitch * 4;
+            //    }
+            //
+            //}
+            //else if (TransFlagPtr[icon_index]) {
+            //    for (int i = 0; i < blit_height; ++i) {
+            //        for (int j = 0; j < blit_width; ++j) {
+            //            uint8_t cur_byte = *src++;
+			//			if (cur_byte) {
+			//				dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
+			//				dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
+			//				dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
+			//				dst[3] = 255;
+			//			}
+            //
+			//			dst += 4;
+            //        }
+            //        src += src_pitch;
+            //        dst += dst_pitch * 4;
+            //    }
+            //
+            //}
+            //else {
+            {
+                //for (int i = 0; i < blit_height; ++i) {
+                //    FastScanlinePaletteBlit(dst, src, blit_width);
+                //    dst += full_pitch * 4;
+                //    src += IconWidth;
+                //}
 
-            if (remapper) {
-                const uint8_t* remap = static_cast<const uint8_t*>(remapper);
-                for (int i = 0; i < blit_height; ++i) {
-                    for (int j = 0; j < blit_width; ++j) {
-                        uint8_t cur_byte = remap[*src++];
-						if (cur_byte) {
-							dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
-							dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
-							dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
-							dst[3] = 255;
-						}
-
-						dst += 4;
-                    }
-                    dst += dst_pitch * 4;
-                }
-
-            }
-            else if (TransFlagPtr[icon_index]) {
-                for (int i = 0; i < blit_height; ++i) {
-                    for (int j = 0; j < blit_width; ++j) {
-                        uint8_t cur_byte = *src++;
-						if (cur_byte) {
-							dst[0] = backbuffer_data_raw[(cur_byte * 3) + 0];
-							dst[1] = backbuffer_data_raw[(cur_byte * 3) + 1];
-							dst[2] = backbuffer_data_raw[(cur_byte * 3) + 2];
-							dst[3] = 255;
-						}
-
-						dst += 4;
-                    }
-                    src += src_pitch;
-                    dst += dst_pitch * 4;
-                }
-
-            }
-            else {
-                for (int i = 0; i < blit_height; ++i) {
-                    FastScanlinePaletteBlit(dst, src, blit_width);
-                    dst += full_pitch * 4;
-                    src += IconWidth;
-                }
+               GL_SetClipRect(xstart, ystart, blit_width, blit_height);
+                GL_RenderImage(tileset_icon_cache[icon_index], xstart, ystart, blit_width, blit_height);
+               GL_ResetClipRect();
             }
         }
     }
 }
 
 extern "C" void __cdecl Buffer_Draw_Stamp_Clip(void const* this_object, void const* icondata, int icon, int x_pixel, int y_pixel, void const* remap, int min_x, int min_y, int max_x, int max_y) {
-	Buffer_Draw_Stamp_Clip2(*((GraphicViewPortClass*)this_object), (IconControlType*)icondata, icon, x_pixel, y_pixel, remap, min_x, min_y, max_x, max_y);
+    if (icondata == NULL)
+        return;
+
+	Buffer_Draw_Stamp_Clip2(*((GraphicViewPortClass*)this_object), icondata, icon, x_pixel, y_pixel, remap, min_x, min_y, max_x, max_y);
 }
 
 extern "C" void __cdecl Buffer_Draw_Stamp(void const* thisptr, void const* icondata, int icon, int x_pixel, int y_pixel, void const* remap) {

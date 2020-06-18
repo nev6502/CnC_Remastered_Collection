@@ -73,6 +73,8 @@ SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
 
+extern std::vector<const ObjectClass*> renderedFrameObjects;
+
 bool renderConsole = false;
 
 void (*Misc_Focus_Loss_Function)(void) = nullptr;
@@ -127,8 +129,8 @@ Image_t* Image_LoadImage(const char* name) {
 		assert(!"Unknown BPP in image!");
 	}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	Image_t* image = new Image_t();
 	strcpy(image->name, name);
@@ -144,7 +146,7 @@ Image_t* Image_LoadImage(const char* name) {
 	return image;
 }
 
-Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, char *data) {
+Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
 	// Check to see if the image is already loaded.
 	for (int i = 0; i < loaded_images.size(); i++) {
 		if (!strcmp(loaded_images[i]->name, name)) {
@@ -152,21 +154,37 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, char
 		}
 	}	
 
+	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+
 	Image_t* image = new Image_t();
 	image->buffer = new unsigned char[Width * Height * 4];
 
 	for (int i = 0; i < Width * Height; i++) {
-		char c = data[i];
+		unsigned char c = data[i];
+		if (remap) {
+			c = remap[c];
+		}
 
-		image->buffer[(i * 4) + 0] = backbuffer_palette[(c * 3) + 0];
-		image->buffer[(i * 4) + 1] = backbuffer_palette[(c * 3) + 1];
-		image->buffer[(i * 4) + 2] = backbuffer_palette[(c * 3) + 2];
-		if (c == 0) {
-			image->buffer[(i * 4) + 3] = 0;
+		unsigned char r = ccpalete[(c * 3) + 0] << 2;
+		unsigned char g = ccpalete[(c * 3) + 1] << 2;
+		unsigned char b = ccpalete[(c * 3) + 2] << 2;
+		unsigned char a = 0;
+
+		if ((r == 84 && g == 252 && b == 84) || (r == 0 && g == 168 && b == 0)) {
+			r = 0;
+			g = 0;
+			b = 0;			
+			a = 128;
 		}
-		else {
-			image->buffer[(i * 4) + 3] = 255;
+		else if (c != 0) {
+			a = 255;
 		}
+
+
+		image->buffer[(i * 4) + 0] = r;
+		image->buffer[(i * 4) + 1] = g;
+		image->buffer[(i * 4) + 2] = b;
+		image->buffer[(i * 4) + 3] = a;
 	}
 
 
@@ -228,6 +246,8 @@ void ImGui_NewFrame(void) {
 	ImGui::NewFrame(show_oldframebuffer);
 
 	ImGui_ImplSDL2_NewFrame(game_window);
+
+	renderedFrameObjects.clear();
 }
 
 void Device_Present(void) {	
