@@ -24,4 +24,4 @@ __forceinline Image_t::~Image_t() {
 }
 
 Image_t* Image_LoadImage(const char* name);
-Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, char* data);
+Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char* data, unsigned char *remap = NULL);

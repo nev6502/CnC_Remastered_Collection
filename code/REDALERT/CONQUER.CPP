@@ -2121,8 +2121,8 @@ static void Sync_Delay(void)
 	**	Delay until the frame timer expires. This forces the game loop to be regulated to a
 	**	speed controlled by the game options slider.
 	*/
-	while (FrameTimer) {
-		Color_Cycle();
+	while (FrameTimer) {		
+		Color_Cycle();	
 		Call_Back();
 
 		if (SpecialDialog == SDLG_NONE) {
@@ -2136,10 +2136,12 @@ static void Sync_Delay(void)
 				Keyboard_Process(input);
 			}
 			Map.Render();
-		}
+		}		
 	}
-	Color_Cycle();
-	Call_Back();
+	if (!FrameTimer) {
+		Color_Cycle();
+		Call_Back();
+	}
 }
 
 
@@ -2321,8 +2323,7 @@ Mono_Set_Cursor(0,0);
 	**	Keep track of elapsed time in the game.
 	*/
 	Score.ElapsedTime += TIMER_SECOND / TICKS_PER_SECOND;
-
-	Call_Back();
+	//Call_Back();
 
 	/*
 	**	Check for player wins or loses according to global event flag.
@@ -3580,24 +3581,21 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 			//	predoffset = -predoffset;
 			//}
 
-			x = x + WindowList[window][WINDOWX] + LogicPage->Get_XPos();
-			y = y + WindowList[window][WINDOWY] + LogicPage->Get_YPos();
-
 			Buffer_Enable_HD_Texture(true);
 			//if (draw_window.Lock()) {
 				if ((flags & (SHAPE_GHOST | SHAPE_FADING)) == (SHAPE_GHOST | SHAPE_FADING)) {
-					Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+					Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
 				}
 				else {
 					if (flags & SHAPE_FADING) {
-						Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
+						Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
 					}
 					else {
 						if (flags & SHAPE_PREDATOR) {
-							Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, predoffset);
+							Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, predoffset);
 						}
 						else {
-							Buffer_Frame_To_Page(x, y, width, height, image, HiddenPage, flags | SHAPE_TRANS, ghostdata, predoffset);
+							Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
 						}
 					}
 				}
@@ -3698,13 +3696,16 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 		/*
 		** In WIn95, build shape returns a pointer to the shape not its size
 		*/
+
+		Image_t* shape_image = NULL;
 		shape_pointer = Build_Frame(shapefile, shapenum, _ShapeBuffer);
+
 		if (shape_pointer) {
-			GraphicViewPortClass draw_window(LogicPage->Get_Graphic_Buffer(),
-														WindowList[window][WINDOWX] + LogicPage->Get_XPos(),
-														WindowList[window][WINDOWY] + LogicPage->Get_YPos(),
-														WindowList[window][WINDOWWIDTH],
-														WindowList[window][WINDOWHEIGHT]);
+			//GraphicViewPortClass draw_window(LogicPage->Get_Graphic_Buffer(),
+			//											WindowList[window][WINDOWX] + LogicPage->Get_XPos(),
+			//											WindowList[window][WINDOWY] + LogicPage->Get_YPos(),
+			//											WindowList[window][WINDOWWIDTH],
+			//											WindowList[window][WINDOWHEIGHT]);
 			unsigned char * buffer = (unsigned char *) shape_pointer;	//Get_Shape_Header_Data((void*)shape_pointer);
 
 #else	//WIN32
@@ -3755,6 +3756,18 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 				}
 			}
 
+			{
+				char tmp[512];
+				sprintf(tmp, "s%d%d%d%d%d", shapefile, shapenum, rotation, fadingdata, flags);
+
+				if (flags & SHAPE_FADING) {
+					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)shape_pointer, (unsigned char*)fadingdata);
+				}
+				else {
+					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)shape_pointer, NULL);
+				}
+			}
+
 			/*
 			**	Special shadow drawing code (used for aircraft and bullets).
 			*/
@@ -3770,21 +3783,20 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 			//	predoffset = -predoffset;
 			//}
 
-			if (draw_window.Lock()) {
+			{
 				if ((flags & (SHAPE_GHOST|SHAPE_FADING)) == (SHAPE_GHOST|SHAPE_FADING)) {
-					Buffer_Frame_To_Page(x, y, width, height, buffer, draw_window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+					Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
 				} else {
 					if (flags & SHAPE_FADING) {
-						Buffer_Frame_To_Page(x, y, width, height, buffer, draw_window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
+						Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
 					} else {
 						if (flags & SHAPE_PREDATOR) {
-							Buffer_Frame_To_Page(x, y, width, height, buffer, draw_window, flags | SHAPE_TRANS, predoffset);
+							Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, predoffset);
 						} else {
-							Buffer_Frame_To_Page(x, y, width, height, buffer, draw_window, flags | SHAPE_TRANS, ghostdata, predoffset);
+							Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
 						}
 					}
 				}
-				draw_window.Unlock();
 			}
 		}
 	}

@@ -1474,33 +1474,35 @@ bool Debug_Write_Shape(const char *file_name, void const * shapefile, int shapen
 	/*
 	** Build frame returns a pointer now instead of the shapes length
 	*/
-	char *shape_pointer = (char*) Build_Frame(shapefile , shapenum , _ShapeBuffer);
-	if (shape_pointer == NULL) {
-		return false;;
-	}
-	if (Get_Last_Frame_Length() > _ShapeBufferSize) {
-		return false;;
-	}
-
-	int width = Get_Build_Frame_Width(shapefile);
-	int height = Get_Build_Frame_Height(shapefile);
-
-	GraphicBufferClass temp_gbuffer(width, height);
-	GraphicViewPortClass	temp_viewport(&temp_gbuffer, 0, 0, width, height);
-
-	WindowList[WINDOW_CUSTOM][WINDOWX] = 0;
-	WindowList[WINDOW_CUSTOM][WINDOWY] = 0;
-	WindowList[WINDOW_CUSTOM][WINDOWWIDTH] = width;
-	WindowList[WINDOW_CUSTOM][WINDOWHEIGHT] = height;
-
-	static const char _shape_trans = 0x40;
-
-	if (flags == 0) {
-		Buffer_Frame_To_Page(0, 0, width, height, shape_pointer, temp_viewport, SHAPE_NORMAL|SHAPE_WIN_REL|_shape_trans);	//, ghostdata, predoffset);
-	} else {
-		Buffer_Frame_To_Page(0, 0, width, height, shape_pointer, temp_viewport, flags, ghostdata);
-	}	
-	Write_PCX_File((char*)file_name, temp_viewport, (unsigned char*)GamePalette.Get_Data());
+// jmarshall - do we need this?
+	//char *shape_pointer = (char*) Build_Frame(shapefile , shapenum , _ShapeBuffer);
+	//if (shape_pointer == NULL) {
+	//	return false;;
+	//}
+	//if (Get_Last_Frame_Length() > _ShapeBufferSize) {
+	//	return false;;
+	//}
+	//
+	//int width = Get_Build_Frame_Width(shapefile);
+	//int height = Get_Build_Frame_Height(shapefile);
+	//
+	//GraphicBufferClass temp_gbuffer(width, height);
+	//GraphicViewPortClass	temp_viewport(&temp_gbuffer, 0, 0, width, height);
+	//
+	//WindowList[WINDOW_CUSTOM][WINDOWX] = 0;
+	//WindowList[WINDOW_CUSTOM][WINDOWY] = 0;
+	//WindowList[WINDOW_CUSTOM][WINDOWWIDTH] = width;
+	//WindowList[WINDOW_CUSTOM][WINDOWHEIGHT] = height;
+	//
+	//static const char _shape_trans = 0x40;
+	//
+	//if (flags == 0) {
+	//	Buffer_Frame_To_Page(0, 0, width, height, shape_pointer, temp_viewport, SHAPE_NORMAL|SHAPE_WIN_REL|_shape_trans);	//, ghostdata, predoffset);
+	//} else {
+	//	Buffer_Frame_To_Page(0, 0, width, height, shape_pointer, temp_viewport, flags, ghostdata);
+	//}	
+	//Write_PCX_File((char*)file_name, temp_viewport, (unsigned char*)GamePalette.Get_Data());
+// jmarshall end
 	return true;
 }
 

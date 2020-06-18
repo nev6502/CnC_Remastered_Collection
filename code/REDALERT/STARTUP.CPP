@@ -924,8 +924,8 @@ void Read_Setup_Options( RawFileClass *config_file )
 		VideoBackBufferAllowed = ini.Get_Bool("Options", "VideoBackBuffer", true);
 		AllowHardwareBlitFills = ini.Get_Bool("Options", "HardwareFills", true);
 
-		ScreenWidth = 1024;
-		ScreenHeight = 768;
+		ScreenWidth = 1280;
+		ScreenHeight = 720;
 
 		/*
 		** See if an alternative socket number has been specified

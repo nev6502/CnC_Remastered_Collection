@@ -397,7 +397,7 @@ void GScreenClass::Render(void)
 	//if (Buttons && Buttons->Is_List_To_Redraw()) {
 	//	IsToRedraw = true;
 	//}
-
+	IsToRedraw = true;
 	if (IsToUpdate || IsToRedraw) {
 		BStart(BENCH_GSCREEN_RENDER);
 

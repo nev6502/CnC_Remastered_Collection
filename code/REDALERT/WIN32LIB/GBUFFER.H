@@ -1122,28 +1122,28 @@ inline void GraphicViewPortClass::Draw_Stamp(void const * icondata, int icon, in
 	int	cache_index=-1;
 
    int drewit = 0;
-	if (IconCacheAllowed){
-		if (IsDirectDraw){
-			if (!remap){
-				cache_index = Is_Icon_Cached(icondata,icon);
-			}
+	//if (IconCacheAllowed){
+	//	if (IsDirectDraw){
+	//		if (!remap){
+	//			cache_index = Is_Icon_Cached(icondata,icon);
+	//		}
+	//
+	//		if (cache_index != -1){
+	//			if (CachedIcons[cache_index].Get_Is_Cached()  ){
+	//				CachedIcons[cache_index].Draw_It (GraphicBuff->Get_DD_Surface() , x_pixel, y_pixel,
+	//															WindowList[clip_window][WINDOWX] + XPos,
+	//															WindowList[clip_window][WINDOWY] +YPos,
+	//															WindowList[clip_window][WINDOWWIDTH],
+	//															WindowList[clip_window][WINDOWHEIGHT]);
+	//				CachedIconsDrawn++;
+    //           drewit = 1;
+	//			}
+	//		}
+	//	}
+	//}
 
-			if (cache_index != -1){
-				if (CachedIcons[cache_index].Get_Is_Cached()  ){
-					CachedIcons[cache_index].Draw_It (GraphicBuff->Get_DD_Surface() , x_pixel, y_pixel,
-																WindowList[clip_window][WINDOWX] + XPos,
-																WindowList[clip_window][WINDOWY] +YPos,
-																WindowList[clip_window][WINDOWWIDTH],
-																WindowList[clip_window][WINDOWHEIGHT]);
-					CachedIconsDrawn++;
-               drewit = 1;
-				}
-			}
-		}
-	}
 
-
-   if (drewit == 0) {
+   {
 		if (Lock()){
 			UnCachedIconsDrawn++;
 			extern int ScreenHeight, ScreenWidth;
@@ -1173,7 +1173,10 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
 	//	Buffer_Draw_Line(this, sx, sy, dx, dy, color);
 	//}
 	//Unlock();
-
+	sx += XPos;
+	sy += YPos;
+	dx += XPos;
+	dy += YPos;
 	GL_DrawLine(color, sx, sy, dx, dy);
 }
 
@@ -1191,14 +1194,11 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
  *=========================================================================*/
 inline VOID GraphicViewPortClass::Fill_Rect(int sx, int sy, int dx, int dy, unsigned char color)
 {
-// jmarshall
-	// Still needed for gameplay.
-	if (Lock()) {
-		Buffer_Fill_Rect(this, sx, sy, dx, dy, color);
-		Unlock();
-	}
-	//GL_FillRect(color, sx, sy, dx - sx, dy - sy);
-// jmarshall end
+	sx += XPos;
+	sy += YPos;
+	dx += XPos;
+	dy += YPos;
+	GL_FillRect(color, sx - 1, sy - 1, (dx - sx) + 1, ((dy - sy) + 1));
 }
 
 
