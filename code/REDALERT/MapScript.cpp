@@ -5,12 +5,13 @@
 #include "MapScript.h"
 
 /***********************************************************************************************
- * Script_GiveCredits - Gives a given player a given amount of credits                         *
+ * Script_GiveCredits - Gives or takes a given amount of credits to / from a player            *
  *                                                                                             *
- *   SCRIPT INPUT:	cashToGive (int) - The amount of cold hard credits to give the player      *
+ *   SCRIPT INPUT:	cashToGive (int) - The amount of cold hard credits to give the player.     *
+ *                                     Negative numbers may be used to *take* money            *
  *                                                                                             *
- *                	houseType (int)  - The player (house) index to give credits to             *
- *                                     or -1 to give to all players                            *
+ *                	houseType (int)  - The player (house) index to complete this transaction   *
+ *                                     for, or -1 to give to all players                       *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -40,7 +41,12 @@ static int Script_GiveCredits(lua_State* L) {
         HouseClass* house = Houses.Ptr(h_index);
 
         if (house->ID == houseType || houseType == -1) {
-            house->Refund_Money(cashToGive);
+
+            if (cashToGive < 0) {
+                house->Spend_Money(max(0, cashToGive*-1));
+            } else {
+                house->Refund_Money(cashToGive);
+            }
 
             // Discontinue giving out free cash if a specific house was specified
             if (houseType >= 0) {
@@ -54,13 +60,100 @@ static int Script_GiveCredits(lua_State* L) {
 }
 
 /***********************************************************************************************
- * Script_NumBuildingTypeForPlayer - Returns the amount of specific buildings for a player     *
+ * Script_GetCredits - Gets how many credits the given player has                              *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)  - The player (house) index to get credits for             *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of credits the player has                    *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GetCredits(lua_State* L) {
+
+    int houseType = lua_tointeger(L, -1);
+
+    long result = -1;
+
+    for (int h_index = 0; h_index < Houses.Count(); h_index++) {
+
+        HouseClass* house = Houses.Ptr(h_index);
+
+        if (house->ID == houseType || houseType == -1) {
+            result = house->Credits;
+
+            break;
+        }
+
+    }
+
+    lua_pushnumber(L, result);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_GetCellBuilding - Gets a building (if any) on a cell and returns the ID              *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_x (int)       - The cell/X location of the cell to test                 *
+ *                  in_y (int)       - The cell/Y location of the cell to test                 *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The ID of the building on the cell, or -1 if none       *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GetCellBuilding(lua_State* L) {
+
+    int in_x = lua_tointeger(L, 1);
+    int in_y = lua_tointeger(L, 2);
+
+    long result = -1;
+
+    BuildingClass* this_building = Map[XY_Cell(in_x, in_y)].Cell_Building();
+    
+    if (this_building != NULL) {
+        result = this_building->ID;
+    }
+    
+    lua_pushnumber(L, result);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_CountBuildings - Returns the amount of specific buildings for a player               *
+ *                                                                                             *
+ *   Optionally, you can return only building at a particular cell or in a rectangular area    *
+ *   using the two groups of optional coordinate inputs                                        *
  *                                                                                             *
  *   SCRIPT INPUT:	structType (int) - The structure index to count buildings for              *
  *                                     or -1 for all structures                                *
  *                                                                                             *
  *                	houseType (int)  - The player (house) index to count buildings for         *
  *                	                   or -1 to for all players                                *
+ *                                                                                             *
+ *                                     NOTE: -1 for either index input acts as ALL             *
+ *                                                                                             *
+ *                  in_x1 (int) (optional A) - Only include buildings at or beginning at this  *
+ *                                             Cell/X location                                 *
+ *                                                                                             *
+ *                  in_y1 (int) (optional A) - Only include buildings at or beginning at this  *
+ *                                             Cell/Y location                                 *
+ *                                                                                             *
+ *                  in_x2 (int) (optional B) - Only include buildings at or before this Cell/X *
+ *                                             location                                        *
+ *                                                                                             *
+ *                  in_y2 (int) (optional B) - Only include buildings at or before this Cell/Y *
+ *                                             location                                        *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
  *                                                                                             *
@@ -80,6 +173,24 @@ static int Script_CountBuildings(lua_State* L) {
     if (lua_gettop(L) == 2) {
         houseType = lua_tointeger(L, 2);
     }
+
+    // Optional search area
+    bool within_area = false;
+    int in_x1, in_x2, in_y1, in_y2;
+    if (lua_gettop(L) == 4) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = in_x1;
+        in_y2 = in_y1;
+        within_area = true;
+    }
+    else if (lua_gettop(L) == 6) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = lua_tointeger(L, 5);
+        in_y2 = lua_tointeger(L, 6);
+        within_area = true;
+    }
     
     int result = 0;
     for (int b_index = 0; b_index < Buildings.Count(); b_index++) {
@@ -87,7 +198,22 @@ static int Script_CountBuildings(lua_State* L) {
 
         if (building->Owner() == houseType || houseType == -1) {
             if (building->Class->Type == structType || structType == -1) {
-                result++;
+                
+                // Count, in general
+                if (within_area == false) {
+                    result++;
+
+                // Within search area
+                } else {
+
+                    int this_x = Cell_X(Coord_Cell(building->Coord));
+                    int this_y = Cell_Y(Coord_Cell(building->Coord));
+
+                    if (this_x >= in_x1 && this_x <= in_x2 && this_y >= in_y1 && this_y <= in_y2) {
+                        result++;
+                    }
+                }
+
             }
         }
     }
@@ -100,11 +226,28 @@ static int Script_CountBuildings(lua_State* L) {
 /***********************************************************************************************
  * Script_CountAircraft - Returns the amount of specific aircraft for a player                 *
  *                                                                                             *
+ *   Optionally, you can return only aircraft at a particular cell or in a rectangular area    *
+ *   using the two groups of optional coordinate inputs                                        *
+ *                                                                                             *
  *   SCRIPT INPUT:	aircraftType (int) - The aircraft index to count aircraft for              *
  *                                       or -1 for all aircraft                                *
  *                                                                                             *
  *                	houseType (int)    - The player (house) index to count aircraft for        *
  *                                       or -1 for all players                                 *
+ *                                                                                             *
+ *                                       NOTE: -1 for either index input acts as ALL           *
+ *                                                                                             *
+ *                  in_x1 (int) (optional A) - Only include aircraft at or beginning at this   *
+ *                                             Cell/X location                                 *
+ *                                                                                             *
+ *                  in_y1 (int) (optional A) - Only include aircraft at or beginning at this   *
+ *                                             Cell/Y location                                 *
+ *                                                                                             *
+ *                  in_x2 (int) (optional B) - Only include aircraft at or before this Cell/X  *
+ *                                             location                                        *
+ *                                                                                             *
+ *                  in_y2 (int) (optional B) - Only include aircraft at or before this Cell/Y  *
+ *                                             location                                        *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The amount of matching aircraft for that player         *
  *                                                                                             *
@@ -124,6 +267,24 @@ static int Script_CountAircraft(lua_State* L) {
     if (lua_gettop(L) == 2) {
         houseType = lua_tointeger(L, 2);
     }
+
+    // Optional search area
+    bool within_area = false;
+    int in_x1, in_x2, in_y1, in_y2;
+    if (lua_gettop(L) == 4) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = in_x1;
+        in_y2 = in_y1;
+        within_area = true;
+    }
+    else if (lua_gettop(L) == 6) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = lua_tointeger(L, 5);
+        in_y2 = lua_tointeger(L, 6);
+        within_area = true;
+    }
     
     int result = 0;
     for (int a_index = 0; a_index < Aircraft.Count(); a_index++) {
@@ -131,7 +292,22 @@ static int Script_CountAircraft(lua_State* L) {
 
         if (aircraft->Owner() == houseType || houseType == -1) {
             if (aircraft->Class->Type == aircraftType || aircraftType == -1) {
-                result++;
+
+                // Count, in general
+                if (within_area == false) {
+                    result++;
+
+                // Within search area
+                } else {
+
+                    int this_x = Cell_X(Coord_Cell(aircraft->Coord));
+                    int this_y = Cell_Y(Coord_Cell(aircraft->Coord));
+
+                    if (this_x >= in_x1 && this_x <= in_x2 && this_y >= in_y1 && this_y <= in_y2) {
+                        result++;
+                    }
+                }
+
             }
         }
     }
@@ -143,13 +319,28 @@ static int Script_CountAircraft(lua_State* L) {
 /***********************************************************************************************
  * Script_CountUnits - Returns the amount of specific units for a player                       *
  *                                                                                             *
+ *   Optionally, you can return only units at a particular cell or in a rectangular area       *
+ *   using the two groups of optional coordinate inputs                                        *
+ *                                                                                             *
  *   SCRIPT INPUT:	unitType (int)  - The unit index to count units for                        *
  *                                    or -1 for all units                                      *
  *                                                                                             *
  *                	houseType (int) - The player (house) index to count units for              *
  *                                    or -1 for all players                                    *
  *                                                                                             *
- *                  NOTE: -1 for either index input acts as ALL                                *
+ *                                    NOTE: -1 for either index input acts as ALL              *
+ *                                                                                             *
+ *                  in_x1 (int) (optional A) - Only include units at or beginning at this      *
+ *                                             Cell/X location                                 *
+ *                                                                                             *
+ *                  in_y1 (int) (optional A) - Only include units at or beginning at this      *
+ *                                             Cell/Y location                                 *
+ *                                                                                             *
+ *                  in_x2 (int) (optional B) - Only include units at or before this Cell/X     *
+ *                                             location                                        *
+ *                                                                                             *
+ *                  in_y2 (int) (optional B) - Only include units at or before this Cell/Y     *
+ *                                             location                                        *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The amount of matching units for that player            *
  *                                                                                             *
@@ -169,6 +360,23 @@ static int Script_CountUnits(lua_State* L) {
     if (lua_gettop(L) == 2) {
         houseType = lua_tointeger(L, 2);
     }
+
+    // Optional search area
+    bool within_area = false;
+    int in_x1, in_x2, in_y1, in_y2;
+    if(lua_gettop(L) == 4) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = in_x1;
+        in_y2 = in_y1;
+        within_area = true;
+    }else if (lua_gettop(L) == 6) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = lua_tointeger(L, 5);
+        in_y2 = lua_tointeger(L, 6);
+        within_area = true;
+    }
     
     int result = 0;
     for (int u_index = 0; u_index < Units.Count(); u_index++) {
@@ -176,11 +384,26 @@ static int Script_CountUnits(lua_State* L) {
 
         if (unit->Owner() == houseType || houseType == -1) {
             if (unit->Class->Type == unitType || unitType == -1) {
-                result++;
+
+                // Count, in general
+                if (within_area == false) {
+                    result++;
+
+                // Within search area
+                } else {
+                    
+                    int this_x = Cell_X(Coord_Cell(unit->Coord));
+                    int this_y = Cell_Y(Coord_Cell(unit->Coord));
+                    
+                    if (this_x >= in_x1 && this_x <= in_x2 && this_y >= in_y1 && this_y <= in_y2) {
+                        result++;
+                    }
+                }
+                
             }
         }
     }
-
+    
     lua_pushnumber(L, result);
     return 1;
 }
@@ -189,13 +412,28 @@ static int Script_CountUnits(lua_State* L) {
 /***********************************************************************************************
  * Script_CountInfantry - Returns the amount of specific infantry for a player                 *
  *                                                                                             *
+ *   Optionally, you can return only infantry at a particular cell or in a rectangular area    *
+ *   using the two groups of optional coordinate inputs                                        *
+ *                                                                                             *
  *   SCRIPT INPUT:	infantryType (int) - The infantry index to count infantry for              *
  *                                       or -1 for all infantry                                *
  *                                                                                             *
  *                	houseType (int)    - The player (house) index to count infantry for        *
  *                                       or -1 for all players                                 *
  *                                                                                             *
- *                  NOTE: -1 for either index input acts as ALL                                *
+ *                                       NOTE: -1 for either index input acts as ALL           *
+ *                                                                                             *
+ *                  in_x1 (int) (optional A) - Only include infantry at or beginning at this   *
+ *                                             Cell/X location                                 *
+ *                                                                                             *
+ *                  in_y1 (int) (optional A) - Only include infantry at or beginning at this   *
+ *                                             Cell/Y location                                 *
+ *                                                                                             *
+ *                  in_x2 (int) (optional B) - Only include infantry at or before this Cell/X  *
+ *                                             location                                        *
+ *                                                                                             *
+ *                  in_y2 (int) (optional B) - Only include infantry at or before this Cell/Y  *
+ *                                             location                                        *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The amount of matching infantry for that player         *
  *                                                                                             *
@@ -215,6 +453,24 @@ static int Script_CountInfantry(lua_State* L) {
     if (lua_gettop(L) == 2) {
         houseType = lua_tointeger(L, 2);
     }
+
+    // Optional search area
+    bool within_area = false;
+    int in_x1, in_x2, in_y1, in_y2;
+    if (lua_gettop(L) == 4) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = in_x1;
+        in_y2 = in_y1;
+        within_area = true;
+    }
+    else if (lua_gettop(L) == 6) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = lua_tointeger(L, 5);
+        in_y2 = lua_tointeger(L, 6);
+        within_area = true;
+    }
     
     int result = 0;
     for (int u_index = 0; u_index < Infantry.Count(); u_index++) {
@@ -222,7 +478,22 @@ static int Script_CountInfantry(lua_State* L) {
 
         if (infantry->Owner() == houseType || houseType == -1) {
             if (infantry->Class->Type == infantryType || infantryType == -1) {
-                result++;
+
+                // Count, in general
+                if (within_area == false) {
+                    result++;
+
+                // Within search area
+                } else {
+
+                    int this_x = Cell_X(Coord_Cell(infantry->Coord));
+                    int this_y = Cell_Y(Coord_Cell(infantry->Coord));
+
+                    if (this_x >= in_x1 && this_x <= in_x2 && this_y >= in_y1 && this_y <= in_y2) {
+                        result++;
+                    }
+                }
+
             }
         }
     }
@@ -235,13 +506,28 @@ static int Script_CountInfantry(lua_State* L) {
 /***********************************************************************************************
  * Script_CountVessels - Returns the amount of specific vessels for a player                   *
  *                                                                                             *
+ *   Optionally, you can return only vessels at a particular cell or in a rectangular area     *
+ *   using the two groups of optional coordinate inputs                                        *
+ *                                                                                             *
  *   SCRIPT INPUT:	vesselType (int) - The vessel index to count vessels for                   *
  *                                     or -1 for all vessels                                   *
  *                                                                                             *
- *                	houseType (int) - The player (house) index to count vessels for            *
+ *                	houseType (int)  - The player (house) index to count vessels for           *
  *                                     or -1 for all players                                   *
  *                                                                                             *
- *                  NOTE: -1 for either index input acts as ALL                                *
+ *                                     NOTE: -1 for either index input acts as ALL             *
+ *                                                                                             *
+ *                  in_x1 (int) (optional A) - Only include vessels at or beginning at this    *
+ *                                             Cell/X location                                 *
+ *                                                                                             *
+ *                  in_y1 (int) (optional A) - Only include vessels at or beginning at this    *
+ *                                             Cell/Y location                                 *
+ *                                                                                             *
+ *                  in_x2 (int) (optional B) - Only include vessels at or before this Cell/X   *
+ *                                             location                                        *
+ *                                                                                             *
+ *                  in_y2 (int) (optional B) - Only include vessels at or before this Cell/X   *
+ *                                             location                                        *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The amount of matching vessels for that player          *
  *                                                                                             *
@@ -262,13 +548,46 @@ static int Script_CountVessels(lua_State* L) {
         houseType = lua_tointeger(L, 2);        
     }
 
+    // Optional search area
+    bool within_area = false;
+    int in_x1, in_x2, in_y1, in_y2;
+    if (lua_gettop(L) == 4) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = in_x1;
+        in_y2 = in_y1;
+        within_area = true;
+    }
+    else if (lua_gettop(L) == 6) {
+        in_x1 = lua_tointeger(L, 3);
+        in_y1 = lua_tointeger(L, 4);
+        in_x2 = lua_tointeger(L, 5);
+        in_y2 = lua_tointeger(L, 6);
+        within_area = true;
+    }
+
     int result = 0;
     for (int u_index = 0; u_index < Vessels.Count(); u_index++) {
         VesselClass* vessel = Vessels.Ptr(u_index);
 
         if (vessel->Owner() == houseType || houseType == -1) {
             if (vessel->Class->Type == vesselType || vesselType == -1) {
-                result++;
+
+                // Count, in general
+                if (within_area == false) {
+                    result++;
+
+                // Within search area
+                } else {
+
+                    int this_x = Cell_X(Coord_Cell(vessel->Coord));
+                    int this_y = Cell_Y(Coord_Cell(vessel->Coord));
+
+                    if (this_x >= in_x1 && this_x <= in_x2 && this_y >= in_y1 && this_y <= in_y2) {
+                        result++;
+                    }
+                }
+
             }
         }
     }
@@ -1009,6 +1328,177 @@ static int Script_StopMissionTimer(lua_State* L) {
 }
 
 
+
+
+
+
+
+
+
+
+
+/***********************************************************************************************
+ * Script_CreateCellCallback - Creates an ENTERED_BY trigger and attaches a callback           *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index to test for entry         *
+ *                  in_x (int)            - The cell/X location of the cell to test            *
+ *                  in_y (int)            - The cell/Y location of the cell to test            *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CreateCellCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_x = lua_tointeger(L, 2);
+    int in_y = lua_tointeger(L, 3);
+    const char* in_function = lua_tostring(L, 4);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+        
+        this_trigger_type->Event1 = TEVENT_PLAYER_ENTERED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+        
+        // Create instance of trigger type
+        TriggerClass * this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        // Get the cell and set the trigger
+        this_trigger->Cell = XY_Cell(in_x, in_y);
+        Map[XY_Cell(in_x, in_y)].Trigger = this_trigger;
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_CreateSpiedByCallback - Creates a SPIED_BY trigger and attaches a callback           *
+ *                                                                                             *
+ *   SCRIPT INPUT:	buildingID (int)      - The building ID being spied                        *
+ *                	houseType (int)       - The house (player) index doing the spying          *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CreateSpiedByCallback(lua_State* L) {
+
+    int buildingID = lua_tointeger(L, 1);
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 3);
+
+    BuildingClass* this_building = Buildings.Ptr(buildingID);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count() && this_building != NULL) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)this_building->House->ID;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+        
+        this_trigger_type->Event1 = TEVENT_SPIED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+        
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        // Set the building
+        this_building->Trigger = this_trigger;
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_Script_TriggerAddCell - Adds a cell to any cell based callback                       *
+ *                                                                                             *
+ *  The map editor will always be the fastest way to do this, but here in case it's needed     *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerIndex (int)     - The trigger ID of which to add a cell             *
+ *                  in_x (int)             - The Cell/X location of the new cell               *
+ *                  in_y (int)             - The Cell/Y location of the new cell               *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_TriggerAddCell(lua_State* L) {
+
+    int triggerIndex = lua_tointeger(L, 1);
+
+    int in_x = lua_tointeger(L, 2);
+    int in_y = lua_tointeger(L, 3);
+
+    TriggerClass* this_trigger = Triggers.Ptr(triggerIndex);
+
+    Map[XY_Cell(in_x, in_y)].Trigger = this_trigger;
+    
+
+    return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /***********************************************************************************************
  * Script_SetBriefingText - Sets the text on the mission briefing screen                       *
  *                                                                                             *
@@ -1156,8 +1646,8 @@ bool MapScript::Init(const char* mapName) {
 * Red Alert Vanilla Events                                                                    *
 *=============================================================================================*/
 
-// player enters this square
-// Spied by.
+    lua_register(L, "CreateCellCallback", Script_CreateCellCallback);               // player enters this square
+    lua_register(L, "CreateSpiedByCallback", Script_CreateSpiedByCallback);         // Spied by.
 // Thieved by (raided or stolen vehicle).
 // player discovers this object
 // House has been discovered.
@@ -1194,8 +1684,12 @@ bool MapScript::Init(const char* mapName) {
 * Utility Functions                                                                           *
 *=============================================================================================*/
 
+    
+
     lua_register(L, "SetBriefingText", Script_SetBriefingText);						// Sets the [text] on the mission briefing screen
     lua_register(L, "GiveCredits", Script_GiveCredits);                             // Give [credits] to [player] 
+    lua_register(L, "GetCredits", Script_GetCredits);                               // Get [player]'s [credits]
+    lua_register(L, "GetCellBuilding", Script_GetCellBuilding);	                    // Gets a building, if any, at [Cell/X],[Cell/Y]
     
     lua_register(L, "CountBuildings", Script_CountBuildings);	                    // Number of buildings of [type] for given [player]
     lua_register(L, "CountAircraft", Script_CountAircraft);	                        // Number of units of [type] for given [player]
@@ -1203,7 +1697,11 @@ bool MapScript::Init(const char* mapName) {
     lua_register(L, "CountInfantry", Script_CountInfantry);	                        // Number of infantry of [type] for given [player]
     lua_register(L, "CountVessels", Script_CountVessels);	                        // Number of vessels of [type] for given [player]
 
-    lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	            // Initiates a given [callback] on an existing [trigger]
+    //CreateCellCallback(10, 10, MyCellCallback)
+
+    
+    lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	            // Initiates a given [callback] on an existing [trigger] // TODO: Make this work via name OR ID
+    lua_register(L, "TriggerAddCell", Script_TriggerAddCell);	                    // Initiates a given [callback] on an existing [trigger]
 
     
 /**********************************************************************************************
