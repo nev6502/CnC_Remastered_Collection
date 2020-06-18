@@ -144,6 +144,50 @@ Image_t* Image_LoadImage(const char* name) {
 	return image;
 }
 
+Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, char *data) {
+	// Check to see if the image is already loaded.
+	for (int i = 0; i < loaded_images.size(); i++) {
+		if (!strcmp(loaded_images[i]->name, name)) {
+			return loaded_images[i];
+		}
+	}	
+
+	Image_t* image = new Image_t();
+	image->buffer = new unsigned char[Width * Height * 4];
+
+	for (int i = 0; i < Width * Height; i++) {
+		char c = data[i];
+
+		image->buffer[(i * 4) + 0] = backbuffer_palette[(c * 3) + 0];
+		image->buffer[(i * 4) + 1] = backbuffer_palette[(c * 3) + 1];
+		image->buffer[(i * 4) + 2] = backbuffer_palette[(c * 3) + 2];
+		if (c == 0) {
+			image->buffer[(i * 4) + 3] = 0;
+		}
+		else {
+			image->buffer[(i * 4) + 3] = 255;
+		}
+	}
+
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	
+	strcpy(image->name, name);
+	image->image = texture;
+	image->width = Width;
+	image->height = Height;
+	loaded_images.push_back(image);
+	return image;
+}
+
+
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
 	// Todo implement resoluton scaling.
 	return true; // Always return true;
