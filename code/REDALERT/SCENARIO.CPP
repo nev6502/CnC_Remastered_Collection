@@ -400,7 +400,7 @@ bool Start_Scenario(char * name, bool briefing)
 	if (Scen.BriefMovie != VQ_NONE) {
 		sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
 	}
-	if (Session.Type == GAME_NORMAL && Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available()) {
+	if (Session.Type == GAME_NORMAL && ( Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available() ) ) {
 		/*
 		** Make sure the mouse is visible before showing the restatement.
 		*/
@@ -649,8 +649,9 @@ void Fill_In_Data(void)
 			Map.Set_Tactical_Position(Cell_Coord((Scen.Waypoint[WAYPT_HOME] - (MAP_CELL_W * 4 * RESFACTOR)) - (5*RESFACTOR)));
 		}
 		if (Session.Type == GAME_SKIRMISH) {
-			Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = PlayerPtr->CenterCell;
-			Map.Set_Tactical_Position( Cell_Coord( (PlayerPtr->CenterCell - (MAP_CELL_W * 4 * RESFACTOR) ) - (5 * RESFACTOR) ) );
+			CELL PlayerCenterCell = XY_Cell( Coord_XCell(PlayerPtr->Center), Coord_YCell( PlayerPtr->Center) );
+			Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = PlayerCenterCell;
+			Map.Set_Tactical_Position( Cell_Coord( (PlayerCenterCell - (MAP_CELL_W * 4 * RESFACTOR) ) - (5 * RESFACTOR) ) );
 		}
 	}
 #endif
@@ -3244,7 +3245,6 @@ static void Create_Units(bool official)
 		**	Assign the center of this house to the waypoint location.
 		*/
 		hptr->Center = Cell_Coord(centroid);
-		hptr->CenterCell = centroid;
 
 		/*
 		**	If Bases are ON, human & computer houses are treated differently

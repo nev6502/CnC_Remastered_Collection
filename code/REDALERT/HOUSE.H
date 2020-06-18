@@ -523,7 +523,7 @@ class HouseClass {
 		**	the base.
 		*/
 		COORDINATE Center;			// Center COORDINATE of the base.
-		CELL CenterCell;			// Center CELL of the base.
+		//CELL CenterCell;			// Center CELL of the base.
 		int Radius;				// Average building distance from center (leptons).
 		struct {
 			int AirDefense;
