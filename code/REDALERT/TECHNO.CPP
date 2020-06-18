@@ -138,11 +138,6 @@
 */
 #define	MAX_UNCLOAK_STAGE		38
 
-//Added for getting the input for special character keys from the client 
-// - 6/26/2019 JAS 
-extern bool DLL_Export_Get_Input_Key_State(KeyNumType key);
-
-
 /***************************************************************************
 **	These are the pointers to the special shape data that the units may need.
 */
@@ -3523,14 +3518,9 @@ ActionType TechnoClass::What_Action(ObjectClass const * object) const
 			return(ACTION_SELF);
 		}
 
-		//bool altdown = (Keyboard->Down(Options.KeyForceMove1) || Keyboard->Down(Options.KeyForceMove2));
-		//bool ctrldown = (Keyboard->Down(Options.KeyForceAttack1) || Keyboard->Down(Options.KeyForceAttack2));
-		//bool shiftdown = (Keyboard->Down(Options.KeySelect1) || Keyboard->Down(Options.KeySelect2));
-		//Added for getting the input for special character keys from the client 
-		// - 6/26/2019 JAS 
-		bool altdown = DLL_Export_Get_Input_Key_State(KN_LALT);
-		bool ctrldown = DLL_Export_Get_Input_Key_State(KN_LCTRL);
-		bool shiftdown = DLL_Export_Get_Input_Key_State(KN_LSHIFT);
+		bool altdown = (Keyboard->Down(Options.KeyForceMove1) || Keyboard->Down(Options.KeyForceMove2));
+		bool ctrldown = (Keyboard->Down(Options.KeyForceAttack1) || Keyboard->Down(Options.KeyForceAttack2));
+		bool shiftdown = (Keyboard->Down(Options.KeySelect1) || Keyboard->Down(Options.KeySelect2));
 
 		/*
 		**	Special guard area mission is possible if both the control and the
@@ -3646,14 +3636,9 @@ ActionType TechnoClass::What_Action(CELL cell) const
 	CellClass const * cellptr = &Map[cell];
 	OverlayTypeClass const * optr = NULL;
 
-	//bool altdown = (Keyboard->Down(Options.KeyForceMove1) || Keyboard->Down(Options.KeyForceMove2));
-	//bool ctrldown = (Keyboard->Down(Options.KeyForceAttack1) || Keyboard->Down(Options.KeyForceAttack2));
-	//bool shiftdown = (Keyboard->Down(Options.KeySelect1) || Keyboard->Down(Options.KeySelect2));
-	//Added for getting the input for special character keys from the client 
-	// - 6/26/2019 JAS 
-	bool altdown = DLL_Export_Get_Input_Key_State(KN_LALT);
-	bool ctrldown = DLL_Export_Get_Input_Key_State(KN_LCTRL);
-	bool shiftdown = DLL_Export_Get_Input_Key_State(KN_LSHIFT);
+	bool altdown = (Keyboard->Down(Options.KeyForceMove1) || Keyboard->Down(Options.KeyForceMove2));
+	bool ctrldown = (Keyboard->Down(Options.KeyForceAttack1) || Keyboard->Down(Options.KeyForceAttack2));
+	bool shiftdown = (Keyboard->Down(Options.KeySelect1) || Keyboard->Down(Options.KeySelect2));
 
 	/*
 	**	Disable recognizing the <CTRL> key forced fire option when dealing with buildings.

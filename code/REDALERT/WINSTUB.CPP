@@ -88,16 +88,6 @@ void Show_OldFrameBuffer(bool show) {
 
 std::vector<Image_t *> loaded_images;
 
-auto utf8_decode = [](const std::string& str) -> std::wstring
-{
-	if (str.empty()) return std::wstring();
-	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-	std::wstring wstrTo(size_needed, 0);
-	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
-	return wstrTo;
-};
-
-
 Image_t* Image_LoadImage(const char* name) {
 	// Check to see if the image is already loaded.
 	for (int i = 0; i < loaded_images.size(); i++) {
@@ -677,133 +667,8 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 }
 
 
-void WWSDL_ProcessEvents(KeyNumType& key, int& flags) {
-	static int numFramesLMouse = 0;
-	extern int mousex, mousey;
-	bool leftMouseProcessed = false;
-
-	SDL_GetMouseState(&mousex, &mousey);
-
-	Keyboard->MouseQX = mousex;
-	Keyboard->MouseQY = mousey;
-
-	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
-	//		flags = 0;	
-
-	SDL_Event event;
-
-	while (SDL_PollEvent(&event)) {
-		const Uint8* state = SDL_GetKeyboardState(NULL);
-
-		switch (event.type)
-		{
-			case SDL_SYSWMEVENT:
-				if ( event.syswm.msg->msg.win.msg == WM_DESTROY )
-				{
-					Invalidate_Cached_Icons();
-					VisiblePage.Un_Init();
-					HiddenPage.Un_Init();
-					AllSurfaces.Release();
-					if (!InDebugger) Reset_Video_Mode();
-
-					/*
-					** If we are shutting down gracefully than flag that the message loop has finished.
-					** If this is a forced shutdown (ReadyToQuit == 0) then try and close down everything
-					** before we exit.
-					*/
-					PostQuitMessage(0);
-
-					switch (ReadyToQuit) {
-						case 1:
-							ReadyToQuit = 2;
-							break;
-						case 0:
-							ExitProcess(0);
-							break;
-					}
-				}
-
-				break;
-
-			case SDL_MOUSEMOTION:
-				flags = GadgetClass::LEFTUP;
-				break;
-
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = GadgetClass::LEFTPRESS;
-					leftMouseProcessed = true;
-					numFramesLMouse++;
-					key = KN_LMOUSE;
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					numFramesLMouse = 0;
-					flags = GadgetClass::RIGHTPRESS;
-					key = KN_RMOUSE;
-				}
-				break;
-
-			case SDL_MOUSEBUTTONUP:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = GadgetClass::LEFTRELEASE;
-					numFramesLMouse = 0;
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					flags = GadgetClass::RIGHTRELEASE;
-					numFramesLMouse = 0;
-				}
-				break;
-
-			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
-					renderConsole = !renderConsole;
-
-					if (renderConsole) {
-						ShowCursor(TRUE);
-						Hide_Mouse();
-					}
-					else {
-						ShowCursor(FALSE);
-						Show_Mouse();
-					}
-					break;
-				}
-			
-				// handle backspace and ENTER
-				if (event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE) Keyboard->Put_Element( KN_BACKSPACE );
-				if (event.key.keysym.scancode == ( SDL_SCANCODE_RETURN || SDL_SCANCODE_KP_ENTER ) ) Keyboard->Put_Element( KN_RETURN );
-
-				break;
-			case SDL_TEXTINPUT:
-				int keyFlags = 0x00;
-
-				if (state[SDL_SCANCODE_RSHIFT] || state[SDL_SCANCODE_LSHIFT]) keyFlags |= KN_SHIFT_BIT;
-				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT]) keyFlags |= KN_ALT_BIT;
-
-				std::wstring input_utf16 = utf8_decode( std::string( event.text.text ) );
-
-				if( input_utf16.length() == 1 )
-				{
-					short vKey = VkKeyScanW( input_utf16[0] );
-					Keyboard->Put_Element( vKey | keyFlags );
-				}
-
-				break;
-		}
-
-		if (Debug_Map || renderConsole)
-		{
-			ImGui_ImplSDL2_ProcessEvent(&event);
-		}
-
-	}
-
-	if (!leftMouseProcessed && numFramesLMouse != 0)
-	{
-		flags = GadgetClass::LEFTHELD;
-	}
-
-	Device_Present();
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
+	UserInput.Process_Input(key, flags, presentBuffer);
 }
 
 #ifndef NDEBUG

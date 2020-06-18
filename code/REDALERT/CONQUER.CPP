@@ -891,43 +891,43 @@ void Keyboard_Process(KeyNumType & input)
 	**	state!
 	*/
 	if (input != 0 && (plain == Options.KeyTeam1 || plain == KN_1)) {
-		Handle_Team(0, action);
-		input = KN_NONE;
-	}
-	if (input != 0 && (plain == Options.KeyTeam2 || plain == KN_2)) {
 		Handle_Team(1, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam3 || plain == KN_3)) {
+	if (input != 0 && (plain == Options.KeyTeam2 || plain == KN_2)) {
 		Handle_Team(2, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam4 || plain == KN_4)) {
+	if (input != 0 && (plain == Options.KeyTeam3 || plain == KN_3)) {
 		Handle_Team(3, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam5 || plain == KN_5)) {
+	if (input != 0 && (plain == Options.KeyTeam4 || plain == KN_4)) {
 		Handle_Team(4, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam6 || plain == KN_6)) {
+	if (input != 0 && (plain == Options.KeyTeam5 || plain == KN_5)) {
 		Handle_Team(5, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam7 || plain == KN_7)) {
+	if (input != 0 && (plain == Options.KeyTeam6 || plain == KN_6)) {
 		Handle_Team(6, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam8 || plain == KN_8)) {
+	if (input != 0 && (plain == Options.KeyTeam7 || plain == KN_7)) {
 		Handle_Team(7, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam9 || plain == KN_9)) {
+	if (input != 0 && (plain == Options.KeyTeam8 || plain == KN_8)) {
 		Handle_Team(8, action);
 		input = KN_NONE;
 	}
-	if (input != 0 && (plain == Options.KeyTeam10 || plain == KN_0)) {
+	if (input != 0 && (plain == Options.KeyTeam9 || plain == KN_9)) {
 		Handle_Team(9, action);
+		input = KN_NONE;
+	}
+	if (input != 0 && (plain == Options.KeyTeam10 || plain == KN_0)) {
+		Handle_Team(0, action);
 		input = KN_NONE;
 	}
 

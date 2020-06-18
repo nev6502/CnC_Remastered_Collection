@@ -84,8 +84,6 @@ GadgetClass * GadgetClass::Focused = 0;
 static RemapControlType _GreyScheme = {15};
 RemapControlType * GadgetClass::ColorScheme = &_GreyScheme;
 
-int mousex, mousey;
-
 /***********************************************************************************************
  * GadgetClass::GadgetClass -- Constructor for gadget object.                                  *
  *                                                                                             *
@@ -569,7 +567,7 @@ KeyNumType GadgetClass::Input(void)
 	if (StuckOn) {
 		StuckOn->Draw_Me(false);
 		GadgetClass * oldstuck = StuckOn;
-		StuckOn->Clicked_On(key, flags, mousex, mousey);
+		StuckOn->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 		if (StuckOn) {
 			StuckOn->Draw_Me(false);
 		} else {
@@ -583,7 +581,7 @@ KeyNumType GadgetClass::Input(void)
 		*/
 		if (Focused && (flags & KEYBOARD)) {
 			Focused->Draw_Me(false);
-			Focused->Clicked_On(key, flags, mousex, mousey);
+			Focused->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 			if (Focused) {
 				Focused->Draw_Me(false);
 			}
@@ -610,7 +608,7 @@ KeyNumType GadgetClass::Input(void)
 					**	Process this button. If the button was recognized and action was
 					**	performed, then bail from further processing (speed reasons?).
 					*/
-					if (next_button->Clicked_On(key, flags, mousex, mousey)) {
+					if (next_button->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y)) {
 
 						/*
 						**	Some buttons will require repainting when they perform some action.

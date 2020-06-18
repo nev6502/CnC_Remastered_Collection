@@ -199,11 +199,10 @@ struct NoInitClass {
 #define TIMER_H
 #endif
 
-#ifdef WIN32
 #include	"key.h"
-#endif
+#include    "io/UserInput.h"
 
-#include <wwlib32.h>
+#include    <wwlib32.h>
 #include	"mpu.h"
 #include	"bench.h"
 #include	"rect.h"
@@ -212,7 +211,7 @@ struct NoInitClass {
 #include	"face.h"
 #include	"random.h"
 #include	"crc.h"
-#include "compat.h"
+#include    "compat.h"
 #include	"fixed.h"
 #include	"base64.h"
 #include	"pipe.h"
@@ -1072,7 +1071,7 @@ extern DynamicVectorClass<EventChoiceClass *> xxx2;
 template <>class DynamicVectorClass<ActionChoiceClass *>;
 extern DynamicVectorClass<ActionChoiceClass *> xxx3;
 
-void WWSDL_ProcessEvents(KeyNumType& key, int& flags);
+void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer = true);
 void Device_Present(void);
 
 /*
