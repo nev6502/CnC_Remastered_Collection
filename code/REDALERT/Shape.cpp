@@ -1546,8 +1546,10 @@ long Buffer_Frame_To_Page(int x, int y, int width, int height, struct Image_t * 
     xstart = xstart + WindowList[Window][WINDOWX];// + LogicPage->Get_XPos();
 	ystart = ystart + WindowList[Window][WINDOWY];// + LogicPage->Get_YPos();
     //GL_SetClipRect(WindowList[Window][WINDOWX], WindowList[Window][WINDOWY], WindowList[Window][WINDOWWIDTH], WindowList[Window][WINDOWWIDTH]);    
-    GL_RenderImage(shape_image, xstart, ystart, width, height);
-    
+    if(renderHDTexture)
+        GL_RenderImage(shape_image, xstart, ystart, width, height, (int)fade_table);
+    else
+        GL_RenderImage(shape_image, xstart, ystart, width, height, 0);
 
     // Here we just use the function that will blit the entire frame
     // using the appropriate effects.

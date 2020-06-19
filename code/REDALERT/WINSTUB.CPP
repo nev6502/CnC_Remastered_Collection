@@ -109,26 +109,19 @@ static int64_t generateHashValue(const char* fname, const int size) {
 	return hash;
 }
 
-Image_t* Image_LoadImage(const char* name) {
-	int64_t hash = generateHashValue(name, strlen(name));
-
-	// Check to see if the image is already loaded.
-	for (int i = 0; i < loaded_images.size(); i++) {
-		if (loaded_images[i]->namehash == hash) {
-			return loaded_images[i];
-		}
-	}
-
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, unsigned char remap[3]) {
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
 	if (!ilLoadImage(name)) {
 		ilDeleteImages(1, &ImageName);
-		return NULL;
+		return false;
 	}
 
+	bool swapBGR = false;
 	if (strstr(name, ".TGA")) {
 		iluFlipImage();
+		swapBGR = true;
 	}
 
 	ILuint Width, Height, Bpp;
@@ -137,12 +130,31 @@ Image_t* Image_LoadImage(const char* name) {
 	Bpp = ilGetInteger(IL_IMAGE_BPP);
 	ILubyte* Data = ilGetData();
 
+	if (Bpp == 4 && (remap[0] + remap[1] + remap[2]) > 0) {
+		for (int i = 0; i < Width * Height; i++) {
+			//float g = (Data[(i * 4) + 1] / 255.0f);
+			if (Data[(i * 4) + 1] > Data[(i * 4) + 0] && Data[(i * 4) + 1] > Data[(i * 4) + 2]) {
+
+				for (int c = 0; c < 3; c++) {
+					//float f = (remap[2 - c]) / 255.0f;		
+					//f = f * min((g * 2.0f), 1.0f);
+					Data[(i * 4) + c] = remap[2 - c] << 2; //((unsigned char)(f * 255.0f)) << 2; //((unsigned char)f) << 2;
+				}				
+			}
+		}
+	}
+
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	if (Bpp == 4) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
+		if (swapBGR) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_BGRA, GL_UNSIGNED_BYTE, Data);
+		}
+		else {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
+		}
 	}
 	else if (Bpp == 3) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
@@ -157,28 +169,79 @@ Image_t* Image_LoadImage(const char* name) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	Image_t* image = new Image_t();
+	
 	strcpy(image->name, name);
-	image->image = texture;
+	image->image[houseid][animid] = texture;
 	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
 	image->buffer = new unsigned char[Width * Height * Bpp];
-	memcpy(image->buffer, Data, Width * Height * Bpp);
-	loaded_images.push_back(image);
 
+	if (houseid == 0 && animid == 0) {
+		memcpy(image->buffer, Data, Width * Height * Bpp);
+	}
 
 	ilDeleteImages(1, &ImageName);
+	return true;
+}
+
+Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+	Image_t* image = new Image_t();
+
+	if (!loadAnims) {
+		unsigned char remap[3] = { 0, 0, 0 };
+		if (!Image_loadHDImage(image, name, 0, 0, hash, remap)) {
+			delete image;
+			return NULL;
+		}
+	}
+	else {
+		byte* palette = (byte *)CCPalette.Get_Data();
+		for (int i = 0; i < MAX_MPLAYER_COLORS; i++) {
+			unsigned char p = ColorRemaps[i].Color;
+			unsigned char remap[3];
+
+			remap[0] = palette[(p * 3) + 0];
+			remap[1] = palette[(p * 3) + 1];
+			remap[2] = palette[(p * 3) + 2];
+			if (!Image_loadHDImage(image, name, i, 0, hash, remap)) {
+				delete image;
+				return NULL;
+			}
+		}
+	}
+	
+	loaded_images.push_back(image);
 	return image;
 }
 
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
 	int64_t hash = generateHashValue(name, strlen(name));
 
-	// Check to see if the image is already loaded.
-	for (int i = 0; i < loaded_images.size(); i++) {
-		if (loaded_images[i]->namehash == hash) {
-			return loaded_images[i];
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
 		}
 	}
 
@@ -226,7 +289,8 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 
 	
 	strcpy(image->name, name);
-	image->image = texture;
+	image->image[0][0] = texture;
+	image->numAnimFrames = -1;
 	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;

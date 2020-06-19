@@ -3486,9 +3486,9 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 	if ((flags & SHAPE_GHOST) && (!ghostdata)) {
 		ghostdata = DisplayClass::SpecialGhost;
 	}
-	if ((flags & SHAPE_FADING) && (!fadingdata)) {
-		fadingdata = DisplayClass::FadingShade;
-	}
+	//if ((flags & SHAPE_FADING) && (!fadingdata)) {
+	//	fadingdata = DisplayClass::FadingShade;
+	//}
 
 	static unsigned char* _xbuffer = 0;
 

@@ -3143,7 +3143,7 @@ void BuildingTypeClass::One_Time(void)
 		{
 			char imageFileName[512];
 			sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", building.Graphic_Name(), building.Graphic_Name());
-			((void const*&)building.HDImageData) = Image_LoadImage(imageFileName);
+			((void const*&)building.HDImageData) = Image_LoadImage(imageFileName, true, true);
 
 			if (building.ImageData != NULL && building.HDImageData != NULL) {
 				int width = Get_Build_Frame_Width(building.ImageData);

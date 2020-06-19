@@ -18,10 +18,10 @@ void GL_ResetClipRect(void) {
 	ImGui::GetForegroundDrawList()->PopClipRect();
 }
 
-void GL_RenderImage(Image_t* image, int x, int y, int width, int height) {
+void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int colorRemap) {
 	ImVec2 mi(x, y);
 	ImVec2 ma(x + width, y + height);
-	ImGui::GetForegroundDrawList()->AddImage((ImTextureID)image->image, mi, ma);
+	ImGui::GetForegroundDrawList()->AddImage((ImTextureID)image->image[colorRemap][0], mi, ma);
 }
 
 void GL_FillRect(int color, int x, int y, int width, int height) {
