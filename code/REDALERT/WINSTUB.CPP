@@ -45,6 +45,7 @@
 #include	"examples/imgui_impl_sdl.h"
 #include	"function.h"
 #include	"il/il.h"
+#include	"il/ilu.h"
 #include	"image.h"
 
 #ifdef WINSOCK_IPX
@@ -106,6 +107,10 @@ Image_t* Image_LoadImage(const char* name) {
 		return NULL;
 	}
 
+	if (strstr(name, ".TGA")) {
+		iluFlipImage();
+	}
+
 	ILuint Width, Height, Bpp;
 	Width = ilGetInteger(IL_IMAGE_WIDTH);
 	Height = ilGetInteger(IL_IMAGE_HEIGHT);
@@ -135,8 +140,8 @@ Image_t* Image_LoadImage(const char* name) {
 	Image_t* image = new Image_t();
 	strcpy(image->name, name);
 	image->image = texture;
-	image->width = Width;
-	image->height = Height;
+	image->renderwidth = image->width = Width;
+	image->renderheight = image->height = Height;
 	image->buffer = new unsigned char[Width * Height * Bpp];
 	memcpy(image->buffer, Data, Width * Height * Bpp);
 	loaded_images.push_back(image);
@@ -199,8 +204,8 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	
 	strcpy(image->name, name);
 	image->image = texture;
-	image->width = Width;
-	image->height = Height;
+	image->renderwidth = image->width = Width;
+	image->renderheight = image->height = Height;
 	loaded_images.push_back(image);
 	return image;
 }

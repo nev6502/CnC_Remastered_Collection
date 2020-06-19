@@ -9,6 +9,8 @@ struct Image_t {
 	unsigned int image;
 	int width;
 	int height;
+	int renderwidth;
+	int renderheight;
 	unsigned char* buffer;
 };
 
