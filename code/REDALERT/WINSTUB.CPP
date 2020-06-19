@@ -91,10 +91,30 @@ void Show_OldFrameBuffer(bool show) {
 
 std::vector<Image_t *> loaded_images;
 
+/*
+================
+return a hash value for the filename
+================
+*/
+static int64_t generateHashValue(const char* fname, const int size) {
+	uint32_t hash = 0x811c9dc5;
+	uint32_t prime = 0x1000193;
+
+	for (int i = 0; i < size; ++i) {
+		uint8_t value = fname[i];
+		hash = hash ^ value;
+		hash *= prime;
+	}
+
+	return hash;
+}
+
 Image_t* Image_LoadImage(const char* name) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
 	// Check to see if the image is already loaded.
 	for (int i = 0; i < loaded_images.size(); i++) {
-		if (!strcmp(loaded_images[i]->name, name)) {
+		if (loaded_images[i]->namehash == hash) {
 			return loaded_images[i];
 		}
 	}
@@ -140,6 +160,7 @@ Image_t* Image_LoadImage(const char* name) {
 	Image_t* image = new Image_t();
 	strcpy(image->name, name);
 	image->image = texture;
+	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
 	image->buffer = new unsigned char[Width * Height * Bpp];
@@ -152,12 +173,14 @@ Image_t* Image_LoadImage(const char* name) {
 }
 
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
 	// Check to see if the image is already loaded.
 	for (int i = 0; i < loaded_images.size(); i++) {
-		if (!strcmp(loaded_images[i]->name, name)) {
+		if (loaded_images[i]->namehash == hash) {
 			return loaded_images[i];
 		}
-	}	
+	}
 
 	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
 
@@ -204,6 +227,7 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	
 	strcpy(image->name, name);
 	image->image = texture;
+	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
 	loaded_images.push_back(image);

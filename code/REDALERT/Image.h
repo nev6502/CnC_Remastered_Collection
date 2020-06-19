@@ -6,11 +6,12 @@ struct Image_t {
 	~Image_t();
 
 	char name[512];
+	int64_t namehash;
 	unsigned int image;
 	int width;
 	int height;
 	int renderwidth;
-	int renderheight;
+	int renderheight;	
 	unsigned char* buffer;
 };
 
