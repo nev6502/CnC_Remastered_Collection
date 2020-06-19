@@ -3761,10 +3761,10 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 				sprintf(tmp, "s%d%d%d%d%d", shapefile, shapenum, rotation, fadingdata, flags);
 
 				if (flags & SHAPE_FADING) {
-					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)shape_pointer, (unsigned char*)fadingdata);
+					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)buffer, (unsigned char*)fadingdata);
 				}
 				else {
-					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)shape_pointer, NULL);
+					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)buffer, NULL);
 				}
 			}
 
