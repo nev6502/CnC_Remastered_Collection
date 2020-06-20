@@ -443,13 +443,14 @@ int Do_Menu(char const ** strings, bool )
 	UnknownKey = 0;
 	while (selection == -1) {
 // jmarshall
-		KeyNumType _key = KN_NONE;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
-		Show_Mouse(true);
-// jmarshall end
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+
 		Call_Back();
-		selection = Check_Menu(0, strings, NULL, 0xFFL, 0, _key);
+
+		Show_Mouse(true);
+
+		selection = Check_Menu(0, strings, NULL, 0xFFL, 0, (KeyNumType)g_globalKeyFlags);
 		if (UnknownKey != 0 || UnknownKey == KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) break;
 	}
 	Keyboard->Clear();

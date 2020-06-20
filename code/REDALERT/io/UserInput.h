@@ -7,6 +7,9 @@
 
 #include "examples/imgui_impl_sdl.h"
 
+extern KeyNumType g_globalKeyNumType;
+extern int g_globalKeyFlags;
+
 // Mapping of SDL KeyCode values to internal KeyNumType
 std::map<SDL_KeyCode, KeyNumType> const sdl_keyMapping = {
 	{ SDLK_a, KN_A },
@@ -101,7 +104,7 @@ class UserInputClass
 			INPUT_ACTION_MOUSE,
 		} InputAction;
 
-		void UserInputClass::Process_Input(KeyNumType& key, int& flags, bool presentBuffer = true);
+		void UserInputClass::Process_Input(KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags);
 
 		InputAction LastAction;
 

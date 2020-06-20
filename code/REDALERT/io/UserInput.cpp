@@ -3,7 +3,7 @@
 
 extern KeyboardClass * Keyboard;
 
-void UserInputClass::Process_Input(KeyNumType& key, int& flags, bool presentBuffer)
+void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 {
 	bool leftMouseProcessed = false;
 	SDL_GetMouseState(&Mouse.X, &Mouse.Y);
@@ -50,17 +50,23 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags, bool presentBuff
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_DOWN;
 
+					key = KN_LMOUSE;
 					flags = GadgetClass::LEFTPRESS;
+
+					Keyboard->Put_Element(KN_LMOUSE);
+
 					leftMouseProcessed = true;
 					numFramesLMouse++;
-					key = KN_LMOUSE;
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					Mouse.Button_Right == MouseButtonState::MOUSE_BUTTON_DOWN;
 
-					numFramesLMouse = 0;
-					flags = GadgetClass::RIGHTPRESS;
+					Keyboard->Put_Element(KN_RMOUSE);
+
 					key = KN_RMOUSE;
+					flags = GadgetClass::RIGHTPRESS;
+
+					numFramesLMouse = 0;
 				}
 				break;
 
@@ -137,10 +143,5 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags, bool presentBuff
 	{
 		Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_HOLD;
 		flags = GadgetClass::LEFTHELD;
-	}
-
-	if (presentBuffer)
-	{
-		Device_Present();
 	}
 }

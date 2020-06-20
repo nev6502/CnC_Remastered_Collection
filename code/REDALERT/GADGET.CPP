@@ -501,6 +501,8 @@ KeyNumType GadgetClass::Input(void)
 	*/
 // jmarshall
 	int flags = g_globalKeyFlags;
+	UserInput.Process_Input( g_globalKeyNumType, flags );
+
 // jmarshall end
 
 	/*
