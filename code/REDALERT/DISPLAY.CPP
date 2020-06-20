@@ -188,7 +188,7 @@ DisplayClass::DisplayClass(void) :
 	ShadowShapes = 0;
 	TransIconset = 0;
 
-	Set_View_Dimensions(0, 0, ScreenWidth, ScreenHeight);
+	Set_View_Dimensions(0, 8 * RESFACTOR, ScreenWidth, ScreenHeight);
 }
 
 
@@ -3090,7 +3090,6 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 	x = Get_Mouse_X();
 	y = Get_Mouse_Y();
 
-
 	bool edge = (y == 0 || x == 0 || x == SeenBuff.Get_Width()-1 || y == SeenBuff.Get_Height()-1);
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
@@ -3309,16 +3308,15 @@ int DisplayClass::TacticalClass::Selection_At_Mouse(unsigned flags, KeyNumType &
 {
 	int		x, y;					// Sub cell pixel coordinates.
 	bool edge = false;
-	if (flags & (LEFTPRESS | LEFTRELEASE | RIGHTPRESS | RIGHTRELEASE)) {
-		x = Keyboard->MouseQX;
-		y = Keyboard->MouseQY;
-	}
-	else {
-		x = Get_Mouse_X();
-		y = Get_Mouse_Y();
+	
+	x = UserInput.Mouse.X;
+	y = UserInput.Mouse.Y;
 
-		if (x == 0 || y == 199 || x == 319) edge = true;
+	if (x == 0 || y == SeenBuff.Get_Height() || x == SeenBuff.Get_Width())
+	{
+		edge = true;
 	}
+
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
 
@@ -3345,7 +3343,7 @@ int DisplayClass::TacticalClass::Selection_At_Mouse(unsigned flags, KeyNumType &
 
 		if (object != nullptr)
 		{
-			bool shiftdown = DLL_Export_Get_Input_Key_State(KN_LSHIFT);
+			bool shiftdown = UserInput.KeyB.Shift == true;
 
 			if (shiftdown)
 			{
@@ -3387,16 +3385,15 @@ int DisplayClass::TacticalClass::Command_Object(unsigned flags, KeyNumType & key
 {
 	int		x, y;					// Sub cell pixel coordinates.
 	bool edge = false;
-	if (flags & (LEFTPRESS | LEFTRELEASE | RIGHTPRESS | RIGHTRELEASE)) {
-		x = Keyboard->MouseQX;
-		y = Keyboard->MouseQY;
-	}
-	else {
-		x = Get_Mouse_X();
-		y = Get_Mouse_Y();
 
-		if (x == 0 || y == 199 || x == 319) edge = true;
+	x = UserInput.Mouse.X;
+	y = UserInput.Mouse.Y;
+
+	if (x == 0 || y == SeenBuff.Get_Height() || x == SeenBuff.Get_Width())
+	{
+		edge = true;
 	}
+
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
 

@@ -1784,13 +1784,8 @@ int RadarClass::RTacticalClass::Action(unsigned flags, KeyNumType & key)
 	**	or release event, special mouse queuing storage variables are used. Other
 	**	events must use the current mouse position globals.
 	*/
-	if (flags & (LEFTPRESS|LEFTRELEASE|RIGHTPRESS|RIGHTRELEASE)) {
-		x = Keyboard->MouseQX;
-		y = Keyboard->MouseQY;
-	} else {
-		x = Get_Mouse_X();
-		y = Get_Mouse_Y();
-	}
+	x = Get_Mouse_X();
+	y = Get_Mouse_Y();
 
 	/*
 	**	See if the mouse is over the radar general area, but not yet

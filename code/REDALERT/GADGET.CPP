@@ -84,8 +84,6 @@ GadgetClass * GadgetClass::Focused = 0;
 static RemapControlType _GreyScheme = {15};
 RemapControlType * GadgetClass::ColorScheme = &_GreyScheme;
 
-int mousex, mousey;
-
 /***********************************************************************************************
  * GadgetClass::GadgetClass -- Constructor for gadget object.                                  *
  *                                                                                             *
@@ -495,37 +493,6 @@ KeyNumType GadgetClass::Input(void)
 		key = Keyboard->Get();
 	}
 
-#ifdef WIN32
-#ifdef CHEAT_KEYS
-	//if (key == KN_K && !Debug_Map && (Debug_Flag || Debug_Playtest)) {
-	//	/*
-	//	** time to create a screen shot using the PCX code (if it works)
-	//	*/
-	//	if (!Debug_MotionCapture) {
-	//		GraphicBufferClass temp_page(	SeenBuff.Get_Width(),
-	//												SeenBuff.Get_Height(),
-	//												NULL,
-	//												SeenBuff.Get_Width() * SeenBuff.Get_Height());
-	//		CDFileClass file;
-	//		char filename[30];
-	//
-//	//		Hide_Mouse();
-	//		SeenBuff.Blit(temp_page);
-//	//		Show_Mouse();
-	//		for (int lp = 0; lp < 99; lp ++) {
-	//			sprintf(filename, "scrsht%02d.pcx", lp);
-	//			file.Set_Name(filename);
-	//			if (!file.Is_Available()) break;
-	//		}
-	//
-	//		file.Cache(200000);
-	//		Write_PCX_File(file, temp_page, & GamePalette);
-	//		Sound_Effect(VOC_BEEP);
-	//	}
-	//}
-#endif
-#endif
-
 	/*
 	**	For mouse button clicks, the mouse position is actually held in the MouseQ...
 	**	globals rather than their normal Mouse... globals. This is because we need to
@@ -597,7 +564,7 @@ KeyNumType GadgetClass::Input(void)
 	if (StuckOn) {
 		StuckOn->Draw_Me(false);
 		GadgetClass * oldstuck = StuckOn;
-		StuckOn->Clicked_On(key, flags, mousex, mousey);
+		StuckOn->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 		if (StuckOn) {
 			StuckOn->Draw_Me(false);
 		} else {
@@ -611,7 +578,7 @@ KeyNumType GadgetClass::Input(void)
 		*/
 		if (Focused && (flags & KEYBOARD)) {
 			Focused->Draw_Me(false);
-			Focused->Clicked_On(key, flags, mousex, mousey);
+			Focused->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 			if (Focused) {
 				Focused->Draw_Me(false);
 			}
@@ -638,7 +605,7 @@ KeyNumType GadgetClass::Input(void)
 					**	Process this button. If the button was recognized and action was
 					**	performed, then bail from further processing (speed reasons?).
 					*/
-					if (next_button->Clicked_On(key, flags, mousex, mousey)) {
+					if (next_button->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y)) {
 
 						/*
 						**	Some buttons will require repainting when they perform some action.

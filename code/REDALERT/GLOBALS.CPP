@@ -253,6 +253,12 @@ RulesClass Rule;
 
 
 /***************************************************************************
+** All user input, mouse and keyboard, is routed through the object pointed to by this
+**	user input class pointer.
+*/
+UserInputClass UserInput;
+
+/***************************************************************************
 ** All keyboard input is routed through the object pointed to by this
 **	keyboard class pointer.
 */

@@ -122,10 +122,10 @@ void Nod_Ending(void)
 				if ((key & 0xFF) == KN_LMOUSE && !(key & KN_RLSE_BIT)) {
 					int mousex = MouseQX;
 					int mousey = MouseQY;
-					if (mousey >= 22 && mousey <= 177) {
+					if (mousex >= 22 && mousey <= 177) {
 						done++;
-						if (mousex <  160 && mousey <  100) selection = 2;
-						if (mousex <  160 && mousey >= 100) selection = 3;
+						if (mousex < 160 && mousey <  100) selection = 2;
+						if (mousex < 160 && mousey >= 100) selection = 3;
 						if (mousex >= 160 && mousey >= 100) selection = 4;
 					}
 				}

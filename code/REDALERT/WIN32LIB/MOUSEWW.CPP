@@ -31,15 +31,15 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "imgui.h"
-#include "mouse.h"
+#include "../FUNCTION.H"
+#include "MOUSE.H"
 #include "../image.h"
-#include <mmsystem.h>
 
 static WWMouseClass *_Mouse=NULL;
 void CALLBACK Process_Mouse( UINT event_id, UINT res1 , DWORD user, DWORD  res2, DWORD  res3 );
-extern bool GameInFocus;
 
-extern int mousex, mousey;
+extern bool GameInFocus;
+extern UserInputClass UserInput;
 
 /***********************************************************************************************
  * MOUSECLASS::MOUSECLASS -- Constructor for the Mouse Class                                   *
@@ -241,8 +241,8 @@ void WWMouseClass::RenderMouse(void) {
 
 	//ImVec2 size(current_cursor->width, current_cursor->height);
 	// Image((ImTextureID)current_cursor->image, size);
-	int _my = mousey + (current_cursor->height * 0.25);
-	int xstart = mousex - Get_Hotspot_X();
+	int _my = UserInput.Mouse.X + (current_cursor->height * 0.25);
+	int xstart = UserInput.Mouse.Y - Get_Hotspot_X();
 	int ystart = _my - Get_Hotspot_Y();
 	int yend = current_cursor->height + ystart - 1;
 	int xend = current_cursor->width + xstart - 1;
@@ -483,7 +483,7 @@ int WWMouseClass::Get_Mouse_State(void)
  *=============================================================================================*/
 int WWMouseClass::Get_Mouse_X(void)
 {
-	return mousex;
+	return UserInput.Mouse.X;
 }
 
 
@@ -499,7 +499,7 @@ int WWMouseClass::Get_Mouse_X(void)
  *=============================================================================================*/
 int WWMouseClass::Get_Mouse_Y(void)
 {
-	return mousey;
+	return UserInput.Mouse.Y;
 }
 
 /***********************************************************************************************
@@ -515,8 +515,8 @@ int WWMouseClass::Get_Mouse_Y(void)
  *=============================================================================================*/
 void WWMouseClass::Get_Mouse_XY(int &x, int &y)
 {	
-	x = mousex;
-	y = mousey;
+	x = UserInput.Mouse.X;
+	y = UserInput.Mouse.Y;
 }
 
 //#pragma off(unreferenced)
@@ -575,14 +575,13 @@ void *Set_Mouse_Cursor(int hotx, int hoty, int cursor)
 
 extern int DLLForceMouseX;
 extern int DLLForceMouseY;
-extern int mousex, mousey;
 
 int Get_Mouse_X(void)
 {
-	return mousex;
+	return UserInput.Mouse.X;
 }
 
 int Get_Mouse_Y(void)
 {
-	return mousey;
+	return UserInput.Mouse.Y;
 }
