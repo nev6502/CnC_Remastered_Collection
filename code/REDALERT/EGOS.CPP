@@ -859,9 +859,9 @@ void Show_Who_Was_Responsible (void)
 		** If user hits escape then break.
 		*/
 
-		KeyNumType _key = KN_NONE;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
 
 		key = Keyboard->Check();
 

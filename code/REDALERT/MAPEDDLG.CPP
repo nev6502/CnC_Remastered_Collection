@@ -652,9 +652,9 @@ int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioP
 	*/
 	bool display = true;
 	while (pickscenerio_process) {
-		KeyNumType _key;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
 	}
 
 	Imgui_Dialog_Function = nullptr;
@@ -1117,9 +1117,10 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 //			}
 //
 //			Show_Mouse();
-			KeyNumType _key;
-			int _types;
-			WWSDL_ProcessEvents(_key, _types);
+
+			g_globalKeyNumType = KN_NONE;
+			g_globalKeyFlags = 0;
+			UserInput.Process_Input();
 
 		//	display = REDRAW_NONE;
 		
@@ -1957,9 +1958,9 @@ int MapEditClass::Scenario_Dialog(void)
 		*/
 		KeyNumType input = KN_NONE; //commands->Input();
 
-		KeyNumType _key;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
 
 		/*
 		**	Process input
@@ -2549,9 +2550,9 @@ int MapEditClass::Select_Trigger(void)
 ////			LogicPage->Unlock();
 //		}
 
-		KeyNumType _key;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
 
 		/*
 		**	Get user input

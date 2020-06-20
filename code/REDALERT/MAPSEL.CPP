@@ -228,9 +228,12 @@ char const * Map_Selection(void)
 	bool done = 0;
 	MouseType shape = MOUSE_NORMAL;
 	while (!done) {
-		KeyNumType _key;
-		int _flags = 0;
-		WWSDL_ProcessEvents(_key, _flags);
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+
+		UserInput.Process_Input();
+
+		Call_Back();
 
 #ifdef WIN32
 		/*
@@ -259,24 +262,23 @@ char const * Map_Selection(void)
 			timer = delay;
 			Set_Mouse_Cursor(xspot, yspot, start + frame);
 		}
-		if (_flags == KN_LMOUSE) {
-			{
-				choice = 0;
-				if (choice != -1) {
-					done = 1;
-					selection = choice;
+		if (g_globalKeyFlags == KN_LMOUSE) 
+		{
+			choice = 0;
+			if (choice != -1) {
+				done = 1;
+				selection = choice;
 #ifdef WIN32
-					Play_Sample(country1, 255, Options.Normalize_Volume(170));
+				Play_Sample(country1, 255, Options.Normalize_Volume(170));
 #else
-					Play_Sample(country1, 255, Options.Normalize_Volume(50));
+				Play_Sample(country1, 255, Options.Normalize_Volume(50));
 #endif
-				} else {
+			} else {
 #ifdef WIN32
-					Play_Sample(scold1, 255, Options.Normalize_Volume(170));
+				Play_Sample(scold1, 255, Options.Normalize_Volume(170));
 #else
-					Play_Sample(scold1, 255, Options.Normalize_Volume(50));
+				Play_Sample(scold1, 255, Options.Normalize_Volume(50));
 #endif
-				}
 			}
 		}
 	}

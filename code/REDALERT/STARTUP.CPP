@@ -684,9 +684,10 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 			{ 
 				Keyboard->Check();
 
-				KeyNumType _key = KN_NONE;
-				int _flags;
-				WWSDL_ProcessEvents(_key, _flags);
+				g_globalKeyNumType = KN_NONE;
+				g_globalKeyFlags = 0;
+
+				UserInput.Process_Input();
 			} while (ReadyToQuit == 1);
 
 			return (EXIT_SUCCESS);
@@ -866,10 +867,10 @@ void Emergency_Exit ( int code )
 	{
 		Keyboard->Check();
 
-		KeyNumType _key = KN_NONE;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
-	}while (ReadyToQuit == 3);
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
+	} while (ReadyToQuit == 3);
 
 
 #else	//WIN32

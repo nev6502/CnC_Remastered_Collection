@@ -886,7 +886,7 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
-	UserInput.Process_Input(key, flags, presentBuffer);
+	//UserInput.Process_Input(key, flags);
 }
 
 #ifndef NDEBUG

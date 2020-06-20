@@ -1638,7 +1638,7 @@ void Color_Cycle(void)
  *=============================================================================================*/
 void Call_Back(void)
 {
-	WWSDL_ProcessEvents(g_globalKeyNumType, g_globalKeyFlags);
+	Device_Present();
 
 	/*
 	**	Music and speech maintenance
