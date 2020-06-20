@@ -113,7 +113,64 @@ static int64_t generateHashValue(const char* fname, const int size) {
 	return hash;
 }
 
-static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, int houseId) {
+/*
+================
+Image_WriteTGA
+================
+*/
+void Image_WriteTGA(const char* filename, const byte* data, int width, int height, bool flipVertical) {
+	byte* buffer;
+	int		i;
+	int		bufferSize = width * height * 4 + 18;
+	int     imgStart = 18;
+
+	buffer = (byte*)malloc(bufferSize);
+	memset(buffer, 0, 18);
+	buffer[2] = 2;		// uncompressed type
+	buffer[12] = width & 255;
+	buffer[13] = width >> 8;
+	buffer[14] = height & 255;
+	buffer[15] = height >> 8;
+	buffer[16] = 32;	// pixel size
+
+	if (!flipVertical) {
+		buffer[17] = (1 << 5);	// flip bit, for normal top to bottom raster order
+	}
+
+	// swap rgba to bgra
+	for (i = imgStart; i < bufferSize; i += 4) {
+		buffer[i] = data[i - imgStart + 2];			// blue
+		buffer[i + 1] = data[i - imgStart + 1];		// green
+		buffer[i + 2] = data[i - imgStart + 0];		// red
+		buffer[i + 3] = data[i - imgStart + 3];		// alpha
+	}
+	char temp[512];
+	strcpy(temp, filename);
+	COM_SetExtension(temp, strlen(temp), ".tga");
+	FILE* f = fopen(temp, "wb");
+	fwrite(buffer, 1, bufferSize, f);
+	fclose(f);
+
+	free(buffer);
+}
+
+
+static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int64_t hash) {
+	static char generatedFileName[1024];
+	sprintf(generatedFileName, "cache/%d.%d.%d.tga", hash, houseid, animid);
+	return &generatedFileName[0];
+}
+
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, bool writeGenerated) {	
+	// Check to see if we can load a generated image first.
+	// We only generate images that need a houseid
+	if (!writeGenerated && houseid >= 0) {
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		if (Image_loadHDImage(image, generatedImageName, houseid, animid, hash, true)) {
+			return true;
+		}
+	}
+
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
@@ -134,14 +191,14 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	Bpp = ilGetInteger(IL_IMAGE_BPP);
 	ILubyte* Data = ilGetData();
 
-	if (Bpp == 4 && houseId != -1) {
+	if (Bpp == 4 && houseid != -1 && !writeGenerated) {
 		//Buffer_Enable_HD_Texture(true);
 		//Data = Draw_Dropsample(Data, Width, Height, Width / 2, Height / 2);
 		//Buffer_Enable_HD_Texture(false);
 		//Width = Width / 2;
 		//Height = Height / 2;
 		for (int i = 0; i < Width * Height; i++) {			
-			RenderTeamPalette(&Data[i * 4], *houseColors[houseId]);
+			RenderTeamPalette(&Data[i * 4], *houseColors[houseid]);
 		}
 	}
 
@@ -172,14 +229,24 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 
 	
 	strcpy(image->name, name);
-	image->image[houseid][animid] = texture;
+
+	if(houseid == -1)
+		image->image[0][animid] = texture;
+	else
+		image->image[houseid][animid] = texture;
 	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
 	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
 	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
+	if (!writeGenerated && Bpp == 4 && houseid >= 0) {
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		Image_WriteTGA(generatedImageName, Data, Width, Height, false);
+	}
+
 	ilDeleteImages(1, &ImageName);
+
 	return true;
 }
 
@@ -202,7 +269,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 
 	if (!loadAnims) {
 		unsigned char remap[3] = { 0, 0, 0 };
-		if (!Image_loadHDImage(image, name, 0, 0, hash, -1)) {
+		if (!Image_loadHDImage(image, name, -1, 0, hash, false)) {
 			delete image;
 			return NULL;
 		}
@@ -210,19 +277,13 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 	else {
 		byte* palette = (byte *)CCPalette.Get_Data();
 		for (int i = 0; i < MAX_MPLAYER_COLORS; i++) {
-			unsigned char p = ColorRemaps[i].Color;
-			unsigned char remap[3];
-
-			remap[0] = palette[(p * 3) + 0];
-			remap[1] = palette[(p * 3) + 1];
-			remap[2] = palette[(p * 3) + 2];
-			if (!Image_loadHDImage(image, name, i, 0, hash, i)) {
+			if (!Image_loadHDImage(image, name, i, 0, hash, false)) {
 				delete image;
 				return NULL;
 			}
 		}
 	}
-	
+
 	loaded_images.push_back(image);
 	return image;
 }
