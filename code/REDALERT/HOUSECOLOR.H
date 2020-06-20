@@ -40,17 +40,17 @@ struct HouseColorHD {
 // 
 static HouseColorHD *houseColors[8] = {
 	// Spain
-	new HouseColorHD(float3(0.26f, 1.0f, 1.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.777f,-0.196, -0.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.737255, 0.627451, 0.239216) ),
+	new HouseColorHD(float3(0.26, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.713,-0.621, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.6421568, 0.4784698, 0.4784698)),	
 	// Greece
 	new HouseColorHD(float3(0.264706f, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.310000f,-0.211000, 0.005000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0980f, 0.3922, 0.9216)),
 	// USSR
 	new HouseColorHD(float3(0.264706f, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.689000f,0.382000, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.756863f, 0.0, 0.015686)),
 	// England
-	new HouseColorHD(float3(0.26, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.911f,-0.381, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.184314, 0.67451, 0.141176)),
+	new HouseColorHD(float3(0.26f, 1.0f, 1.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.777f,-0.196, -0.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.737255, 0.627451, 0.239216)),	
 	// Ukraine
 	new HouseColorHD(float3(0.26, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.726,0.119, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.772549, 0.380392, 0.07451)),
 	// Germany
-	new HouseColorHD(float3(0.26, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.713,-0.621, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.6421568, 0.4784698, 0.4784698)),
+	new HouseColorHD(float3(0.26, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.911f,-0.381, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.184314, 0.67451, 0.141176)),
 	// France
 	new HouseColorHD(float3(0.26, 1.0f, 0.0f), float3(0.0f, 1.0f, 0.22f), 0, float3(0.119,-0.233, 0.000000), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.0f, 1.0f, 1.0f), float2(0.0f, 1.0f), float3(0.1151961, 0.6911765, 0.4031861)),
 	// Turkey
