@@ -1,4 +1,4 @@
-# CMakeList.txt : CMake project for Red Alert
+# CMakeList.txt : CMake project for Red Alert 
 cmake_minimum_required (VERSION 3.8)
 
 project(RedAlert ASM CXX C)

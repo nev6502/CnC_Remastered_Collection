@@ -63,6 +63,8 @@
 #include <examples/imgui_impl_opengl3.h>
 
 #include <vector>
+#include "HOUSECOLOR.H"
+#include "IMGUTIL.H"
 
 GLuint backbuffer_texture = -1;
 //byte* backbuffer_data;
@@ -109,28 +111,7 @@ static int64_t generateHashValue(const char* fname, const int size) {
 	return hash;
 }
 
-static void OffsetRemap(unsigned char remap[3]) {
-	int r = remap[0] << 2;
-	int g = remap[1] << 2;
-	int b = remap[2] << 2;
-
-	// normalize by color instead of saturating to white
-	//if ((r | g | b) > 255) {
-	//	int		max;
-	//
-	//	max = r > g ? r : g;
-	//	max = max > b ? max : b;
-	//	r = r * 255 / max;
-	//	g = g * 255 / max;
-	//	b = b * 255 / max;
-	//}
-
-	remap[0] = r;
-	remap[1] = g;
-	remap[2] = b;
-}
-
-static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, unsigned char remap[3]) {
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, int houseId) {
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
@@ -151,18 +132,9 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	Bpp = ilGetInteger(IL_IMAGE_BPP);
 	ILubyte* Data = ilGetData();
 
-	if (Bpp == 4 && (remap[0] + remap[1] + remap[2]) > 0) {
-		OffsetRemap(remap);
-
+	if (Bpp == 4 && houseId != -1) {
 		for (int i = 0; i < Width * Height; i++) {			
-			if (Data[(i * 4) + 1] > Data[(i * 4) + 0] && Data[(i * 4) + 1] > Data[(i * 4) + 2]) {
-				float g = (Data[(i * 4) + 1] / 255.0f);
-				for (int c = 0; c < 3; c++) {
-					float f = ((remap[2 - c]) / 255.0f) * min(g, 1);
-					f = f * 255.0f;
-					Data[(i * 4) + c] = ((unsigned int) f); //((unsigned char)(f * 255.0f)) << 2; //((unsigned char)f) << 2;
-				}				
-			}
+			RenderTeamPalette(&Data[i * 4], *houseColors[houseId]);
 		}
 	}
 
@@ -226,7 +198,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 
 	if (!loadAnims) {
 		unsigned char remap[3] = { 0, 0, 0 };
-		if (!Image_loadHDImage(image, name, 0, 0, hash, remap)) {
+		if (!Image_loadHDImage(image, name, 0, 0, hash, -1)) {
 			delete image;
 			return NULL;
 		}
@@ -240,7 +212,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 			remap[0] = palette[(p * 3) + 0];
 			remap[1] = palette[(p * 3) + 1];
 			remap[2] = palette[(p * 3) + 2];
-			if (!Image_loadHDImage(image, name, i, 0, hash, remap)) {
+			if (!Image_loadHDImage(image, name, i, 0, hash, i)) {
 				delete image;
 				return NULL;
 			}
