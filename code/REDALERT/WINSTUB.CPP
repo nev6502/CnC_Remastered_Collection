@@ -290,6 +290,25 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 	return image;
 }
 
+Image_t *Find_Image(const char* name) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+
+	return NULL;
+}
+
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
 	int64_t hash = generateHashValue(name, strlen(name));
 
@@ -359,6 +378,61 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	delete buffer;
 	return image;
 }
+
+void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap) {	
+	unsigned char* buffer = new unsigned char[Width * Height * 4];
+	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+
+	if (image->width != Width || image->height != Height) {
+		assert(!"Image_Add8BitImage: Invalid new dimensions!");
+	}
+
+	for (int i = 0; i < Width * Height; i++) {
+		unsigned char c = data[i];
+		if (remap) {
+			c = remap[c];
+		}
+
+		unsigned char r = ccpalete[(c * 3) + 0] << 2;
+		unsigned char g = ccpalete[(c * 3) + 1] << 2;
+		unsigned char b = ccpalete[(c * 3) + 2] << 2;
+		unsigned char a = 0;
+
+		if ((r == 84 && g == 252 && b == 84) || (r == 0 && g == 168 && b == 0)) {
+			r = 0;
+			g = 0;
+			b = 0;
+			a = 128;
+		}
+		else if (c != 0) {
+			a = 255;
+		}
+
+
+		buffer[(i * 4) + 0] = r;
+		buffer[(i * 4) + 1] = g;
+		buffer[(i * 4) + 2] = b;
+		buffer[(i * 4) + 3] = a;
+	}
+
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+
+	image->image[HouseId][ShapeID] = texture;
+	image->numAnimFrames = -1;
+	image->renderwidth = image->width = Width;
+	image->renderheight = image->height = Height;
+
+	delete buffer;
+}
+
 
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {

@@ -49,6 +49,7 @@
 #include	"function.h"
 #include	"terrain.h"
 #include	"type.h"
+#include    "Image.h"
 
 
 static short const _List000011101000[] = {MAP_CELL_W, MAP_CELL_W+1, MAP_CELL_W+2, MAP_CELL_W*2, REFRESH_EOL};
@@ -688,6 +689,12 @@ void TerrainTypeClass::Init(TheaterType theater)
 				*/
 				_makepath(fullname, NULL, NULL, terrain.IniName, Theaters[theater].Suffix);
 				((void const *&)terrain.ImageData) = MFCD::Retrieve(fullname);
+
+				{
+					char tmp[512];
+					sprintf(tmp, "icon_%s", fullname);
+					((void const*&)terrain.HDImageData) = Load_Stamp(fullname, terrain.ImageData);
+				}
 
 				IsTheaterShape = true;	//Let Build_Frame know that this is a theater specific shape
 				if (terrain.RadarIcon != NULL) delete[] (char *)terrain.RadarIcon;

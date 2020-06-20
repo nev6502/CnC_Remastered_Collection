@@ -1091,7 +1091,9 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 			**	This is the underlying terrain icon.
 			*/
 			if (ttype->Get_Image_Data()) {
-				LogicPage->Draw_Stamp(ttype, icon, x, y, NULL, WINDOW_TACTICAL);
+// jmarshall - hd image should always be valid even if loading legacy assets
+				LogicPage->Draw_Stamp(ttype->Get_HDImage_Data(), icon, x, y, NULL, WINDOW_TACTICAL);
+// jmarshall end
 				if (remap) {
 					LogicPage->Remap(x+Map.TacPixelX, y+Map.TacPixelY, ICON_PIXEL_W, ICON_PIXEL_H, remap);
 				}
@@ -1190,9 +1192,9 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 				**	Draw the hash-mark cursor:
 				*/
 				if (Map.ProximityCheck && Is_Clear_To_Build(loco)) {
-					LogicPage->Draw_Stamp(DisplayClass::TransIconset, 0, x, y, NULL, WINDOW_TACTICAL);
+					LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 0, x, y, NULL, WINDOW_TACTICAL);
 				} else {
-					LogicPage->Draw_Stamp(DisplayClass::TransIconset, 2, x, y, NULL, WINDOW_TACTICAL);
+					LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 2, x, y, NULL, WINDOW_TACTICAL);
 				}
 
 	#ifdef SCENARIO_EDITOR
@@ -1213,8 +1215,8 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 								icon = (Cell_X(cell) - Cell_X(Map.ZoneCell + Map.ZoneOffset)) +
 									(Cell_Y(cell) - Cell_Y(Map.ZoneCell + Map.ZoneOffset)) *
 									tptr->Width;
-// jmarshall - pass in raw tptr
-								LogicPage->Draw_Stamp(tptr, icon, x, y, NULL, WINDOW_TACTICAL);
+// jmarshall - hd image should always be valid even if loading legacy assets
+								LogicPage->Draw_Stamp(tptr->Get_HDImage_Data(), icon, x, y, NULL, WINDOW_TACTICAL);
 // jmarshall end
 							}
 							break;

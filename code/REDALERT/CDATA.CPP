@@ -3136,6 +3136,12 @@ void TemplateTypeClass::Init(TheaterType theater)
 
 			((unsigned char &)tplate.Width) = Get_IconSet_MapWidth(ptr);
 			((unsigned char &)tplate.Height) = Get_IconSet_MapHeight(ptr);
+
+			{
+				char tmp[512];
+				sprintf(tmp, "icon_%s", fullname);
+				((void const*&)tplate.HDImageData) = Load_Stamp(fullname, tplate.ImageData);
+			}
 		}
 	}
 }
