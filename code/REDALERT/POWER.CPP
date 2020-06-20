@@ -204,6 +204,8 @@ void PowerClass::Draw_It(bool complete)
 				power_height = Bound(power_height, 0, PowerButton.Height - 2);
 				drain_height = Bound(drain_height, 0, PowerButton.Height - 2);
 
+				bottom -= (15 * RESFACTOR);
+
 				/*
 				**	Draw the power output graphic on top of the power bar framework.
 				*/
@@ -245,6 +247,7 @@ void PowerClass::Draw_It(bool complete)
 		}
 		BEnd(BENCH_POWER);
 	}
+
 	RadarClass::Draw_It(complete);
 }
 

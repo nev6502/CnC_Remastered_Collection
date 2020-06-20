@@ -188,7 +188,7 @@ DisplayClass::DisplayClass(void) :
 	ShadowShapes = 0;
 	TransIconset = 0;
 
-	Set_View_Dimensions(0, 0, ScreenWidth, ScreenHeight);
+	Set_View_Dimensions(0, 8 * RESFACTOR, ScreenWidth, ScreenHeight);
 }
 
 

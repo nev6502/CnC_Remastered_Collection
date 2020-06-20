@@ -74,6 +74,7 @@ std::map<SDL_KeyCode, KeyNumType> const sdl_keyMapping = {
 	{ SDLK_F12, KN_F12 },
 
 	{ SDLK_BACKSPACE, KN_BACKSPACE },
+	{ SDLK_SPACE, KN_SPACE },
 	{ SDLK_KP_ENTER, KN_RETURN },
 	{ SDLK_RETURN, KN_RETURN },
 	{ SDLK_ESCAPE, KN_ESC },

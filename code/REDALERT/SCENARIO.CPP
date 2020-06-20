@@ -923,11 +923,6 @@ void Do_Win(void)
 	}
 
 	/*
-	**	Determine a cosmetic center point for the text.
-	*/
-	int x = Map.TacPixelX + (Lepton_To_Pixel(Map.TacLeptonWidth)/2);
-
-	/*
 	** Hack section.  If it's allied scenario 10, variation A, then skip the
 	** score and map selection, don't increment scenario, and set it to
 	** variation B.
@@ -945,7 +940,7 @@ void Do_Win(void)
 		Map.Flag_To_Redraw (true);
 		Map.Render();
 #ifdef WIN32
-		Fancy_Text_Print(TXT_SCENARIO_WON, x, 90*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
+		Fancy_Text_Print(TXT_SCENARIO_WON, (SeenBuff.Get_Width() / 2), 90*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
 #else
 		Fancy_Text_Print(TXT_MISSION, x, 90*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
 		Fancy_Text_Print(TXT_HACKHACK, x, 110*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
