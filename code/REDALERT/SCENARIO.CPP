@@ -398,7 +398,7 @@ bool Start_Scenario(char * name, bool briefing)
 	if (Scen.BriefMovie != VQ_NONE) {
 		sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
 	}
-	if (Session.Type == GAME_NORMAL && Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available()) {
+	if (Session.Type == GAME_NORMAL && ( Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available() ) ) {
 		/*
 		** Make sure the mouse is visible before showing the restatement.
 		*/
@@ -569,7 +569,10 @@ bool Read_Scenario(char * name)
 		}
 #endif
 		Fill_In_Data();
-		Map.Set_View_Dimensions(0, 0, Map.MapCellWidth, Map.MapCellHeight);
+
+		// BL 2020-06-15 : not needed !!
+		//Map.Set_View_Dimensions(0, 0, Map.MapCellWidth, Map.MapCellHeight);
+
 	} else {
 		
 #if (1)
@@ -639,10 +642,15 @@ void Fill_In_Data(void)
 	*/
 	if (!Debug_Map) {
 		Map.SidebarClass::Activate(1);
-//		if (Session.Type == GAME_NORMAL) {
+		if (Session.Type == GAME_NORMAL) {
 			Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = Scen.Waypoint[WAYPT_HOME];
 			Map.Set_Tactical_Position(Cell_Coord((Scen.Waypoint[WAYPT_HOME] - (MAP_CELL_W * 4 * RESFACTOR)) - (5*RESFACTOR)));
-//		}
+		}
+		if (Session.Type == GAME_SKIRMISH) {
+			CELL PlayerCenterCell = XY_Cell( Coord_XCell(PlayerPtr->Center), Coord_YCell( PlayerPtr->Center) );
+			Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = PlayerCenterCell;
+			Map.Set_Tactical_Position( Cell_Coord( (PlayerCenterCell - (MAP_CELL_W * 4 * RESFACTOR) ) - (5 * RESFACTOR) ) );
+		}
 	}
 #endif
 
@@ -757,7 +765,9 @@ void Fill_In_Data(void)
  *=============================================================================================*/
 void Post_Load_Game(int load_multi)
 {
-	Map.Set_View_Dimensions(0, 0, Map.MapCellWidth, Map.MapCellHeight);
+	// BL 2020-06-15 : not needed !!
+	//Map.Set_View_Dimensions(0, 0, Map.MapCellWidth, Map.MapCellHeight);
+
 	//
 	// Do NOT call Overpass if we're loading a multiplayer game; it calls the
 	// random # generator, which throws the games out of sync if they were
@@ -911,11 +921,6 @@ void Do_Win(void)
 	}
 
 	/*
-	**	Determine a cosmetic center point for the text.
-	*/
-	int x = Map.TacPixelX + (Lepton_To_Pixel(Map.TacLeptonWidth)/2);
-
-	/*
 	** Hack section.  If it's allied scenario 10, variation A, then skip the
 	** score and map selection, don't increment scenario, and set it to
 	** variation B.
@@ -933,7 +938,7 @@ void Do_Win(void)
 		Map.Flag_To_Redraw (true);
 		Map.Render();
 #ifdef WIN32
-		Fancy_Text_Print(TXT_SCENARIO_WON, x, 90*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
+		Fancy_Text_Print(TXT_SCENARIO_WON, (SeenBuff.Get_Width() / 2), 90*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
 #else
 		Fancy_Text_Print(TXT_MISSION, x, 90*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);
 		Fancy_Text_Print(TXT_HACKHACK, x, 110*RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER|TPF_VCR|TPF_USE_GRAD_PAL|TPF_DROPSHADOW);

@@ -376,6 +376,8 @@ void EditClass::Draw_Text(char const * text)
  *=============================================================================================*/
 bool EditClass::Handle_Key(KeyASCIIType ascii)
 {
+	unsigned char testAscii = (unsigned char)ascii;
+
 	switch (ascii) {
 		/*
 		**	Handle the special case of a non-keyboard event. It is possible that this
@@ -416,7 +418,7 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 			/*
 			**	Don't add a character if the length is greater than edit width.
 			*/
-			if (((int)String_Pixel_Width(String) + (int)Char_Pixel_Width(ascii) ) >= (Width-2)) {
+			if (((int)String_Pixel_Width(String) + (int)Char_Pixel_Width(testAscii) ) >= (Width-2)) {
 				break;
 			}
 
@@ -429,21 +431,21 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 			**	Invisible characters are never added to the string. This is
 			**	especially true for spaces at the beginning of the string.
 			*/
-			if (!isgraph(ascii) && ascii != ' ') break;
-			if (ascii == ' ' && Length == 0) break;
+			if (!isgraph(testAscii) && testAscii != ' ') break;
+			if (testAscii == ' ' && Length == 0) break;
 
 			/*
 			**	If this is an upper case only edit gadget, then force the alphabetic
 			**	character to upper case.
 			*/
-			if ((EditFlags & UPPERCASE) && isalpha(ascii)) {
-				ascii = (KeyASCIIType)toupper(ascii);
+			if ((EditFlags & UPPERCASE) && isalpha(testAscii)) {
+				testAscii = (KeyASCIIType)toupper(testAscii);
 			}
 
-			if ((!(EditFlags & NUMERIC) || !isdigit(ascii)) &&
-				(!(EditFlags & ALPHA) || !isalpha(ascii)) &&
-				(!(EditFlags & MISC) || isalnum(ascii)) &&
-				ascii != ' ') {
+			if ((!(EditFlags & NUMERIC) || !isdigit(testAscii)) &&
+				(!(EditFlags & ALPHA) || !isalpha(testAscii)) &&
+				(!(EditFlags & MISC) || isalnum(testAscii)) &&
+				testAscii != ' ') {
 					break;
 			}
 
@@ -453,7 +455,7 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 			**	because the event flag has been cleared. This prevents the gadget's ID
 			**	number from being returned just because the gadget has been edited.
 			*/
-			String[Length++] = ascii;
+			String[Length++] = testAscii;
 			String[Length] = '\0';
 			Flag_To_Redraw();
 			break;

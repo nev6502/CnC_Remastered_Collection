@@ -51,7 +51,8 @@
  *   WWKeyboardClass::Put_Mouse_Message -- Stores a mouse type message into the keyboard buffer*
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-#include "key.h"
+//#include "key.h"
+#include "FUNCTION.H"
 
 #include	"monoc.h"
 
@@ -102,10 +103,12 @@ unsigned short WWKeyboardClass::Buff_Get(void)
 	while (!Check()) {}										// wait for key in buffer
 
 	unsigned short temp = Fetch_Element();
+	/*
 	if (Is_Mouse_Key(temp)) {
 		MouseQX = Fetch_Element();
 		MouseQY = Fetch_Element();
 	}
+	*/
 	return(temp);
 }
 
@@ -191,7 +194,6 @@ bool WWKeyboardClass::Put(unsigned short key)
 	}
 	return(false);
 }
-
 
 /***********************************************************************************************
  * WWKeyboardClass::Put_Key_Message -- Translates and inserts wParam into Keyboard Buffer      *
@@ -317,8 +319,9 @@ char WWKeyboardClass::To_ASCII(unsigned short key)
 	int result = 1;
 	int scancode = 0;
 
-	scancode = MapVirtualKey(key & 0xFF, 0);
-	result = ToAscii((UINT)(key & 0xFF), (UINT)scancode, (PBYTE)KeyState, (LPWORD)buffer, (UINT)0);
+	//scancode = MapVirtualKey(key & 0xFF, 0);
+	//result = ToAscii((UINT)(key & 0xFF), (UINT)scancode, (PBYTE)KeyState, (LPWORD)buffer, (UINT)0);
+	buffer[0] = UserInput.KeyB.ASCII;
 
 	/*
 	**	Restore the KeyState buffer back to pristine condition.

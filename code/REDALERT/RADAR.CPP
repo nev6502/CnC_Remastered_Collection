@@ -148,35 +148,23 @@ RadarClass::RadarClass(void) :
 void RadarClass::One_Time(void)
 {
 	RadWidth		= 80 * RESFACTOR;
-	RadHeight 	= 70 * RESFACTOR;
+	RadHeight 		= 70 * RESFACTOR;
 	RadX 			= SeenBuff.Get_Width() - RadWidth;
 	RadY 			= 7 * RESFACTOR;
-	RadPWidth 	= 64 * RESFACTOR;
-	RadPHeight 	= 64 * RESFACTOR;
-	#ifdef WIN32
-		RadOffX 		= 6;
-		RadOffY 		= 7;
-		RadIWidth 	= 128+18;//************
-		RadIHeight	= 128+2;//************
-	#else
-		RadOffX 		= 4;
-		RadOffY 		= 1;
-		RadIWidth 	= 72;
-		RadIHeight	= 69;
-	#endif
+	RadPWidth 		= 64 * RESFACTOR;
+	RadPHeight 		= 64 * RESFACTOR;
+
+	RadOffX 		= 6;
+	RadOffY 		= 7;
+	RadIWidth 		= 128+18;//************
+	RadIHeight		= 128+2;//************
 
 	DisplayClass::One_Time();
-#ifdef OBSOLETE
-	RadarButton.X			= RadX+RadOffX;
-	RadarButton.Y 			= RadY+RadOffY;
-	RadarButton.Width 	= RadIWidth;
-	RadarButton.Height 	= RadIHeight;
-#else
+
 	RadarButton.X			= RadX;
 	RadarButton.Y 			= RadY;
 	RadarButton.Width 	= RadWidth;
 	RadarButton.Height 	= RadHeight;
-#endif
 }
 
 
@@ -1784,13 +1772,8 @@ int RadarClass::RTacticalClass::Action(unsigned flags, KeyNumType & key)
 	**	or release event, special mouse queuing storage variables are used. Other
 	**	events must use the current mouse position globals.
 	*/
-	if (flags & (LEFTPRESS|LEFTRELEASE|RIGHTPRESS|RIGHTRELEASE)) {
-		x = Keyboard->MouseQX;
-		y = Keyboard->MouseQY;
-	} else {
-		x = Get_Mouse_X();
-		y = Get_Mouse_Y();
-	}
+	x = Get_Mouse_X();
+	y = Get_Mouse_Y();
 
 	/*
 	**	See if the mouse is over the radar general area, but not yet

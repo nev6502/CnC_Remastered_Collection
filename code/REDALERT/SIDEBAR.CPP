@@ -325,7 +325,7 @@ void SidebarClass::Init_IO(void)
 
 		Zoom.IsSticky = true;
 		Zoom.ID = BUTTON_ZOOM;
-		Zoom.X = 1024 - (640 - ((0x24c/2)*RESFACTOR));
+		Zoom.X = ScreenWidth - (640 - ((0x24c/2)*RESFACTOR));
 		Zoom.Y = (0x96/2)*RESFACTOR;
 		Zoom.IsPressed = false;
 		Zoom.Set_Shape(MFCD::Retrieve("MAP.SHP"));
@@ -1030,7 +1030,8 @@ bool SidebarClass::Activate(int control)
 		**	activate it on the left side of the screen.
 		*/
 		if (IsSidebarActive /*&& X*/) {
-			Set_View_Dimensions(0, 0, (((ScreenWidth/2)-SIDE_WIDTH)/ICON_PIXEL_W) * RESFACTOR);
+			Set_View_Dimensions( 0, 8 * RESFACTOR, SeenBuff.Get_Width() - ( SIDE_WIDTH * RESFACTOR ) );
+
 			IsToRedraw = true;
 			Help_Text(TXT_NONE);
 			Repair.Zap();

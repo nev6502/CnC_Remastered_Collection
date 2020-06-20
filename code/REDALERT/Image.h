@@ -15,20 +15,18 @@ struct Image_t {
 	int height;
 	int renderwidth;
 	int renderheight;	
-	//unsigned char* buffer[MAX_HOUSE_COLORS][MAX_IMAGE_FRAMES];
+	void* IconMapPtr;
 };
 
 __forceinline Image_t::Image_t() {
-//	buffer = NULL;
+	IconMapPtr = NULL;
 	numAnimFrames = 0;
 }
 
 __forceinline Image_t::~Image_t() {
-	//if (buffer) {
-	//	delete buffer;
-	//	buffer = NULL;
-	//}
 }
 
 Image_t* Image_LoadImage(const char* name, bool loadAnims = false, bool loadHouseColor = false);
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char* data, unsigned char *remap = NULL);
+Image_t* Find_Image(const char* name);
+void Image_Add8BitImage(Image_t* image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap);

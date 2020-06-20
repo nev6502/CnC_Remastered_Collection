@@ -267,8 +267,8 @@ int Check_Menu(int menu, char const * text[], char *, long field, int index, Key
 	mx2=mx1+(menuptr[ITEMWIDTH]*FontWidth)-1;		/*		structure as		*/
 	my2=my1+(menuptr[ITEMSHIGH]*menuskip)-1;		/*		necessary			*/
 
-		tempy=Get_Mouse_Y();
-		if (Coordinates_In_Region(Get_Mouse_X(), tempy, mx1, my1, mx2, my2)&& MenuUpdate) {
+		tempy=UserInput.Mouse.Y;
+		if (Coordinates_In_Region(UserInput.Mouse.X, tempy, mx1, my1, mx2, my2)&& MenuUpdate) {
 			newitem=(tempy-my1)/menuskip;
 		}
 
@@ -299,8 +299,8 @@ int Check_Menu(int menu, char const * text[], char *, long field, int index, Key
 		*/
 		case KN_RMOUSE:
 		case KN_LMOUSE:
-			if (Coordinates_In_Region(Keyboard->MouseQX, Keyboard->MouseQY, mx1, my1, mx2, my2)) {
-				newitem = (Keyboard->MouseQY - my1) / menuskip;
+			if (Coordinates_In_Region(UserInput.Mouse.X, UserInput.Mouse.Y, mx1, my1, mx2, my2)) {
+				newitem = (UserInput.Mouse.Y - my1) / menuskip;
 			} else {
 				UnknownKey = key;			//	Pass the unprocessed button click back.
 				break;
@@ -772,7 +772,7 @@ int Main_Menu(unsigned long )
 
 
 			case KN_LMOUSE:
-				if (Coordinates_In_Region(Keyboard->MouseQX, Keyboard->MouseQY,
+				if (Coordinates_In_Region(UserInput.Mouse.X, UserInput.Mouse.Y,
 
 													9*RESFACTOR, 10*RESFACTOR,
 													79*RESFACTOR, 24*RESFACTOR)){
@@ -786,7 +786,7 @@ int Main_Menu(unsigned long )
 				// secret ANT missions
 				if (Is_Counterstrike_Installed() == true)
 				{
-					if ((Keyboard->Down(KN_LSHIFT) || Keyboard->Down(KN_RSHIFT)) && Coordinates_In_Region(Keyboard->MouseQX, Keyboard->MouseQY, 260*RESFACTOR, 0, 320*RESFACTOR, 50*RESFACTOR))  {
+					if ((Keyboard->Down(KN_LSHIFT) || Keyboard->Down(KN_RSHIFT)) && Coordinates_In_Region(UserInput.Mouse.X, UserInput.Mouse.Y, 260*RESFACTOR, 0, 320*RESFACTOR, 50*RESFACTOR))  {
 						AntsEnabled = true;
 						process = false;
 						retval = 2;		//	To match SEL_START_NEW_GAME

@@ -32,8 +32,6 @@ class GraphicViewPortClass;
 
 #define TD_TILESET_CHECK 0x20
 
-Image_t* tileset_icon_cache[4096];
-
 /**
 * @brief union is to handle the parts of the header which vary between TD and RA format tiles.
 */
@@ -103,8 +101,7 @@ static int IconSize;
 static int IconCount;
 
 void __cdecl Init_Stamps(IconControlType* iconset)
-{
-    memset(&tileset_icon_cache, 0, sizeof(tileset_icon_cache));
+{    
     if (iconset && LastIconset != iconset) {
         IconCount = (iconset->count);
         IconWidth = (iconset->width);
@@ -193,51 +190,67 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
     }
 }
 
+struct Image_t *__cdecl Load_Stamp(const char *name, const void* icondata)
+{
+	IconControlType* tileset = (IconControlType*)icondata;
+
+	if (!tileset) {
+		return NULL;
+	}
+
+	if (LastIconset != tileset) {
+		Init_Stamps(tileset);
+	}
+
+
+	int icon_index = 0;
+
+    if (icon_index >= IconCount) {
+        return NULL;
+    }
+	
+    uint8_t* src = &StampPtr[IconSize * icon_index]; 
+    
+    // Check to see if the image is already loaded.
+    {
+        Image_t* image = Find_Image(name);
+        if (image) {
+            return image;
+        }
+    }
+
+	Image_t *image = Image_CreateImageFrom8Bit(name, IconWidth, IconHeight, (unsigned char*)src);
+    image->IconMapPtr = MapPtr;
+    if (IconCount == 1)
+        return image;    
+
+    for (int i = 1; i < IconCount; i++) {
+        icon_index = i;
+        src = &StampPtr[IconSize * icon_index];
+        Image_Add8BitImage(image, 0, i, IconWidth, IconHeight, src, NULL);
+    }
+
+    return image;
+}
+
 void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void *icondata, int icon, int x, int y, const void* remapper, int left, int top, int right, int bottom)
 {
-    const TemplateTypeClass* ttype = (TemplateTypeClass const*)icondata;
-    IconControlType* tileset = (IconControlType * )ttype->Get_Image_Data();
-
-    // This is a awful hack, but need type info to generate unique id's for tileset generation.
-    if (icondata == DisplayClass::TransIconset) {
-        tileset = (IconControlType*)DisplayClass::TransIconset;
-        ttype = NULL;
-    }
-
-    if (!tileset) {
-        return;
-    }
-
-    if (LastIconset != tileset) {
-        Init_Stamps(tileset);
-    }
-
-    int icon_index = MapPtr != nullptr ? MapPtr[icon] : icon;
-    
-    if (icon_index < IconCount) {
+    Image_t* iconImage = (Image_t*)icondata;
+    uint8_t* MapPtr = (uint8_t * )iconImage->IconMapPtr;
+	int icon_index = MapPtr != nullptr ? MapPtr[icon] : icon;
+	{
         int blit_height = IconHeight;
         int blit_width = IconWidth;
-        uint8_t* src = &StampPtr[IconSize * icon_index];
+        
         int width = left + right;
         int xstart = left + x;
         int height = top + bottom;
         int ystart = top + y;
 
-		//
-		if (!tileset_icon_cache[icon_index]) {
-			char tmp[512];
-            if (ttype != NULL) {
-                sprintf(tmp, "icon_%d_%d", ttype->Type, icon_index);
-            }
-            else {
-                sprintf(tmp, "icon_%d_%d", icondata, icon_index);
-            }
-            tileset_icon_cache[icon_index] = Image_CreateImageFrom8Bit(tmp, IconWidth, IconHeight, (unsigned char *)src);
-		}
-    
+
         if (xstart < width && ystart < height && IconHeight + ystart > top && IconWidth + xstart > left) {
             if (xstart < left) {
-                src += left - xstart;
+//                src += left - xstart;
                 blit_width -= left - xstart;
                 xstart = left;
             }
@@ -251,7 +264,7 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
     
             if (top > ystart) {
                 blit_height = IconHeight - (top - ystart);
-                src += IconWidth * (top - ystart);
+  //              src += IconWidth * (top - ystart);
                 ystart = top;
             }
     
@@ -308,7 +321,7 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
                 //}
 
                GL_SetClipRect(xstart, ystart, blit_width, blit_height);
-                GL_RenderImage(tileset_icon_cache[icon_index], xstart, ystart, blit_width, blit_height);
+                GL_RenderImage(iconImage, xstart, ystart, blit_width, blit_height, 0, icon_index);
                GL_ResetClipRect();
             }
         }

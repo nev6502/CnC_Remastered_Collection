@@ -61,6 +61,8 @@
 
 #include <imgui.h>
 #include <examples/imgui_impl_opengl3.h>
+#include <string>
+#include <algorithm>
 
 #include <vector>
 #include "HOUSECOLOR.H"
@@ -288,6 +290,25 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 	return image;
 }
 
+Image_t *Find_Image(const char* name) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+
+	return NULL;
+}
+
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
 	int64_t hash = generateHashValue(name, strlen(name));
 
@@ -357,6 +378,61 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	delete buffer;
 	return image;
 }
+
+void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap) {	
+	unsigned char* buffer = new unsigned char[Width * Height * 4];
+	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+
+	if (image->width != Width || image->height != Height) {
+		assert(!"Image_Add8BitImage: Invalid new dimensions!");
+	}
+
+	for (int i = 0; i < Width * Height; i++) {
+		unsigned char c = data[i];
+		if (remap) {
+			c = remap[c];
+		}
+
+		unsigned char r = ccpalete[(c * 3) + 0] << 2;
+		unsigned char g = ccpalete[(c * 3) + 1] << 2;
+		unsigned char b = ccpalete[(c * 3) + 2] << 2;
+		unsigned char a = 0;
+
+		if ((r == 84 && g == 252 && b == 84) || (r == 0 && g == 168 && b == 0)) {
+			r = 0;
+			g = 0;
+			b = 0;
+			a = 128;
+		}
+		else if (c != 0) {
+			a = 255;
+		}
+
+
+		buffer[(i * 4) + 0] = r;
+		buffer[(i * 4) + 1] = g;
+		buffer[(i * 4) + 2] = b;
+		buffer[(i * 4) + 3] = a;
+	}
+
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+
+	image->image[HouseId][ShapeID] = texture;
+	image->numAnimFrames = -1;
+	image->renderwidth = image->width = Width;
+	image->renderheight = image->height = Height;
+
+	delete buffer;
+}
+
 
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
@@ -884,133 +960,8 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
-	static int numFramesLMouse = 0;
-	extern int mousex, mousey;
-	bool leftMouseProcessed = false;
-
-	key = KN_NONE;
-	flags = 0;
-
-	SDL_GetMouseState(&mousex, &mousey);
-
-	Keyboard->MouseQX = mousex;
-	Keyboard->MouseQY = mousey;
-
-	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
-	//		flags = 0;	
-
-	static SDL_Event event;
-	memset(&event, 0, sizeof(SDL_Event));
-	while (SDL_PollEvent(&event)) {
-		switch (event.type)
-		{
-			case SDL_SYSWMEVENT:
-				if ( event.syswm.msg->msg.win.msg == WM_DESTROY )
-				{
-					Invalidate_Cached_Icons();
-					VisiblePage.Un_Init();
-					HiddenPage.Un_Init();
-					AllSurfaces.Release();
-					if (!InDebugger) Reset_Video_Mode();
-
-					/*
-					** If we are shutting down gracefully than flag that the message loop has finished.
-					** If this is a forced shutdown (ReadyToQuit == 0) then try and close down everything
-					** before we exit.
-					*/
-					PostQuitMessage(0);
-
-					switch (ReadyToQuit) {
-						case 1:
-							ReadyToQuit = 2;
-							break;
-						case 0:
-							ExitProcess(0);
-							break;
-					}
-				}
-
-				break;
-
-			case SDL_MOUSEMOTION:
-				flags = GadgetClass::LEFTUP;
-				break;
-
-
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = GadgetClass::LEFTPRESS;
-					leftMouseProcessed = true;
-					numFramesLMouse++;
-					key = KN_LMOUSE;
-					Keyboard->Put_Element(KN_LMOUSE);
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					numFramesLMouse = 0;
-					flags = GadgetClass::RIGHTPRESS;
-					Keyboard->Put_Element(KN_RMOUSE);
-					key = KN_RMOUSE;
-				}
-				break;
-
-			case SDL_MOUSEBUTTONUP:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = GadgetClass::LEFTRELEASE;
-					numFramesLMouse = 0;
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					flags = GadgetClass::RIGHTRELEASE;
-					numFramesLMouse = 0;
-				}
-				break;
-
-			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
-					renderConsole = !renderConsole;
-
-					if (renderConsole) {
-					//	ShowCursor(TRUE);
-					//	Hide_Mouse();
-					}
-					else {
-					//	ShowCursor(FALSE);
-					//	Show_Mouse();
-					}
-					break;
-				}
-
-				const Uint8* state = SDL_GetKeyboardState(NULL);
-
-				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
-				{
-					Keyboard->Put_Element(event.key.keysym.sym | KN_ALT_BIT);
-				}
-				else
-				{
-					Keyboard->Put_Element(event.key.keysym.sym);
-				}
-
-				break;
-		}
-
-		if (Debug_Map || renderConsole)
-		{
-			ImGui_ImplSDL2_ProcessEvent(&event);
-		}
-
-	}
-
-	if (!leftMouseProcessed && numFramesLMouse != 0)
-	{
-		flags = GadgetClass::LEFTHELD;
-	}
-
-	if (presentBuffer) {
-		Device_Present();
-	}
+	UserInput.Process_Input(key, flags, presentBuffer);
 }
-
-
 
 #ifndef NDEBUG
 /***********************************************************************************************

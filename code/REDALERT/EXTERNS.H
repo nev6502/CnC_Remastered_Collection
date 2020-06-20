@@ -91,6 +91,8 @@ extern void const *LightningShapes;
 
 extern int NewINIFormat;
 
+extern bool renderConsole;
+
 
 #ifdef FIXIT_ANTS
 extern bool AntsEnabled;
@@ -158,6 +160,7 @@ extern PKey							FastKey;
 extern PKey							SlowKey;
 extern RulesClass					Rule;
 extern KeyboardClass *			Keyboard;
+extern UserInputClass			UserInput;
 extern RandomStraw				CryptRandom;
 extern RandomClass				NonCriticalRandomNumber;
 extern CarryoverClass *			Carryover;
@@ -365,6 +368,8 @@ extern GroundType  				Ground[LAND_COUNT];
 /*
 **	Constant externs (data is not modified during game play).
 */
+extern std::map<SDL_KeyCode, KeyNumType> const sdl_keyMapping;
+
 extern char const *							Missions[MISSION_COUNT];
 extern char const								Keys[];
 extern char const * const					VQName[VQ_COUNT];

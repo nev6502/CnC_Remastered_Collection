@@ -8,6 +8,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+set(src_io
+	./REDALERT/io/UserInput.cpp
+	./REDALERT/io/UserInput.h
+)
+
 set(src_win32lib
 	./REDALERT/WIN32LIB/TOBUFF.cpp
 	./RedAlert/WIN32LIB/ALLOC.CPP
@@ -711,7 +716,7 @@ set(src_external
 
 add_definitions(-D RA_AF -DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
-add_executable(RedAlert ${src_win32lib} ${src_redalert} ${src_external})
+add_executable(RedAlert ${src_io} ${src_win32lib} ${src_redalert} ${src_external})
 
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../" )
 target_include_directories(RedAlert PRIVATE ./external/devil/;./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
