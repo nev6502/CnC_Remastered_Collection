@@ -109,6 +109,27 @@ static int64_t generateHashValue(const char* fname, const int size) {
 	return hash;
 }
 
+static void OffsetRemap(unsigned char remap[3]) {
+	int r = remap[0] << 2;
+	int g = remap[1] << 2;
+	int b = remap[2] << 2;
+
+	// normalize by color instead of saturating to white
+	//if ((r | g | b) > 255) {
+	//	int		max;
+	//
+	//	max = r > g ? r : g;
+	//	max = max > b ? max : b;
+	//	r = r * 255 / max;
+	//	g = g * 255 / max;
+	//	b = b * 255 / max;
+	//}
+
+	remap[0] = r;
+	remap[1] = g;
+	remap[2] = b;
+}
+
 static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, unsigned char remap[3]) {
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
@@ -131,14 +152,15 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	ILubyte* Data = ilGetData();
 
 	if (Bpp == 4 && (remap[0] + remap[1] + remap[2]) > 0) {
-		for (int i = 0; i < Width * Height; i++) {
-			//float g = (Data[(i * 4) + 1] / 255.0f);
-			if (Data[(i * 4) + 1] > Data[(i * 4) + 0] && Data[(i * 4) + 1] > Data[(i * 4) + 2]) {
+		OffsetRemap(remap);
 
+		for (int i = 0; i < Width * Height; i++) {			
+			if (Data[(i * 4) + 1] > Data[(i * 4) + 0] && Data[(i * 4) + 1] > Data[(i * 4) + 2]) {
+				float g = (Data[(i * 4) + 1] / 255.0f);
 				for (int c = 0; c < 3; c++) {
-					//float f = (remap[2 - c]) / 255.0f;		
-					//f = f * min((g * 2.0f), 1.0f);
-					Data[(i * 4) + c] = remap[2 - c] << 2; //((unsigned char)(f * 255.0f)) << 2; //((unsigned char)f) << 2;
+					float f = ((remap[2 - c]) / 255.0f) * min(g + 0.25, 1);
+					f = f * 255.0f;
+					Data[(i * 4) + c] = ((unsigned int) f); //((unsigned char)(f * 255.0f)) << 2; //((unsigned char)f) << 2;
 				}				
 			}
 		}
