@@ -138,7 +138,31 @@
 #include "iconcach.h"
 #include "../NEWBLIT.H"
 
+#include <stdint.h>
+
 extern unsigned char* backbuffer_data_raw;
+extern unsigned char backbuffer_palette[768];
+__forceinline void FastScanlinePaletteBlit(uint8_t* dst, uint8_t* src, int length) {
+	for (int i = 0; i < length; i++) {
+		uint8_t color = src[i];
+		if (color == 0)
+			continue;
+
+		dst[(i * 4) + 0] = backbuffer_palette[(color * 3) + 0];
+		dst[(i * 4) + 1] = backbuffer_palette[(color * 3) + 1];
+		dst[(i * 4) + 2] = backbuffer_palette[(color * 3) + 2];
+		dst[(i * 4) + 3] = 255;
+	}
+}
+
+__forceinline void FastScanlinePaletteBlit(uint8_t* dst, uint8_t color, int length) {
+	for (int i = 0; i < length; i++) {
+		dst[(i * 4) + 0] = backbuffer_palette[(color * 3) + 0];
+		dst[(i * 4) + 1] = backbuffer_palette[(color * 3) + 1];
+		dst[(i * 4) + 2] = backbuffer_palette[(color * 3) + 2];
+		dst[(i * 4) + 3] = 255;
+	}
+}
 
 #ifndef FUNCTION_H
 //#pragma off (unreferenced)
@@ -268,6 +292,7 @@ class GraphicViewPortClass {
 						int dy_pixel, int pixel_width, int pixel_height, BOOL trans = FALSE);
 		HRESULT	Blit(	GraphicViewPortClass& dest, int dx, int dy, BOOL trans = FALSE);
 		HRESULT	Blit(	GraphicViewPortClass& dest, BOOL trans = FALSE);
+		HRESULT	BlitLegacy(GraphicViewPortClass& dest, BOOL trans = FALSE);
 		HRESULT	Blit(	VideoViewPortClass& dest, int x_pixel, int y_pixel, int dx_pixel,
 						int dy_pixel, int pixel_width, int pixel_height, BOOL trans = FALSE);
 		HRESULT	Blit(	VideoViewPortClass& dest, int dx, int dy, BOOL trans = FALSE);
@@ -808,9 +833,43 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int dx, i
  * HISTORY:                                                                *
  *   01/06/1995 PWG : Created.                                             *
  *=========================================================================*/
+inline HRESULT	GraphicViewPortClass::BlitLegacy(GraphicViewPortClass& dest, BOOL trans)
+{
+	HRESULT		return_code = 0;
+
+
+	if (Lock()) {
+		if (dest.Lock()) {
+
+				return_code = (Linear_Blit_To_Linear_Pal(this, &dest, 0, 0
+					, 0, 0
+					, Width, Height, trans));
+		
+		}
+		dest.Unlock();
+	}
+	Unlock();
+
+	return (return_code);
+
+}
+
+
+/***************************************************************************
+ * GVPC::BLIT -- stub 3 to call curr graphic mode Blit to GVPC					*
+ *                                                                         *
+ * INPUT:                                                                  *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   01/06/1995 PWG : Created.                                             *
+ *=========================================================================*/
 inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, BOOL trans)
 {
-	HRESULT		return_code=0;
+	HRESULT		return_code = 0;
 
 
 	if (Lock()) {
@@ -1063,28 +1122,28 @@ inline void GraphicViewPortClass::Draw_Stamp(void const * icondata, int icon, in
 	int	cache_index=-1;
 
    int drewit = 0;
-	if (IconCacheAllowed){
-		if (IsDirectDraw){
-			if (!remap){
-				cache_index = Is_Icon_Cached(icondata,icon);
-			}
+	//if (IconCacheAllowed){
+	//	if (IsDirectDraw){
+	//		if (!remap){
+	//			cache_index = Is_Icon_Cached(icondata,icon);
+	//		}
+	//
+	//		if (cache_index != -1){
+	//			if (CachedIcons[cache_index].Get_Is_Cached()  ){
+	//				CachedIcons[cache_index].Draw_It (GraphicBuff->Get_DD_Surface() , x_pixel, y_pixel,
+	//															WindowList[clip_window][WINDOWX] + XPos,
+	//															WindowList[clip_window][WINDOWY] +YPos,
+	//															WindowList[clip_window][WINDOWWIDTH],
+	//															WindowList[clip_window][WINDOWHEIGHT]);
+	//				CachedIconsDrawn++;
+    //           drewit = 1;
+	//			}
+	//		}
+	//	}
+	//}
 
-			if (cache_index != -1){
-				if (CachedIcons[cache_index].Get_Is_Cached()  ){
-					CachedIcons[cache_index].Draw_It (GraphicBuff->Get_DD_Surface() , x_pixel, y_pixel,
-																WindowList[clip_window][WINDOWX] + XPos,
-																WindowList[clip_window][WINDOWY] +YPos,
-																WindowList[clip_window][WINDOWWIDTH],
-																WindowList[clip_window][WINDOWHEIGHT]);
-					CachedIconsDrawn++;
-               drewit = 1;
-				}
-			}
-		}
-	}
 
-
-   if (drewit == 0) {
+   {
 		if (Lock()){
 			UnCachedIconsDrawn++;
 			extern int ScreenHeight, ScreenWidth;
@@ -1114,7 +1173,10 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
 	//	Buffer_Draw_Line(this, sx, sy, dx, dy, color);
 	//}
 	//Unlock();
-
+	sx += XPos;
+	sy += YPos;
+	dx += XPos;
+	dy += YPos;
 	GL_DrawLine(color, sx, sy, dx, dy);
 }
 
@@ -1132,14 +1194,11 @@ inline VOID GraphicViewPortClass::Draw_Line(int sx, int sy, int dx, int dy, unsi
  *=========================================================================*/
 inline VOID GraphicViewPortClass::Fill_Rect(int sx, int sy, int dx, int dy, unsigned char color)
 {
-// jmarshall
-	// Still needed for gameplay.
-	if (Lock()) {
-		Buffer_Fill_Rect(this, sx, sy, dx, dy, color);
-		Unlock();
-	}
-	//GL_FillRect(color, sx, sy, dx - sx, dy - sy);
-// jmarshall end
+	sx += XPos;
+	sy += YPos;
+	dx += XPos;
+	dy += YPos;
+	GL_FillRect(color, sx - 1, sy - 1, (dx - sx) + 1, ((dy - sy) + 1));
 }
 
 

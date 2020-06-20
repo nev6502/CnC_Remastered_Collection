@@ -58,7 +58,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-
+#include    "Image.h"
 
 #define FATSHIP
 
@@ -142,6 +142,9 @@ static short const OComList[] = {1, REFRESH_EOL};
 static short const OList12[] = {0, REFRESH_EOL};
 static short const OListTmpl[] = {0, 1, 2, REFRESH_EOL};
 
+#ifdef RA_AF
+#include	"BDATA_AF.H"
+#endif 
 
 /***************************************************************************
 */
@@ -3026,6 +3029,9 @@ void BuildingTypeClass::Init_Heap(void)
 	new BuildingTypeClass(ClassLarva2);			// STRUCT_LARVA2
 #endif
 
+#ifdef RA_AF
+	new BuildingTypeClass(ClassAFV01);			// STRUCT_AFV01
+#endif
 }
 
 
@@ -3134,6 +3140,19 @@ void BuildingTypeClass::One_Time(void)
 		*/
 		_makepath(fullname, NULL, NULL, building.Graphic_Name(), ".SHP");
 		((void const *&)building.ImageData) = MFCD::Retrieve(fullname);
+		{
+			char imageFileName[512];
+			sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", building.Graphic_Name(), building.Graphic_Name());
+			((void const*&)building.HDImageData) = Image_LoadImage(imageFileName, true, true);
+
+			if (building.ImageData != NULL && building.HDImageData != NULL) {
+				int width = Get_Build_Frame_Width(building.ImageData);
+				int height = Get_Build_Frame_Height(building.ImageData);
+
+				building.HDImageData->renderwidth = width;
+				building.HDImageData->renderheight = height;
+			}
+		}
 	}
 
 	// Try to load weap2.shp and tesla coil's lightning shapes
@@ -3206,13 +3225,24 @@ StructType BuildingTypeClass::From_Name(char const * name)
  *=============================================================================================*/
 void BuildingTypeClass::Display(int x, int y, WindowNumberType window, HousesType ) const
 {
-	void const * ptr = Get_Cameo_Data();
-	if (ptr == NULL) {
-		IsTheaterShape = IsTheater;
-		ptr = Get_Image_Data();
+// jmarshall - hd buildings.
+	Image_t* hdimage = Get_HDImage_Data();
+	if (hdimage != NULL) {
+		//CC_Draw_Shape((Image_t *)Get_HDImage_Data(), 0, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL, NULL, NULL, DIR_N);
+		x += WindowList[window][WINDOWX];
+		y += WindowList[window][WINDOWY];
+		GL_RenderImage(hdimage, x, y, hdimage->renderwidth, hdimage->renderheight);
 	}
-	CC_Draw_Shape(ptr, 0, x, y, window, SHAPE_CENTER|SHAPE_WIN_REL);
-	IsTheaterShape = false;
+	else {
+		void const* ptr = Get_Cameo_Data();
+		if (ptr == NULL) {
+			IsTheaterShape = IsTheater;
+			ptr = Get_Image_Data();
+		}
+		CC_Draw_Shape(ptr, 0, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL);
+		IsTheaterShape = false;
+	}
+// jmarshall end
 }
 
 
@@ -3235,7 +3265,7 @@ void BuildingTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 void BuildingTypeClass::Prep_For_Add(void)
 {
 	for (StructType index = STRUCT_FIRST; index < STRUCT_COUNT; index++) {
-		if (As_Reference(index).Get_Image_Data()) {
+		if (As_Reference(index).Get_Image_Data() || As_Reference(index).Get_HDImage_Data()) {
 			Map.Add_To_List(&As_Reference(index));
 		}
 	}
@@ -3356,7 +3386,28 @@ void BuildingTypeClass::Init(TheaterType theater)
 			if (classptr->IsTheater) {
 				_makepath(fullname, NULL, NULL, classptr->Graphic_Name(), Theaters[theater].Suffix);
 				((void const *&)classptr->ImageData) = MFCD::Retrieve(fullname);
+// jmarshall				
+				{
+					char imageFileName[512];
 
+					// Try load the theatre specific asset first 
+					sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s.%s/%s.%s-0000.DDS", Theaters[theater].Name, classptr->Graphic_Name(), Theaters[theater].Suffix, classptr->Graphic_Name(), Theaters[theater].Suffix);
+					((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName);
+
+					if (!((BuildingTypeClass*)classptr)->HDImageData) {
+						sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", classptr->Graphic_Name(), classptr->Graphic_Name());
+						((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName);
+					}
+
+					if (classptr->ImageData != NULL && classptr->HDImageData != NULL) {
+						int width = Get_Build_Frame_Width(classptr->ImageData);
+						int height = Get_Build_Frame_Height(classptr->ImageData);
+
+						classptr->HDImageData->renderwidth = width;
+						classptr->HDImageData->renderheight = height;
+					}
+				}
+// jmarshall end
 				/*
 				**	Buildup data is probably theater specific as well. Fetch a pointer to the
 				**	data at this time as well.

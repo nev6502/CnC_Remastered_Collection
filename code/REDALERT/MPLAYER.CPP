@@ -160,7 +160,7 @@ GameType Select_MPlayer_Game (void)
 	//	Initialize
 	//------------------------------------------------------------------------
 	Set_Logic_Page(SeenBuff);
-	VisiblePage.Blit(seen_buff_save);
+	//VisiblePage.Blit(seen_buff_save);
 
 	//------------------------------------------------------------------------
 	//	Fill array of button ptrs
@@ -694,7 +694,7 @@ int Surrender_Dialog(int text)
 		//.....................................................................
 		//	Refresh display if needed
 		//.....................................................................
-		if (display) {
+		{
 			display = false;
 
 			//..................................................................
@@ -730,6 +730,9 @@ int Surrender_Dialog(int text)
 		//	Get user input
 		//.....................................................................
 		KeyNumType input = commands->Input();
+// jmarshall
+		Call_Back();
+// jmarshall end
 
 		//.....................................................................
 		//	Process input

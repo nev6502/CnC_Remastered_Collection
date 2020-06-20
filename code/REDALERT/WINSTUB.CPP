@@ -45,6 +45,7 @@
 #include	"examples/imgui_impl_sdl.h"
 #include	"function.h"
 #include	"il/il.h"
+#include	"il/ilu.h"
 #include	"image.h"
 
 #ifdef WINSOCK_IPX
@@ -62,9 +63,11 @@
 #include <examples/imgui_impl_opengl3.h>
 
 #include <vector>
+#include "HOUSECOLOR.H"
+#include "IMGUTIL.H"
 
 GLuint backbuffer_texture = -1;
-byte* backbuffer_data;
+//byte* backbuffer_data;
 unsigned char* backbuffer_data_raw;
 byte backbuffer_palette[768];
 HWND MainWindow;
@@ -72,6 +75,8 @@ SurfaceMonitorClass AllSurfaces;
 SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
+
+extern std::vector<const ObjectClass*> renderedFrameObjects;
 
 bool renderConsole = false;
 
@@ -83,16 +88,86 @@ void (*Imgui_Dialog_Function)(void) = nullptr;
 bool show_oldframebuffer = true;
 void Show_OldFrameBuffer(bool show) {
 	show_oldframebuffer = show;
-	memset(backbuffer_data, 0, ScreenWidth * ScreenHeight * 4);
+	memset(backbuffer_data_raw, 0, ScreenWidth * ScreenHeight * 4);
 }
 
 std::vector<Image_t *> loaded_images;
 
-Image_t* Image_LoadImage(const char* name) {
-	// Check to see if the image is already loaded.
-	for (int i = 0; i < loaded_images.size(); i++) {
-		if (!strcmp(loaded_images[i]->name, name)) {
-			return loaded_images[i];
+unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheight, int outwidth, int outheight);
+
+/*
+================
+return a hash value for the filename
+================
+*/
+static int64_t generateHashValue(const char* fname, const int size) {
+	uint32_t hash = 0x811c9dc5;
+	uint32_t prime = 0x1000193;
+
+	for (int i = 0; i < size; ++i) {
+		uint8_t value = fname[i];
+		hash = hash ^ value;
+		hash *= prime;
+	}
+
+	return hash;
+}
+
+/*
+================
+Image_WriteTGA
+================
+*/
+void Image_WriteTGA(const char* filename, const byte* data, int width, int height, bool flipVertical) {
+	byte* buffer;
+	int		i;
+	int		bufferSize = width * height * 4 + 18;
+	int     imgStart = 18;
+
+	buffer = (byte*)malloc(bufferSize);
+	memset(buffer, 0, 18);
+	buffer[2] = 2;		// uncompressed type
+	buffer[12] = width & 255;
+	buffer[13] = width >> 8;
+	buffer[14] = height & 255;
+	buffer[15] = height >> 8;
+	buffer[16] = 32;	// pixel size
+
+	if (!flipVertical) {
+		buffer[17] = (1 << 5);	// flip bit, for normal top to bottom raster order
+	}
+
+	// swap rgba to bgra
+	for (i = imgStart; i < bufferSize; i += 4) {
+		buffer[i] = data[i - imgStart + 2];			// blue
+		buffer[i + 1] = data[i - imgStart + 1];		// green
+		buffer[i + 2] = data[i - imgStart + 0];		// red
+		buffer[i + 3] = data[i - imgStart + 3];		// alpha
+	}
+	char temp[512];
+	strcpy(temp, filename);
+	COM_SetExtension(temp, strlen(temp), ".tga");
+	FILE* f = fopen(temp, "wb");
+	fwrite(buffer, 1, bufferSize, f);
+	fclose(f);
+
+	free(buffer);
+}
+
+
+static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int64_t hash) {
+	static char generatedFileName[1024];
+	sprintf(generatedFileName, "cache/%d.%d.%d.tga", hash, houseid, animid);
+	return &generatedFileName[0];
+}
+
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, bool writeGenerated) {	
+	// Check to see if we can load a generated image first.
+	// We only generate images that need a houseid
+	if (!writeGenerated && houseid >= 0) {
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		if (Image_loadHDImage(image, generatedImageName, houseid, animid, hash, true)) {
+			return true;
 		}
 	}
 
@@ -100,7 +175,14 @@ Image_t* Image_LoadImage(const char* name) {
 	ilGenImages(1, &ImageName);
 	ilBindImage(ImageName);
 	if (!ilLoadImage(name)) {
-		return NULL;
+		ilDeleteImages(1, &ImageName);
+		return false;
+	}
+
+	bool swapBGR = false;
+	if (strstr(name, ".TGA")) {
+		iluFlipImage();
+		swapBGR = true;
 	}
 
 	ILuint Width, Height, Bpp;
@@ -109,12 +191,28 @@ Image_t* Image_LoadImage(const char* name) {
 	Bpp = ilGetInteger(IL_IMAGE_BPP);
 	ILubyte* Data = ilGetData();
 
+	if (Bpp == 4 && houseid != -1 && !writeGenerated) {
+		//Buffer_Enable_HD_Texture(true);
+		//Data = Draw_Dropsample(Data, Width, Height, Width / 2, Height / 2);
+		//Buffer_Enable_HD_Texture(false);
+		//Width = Width / 2;
+		//Height = Height / 2;
+		for (int i = 0; i < Width * Height; i++) {			
+			RenderTeamPalette(&Data[i * 4], *houseColors[houseid]);
+		}
+	}
+
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	if (Bpp == 4) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
+		if (swapBGR) {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_BGRA, GL_UNSIGNED_BYTE, Data);
+		}
+		else {
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
+		}
 	}
 	else if (Bpp == 3) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
@@ -126,19 +224,140 @@ Image_t* Image_LoadImage(const char* name) {
 		assert(!"Unknown BPP in image!");
 	}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	ilDeleteImages(1, &ImageName);	
-
-	Image_t* image = new Image_t();
+	
 	strcpy(image->name, name);
-	image->image = texture;
-	image->width = Width;
-	image->height = Height;
+
+	if(houseid == -1)
+		image->image[0][animid] = texture;
+	else
+		image->image[houseid][animid] = texture;
+	image->namehash = hash;
+	image->renderwidth = image->width = Width;
+	image->renderheight = image->height = Height;
+	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
+	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
+
+	if (!writeGenerated && Bpp == 4 && houseid >= 0) {
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		Image_WriteTGA(generatedImageName, Data, Width, Height, false);
+	}
+
+	ilDeleteImages(1, &ImageName);
+
+	return true;
+}
+
+Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+	Image_t* image = new Image_t();
+
+	if (!loadAnims) {
+		unsigned char remap[3] = { 0, 0, 0 };
+		if (!Image_loadHDImage(image, name, -1, 0, hash, false)) {
+			delete image;
+			return NULL;
+		}
+	}
+	else {
+		byte* palette = (byte *)CCPalette.Get_Data();
+		for (int i = 0; i < MAX_MPLAYER_COLORS; i++) {
+			if (!Image_loadHDImage(image, name, i, 0, hash, false)) {
+				delete image;
+				return NULL;
+			}
+		}
+	}
+
 	loaded_images.push_back(image);
 	return image;
 }
+
+Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+
+	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+
+	Image_t* image = new Image_t();
+	unsigned char *buffer = new unsigned char[Width * Height * 4];
+
+	for (int i = 0; i < Width * Height; i++) {
+		unsigned char c = data[i];
+		if (remap) {
+			c = remap[c];
+		}
+
+		unsigned char r = ccpalete[(c * 3) + 0] << 2;
+		unsigned char g = ccpalete[(c * 3) + 1] << 2;
+		unsigned char b = ccpalete[(c * 3) + 2] << 2;
+		unsigned char a = 0;
+
+		if ((r == 84 && g == 252 && b == 84) || (r == 0 && g == 168 && b == 0)) {
+			r = 0;
+			g = 0;
+			b = 0;			
+			a = 128;
+		}
+		else if (c != 0) {
+			a = 255;
+		}
+
+
+		buffer[(i * 4) + 0] = r;
+		buffer[(i * 4) + 1] = g;
+		buffer[(i * 4) + 2] = b;
+		buffer[(i * 4) + 3] = a;
+	}
+
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	
+	strcpy(image->name, name);
+	image->image[0][0] = texture;
+	image->numAnimFrames = -1;
+	image->namehash = hash;
+	image->renderwidth = image->width = Width;
+	image->renderheight = image->height = Height;
+	loaded_images.push_back(image);
+	delete buffer;
+	return image;
+}
+
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
 	// Todo implement resoluton scaling.
@@ -180,19 +399,21 @@ void ImGui_NewFrame(void) {
 	ImGui::NewFrame(show_oldframebuffer);
 
 	ImGui_ImplSDL2_NewFrame(game_window);
+
+	renderedFrameObjects.clear();
 }
 
 void Device_Present(void) {	
 
 	// Rasterize the palette.
-	for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
-		backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
-		backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
-		backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
-		backbuffer_data[(i * 4) + 3] = 255;
-	}
+	//for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
+	//	backbuffer_data[(i * 4) + 0] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 0];
+	//	backbuffer_data[(i * 4) + 1] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 1];
+	//	backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
+	//	backbuffer_data[(i * 4) + 3] = 255;
+	//}
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data_raw);
 
 	bool ScreenActive;
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -422,15 +643,13 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 	glGenTextures(1, &backbuffer_texture);
 	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+	// Give the image to OpenGL	
+	backbuffer_data_raw = new byte[width * height * 4];
+	memset(backbuffer_data_raw, 0, width * height * 4);
 
-	// Give the image to OpenGL
-	backbuffer_data = new byte[width * height * 4];
-	memset(backbuffer_data, 0, width * height * 4);
-	backbuffer_data_raw = new byte[width * height];
-	memset(backbuffer_data_raw, 0, width * height);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data_raw);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	glewInit();
@@ -669,6 +888,9 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	extern int mousex, mousey;
 	bool leftMouseProcessed = false;
 
+	key = KN_NONE;
+	flags = 0;
+
 	SDL_GetMouseState(&mousex, &mousey);
 
 	Keyboard->MouseQX = mousex;
@@ -677,7 +899,8 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
 	//		flags = 0;	
 
-	SDL_Event event;
+	static SDL_Event event;
+	memset(&event, 0, sizeof(SDL_Event));
 	while (SDL_PollEvent(&event)) {
 		switch (event.type)
 		{
@@ -720,10 +943,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 					leftMouseProcessed = true;
 					numFramesLMouse++;
 					key = KN_LMOUSE;
+					Keyboard->Put_Element(KN_LMOUSE);
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					numFramesLMouse = 0;
 					flags = GadgetClass::RIGHTPRESS;
+					Keyboard->Put_Element(KN_RMOUSE);
 					key = KN_RMOUSE;
 				}
 				break;
@@ -744,12 +969,12 @@ void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
 					renderConsole = !renderConsole;
 
 					if (renderConsole) {
-						ShowCursor(TRUE);
-						Hide_Mouse();
+					//	ShowCursor(TRUE);
+					//	Hide_Mouse();
 					}
 					else {
-						ShowCursor(FALSE);
-						Show_Mouse();
+					//	ShowCursor(FALSE);
+					//	Show_Mouse();
 					}
 					break;
 				}

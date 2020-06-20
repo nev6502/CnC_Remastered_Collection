@@ -4450,6 +4450,19 @@ VisualType TechnoClass::Visual_Character(bool raw) const
 	return(VISUAL_HIDDEN);
 }
 
+void TechnoClass::Techno_Draw_Object_HD(struct Image_t* image, int shapenum, int x, int y, WindowNumberType window, DirType rotation, int scale) const {
+	//void const* remap = Remap_Table();
+	void const* shadow = Map.UnitShadow;
+
+	PlayerColorType remapColor = PCOLOR_GOLD;
+	if (Techno_Type_Class()->IsRemappable) {
+		remapColor = House->RemapColor;
+	}
+
+	y -= Lepton_To_Pixel(Height);	
+
+	CC_Draw_Shape(image, shapenum, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL | SHAPE_FADING | SHAPE_GHOST, (const void *)remapColor, shadow, rotation);
+}
 
 /***********************************************************************************************
  * TechnoClass::Techno_Draw_Object -- General purpose draw object routine.                     *

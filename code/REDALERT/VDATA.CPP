@@ -49,7 +49,7 @@
 
 
 #include "function.h"
-
+#include "Image.h"
 
 // Submarine
 static VesselTypeClass const VesselSubmarine(
@@ -578,7 +578,6 @@ void VesselTypeClass::One_Time(void)
 		*/
 		_makepath(fullname, NULL, NULL, uclass.Graphic_Name(), ".SHP");
 		((void const *&)uclass.ImageData) = MFCD::Retrieve(fullname);
-
 		((int &)uclass.MaxSize) = 26;
 	}
 }

@@ -651,11 +651,6 @@ oh_dear_its_a_label:
 			}
 		}
 
-		/*
-		........................ Invoke game callback .........................
-		*/
-		Call_Back();
-
 #ifdef WIN32
 		/*
 		** If we have just received input focus again after running in the background then
@@ -794,6 +789,11 @@ oh_dear_its_a_label:
 		messages_have_focus = Session.Messages.Has_Edit_Focus();
 		bool droplist_is_dropped = housebtn.IsDropped;
 		input = commands->Input();
+
+		/*
+		........................ Invoke game callback .........................
+		*/
+		Call_Back();
 
 		Load_Title_Page(true);
 

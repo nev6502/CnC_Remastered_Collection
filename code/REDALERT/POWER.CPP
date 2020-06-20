@@ -166,6 +166,10 @@ void PowerClass::Draw_It(bool complete)
 		0, -1, 0, 1, 0, -1, -2, -1, 0, 1, 2, 1 ,0
 	};
 
+// jmarshall - render the world before the power bar.
+	RadarClass::Draw_It(complete);
+// jmarshall end
+
 	{
 		BStart(BENCH_POWER);
 
@@ -244,8 +248,7 @@ void PowerClass::Draw_It(bool complete)
 			LogicPage->Unlock();
 		}
 		BEnd(BENCH_POWER);
-	}
-	RadarClass::Draw_It(complete);
+	}	
 }
 
 

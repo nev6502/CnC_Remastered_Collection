@@ -2532,7 +2532,9 @@ static void Init_Color_Remaps(void)
 	GraphicBufferClass temp_page(320, 200, (void*)NULL);
 	temp_page.Clear();
 	Load_Picture("PALETTE.CPS", temp_page, temp_page, NULL, BM_DEFAULT);
-	temp_page.Blit(HidPage);
+// jmarshall
+	temp_page.BlitLegacy(HidPage, (BOOL)false);
+// jmarshall end
 #else
 	Load_Picture("PALETTE.CPS", HidPage, HidPage, NULL, BM_DEFAULT);
 #endif

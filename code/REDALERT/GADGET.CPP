@@ -533,10 +533,7 @@ KeyNumType GadgetClass::Input(void)
 	**	rather the the mouse position at the time we get around to this function.
 	*/
 // jmarshall
-	int flags = 0;
-	WWSDL_ProcessEvents(key, flags);
-
-	Show_Mouse(); // jmarshall: thsi shouldn't be here!
+	int flags = g_globalKeyFlags;
 // jmarshall end
 
 	/*

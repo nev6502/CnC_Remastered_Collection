@@ -115,6 +115,12 @@ class TriggerClass {
 		** Some additional padding in case we need to add data to the class and maintain backwards compatibility for save/load
 		*/
 		unsigned char SaveLoadPadding[32];
+
+		/*
+		** Store MapScript callback function and optional action index (because there can be multiple outcomes) -- JJ 6/14/2020
+		*/
+		char MapScriptCallback[32];
+		char MapScriptActionIndex;
 };
 
 

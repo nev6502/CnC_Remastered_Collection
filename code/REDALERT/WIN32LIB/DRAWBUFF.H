@@ -43,6 +43,7 @@ extern "C" {
 	 long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *Buffer, void *view);
 	 BOOL	__cdecl Linear_Blit_To_Linear(	void *thisptr, void * dest, int x_pixel, int y_pixel, int dx_pixel,
 			 										int dy_pixel, int pixel_width, int pixel_height, BOOL trans);
+	 BOOL __cdecl Linear_Blit_To_Linear_Pal(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int w, int h, BOOL use_key);
 	 BOOL __cdecl Linear_Scale_To_Linear(	void *, void *, int, int, int, int, int, int, int, int, BOOL, char *);
 
 	 LONG __cdecl Buffer_Print(void *thisptr, const char *str, int x, int y, int fcolor, int bcolor);

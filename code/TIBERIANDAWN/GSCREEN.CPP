@@ -492,6 +492,7 @@ extern bool CanVblankSync;
  *=============================================================================================*/
 void GScreenClass::Blit_Display(void)
 {
+#if 0 // jmarshall - no longer used and saves on performance to disable it(3.6%).
 	if (SeenBuff.Get_Width()!=320){
 #if (0)
 		if (HidPage.Get_IsDirectDraw() && (Options.GameSpeed >1 || Options.ScrollRate==6 && CanVblankSync) ){
@@ -520,7 +521,7 @@ void GScreenClass::Blit_Display(void)
 		// ST - 1/2/2019 5:26PM
 		//ModeX_Blit (&HiddenPage);
 	}
-
+#endif
 }
 
 

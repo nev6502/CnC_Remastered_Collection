@@ -236,6 +236,9 @@ class BuildingClass : public TechnoClass
 		*/
 		virtual int Value(void) const;
 		virtual void const * Get_Image_Data(void) const;
+// jmarshall
+		struct Image_t* BuildingClass::Get_HDImage_Data(void) const;
+// jmarshall end
 		virtual int How_Many_Survivors(void) const;
 		virtual DirType Turret_Facing(void) const;
 		virtual CELL Find_Exit_Cell(TechnoClass const * techno) const;

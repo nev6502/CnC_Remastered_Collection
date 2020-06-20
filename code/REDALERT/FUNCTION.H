@@ -549,6 +549,7 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 
 // Added for draw intercept. ST - 1/17/2019 12:31PM
 void CC_Draw_Shape(const ObjectClass *object, void const * shapefile, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const * fadingdata = 0, void const * ghostdata = 0, DirType rotation = DIR_N, long virtualscale = 0x0100);
+void CC_Draw_Shape(Image_t *image, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const* fadingdata, void const* ghostdata, DirType rotation);
 void CC_Draw_Shape(const ObjectClass *object, const char *shape_file_name, void const * shapefile, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const * fadingdata = 0, void const * ghostdata = 0, DirType rotation = DIR_N, long virtualscale = 0x0100, char override_owner = HOUSE_NONE);
 
 // Added for pip draw intercept - SKY
@@ -704,12 +705,12 @@ void *Build_Translucent_Table(PaletteClass const & palette, TLucentType const *c
 void *Conquer_Build_Translucent_Table(PaletteClass const & palette, TLucentType const *control, int count, void *buffer);
 void * Make_Fading_Table(PaletteClass const & palette, void * dest, int color, int frac);
 
+void Buffer_Enable_HD_Texture(bool hdTextureEnabled);
+
 /*
 **	KEYFBUFF.ASM
 */
-extern "C" {
-	long __cdecl Buffer_Frame_To_Page(int x, int y, int w, int h, void *Buffer, GraphicViewPortClass &view, int flags, ...);
-}
+long __cdecl Buffer_Frame_To_Page(int x, int y, int w, int h, Image_t* image, unsigned int Window, int flags, ...);
 
 /*
 **	KEYFRAME.CPP
@@ -1180,5 +1181,6 @@ __forceinline void COM_SetExtension(char* path, int maxSize, const char* extensi
 }
 
 extern bool g_inMainMenu;
-
+extern KeyNumType	g_globalKeyNumType;
+extern int			g_globalKeyFlags;
 #endif

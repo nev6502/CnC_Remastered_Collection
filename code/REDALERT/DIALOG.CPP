@@ -99,7 +99,7 @@ void Dialog_Box(int x, int y, int w, int h)
 	int cx = w/2;
 	int cy = h/2;
 // jmarshall
-	void const * shapedata = MFCD::Retrieve("DD-BKGND.SHP");
+	//void const * shapedata = MFCD::Retrieve("DD-BKGND.SHP");
 //#ifdef WIN32
 //	CC_Draw_Shape(shapedata, 0, cx-312, cy-192, WINDOW_PARTIAL, SHAPE_WIN_REL);
 //	CC_Draw_Shape(shapedata, 1, cx,     cy-192, WINDOW_PARTIAL, SHAPE_WIN_REL);
@@ -197,17 +197,17 @@ void Dialog_Box(int x, int y, int w, int h)
 	//CC_Draw_Shape(shapedata, 2, 0,                  h-(12*RESFACTOR), WINDOW_PARTIAL, SHAPE_WIN_REL);
 	//CC_Draw_Shape(shapedata, 3, w-(12*RESFACTOR-1), h-(12*RESFACTOR), WINDOW_PARTIAL, SHAPE_WIN_REL);
 
-#ifdef WIN32
-	WWMouse->Draw_Mouse(&HidPage);
-	HidPage.Blit(SeenBuff, x, y, x, y, w, h, false);
-	WWMouse->Erase_Mouse(&HidPage, FALSE);
-#else
-//	Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, Map.ShadowPage->Get_Buffer());
-	Hide_Mouse();
-	HidPage.Blit(SeenBuff);
-	Show_Mouse();
-//	Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, ((GraphicBufferClass*)Map.Shadow_Address())->Get_Buffer());
-#endif
+//#ifdef WIN32
+//	WWMouse->Draw_Mouse(&HidPage);
+//	HidPage.Blit(SeenBuff, x, y, x, y, w, h, false);
+//	WWMouse->Erase_Mouse(&HidPage, FALSE);
+//#else
+////	Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, Map.ShadowPage->Get_Buffer());
+//	Hide_Mouse();
+//	HidPage.Blit(SeenBuff);
+//	Show_Mouse();
+////	Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, ((GraphicBufferClass*)Map.Shadow_Address())->Get_Buffer());
+//#endif
 	Set_Logic_Page(oldpage);
 
 	GL_ResetClipRect();

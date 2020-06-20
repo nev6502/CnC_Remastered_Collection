@@ -252,7 +252,7 @@ void WWMouseClass::RenderMouse(void) {
 	
 	
 	ImGui::SetMouseCursor(ImGuiMouseCursor_None);
-	ImGui::GetForegroundDrawList()->AddImage((ImTextureID)current_cursor->image, mi, ma);
+	ImGui::GetForegroundDrawList()->AddImage((ImTextureID)current_cursor->image[0][0], mi, ma);
 }
 
 void WWMouseClass::Low_Show_Mouse(int x, int y)

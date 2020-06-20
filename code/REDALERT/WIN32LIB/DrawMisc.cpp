@@ -79,7 +79,7 @@ extern "C" int __cdecl Get_Free_Cache_Slot(void) {return -1;}
 void IconCacheClass::Draw_It (void *dest_surface , int x_pixel, int y_pixel, int window_left , int window_top , int window_width , int window_height) {}
 
 
-
+extern bool renderHDTexture;
 extern	int	CachedIconsDrawn;
 extern	int	UnCachedIconsDrawn;
 
@@ -1054,231 +1054,34 @@ CODESEG
 #define OPTIMAL_BYTE_COPY	14
 
 
-void __cdecl Buffer_Fill_Rect(void *thisptr, int sx, int sy, int dx, int dy, unsigned char color)
+void __cdecl Buffer_Fill_Rect(void *thisptr, int x, int y, int w, int h, unsigned char color)
 {
-/*
-	;*===================================================================
-	;* define the arguements that our function takes.
-	;*===================================================================
-	ARG    	this_object:DWORD			; this is a member function
-	ARG	x1_pixel:WORD
-	ARG	y1_pixel:WORD
-	ARG	x2_pixel:WORD
-	ARG	y2_pixel:WORD
-	ARG    	color:BYTE			; what color should we clear to
-*/
-	
-	void *this_object = thisptr;
-	int x1_pixel = sx;
-	int y1_pixel = sy;
-	int x2_pixel = dx;
-	int y2_pixel = dy;
-	
-/*
-	;*===================================================================
-	; Define some locals so that we can handle things quickly
-	;*===================================================================
-	LOCAL	VPwidth:DWORD		; the width of the viewport
-	LOCAL	VPheight:DWORD		; the height of the viewport
-	LOCAL	VPxadd:DWORD		; the additional x offset of viewport
-	LOCAL	VPbpr:DWORD		; the number of bytes per row of viewport
-*/
+	GraphicViewPortClass& vp = (*(GraphicViewPortClass *)thisptr);
 
-	int VPwidth;
-	int VPheight;
-	int VPxadd;
-	int VPbpr;
+	// If we aren't drawing within the viewport, return
+	if (x >= vp.Get_Width() || y >= vp.Get_Height() || w < 0 || h < 0) {
+		return;
+	}
 
-	int local_ebp;	                      // Can't use ebp
+	// Clipping
+	if (x < 0) {
+		x = 0;
+	}
 
-	__asm {
+	if (y < 0) {
+		y = 0;
+	}
 
-		;*===================================================================
-		;* save off the viewport characteristics on the stack
-		;*===================================================================
-		mov	ebx,[this_object]				; get a pointer to viewport
-		mov	eax,[ebx]GraphicViewPortClass.Width		; get width from viewport
-		mov	ecx,[ebx]GraphicViewPortClass.Height	; get height from viewport
-		mov	edx,[ebx]GraphicViewPortClass.XAdd		; get xadd from viewport
-		add	edx,[ebx]GraphicViewPortClass.Pitch		; extra pitch of direct draw surface
-		mov	[VPwidth],eax				; store the width of locally
-		mov	[VPheight],ecx
-		mov	[VPxadd],edx
-		add	eax,edx
-		mov	[VPbpr],eax
+	w = min(w, vp.Get_Width() - 1);
+	h = min(h, vp.Get_Height() - 1);
 
-		;*===================================================================
-		;* move the important parameters into local registers
-		;*===================================================================
-		mov	eax,[x1_pixel]
-		mov	ebx,[y1_pixel]
-		mov	ecx,[x2_pixel]
-		mov	edx,[y2_pixel]
+	uint8_t* offset = (y * 4) * vp.Get_Full_Pitch() + (x * 4) + (uint8_t*)(vp.Get_Offset());
+	int height = h - y + 1;
+	int width = w - x + 1;
 
-		;*===================================================================
-		;* Convert the x2 and y2 pixel to a width and height
-		;*===================================================================
-		cmp	eax,ecx
-		jl	no_swap_x
-		xchg	eax,ecx
-
-	no_swap_x:
-		sub	ecx,eax
-		cmp	ebx,edx
-		jl	no_swap_y
-		xchg	ebx,edx
-	no_swap_y:
-		sub	edx,ebx
-		inc	ecx
-		inc	edx
-
-		;*===================================================================
-		;* Bounds check source X.
-		;*===================================================================
-		cmp	eax, [VPwidth]			; compare with the max
-		jge	done				; starts off screen, then later
-		jb	short sx_done			; if it's not negative, it's ok
-
-		;------ Clip source X to left edge of screen.
-		add	ecx, eax			; Reduce width (add in negative src X).
-		xor	eax, eax			; Clip to left of screen.
-	sx_done:
-
-		;*===================================================================
-		;* Bounds check source Y.
-		;*===================================================================
-		cmp	ebx, [VPheight]			; compare with the max
-		jge	done				; starts off screen, then later
-		jb	short sy_done			; if it's not negative, it's ok
-
-		;------ Clip source Y to top edge of screen.
-		add	edx, ebx			; Reduce height (add in negative src Y).
-		xor	ebx, ebx			; Clip to top of screen.
-
-	sy_done:
-		;*===================================================================
-		;* Bounds check width versus width of source and dest view ports
-		;*===================================================================
-		push	ebx				; save off ebx for later use
-		mov	ebx,[VPwidth]			; get the source width
-		sub	ebx, eax			; Maximum allowed pixel width (given coordinates).
-		sub	ebx, ecx			; Pixel width undershoot.
-		jns	short width_ok		; if not signed no adjustment necessary
-		add	ecx, ebx			; Reduce width to screen limits.
-
-	width_ok:
-		pop	ebx				; restore ebx to old value
-
-		;*===================================================================
-		;* Bounds check height versus height of source view port
-		;*===================================================================
-		push	eax				; save of eax for later use
-		mov	eax, [VPheight]			; get the source height
-		sub	eax, ebx			; Maximum allowed pixel height (given coordinates).
-		sub	eax, edx			; Pixel height undershoot.
-		jns	short height_ok		; if not signed no adjustment necessary
-		add	edx, eax			; Reduce height to screen limits.
-	height_ok:
-		pop	eax				; restore eax to old value
-
-		;*===================================================================
-		;* Perform the last minute checks on the width and height
-		;*===================================================================
-		or	ecx,ecx
-		jz	done
-
-		or	edx,edx
-		jz	done
-
-		cmp	ecx,[VPwidth]
-		ja	done
-		cmp	edx,[VPheight]
-		ja	done
-
-		;*===================================================================
-		;* Get the offset into the virtual viewport.
-		;*===================================================================
-		xchg	edi,eax			; save off the contents of eax
-		xchg	esi,edx			;   and edx for size test
-		mov	eax,ebx			; move the y pixel into eax
-		mul	[VPbpr]			; multiply by bytes per row
-		add	edi,eax			; add the result into the x position
-		mov	ebx,[this_object]
-		add	edi,[ebx]GraphicViewPortClass.Offset
-
-		mov	edx,esi			; restore edx back to real value
-		mov	eax,ecx			; store total width in ecx
-		sub	eax,[VPwidth]		; modify xadd value to include clipped
-		sub	[VPxadd],eax		;   width bytes (subtract a negative number)
-
-		;*===================================================================
-		; Convert the color byte to a DWORD for fast storing
-		;*===================================================================
-		mov	al,[color]				; get color to clear to
-		mov	ah,al					; extend across WORD
-		mov	ebx,eax					; extend across DWORD in
-		shl	eax,16					;   several steps
-		mov	ax,bx
-
-		;*===================================================================
-		; If there is no row offset then adjust the width to be the size of
-		;   the entire viewport and adjust the height to be 1
-		;*===================================================================
-		mov	esi,[VPxadd]
-		or	esi,esi					; set the flags for esi
-		jnz	row_by_row_aligned			;   and act on them
-
-		xchg	eax,ecx					; switch bit pattern and width
-		mul	edx					; multiply by edx to get size
-		xchg	eax,ecx					; switch size and bit pattern
-		mov	edx,1					; only 1 line off view port size to do
-
-		;*===================================================================
-		; Find out if we should bother to align the row.
-		;*===================================================================
-	row_by_row_aligned:
-		mov	[local_ebp],ecx					; width saved in ebp
-		cmp	ecx,OPTIMAL_BYTE_COPY			; is it worth aligning them?
-		jl	row_by_row				;   if not then skip
-
-		;*===================================================================
-		; Figure out the alignment offset if there is any
-		;*===================================================================
-		mov	ebx,edi					; get output position
-		and	ebx,3					;   is there a remainder?
-		jz	aligned_loop				;   if not we are aligned
-		xor	ebx,3					; find number of align bytes
-		inc	ebx					; this number is off by one
-		sub	[local_ebp],ebx					; subtract from width
-
-		;*===================================================================
-		; Now that we have the alignment offset copy each row
-		;*===================================================================
-	aligned_loop:
-		mov	ecx,ebx					; get number of bytes to align
-		rep	stosb					;   and move them over
-		mov	ecx,[local_ebp]					; get number of aligned bytes
-		shr	ecx,2					;   convert to DWORDS
-		rep	stosd					;   and move them over
-		mov	ecx,[local_ebp]					; get number of aligned bytes
-		and	ecx,3					;   find the remainder
-		rep	stosb					;   and move it over
-		add	edi,esi					; fix the line offset
-		dec	edx					; decrement the height
-		jnz	aligned_loop				; if more to do than do it
-		jmp	done					; we are all done
-
-		;*===================================================================
-		; If not enough bytes to bother aligning copy each line across a byte
-		;    at a time.
-		;*===================================================================
-	row_by_row:
-		mov	ecx,[local_ebp]					; get total width in bytes
-		rep	stosb					; store the width
-		add	edi,esi					; handle the xadd
-		dec	edx					; decrement the height
-		jnz	row_by_row				; if any left then next line
-	done:
+	for (int i = 0; i < height; ++i) {
+		FastScanlinePaletteBlit(offset, color, width);
+		offset += vp.Get_Full_Pitch() * 4;
 	}
 }
 
@@ -1328,22 +1131,37 @@ void	__cdecl Buffer_Clear(void *this_object, unsigned char color)
 */
 
 // jmarshall - ported to c
+
+
 unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheight, int outwidth, int outheight) {
 	int		i, j, k;
 	const unsigned char* inrow;
 	const unsigned char* pix1;
 	unsigned char* out, * out_p;
-	static unsigned char ViewportPixelBuffer[4096 * 4096];
+	static unsigned char ViewportPixelBuffer[4096 * 4096 * 4];
 
 	out = &ViewportPixelBuffer[0];
 	out_p = out;
 
-	for (i = 0; i < outheight; i++, out_p += outwidth * 1) {
-		inrow = in + 1 * inwidth * (int)((i + 0.25) * inheight / outheight);
+	int bpp = 1;
+	if (renderHDTexture) {
+		bpp = 4;
+	}
+
+	for (i = 0; i < outheight; i++, out_p += outwidth * bpp) {
+		inrow = in + bpp * inwidth * (int)((i + 0.25) * inheight / outheight);
 		for (j = 0; j < outwidth; j++) {
 			k = j * inwidth / outwidth;
-			pix1 = inrow + k * 1;
-			out_p[j * 1 + 0] = pix1[0];
+			pix1 = inrow + k * bpp;
+			if (renderHDTexture) {
+				out_p[j * 4 + 0] = pix1[0];
+				out_p[j * 4 + 1] = pix1[1];
+				out_p[j * 4 + 2] = pix1[2];
+				out_p[j * 4 + 3] = pix1[3];
+			}
+			else {
+				out_p[j * 1 + 0] = pix1[0];
+			}
 			//out_p[j * 3 + 1] = pix1[1];
 			//out_p[j * 3 + 2] = pix1[2];
 		}
@@ -1352,145 +1170,111 @@ unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheigh
 	return out;
 }
 
-BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int src_w, int src_h, int dst_w, int dst_h, BOOL use_keysrc, char* fade)
+
+/*
+==============
+R_CopyImage
+==============
+*/
+void Nearest_CopyImage(unsigned char* source, int sourceX, int sourceY, int sourceWidth, unsigned char* dest, int destX, int destY, int destWidth, int width, int height, BOOL trans)
 {
-	GraphicViewPortClass& src_vp = *(GraphicViewPortClass*)this_object;
-	GraphicViewPortClass& dst_vp = *(GraphicViewPortClass*)dest;
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
 
-	// If there is nothing to scale, just return.
-	if (src_w <= 0 || src_h <= 0 || dst_w <= 0 || dst_h <= 0) {
-		return false;
-	}
+			int destPos = ((destWidth * (y + destY)) * 4) + ((x + destX) * 4);
+			int sourcePos = (sourceWidth * (y + (sourceY))) + (x + (sourceX));
+			if (renderHDTexture) {
+				sourcePos = ((sourceWidth * (y + sourceY)) * 4) + ((x + sourceX) * 4);
 
-	int sx = src_x;
-	int sy = src_y;
-	int dx = dst_x;
-	int dy = dst_y;
-	int dw = dst_w + dst_x;
-	int dh = dst_h + dst_y;
+				// This needs some work!
+				if (source[0] == 0 && source[1] == 0 && source[2] == 0 && trans)
+					continue;
 
-	// These ifs are all for clipping purposes incase coords are outside
-	// the expected area.
-	if (src_x < 0) {
-		sx = 0;
-		dx = dst_x + ((dst_w * -src_x) / src_w);
-	}
-
-	if (src_y < 0) {
-		sy = 0;
-		dy = dst_y + ((dst_h * -src_y) / src_h);
-	}
-
-	if (src_x + src_w > src_vp.Get_Width() + 1) {
-		dw = dst_x + (dst_w * (src_vp.Get_Width() - src_x) / src_w);
-	}
-
-	if (src_y + src_h > src_vp.Get_Height() + 1) {
-		dh = dst_y + (dst_h * (src_vp.Get_Height() - src_y) / src_h);
-	}
-
-	if (dx < 0) {
-		dx = 0;
-		sx = src_x + ((src_w * -dst_x) / dst_w);
-	}
-
-	if (dy < 0) {
-		dy = 0;
-		sy = src_y + ((src_h * -dst_y) / dst_h);
-	}
-
-	if (dw > dst_vp.Get_Width() + 1) {
-		dw = dst_vp.Get_Width();
-	}
-
-	if (dh > dst_vp.Get_Height() + 1) {
-		dh = dst_vp.Get_Height();
-	}
-
-	if (dy > dh || dx > dw) {
-		return false;
-	}
-
-	uint8_t* src = sy * src_vp.Get_Full_Pitch() + sx + (uint8_t*)(src_vp.Get_Offset());
-	uint8_t* dst = dy * dst_vp.Get_Full_Pitch() + dx + (uint8_t*)(dst_vp.Get_Offset());
-	dw -= dx;
-	dh -= dy;
-	int x_ratio = ((src_w << 16) / dw) + 1;
-	int y_ratio = ((src_h << 16) / dh) + 1;
-
-	// keysrc basically means do we skip index 0 entries, thus treating them as
-	// transparent?
-	if (use_keysrc) {
-		if (fade != nullptr) {
-			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
-				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
-				int xrat = 0;
-
-				for (int j = 0; j < dw; ++j) {
-					uint8_t tmp = s[xrat >> 16];
-
-					if (tmp != 0) {
-						*d = ((uint8_t*)(fade))[tmp];
-					}
-
-					++d;
-					xrat += x_ratio;
-				}
+				dest[destPos + 0] = source[sourcePos + 0];
+				dest[destPos + 1] = source[sourcePos + 1];
+				dest[destPos + 2] = source[sourcePos + 2];
+				dest[destPos + 3] = 255;
 			}
-		}
-		else {
-			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
-				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
-				int xrat = 0;
+			else
+			{
+				unsigned char c = source[sourcePos];
 
-				for (int j = 0; j < dw; ++j) {
-					uint8_t tmp = s[xrat >> 16];
-
-					if (tmp != 0) {
-						*d = tmp;
-					}
-
-					++d;
-					xrat += x_ratio;
+				if (c == 0 && trans) {
+					continue;
 				}
+
+				dest[destPos + 0] = backbuffer_palette[(c * 3) + 0];
+				dest[destPos + 1] = backbuffer_palette[(c * 3) + 1];
+				dest[destPos + 2] = backbuffer_palette[(c * 3) + 2];
+				dest[destPos + 3] = 255;
 			}
 		}
 	}
-	else {
-		if (fade != nullptr) {
-			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
-				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
-				int xrat = 0;
+}
 
-				for (int j = 0; j < dw; ++j) {
-					*d++ = ((uint8_t*)(fade))[s[xrat >> 16]];
-					xrat += x_ratio;
-				}
-			}
-		}
-		else {
-			for (int i = 0; i < dh; ++i) {
-				uint8_t* d = dst + i * dst_vp.Get_Full_Pitch();
-				uint8_t* s = src + ((i * y_ratio) >> 16) * src_vp.Get_Full_Pitch();
-				int xrat = 0;
 
-				for (int j = 0; j < dw; ++j) {
-					*d++ = s[xrat >> 16];
-					xrat += x_ratio;
-				}
-			}
-		}
-	}
+BOOL __cdecl Linear_Scale_To_Linear(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int src_width, int src_height, int dst_width, int dst_height, BOOL trans, char* remap)
+{
+	GraphicViewPortClass* viewportClass = (GraphicViewPortClass*)this_object;
+	GraphicViewPortClass* destViewportClass = (GraphicViewPortClass*)dest;
+
+	unsigned char* viewportBuffer = ((unsigned char*)viewportClass->Get_Offset());
+
+	// Scale the GraphicViewPortClass to dest_x, dest_y
+	unsigned char* scaled_buffer = Draw_Dropsample((unsigned char*)viewportBuffer, viewportClass->Get_Width(), viewportClass->Get_Height(), dst_width, dst_height);
+
+	// Blit the scaled_buffer to dest.
+	Nearest_CopyImage(scaled_buffer, src_x, src_y, dst_width, (unsigned char*)destViewportClass->Get_Offset(), dst_x, dst_y, destViewportClass->Get_Width(), dst_width, dst_height, trans);
 
 	return true;
 }
 
-BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int w, int h, BOOL use_key)
+BOOL __cdecl Linear_Blit_To_Linear(void* this_object, void* dest, int x_pixel, int y_pixel, int dest_x0, int dest_y0, int pixel_width, int pixel_height, BOOL trans)
 {
-	GraphicViewPortClass& src_vp = *(GraphicViewPortClass *)this_object;
+	GraphicViewPortClass* viewportClass = (GraphicViewPortClass*)this_object;
+	GraphicViewPortClass* destViewportClass = (GraphicViewPortClass*)dest;
+	bool needsUnlock = false;
+	bool sourceNeedsUnlock = false;
+
+	unsigned char* viewportBuffer = NULL;
+	viewportBuffer = ((unsigned char*)viewportClass->Get_Offset());
+
+	unsigned char* destBuffer = NULL;
+	destBuffer = ((unsigned char*)destViewportClass->Get_Offset());
+
+	//if (destViewportClass->Get_Graphic_Buffer()->Get_Buffer() != NULL) {
+	//	destBuffer = (byte*)destViewportClass->Get_Graphic_Buffer()->Get_Buffer();
+	//}
+	//else {
+	//	destViewportClass->Get_Graphic_Buffer()->Lock();
+	//	destBuffer = ((byte*)destViewportClass->Get_Graphic_Buffer()->GetMemoryBuffer());
+	//	needsUnlock = true;
+	//}
+	//
+	//if (viewportBuffer == NULL) {
+	//	viewportClass->Get_Graphic_Buffer()->Lock();
+	//	viewportBuffer = ((byte*)viewportClass->Get_Graphic_Buffer()->GetMemoryBuffer());
+	//	sourceNeedsUnlock = true;
+	//}
+
+	// Blit the buffer to dest.
+	Nearest_CopyImage(viewportBuffer, x_pixel, y_pixel, viewportClass->Get_Width(), (unsigned char*)destBuffer, dest_x0, dest_y0, destViewportClass->Get_Width(), pixel_width, pixel_height, trans);
+
+	//if (needsUnlock) {
+	//	destViewportClass->Get_Graphic_Buffer()->Unlock();
+	//}
+	//
+	//if (sourceNeedsUnlock) {
+	//	viewportClass->Get_Graphic_Buffer()->Unlock();
+	//}
+	return true;
+}
+
+BOOL __cdecl Linear_Blit_To_Linear_Pal(void* this_object, void* dest, int src_x, int src_y, int dst_x, int dst_y, int w, int h, BOOL use_key)
+{
+	GraphicViewPortClass& src_vp = *(GraphicViewPortClass*)this_object;
 	GraphicViewPortClass& dst_vp = *(GraphicViewPortClass*)dest;
 
 	uint8_t* src = (uint8_t*)(src_vp.Get_Offset());
@@ -1687,525 +1471,6 @@ fini:
 
 	}
 }
-
-
-/*
-;***********************************************************
-
-;***********************************************************
-; DRAW_STAMP
-;
-; VOID cdecl Buffer_Draw_Stamp(VOID *icondata, WORD icon, WORD x_pixel, WORD y_pixel, VOID *remap);
-;
-; This routine renders the icon at the given coordinate.
-;
-; The remap table is a 256 byte simple pixel translation table to use when
-; drawing the icon.  Transparency check is performed AFTER the remap so it is possible to
-; remap valid colors to be invisible (for special effect reasons).
-; This routine is fastest when no remap table is passed in.
-;*
-*/
-
-void __cdecl Buffer_Draw_Stamp(void const *this_object, void const *icondata, int icon, int x_pixel, int y_pixel, void const *remap)
-{
-	unsigned int	modulo = 0;
-	unsigned int	iwidth = 0;
-	unsigned char	doremap = 0;
-
-
-/*
-		PROC	Buffer_Draw_Stamp C near
-
-		ARG	this_object:DWORD		; this is a member function
-		ARG	icondata:DWORD		; Pointer to icondata.
-		ARG	icon:DWORD		; Icon number to draw.
-		ARG	x_pixel:DWORD		; X coordinate of icon.
-		ARG	y_pixel:DWORD		; Y coordinate of icon.
-		ARG	remap:DWORD 		; Remap table.
-
-		LOCAL	modulo:DWORD		; Modulo to get to next row.
-		LOCAL	iwidth:DWORD		; Icon width (here for speedy access).
-		LOCAL	doremap:BYTE		; Should remapping occur?
-*/
-		
-	__asm {
-
-			pushad
-			cmp	[icondata],0
-			je	proc_out
-
-			; Initialize the stamp data if necessary.
-			mov	eax,[icondata]
-			cmp	[LastIconset],eax
-			je		short noreset
-			push	eax
-			call	Init_Stamps
-			pop	eax			             // Clean up stack. ST - 12/20/2018 10:42AM
-noreset:
-
-			; Determine if the icon number requested is actually in the set.
-			; Perform the logical icon to actual icon number remap if necessary.
-			mov	ebx,[icon]
-			cmp	[MapPtr],0
-			je	short notmap
-			mov	edi,[MapPtr]
-			mov	bl,[edi+ebx]
-notmap:
-			cmp	ebx,[IconCount]
-			jae	proc_out
-			mov	[icon],ebx		; Updated icon number.
-
-			; If the remap table pointer passed in is NULL, then flag this condition
-			; so that the faster (non-remapping) icon draw loop will be used.
-			cmp	[remap],0
-			setne	[doremap]
-
-			; Get pointer to position to render icon. EDI = ptr to destination page.
-			mov	ebx,[this_object]
-			mov	edi,[ebx]GraphicViewPortClass.Offset
-			mov	eax,[ebx]GraphicViewPortClass.Width
-			add	eax,[ebx]GraphicViewPortClass.XAdd
-			add	eax,[ebx]GraphicViewPortClass.Pitch
-			push	eax			; save viewport full width for lower
-			mul	[y_pixel]
-			add	edi,eax
-			add	edi,[x_pixel]
-
-			; Determine row modulo for advancing to next line.
-			pop	eax			; retrieve viewport width
-			sub	eax,[IconWidth]
-			mov	[modulo],eax
-
-			; Setup some working variables.
-			mov	ecx,[IconHeight]	; Row counter.
-			mov	eax,[IconWidth]
-			mov	[iwidth],eax		; Stack copy of byte width for easy BP access.
-
-			; Fetch pointer to start of icon's data.  ESI = ptr to icon data.
-			mov	eax,[icon]
-			mul	[IconSize]
-			mov	esi,[StampPtr]
-			add	esi,eax
-
-			; Determine whether simple icon draw is sufficient or whether the
-			; extra remapping icon draw is needed.
-			cmp	[BYTE PTR doremap],0
-			je	short istranscheck
-
-			;************************************************************
-			; Complex icon draw -- extended remap.
-			; EBX = Palette pointer (ready for XLAT instruction).
-			; EDI = Pointer to icon destination in page.
-			; ESI = Pointer to icon data.
-			; ECX = Number of pixel rows.
-		;;;	mov	edx,[remap]
-		 mov ebx,[remap]
-			xor	eax,eax
-xrowloop:
-			push	ecx
-			mov	ecx,[iwidth]
-
-xcolumnloop:
-			lodsb
-		;;;	mov	ebx,edx
-		;;;	add	ebx,eax
-		;;;	mov	al,[ebx]		; New real color to draw.
-		 xlatb
-			or	al,al
-			jz	short xskip1		; Transparency skip check.
-			mov	[edi],al
-xskip1:
-			inc	edi
-			loop	xcolumnloop
-
-			pop	ecx
-			add	edi,[modulo]
-			loop	xrowloop
-			jmp	short proc_out
-
-
-			;************************************************************
-			; Check to see if transparent or generic draw is necessary.
-istranscheck:
-			mov	ebx,[IsTrans]
-			add	ebx,[icon]
-			cmp	[BYTE PTR ebx],0
-			jne	short rowloop
-
-			;************************************************************
-			; Fast non-transparent icon draw routine.
-			; ES:DI = Pointer to icon destination in page.
-			; DS:SI = Pointer to icon data.
-			; CX = Number of pixel rows.
-			mov	ebx,ecx
-			shr	ebx,2
-			mov	edx,[modulo]
-			mov	eax,[iwidth]
-			shr	eax,2
-loop1:
-			mov	ecx,eax
-			rep movsd
-			add	edi,edx
-
-			mov	ecx,eax
-			rep movsd
-			add	edi,edx
-
-			mov	ecx,eax
-			rep movsd
-			add	edi,edx
-
-			mov	ecx,eax
-			rep movsd
-			add	edi,edx
-
-			dec	ebx
-			jnz	loop1
-			jmp	short proc_out
-
-			;************************************************************
-			; Transparent icon draw routine -- no extended remap.
-			; ES:DI = Pointer to icon destination in page.
-			; DS:SI = Pointer to icon data.
-			; CX = Number of pixel rows.
-rowloop:
-			push	ecx
-			mov	ecx,[iwidth]
-
-columnloop:
-			lodsb
-			or	al,al
-			jz	short skip1		; Transparency check.
-			mov	[edi],al
-skip1:
-			inc	edi
-			loop	columnloop
-
-			pop	ecx
-			add	edi,[modulo]
-			loop	rowloop
-
-			; Cleanup and exit icon drawing routine.
-proc_out:
-			popad
-			//ret
-	}
-}
-
-
-
-
-/*
-;***********************************************************
-; DRAW_STAMP_CLIP
-;
-; VOID cdecl MCGA_Draw_Stamp_Clip(VOID *icondata, WORD icon, WORD x_pixel, WORD y_pixel, VOID *remap, LONG min_x, LONG min_y, LONG max_x, LONG max_y);
-;
-; This routine renders the icon at the given coordinate.
-;
-; The remap table is a 256 byte simple pixel translation table to use when
-; drawing the icon.  Transparency check is performed AFTER the remap so it is possible to
-; remap valid colors to be invisible (for special effect reasons).
-; This routine is fastest when no remap table is passed in.
-;*
-*/	
-void __cdecl Buffer_Draw_Stamp_Clip(void const *this_object, void const *icondata, int icon, int x_pixel, int y_pixel, void const *remap, int min_x, int min_y, int max_x, int max_y)
-{
-	
-	
-	unsigned int	modulo = 0;
-	unsigned int	iwidth = 0;
-	unsigned int	skip = 0;
-	unsigned char	doremap = 0;
-	
-		
-/*		
-	ARG	this_object:DWORD	; this is a member function
-	ARG	icondata:DWORD		; Pointer to icondata.
-	ARG	icon:DWORD		; Icon number to draw.
-	ARG	x_pixel:DWORD		; X coordinate of icon.
-	ARG	y_pixel:DWORD		; Y coordinate of icon.
-	ARG	remap:DWORD 		; Remap table.
-	ARG	min_x:DWORD		; Clipping rectangle boundary
-	ARG	min_y:DWORD		; Clipping rectangle boundary
-	ARG	max_x:DWORD		; Clipping rectangle boundary
-	ARG	max_y:DWORD		; Clipping rectangle boundary
-
-	LOCAL	modulo:DWORD		; Modulo to get to next row.
-	LOCAL	iwidth:DWORD		; Icon width (here for speedy access).
-	LOCAL	skip:DWORD		; amount to skip per row of icon data
-	LOCAL	doremap:BYTE		; Should remapping occur?
-*/
-	__asm {
-			pushad
-			cmp	[icondata],0
-			je	proc_out
-
-			; Initialize the stamp data if necessary.
-			mov	eax,[icondata]
-			cmp	[LastIconset],eax
-			je		short noreset2
-			push	eax
-			call	Init_Stamps
-			pop	eax			             // Clean up stack. ST - 12/20/2018 10:42AM
-noreset2:
-
-			; Determine if the icon number requested is actually in the set.
-			; Perform the logical icon to actual icon number remap if necessary.
-			mov	ebx,[icon]
-			cmp	[MapPtr],0
-			je	short notmap2
-			mov	edi,[MapPtr]
-			mov	bl,[edi+ebx]
-notmap2:
-			cmp	ebx,[IconCount]
-			jae	proc_out
-			mov	[icon],ebx		; Updated icon number.
-
-			; Setup some working variables.
-			mov	ecx,[IconHeight]	; Row counter.
-			mov	eax,[IconWidth]
-			mov	[iwidth],eax		; Stack copy of byte width for easy BP access.
-
-			; Fetch pointer to start of icon's data.  ESI = ptr to icon data.
-			mov	eax,[icon]
-			mul	[IconSize]
-			mov	esi,[StampPtr]
-			add	esi,eax
-
-			; Update the clipping window coordinates to be valid maxes instead of width & height
-			; , and change the coordinates to be window-relative
-			mov	ebx,[min_x]
-			add	[max_x],ebx
-			add	[x_pixel],ebx		; make it window-relative
-			mov	ebx,[min_y]
-			add	[max_y],ebx
-			add	[y_pixel],ebx		; make it window-relative
-
-			; See if the icon is within the clipping window
-			; First, verify that the icon position is less than the maximums
-			mov	ebx,[x_pixel]
-			cmp	ebx,[max_x]
-			jge	proc_out
-			mov	ebx,[y_pixel]
-			cmp	ebx,[max_y]
-			jge	proc_out
-			; Now verify that the icon position is >= the minimums
-			add	ebx,[IconHeight]
-			cmp	ebx,[min_y]
-			jle	proc_out
-			mov	ebx,[x_pixel]
-			add	ebx,[IconWidth]
-			cmp	ebx,[min_x]
-			jle	proc_out
-
-			; Now, clip the x, y, width, and height variables to be within the
-			; clipping rectangle
-			mov	ebx,[x_pixel]
-			cmp	ebx,[min_x]
-			jge	nominxclip
-			; x < minx, so must clip
-			mov	ebx,[min_x]
-			sub	ebx,[x_pixel]
-			add	esi,ebx		; source ptr += (minx - x)
-			sub	[iwidth],ebx	; icon width -= (minx - x)
-			mov	ebx,[min_x]
-			mov	[x_pixel],ebx
-
-nominxclip:
-			mov	eax,[IconWidth]
-			sub	eax,[iwidth]
-			mov	[skip],eax
-
-			; Check for x+width > max_x
-			mov	eax,[x_pixel]
-			add	eax,[iwidth]
-			cmp	eax,[max_x]
-			jle	nomaxxclip
-			; x+width is greater than max_x, so must clip width down
-			mov	eax,[iwidth]	; eax = old width
-			mov	ebx,[max_x]
-			sub	ebx,[x_pixel]
-			mov	[iwidth],ebx	; iwidth = max_x - xpixel
-			sub	eax,ebx
-			add	[skip],eax	; skip += (old width - iwidth)
-nomaxxclip:
-			; check if y < miny
-			mov	eax,[min_y]
-			cmp	eax,[y_pixel]	; if(miny <= y_pixel), no clip needed
-			jle	nominyclip
-			sub	eax,[y_pixel]
-			sub	ecx,eax		; height -= (miny - y)
-			mul	[IconWidth]
-			add	esi,eax		; icon source ptr += (width * (miny - y))
-			mov	eax,[min_y]
-			mov	[y_pixel],eax	; y = miny
-nominyclip:
-			; check if (y+height) > max y
-			mov	eax,[y_pixel]
-			add	eax,ecx
-			cmp	eax,[max_y]	; if (y + height <= max_y), no clip needed
-			jle	nomaxyclip
-			mov	ecx,[max_y]	; height = max_y - y_pixel
-			sub	ecx,[y_pixel]
-nomaxyclip:
-
-			; If the remap table pointer passed in is NULL, then flag this condition
-			; so that the faster (non-remapping) icon draw loop will be used.
-			cmp	[remap],0
-			setne	[doremap]
-
-			; Get pointer to position to render icon. EDI = ptr to destination page.
-			mov	ebx,[this_object]
-			mov	edi,[ebx]GraphicViewPortClass.Offset
-			mov	eax,[ebx]GraphicViewPortClass.Width
-			add	eax,[ebx]GraphicViewPortClass.XAdd
-			add	eax,[ebx]GraphicViewPortClass.Pitch
-			push	eax			; save viewport full width for lower
-			mul	[y_pixel]
-			add	edi,eax
-			add	edi,[x_pixel]
-
-			; Determine row modulo for advancing to next line.
-			pop	eax			; retrieve viewport width
-			sub	eax,[iwidth]
-			mov	[modulo],eax
-
-			; Determine whether simple icon draw is sufficient or whether the
-			; extra remapping icon draw is needed.
-			cmp	[BYTE PTR doremap],0
-			je	short istranscheck2
-
-			;************************************************************
-			; Complex icon draw -- extended remap.
-			; EBX = Palette pointer (ready for XLAT instruction).
-			; EDI = Pointer to icon destination in page.
-			; ESI = Pointer to icon data.
-			; ECX = Number of pixel rows.
-			mov	ebx,[remap]
-			xor	eax,eax
-xrowloopc:
-			push	ecx
-			mov	ecx,[iwidth]
-
-xcolumnloopc:
-			lodsb
-			xlatb
-			or	al,al
-			jz	short xskip1c		; Transparency skip check.
-			mov	[edi],al
-xskip1c:
-			inc	edi
-			loop	xcolumnloopc
-
-			pop	ecx
-			add	edi,[modulo]
- 		add esi,[skip]
-			loop	xrowloopc
-			jmp	short proc_out
-
-
-			;************************************************************
-			; Check to see if transparent or generic draw is necessary.
-istranscheck2:
-			mov	ebx,[IsTrans]
-			add	ebx,[icon]
-			cmp	[BYTE PTR ebx],0
-			jne	short rowloopc
-
-			;************************************************************
-			; Fast non-transparent icon draw routine.
-			; ES:DI = Pointer to icon destination in page.
-			; DS:SI = Pointer to icon data.
-			; CX = Number of pixel rows.
-			mov	ebx,ecx
-			mov	edx,[modulo]
-			mov	eax,[iwidth]
-
-			;
-			; Optimise copy by dword aligning the destination
-			;
-loop1c:
-			push	eax
- 		//rept 3					// No rept in inline asm. ST - 12/20/2018 10:43AM
-			test	edi,3
-			jz	aligned
-			movsb
-			dec	eax
-			jz	finishedit
-
-			test	edi,3
-			jz	aligned
-			movsb
-			dec	eax
-			jz	finishedit
-
-			test	edi,3
-			jz	aligned
-			movsb
-			dec	eax
-			jz	finishedit
-
- 		//endm
-aligned:
-			mov	ecx,eax
-			shr	ecx,2
-			rep	movsd
-			mov	ecx,eax
-			and	ecx,3
-			rep	movsb
-
-finishedit:
-			add	edi,edx
-			add	esi,[skip]
-			pop	eax
-
-			dec	ebx
-			jnz	loop1c
-			jmp	short proc_out
-
-			;************************************************************
-			; Transparent icon draw routine -- no extended remap.
-			; ES:DI = Pointer to icon destination in page.
-			; DS:SI = Pointer to icon data.
-			; CX = Number of pixel rows.
-rowloopc:
-			push	ecx
-			mov	ecx,[iwidth]
-
-columnloopc:
-			lodsb
-			or	al,al
-			jz	short skip1c		; Transparency check.
-			mov	[edi],al
-skip1c:
-			inc	edi
-			loop	columnloopc
-
-			pop	ecx
-			add	edi,[modulo]
- 		add esi,[skip]
-			loop	rowloopc
-
-			; Cleanup and exit icon drawing routine.
-proc_out:
-			popad
-			//ret
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	 VOID __cdecl Buffer_Draw_Line(void *thisptr, int sx, int sy, int dx, int dy, unsigned char color);
@@ -4169,7 +3434,7 @@ extern "C" long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *buffer,
 	yend = min(yend, vp.Get_Height() - 1);
 
 	int pitch = vp.Get_Pitch() + vp.Get_Width() + vp.Get_XAdd();
-	uint8_t* dst = y * pitch + x + (uint8_t*)(vp.Get_Offset());
+	uint8_t* dst = (y * 4) * pitch + (x * 4) + (uint8_t*)(vp.Get_Offset());
 	uint8_t* src = xoffset + w * yoffset + static_cast<uint8_t*>(buffer);
 	// int dst_pitch = x_pos + pitch - xend;
 	// int src_pitch = x_pos + width - xend;
@@ -4178,9 +3443,9 @@ extern "C" long __cdecl Buffer_To_Page(int x, int y, int w, int h, void *buffer,
 
 	// blit
 	while (lines--) {
-		memcpy(dst, src, blit_width);
+		FastScanlinePaletteBlit(dst, src, blit_width);
 		src += w;
-		dst += pitch;
+		dst += pitch * 4;
 	}
 
 	return 0;

@@ -60,7 +60,6 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-#include    "MapScript.h"
 #ifdef WIN32
 #include "tcpip.h"
 #include "ccdde.h"
@@ -111,7 +110,6 @@ bool Is_Mission_Counterstrike (char *file_name);
 bool Is_Mission_Aftermath (char *file_name);
 #endif
 
-MapScript* mapScript = nullptr;
 bool mapScriptPlayStart = false;
 
 void Cmd_Map(void);
@@ -332,13 +330,13 @@ bool Start_Scenario(char * name, bool briefing)
 	}
 
 // jmarshall: map scripts
-	if (mapScript) {
-		delete mapScript;
+	if (Scen.mapScript) {
+		delete Scen.mapScript;
 	}
-	mapScript = new MapScript();
-	if (!mapScript->Init(name)) {
-		delete mapScript;
-		mapScript = nullptr;
+	Scen.mapScript = new MapScript();
+	if (!Scen.mapScript->Init(name)) {
+		delete Scen.mapScript;
+		Scen.mapScript = nullptr;
 	}
 	else {
 		mapScriptPlayStart = true;
@@ -379,11 +377,11 @@ bool Start_Scenario(char * name, bool briefing)
 //   	}
 	Theme.Stop();
 // jmarshall - map scripts
-	if (mapScript) {
+	if (Scen.mapScript) {
 		Hide_Mouse();
 		VisiblePage.Clear();
 		Show_Mouse();
-		mapScript->CallFunction("map_briefing");
+		Scen.mapScript->CallFunction("map_briefing");
 	}
 	else if (briefing) {
 		Hide_Mouse();
@@ -430,16 +428,16 @@ bool Start_Scenario(char * name, bool briefing)
 }
 
 void Scenario_MapScriptFrame(void) {
-	if (!mapScript)
+	if (!Scen.mapScript)
 		return;
 
 	if (mapScriptPlayStart) {
-		mapScript->CallFunction("map_start");
+		Scen.mapScript->CallFunction("map_start");
 		mapScriptPlayStart = false;
 		return;
 	}
 
-	mapScript->CallFunction("map_frame");
+	Scen.mapScript->CallFunction("map_frame");
 }
 
 
@@ -1628,7 +1626,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 	HidPage.Blit(SeenPage);
 
 	#ifdef WIN32
-	VisiblePage.Blit(seen_buff_save);
+	//VisiblePage.Blit(seen_buff_save);
 	#endif
 
 	static unsigned char _scorepal[]={0,1,12,13,4,5,6,7,8,9,10,255,252,253,14,248};

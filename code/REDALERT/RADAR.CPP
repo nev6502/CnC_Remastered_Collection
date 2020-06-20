@@ -67,7 +67,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-
+#include	"Image.h"
 
 //void const * RadarClass::CoverShape;
 RadarClass::RTacticalClass RadarClass::RadarButton;
@@ -1073,7 +1073,7 @@ void RadarClass::Plot_Radar_Pixel(CELL cell)
  		*/
 		if (color == TBLACK) {
 			if (ZoomFactor > 1) {
-				void const * ptr = NULL;
+				const TemplateTypeClass* ptr = NULL;
 				int icon;
 
 				/*
@@ -1081,7 +1081,7 @@ void RadarClass::Plot_Radar_Pixel(CELL cell)
 				**	specified cell.
 				*/
 				if (cellptr->TType != TEMPLATE_NONE && cellptr->TType != 255) {
-					ptr = TemplateTypeClass::As_Reference(cellptr->TType).Get_Image_Data();
+					ptr = &TemplateTypeClass::As_Reference(cellptr->TType);
 					icon = cellptr->TIcon;
 				}
 
@@ -1090,11 +1090,11 @@ void RadarClass::Plot_Radar_Pixel(CELL cell)
 				**	template or an illegal one. Setup for a clear template.
 				*/
 				if (ptr == NULL) {
-					ptr = TemplateTypeClass::As_Reference(TEMPLATE_CLEAR1).Get_Image_Data();
+					ptr = &TemplateTypeClass::As_Reference(TEMPLATE_CLEAR1);
 					icon = cellptr->Clear_Icon();
 				}
 
-				IconsetClass const * iconset = (IconsetClass const *)ptr;
+				IconsetClass const * iconset = (IconsetClass const *)ptr->Get_Image_Data();
 				unsigned char const * icondata = iconset->Icon_Data();
 
 
@@ -1103,10 +1103,18 @@ void RadarClass::Plot_Radar_Pixel(CELL cell)
 				*/
 				icon &= 0x00FF;
 				icon = *(iconset->Map_Data() + icon);
-
+// jmarshall
 				unsigned char * data = (unsigned char *)icondata + icon*(24*24);
-				Buffer_To_Page(0, 0, 24, 24, data, _TileStage);
-				_TileStage.Scale(*LogicPage, 0, 0, x, y, 24, 24, ZoomFactor, ZoomFactor, TRUE);
+				Image_t* image;
+				{
+					char tmp[512];
+					sprintf(tmp, "radar_%d_%d", ptr->Type, icon);
+					image = Image_CreateImageFrom8Bit(tmp, 24, 24, (unsigned char*)data);
+				}
+				GL_RenderImage(image, x, y, ZoomFactor, ZoomFactor);
+// jmarshall end
+				//Buffer_To_Page(0, 0, 24, 24, data, _TileStage);
+				//_TileStage.Scale(*LogicPage, 0, 0, x, y, 24, 24, ZoomFactor, ZoomFactor, TRUE);
 			} else {
 //				LogicPage->Fill_Rect(x, y, x+ZoomFactor-1, y+ZoomFactor-1, cellptr->Cell_Color(false));
 /*BG*/		LogicPage->Put_Pixel(x, y, cellptr->Cell_Color(false));

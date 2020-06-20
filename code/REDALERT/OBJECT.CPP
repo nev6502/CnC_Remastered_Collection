@@ -164,6 +164,11 @@ void const * ObjectClass::Get_Image_Data(void) const
 	return(Class_Of().Get_Image_Data());
 }
 
+struct Image_t *ObjectClass::Get_HDImage_Data(void) const
+{
+	return(Class_Of().Get_HDImage_Data());
+}
+
 
 /***********************************************************************************************
  * ObjectClass::Name -- Fetches the identification name of this object.                        *
@@ -2177,7 +2182,8 @@ ObjectTypeClass::ObjectTypeClass(
 	Armor(ARMOR_NONE),
 	MaxStrength(0),
 	ImageData(0),
-	RadarIcon(0)
+	RadarIcon(0),
+	HDImageData(0)
 {
 	/*
 	** Init the DimensionData rect. Not sure how this was ever working before without being allocated. It was just trashing
