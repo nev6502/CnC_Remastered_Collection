@@ -139,10 +139,9 @@ void TabClass::Draw_Credits_Tab(void)
 	int width = SeenBuff.Get_Width();
 	CC_Draw_Shape(TabShape, Map.MoneyFlashTimer > 1 ? 8 : 6, width - (EVA_WIDTH * RESFACTOR), 0, WINDOW_MAIN, SHAPE_NORMAL);
 
-
 	if (Scen.MissionTimer.Is_Active()) {
 		bool light = ((int)Scen.MissionTimer < TICKS_PER_MINUTE * Rule.TimerWarning) || Map.FlasherTimer > 0;
-		CC_Draw_Shape(TabShape, light ? 4 : 2, 320, 0, WINDOW_MAIN, SHAPE_NORMAL);
+		CC_Draw_Shape(TabShape, light ? 4 : 2, width - ( ( EVA_WIDTH * 2 ) * RESFACTOR) , 0, WINDOW_MAIN, SHAPE_NORMAL);
 	}
 }
 

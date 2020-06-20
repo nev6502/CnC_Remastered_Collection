@@ -719,7 +719,6 @@ static int map_y2;										// map coords y2, pixel coords
 bool sizemap_cancel = false;							// true = user cancels
 bool sizemap_process = true;
 void Imgui_SizeMap(void) {
-	extern int mousex, mousey;
 	bool toolActive = false;
 
 	ImGuiStyle& style = ImGui::GetStyle();

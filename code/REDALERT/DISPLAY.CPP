@@ -188,7 +188,7 @@ DisplayClass::DisplayClass(void) :
 	ShadowShapes = 0;
 	TransIconset = 0;
 
-	Set_View_Dimensions(0, 0, ScreenWidth, ScreenHeight);
+	Set_View_Dimensions(0, 8 * RESFACTOR, ScreenWidth, ScreenHeight);
 }
 
 
@@ -561,33 +561,18 @@ short const * DisplayClass::Text_Overlap_List(char const * text, int x, int y) c
  *=============================================================================================*/
 void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 {
-	//if (width == -1) {
-	//	TacLeptonWidth = Pixel_To_Lepton(SeenBuff.Get_Width()-x);
-	//} else {
-	//	TacLeptonWidth = width * CELL_LEPTON_W;
-	//}
-	TacLeptonWidth = Pixel_To_Lepton(SeenBuff.Get_Width() - x);
+	if (width == -1) width = SeenBuff.Get_Width();
+	TacLeptonWidth = Pixel_To_Lepton( width - x);
 
-	// ST - 3/1/2019 12:05PM
-	// Made the below code more consistent with the width calculation. This is needed if we aren't going to draw the tabs at the top of the screen
-	//
-	//if (height == -1) {
-	//	TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
-	//	//height = (SeenBuff.Get_Height()-y) / CELL_PIXEL_H;
-	//}
-	//else {
-	//	TacLeptonHeight = height * CELL_LEPTON_H;
-	//}
-	//TacLeptonHeight = height * CELL_LEPTON_H;
-
-	TacLeptonHeight = Pixel_To_Lepton(SeenBuff.Get_Height() - y);
+	if (height == -1) height = SeenBuff.Get_Height();
+	TacLeptonHeight = Pixel_To_Lepton(height - y);
 
 	/*
 	**	Adjust the tactical cell if it is now in an invalid position
 	**	because of the changed dimensions.
 	*/
-	int xx = 0;// Coord_X(TacticalCoord) - (MapCellX * CELL_LEPTON_W);
-	int yy = 0;// Coord_Y(TacticalCoord) - (MapCellY * CELL_LEPTON_H);
+	int xx = Coord_X(TacticalCoord) - (MapCellX * CELL_LEPTON_W);
+	int yy = Coord_Y(TacticalCoord) - (MapCellY * CELL_LEPTON_H);
 
 	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, MapCellWidth * CELL_LEPTON_W, MapCellHeight * CELL_LEPTON_H);
 
@@ -3105,7 +3090,6 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 	x = Get_Mouse_X();
 	y = Get_Mouse_Y();
 
-
 	bool edge = (y == 0 || x == 0 || x == SeenBuff.Get_Width()-1 || y == SeenBuff.Get_Height()-1);
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
@@ -3324,16 +3308,15 @@ int DisplayClass::TacticalClass::Selection_At_Mouse(unsigned flags, KeyNumType &
 {
 	int		x, y;					// Sub cell pixel coordinates.
 	bool edge = false;
-	if (flags & (LEFTPRESS | LEFTRELEASE | RIGHTPRESS | RIGHTRELEASE)) {
-		x = Keyboard->MouseQX;
-		y = Keyboard->MouseQY;
-	}
-	else {
-		x = Get_Mouse_X();
-		y = Get_Mouse_Y();
+	
+	x = UserInput.Mouse.X;
+	y = UserInput.Mouse.Y;
 
-		if (x == 0 || y == 199 || x == 319) edge = true;
+	if (x == 0 || y == SeenBuff.Get_Height() || x == SeenBuff.Get_Width())
+	{
+		edge = true;
 	}
+
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
 
@@ -3360,7 +3343,7 @@ int DisplayClass::TacticalClass::Selection_At_Mouse(unsigned flags, KeyNumType &
 
 		if (object != nullptr)
 		{
-			bool shiftdown = DLL_Export_Get_Input_Key_State(KN_LSHIFT);
+			bool shiftdown = UserInput.KeyB.Shift == true;
 
 			if (shiftdown)
 			{
@@ -3402,16 +3385,15 @@ int DisplayClass::TacticalClass::Command_Object(unsigned flags, KeyNumType & key
 {
 	int		x, y;					// Sub cell pixel coordinates.
 	bool edge = false;
-	if (flags & (LEFTPRESS | LEFTRELEASE | RIGHTPRESS | RIGHTRELEASE)) {
-		x = Keyboard->MouseQX;
-		y = Keyboard->MouseQY;
-	}
-	else {
-		x = Get_Mouse_X();
-		y = Get_Mouse_Y();
 
-		if (x == 0 || y == 199 || x == 319) edge = true;
+	x = UserInput.Mouse.X;
+	y = UserInput.Mouse.Y;
+
+	if (x == 0 || y == SeenBuff.Get_Height() || x == SeenBuff.Get_Width())
+	{
+		edge = true;
 	}
+
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
 

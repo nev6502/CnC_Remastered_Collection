@@ -61,6 +61,8 @@
 
 #include <imgui.h>
 #include <examples/imgui_impl_opengl3.h>
+#include <string>
+#include <algorithm>
 
 #include <vector>
 #include "HOUSECOLOR.H"
@@ -884,133 +886,8 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
-	static int numFramesLMouse = 0;
-	extern int mousex, mousey;
-	bool leftMouseProcessed = false;
-
-	key = KN_NONE;
-	flags = 0;
-
-	SDL_GetMouseState(&mousex, &mousey);
-
-	Keyboard->MouseQX = mousex;
-	Keyboard->MouseQY = mousey;
-
-	//	if (flags == LEFTRELEASE || flags == RIGHTRELEASE)
-	//		flags = 0;	
-
-	static SDL_Event event;
-	memset(&event, 0, sizeof(SDL_Event));
-	while (SDL_PollEvent(&event)) {
-		switch (event.type)
-		{
-			case SDL_SYSWMEVENT:
-				if ( event.syswm.msg->msg.win.msg == WM_DESTROY )
-				{
-					Invalidate_Cached_Icons();
-					VisiblePage.Un_Init();
-					HiddenPage.Un_Init();
-					AllSurfaces.Release();
-					if (!InDebugger) Reset_Video_Mode();
-
-					/*
-					** If we are shutting down gracefully than flag that the message loop has finished.
-					** If this is a forced shutdown (ReadyToQuit == 0) then try and close down everything
-					** before we exit.
-					*/
-					PostQuitMessage(0);
-
-					switch (ReadyToQuit) {
-						case 1:
-							ReadyToQuit = 2;
-							break;
-						case 0:
-							ExitProcess(0);
-							break;
-					}
-				}
-
-				break;
-
-			case SDL_MOUSEMOTION:
-				flags = GadgetClass::LEFTUP;
-				break;
-
-
-			case SDL_MOUSEBUTTONDOWN:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = GadgetClass::LEFTPRESS;
-					leftMouseProcessed = true;
-					numFramesLMouse++;
-					key = KN_LMOUSE;
-					Keyboard->Put_Element(KN_LMOUSE);
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					numFramesLMouse = 0;
-					flags = GadgetClass::RIGHTPRESS;
-					Keyboard->Put_Element(KN_RMOUSE);
-					key = KN_RMOUSE;
-				}
-				break;
-
-			case SDL_MOUSEBUTTONUP:
-				if (event.button.button == SDL_BUTTON_LEFT) {
-					flags = GadgetClass::LEFTRELEASE;
-					numFramesLMouse = 0;
-				}
-				else if (event.button.button == SDL_BUTTON_RIGHT) {
-					flags = GadgetClass::RIGHTRELEASE;
-					numFramesLMouse = 0;
-				}
-				break;
-
-			case SDL_KEYDOWN:
-				if (event.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
-					renderConsole = !renderConsole;
-
-					if (renderConsole) {
-					//	ShowCursor(TRUE);
-					//	Hide_Mouse();
-					}
-					else {
-					//	ShowCursor(FALSE);
-					//	Show_Mouse();
-					}
-					break;
-				}
-
-				const Uint8* state = SDL_GetKeyboardState(NULL);
-
-				if (state[SDL_SCANCODE_RALT] || state[SDL_SCANCODE_LALT])
-				{
-					Keyboard->Put_Element(event.key.keysym.sym | KN_ALT_BIT);
-				}
-				else
-				{
-					Keyboard->Put_Element(event.key.keysym.sym);
-				}
-
-				break;
-		}
-
-		if (Debug_Map || renderConsole)
-		{
-			ImGui_ImplSDL2_ProcessEvent(&event);
-		}
-
-	}
-
-	if (!leftMouseProcessed && numFramesLMouse != 0)
-	{
-		flags = GadgetClass::LEFTHELD;
-	}
-
-	if (presentBuffer) {
-		Device_Present();
-	}
+	UserInput.Process_Input(key, flags, presentBuffer);
 }
-
-
 
 #ifndef NDEBUG
 /***********************************************************************************************

@@ -1506,7 +1506,6 @@ int mainmenu_x = -1;
 int mainmenu_y = -1;
 
 void Imgui_MapEdit_MainMenu(void) {
-	extern int mousex, mousey;
 	bool toolActive = false;
 
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -1559,15 +1558,14 @@ void Imgui_MapEdit_MainMenu(void) {
  *=========================================================================*/
 void MapEditClass::Main_Menu(void)
 {
-	extern int mousex, mousey;
 	int selection;						// option the user picks
 	bool process;						// menu stays up while true
 	int rc;
 
 	Imgui_Dialog_Function = Imgui_MapEdit_MainMenu;
 	mainmenu_selection = -1;
-	mainmenu_x = mousex;
-	mainmenu_y = mousey;
+	mainmenu_x = UserInput.Mouse.X;
+	mainmenu_y = UserInput.Mouse.Y;
 
 	/*
 	**	Main Menu loop

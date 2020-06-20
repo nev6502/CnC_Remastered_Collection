@@ -326,12 +326,12 @@ int Mouse_Over_Spot(int house, int scenario)
 {
 	int retval = -1;
 	for (int selection = 0; selection < 3 && MapCoords[house][scenario][selection].x != -1; selection++) {
-		int mousex = Get_Mouse_X() / RESFACTOR;
+		int mousex = UserInput.Mouse.X / RESFACTOR;
 		int mousey = Get_Mouse_Y() / RESFACTOR;
-		if (mousex >= MapCoords[house][scenario][selection].x &&
-			 mousey >= MapCoords[house][scenario][selection].y &&
-			 mousex <= MapCoords[house][scenario][selection].x+11 &&
-			 mousey <= MapCoords[house][scenario][selection].y+9) {
+		if (UserInput.Mouse.X >= MapCoords[house][scenario][selection].x &&
+			 UserInput.Mouse.Y >= MapCoords[house][scenario][selection].y &&
+			 UserInput.Mouse.X <= MapCoords[house][scenario][selection].x+11 &&
+			 UserInput.Mouse.Y <= MapCoords[house][scenario][selection].y+9) {
 
 			retval = selection;
 			break;
