@@ -3486,9 +3486,9 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 	if ((flags & SHAPE_GHOST) && (!ghostdata)) {
 		ghostdata = DisplayClass::SpecialGhost;
 	}
-	if ((flags & SHAPE_FADING) && (!fadingdata)) {
-		fadingdata = DisplayClass::FadingShade;
-	}
+	//if ((flags & SHAPE_FADING) && (!fadingdata)) {
+	//	fadingdata = DisplayClass::FadingShade;
+	//}
 
 	static unsigned char* _xbuffer = 0;
 
@@ -3498,8 +3498,8 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 
 	if (image != NULL && shapenum != -1) {
 
-		int width = image->width;
-		int height = image->height;
+		int width = image->renderwidth;
+		int height = image->renderheight;
 
 #ifdef NEVER
 		/*
@@ -3758,7 +3758,7 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 
 			{
 				char tmp[512];
-				sprintf(tmp, "s%d%d%d%d%d", shapefile, shapenum, rotation, fadingdata, flags);
+				sprintf(tmp, "s_%d_%d_%d_%d_%d", shapefile, shapenum, rotation, fadingdata, flags);
 
 				if (flags & SHAPE_FADING) {
 					shape_image = Image_CreateImageFrom8Bit(tmp, width, height, (unsigned char*)buffer, (unsigned char*)fadingdata);
