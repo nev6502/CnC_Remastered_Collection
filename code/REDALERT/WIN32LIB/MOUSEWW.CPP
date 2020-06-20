@@ -241,8 +241,8 @@ void WWMouseClass::RenderMouse(void) {
 
 	//ImVec2 size(current_cursor->width, current_cursor->height);
 	// Image((ImTextureID)current_cursor->image, size);
-	int _my = UserInput.Mouse.X + (current_cursor->height * 0.25);
-	int xstart = UserInput.Mouse.Y - Get_Hotspot_X();
+	int _my = UserInput.Mouse.Y + (current_cursor->height * 0.25);
+	int xstart = UserInput.Mouse.X - Get_Hotspot_X();
 	int ystart = _my - Get_Hotspot_Y();
 	int yend = current_cursor->height + ystart - 1;
 	int xend = current_cursor->width + xstart - 1;
