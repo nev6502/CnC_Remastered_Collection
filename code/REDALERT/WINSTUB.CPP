@@ -102,7 +102,7 @@ unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheigh
 return a hash value for the filename
 ================
 */
-static int64_t generateHashValue(const char* fname, const int size) {
+int64_t generateHashValue(const char* fname, const int size) {
 	uint32_t hash = 0x811c9dc5;
 	uint32_t prime = 0x1000193;
 

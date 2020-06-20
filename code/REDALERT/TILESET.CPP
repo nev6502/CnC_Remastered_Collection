@@ -190,7 +190,7 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
     }
 }
 
-Image_t* Load_StampHD(const char* theaterName, const char* iconName, const void* icondata) {
+Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
     char filename[2048];
     Image_t* image = NULL;
 
@@ -205,33 +205,24 @@ Image_t* Load_StampHD(const char* theaterName, const char* iconName, const void*
 	}
 
     // This is because were trying to avoid parsing the XML's and the filenames aren't consistant.
-    char* baseFileNameTemplate = "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s/%s-%04d.DDS";
-    char* fileNameTemplate = baseFileNameTemplate;
-
+    const char* theaterName = Theaters[theater].Name;
     for (int i = 0; i < IconCount; i++)
     {
-        sprintf(filename, fileNameTemplate, theaterName, iconName, iconName, i);
+        char filename[512];
+        char fixedIconName[512];
+        strcpy(fixedIconName, iconName);
+        COM_SetExtension(fixedIconName, strlen(fixedIconName), "");
+        const char* tileEntryName = Tileset_FindHDTexture(theater, fixedIconName, i);
+        sprintf(filename, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s", Theaters[theater].Name, tileEntryName);
+        COM_SetExtension(filename, sizeof(filename), ".dds");
+                
         if (image == NULL) {
-            image = Image_LoadImage(filename);
-            if (image == NULL) {
-                fileNameTemplate = "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s/%s-%04d-0000.DDS";
-                sprintf(filename, fileNameTemplate, theaterName, iconName, iconName, i);
-				image = Image_LoadImage(filename);
-                if (image == NULL) {
-					fileNameTemplate = "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s/%s-%04d-00.DDS";
-					sprintf(filename, fileNameTemplate, theaterName, iconName, iconName, i);
-					image = Image_LoadImage(filename);
-                    if (image == NULL) {
-                        fileNameTemplate = baseFileNameTemplate; // Restore back to the original template.
-                        continue;
-                    }
-                }
-            }
+            image = Image_LoadImage(filename);     
 
-			//if (i != 0) {
-			//	image->image[0][i] = image->image[0][0];
-			//	image->image[0][0] = 0;
-			//}
+            if (image != NULL && i != 0) {
+                image->image[0][i] = image->image[0][0];
+                image->image[0][0] = 0;
+            }
         }
         else {
             if (!Image_Add32BitImage(filename, image, -1, i)) {

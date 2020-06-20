@@ -691,7 +691,7 @@ void TerrainTypeClass::Init(TheaterType theater)
 				((void const *&)terrain.ImageData) = MFCD::Retrieve(fullname);
 
 				// Try and load HD assets first.
-				Image_t* hdImage = Load_StampHD(Theaters[theater].Name, fullname, terrain.ImageData);
+				Image_t* hdImage = Load_StampHD(theater, fullname, terrain.ImageData);
 				if (hdImage)
 				{
 					Get_Stamp_Size(terrain.ImageData, hdImage->renderwidth, hdImage->renderheight);

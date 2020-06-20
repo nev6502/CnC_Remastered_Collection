@@ -42,7 +42,6 @@ class MapEditClass;
 class HouseClass;
 class WeaponTypeClass;
 
-
 /***************************************************************************
 **	This is the abstract type class. It holds information common to all
 **	objects that might exist. This contains the name of the object type.

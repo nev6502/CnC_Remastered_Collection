@@ -3138,7 +3138,7 @@ void TemplateTypeClass::Init(TheaterType theater)
 			((unsigned char &)tplate.Height) = Get_IconSet_MapHeight(ptr);
 
 			// Try and load HD assets first.
-			Image_t *hdImage = Load_StampHD(Theaters[theater].Name, fullname, tplate.ImageData);
+			Image_t *hdImage = Load_StampHD(theater, fullname, tplate.ImageData);
 			if (hdImage)
 			{
 				Get_Stamp_Size(tplate.ImageData, hdImage->renderwidth, hdImage->renderheight);

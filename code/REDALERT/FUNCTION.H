@@ -1179,6 +1179,9 @@ __forceinline void COM_SetExtension(char* path, int maxSize, const char* extensi
 	sprintf(path, "%s%s", oldPath, extension);
 }
 
+void Tileset_LoadRules(void);
+const char* Tileset_FindHDTexture(int theaterType, const char* shapeFileName, int shapeNum);
+
 extern bool g_inMainMenu;
 extern KeyNumType	g_globalKeyNumType;
 extern int			g_globalKeyFlags;
