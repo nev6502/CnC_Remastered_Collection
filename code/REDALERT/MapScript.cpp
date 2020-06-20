@@ -4,6 +4,8 @@
 #include "FUNCTION.H"
 #include "MapScript.h"
 
+
+
 /***********************************************************************************************
  * Script_GiveCredits - Gives or takes a given amount of credits to / from a player            *
  *                                                                                             *
@@ -96,11 +98,12 @@ static int Script_GetCredits(lua_State* L) {
     return 1;
 }
 
+
 /***********************************************************************************************
- * Script_GetCellBuilding - Gets a building (if any) on a cell and returns the ID              *
+ * Script_GetCellObject - Gets an object (if any) on a cell and returns the ID                 *
  *                                                                                             *
- *   SCRIPT INPUT:	in_x (int)       - The cell/X location of the cell to test                 *
- *                  in_y (int)       - The cell/Y location of the cell to test                 *
+ *   SCRIPT INPUT:	in_x (int)       - The cell/X location of the cell to pick from            *
+ *                  in_y (int)       - The cell/Y location of the cell to pick from            *
  *                                                                                             *
  *   SCRIPT OUTPUT:  result (number) - The ID of the building on the cell, or -1 if none       *
  *                                                                                             *
@@ -111,23 +114,210 @@ static int Script_GetCredits(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_GetCellBuilding(lua_State* L) {
+static int Script_GetCellObject(lua_State* L) {
 
     int in_x = lua_tointeger(L, 1);
     int in_y = lua_tointeger(L, 2);
 
     long result = -1;
+    
+    ObjectClass* this_object = Map[XY_Cell(in_x, in_y)].Cell_Object();
 
-    BuildingClass* this_building = Map[XY_Cell(in_x, in_y)].Cell_Building();
-    
-    if (this_building != NULL) {
-        result = this_building->ID;
+    if (this_object == NULL) {
+
+        lua_pushnumber(L, -1);
+        return 1;
     }
-    
-    lua_pushnumber(L, result);
+
+    MapScriptObject* CacheObject = new MapScriptObject;
+
+    CacheObject->ID = this_object->ID;
+    CacheObject->RTTI = this_object->RTTI;
+    CacheObject->classIndex = -1;
+
+    switch (this_object->RTTI) {
+        case RTTI_BUILDING: {
+            CacheObject->classIndex = Script_BuildingIndexFromID(this_object->ID);
+        }break;
+        case RTTI_UNIT: {
+            CacheObject->classIndex = Script_UnitIndexFromID(this_object->ID);
+        }break;
+        case RTTI_AIRCRAFT: {
+            CacheObject->classIndex = Script_AircraftIndexFromID(this_object->ID);
+        }break;
+        case RTTI_INFANTRY: {
+            CacheObject->classIndex = Script_InfantryIndexFromID(this_object->ID);
+        }break;
+        case RTTI_VESSEL: {
+            CacheObject->classIndex = Script_VesselIndexFromID(this_object->ID);
+        }break;
+    }
+
+    if (CacheObject->classIndex == -1 || CacheObject->ID < 0) {
+        delete CacheObject;
+        lua_pushnumber(L, -1);
+    }else {
+        Scen.mapScript->ObjectCache.push_back(CacheObject);
+        lua_pushnumber(L, CacheObject->ID); // Return index for ultrafast lookup
+    }
 
     return 1;
 }
+
+
+/***********************************************************************************************
+ * MapScript::GetCacheObject -- Returns ObjectClass from cache with given ID                   *
+ *                                                                                             *
+ * INPUT:  input_object_id (int)         - Input object ID                                     *
+ *                                                                                             *
+ * OUTPUT:  this_object (ObjectClass*)   - The object with the ID or NULL                      *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+ObjectClass* Script_GetCacheObject(int input_object_id) {
+
+    if (input_object_id < 0 ) {
+        return false;
+    }
+
+    // Look through cache for object with ID, and return it
+    for (std::vector<MapScriptObject*>::iterator it = Scen.mapScript->ObjectCache.begin(); it != Scen.mapScript->ObjectCache.end(); ++it) {//Error 2-4
+
+        MapScriptObject* thisCacheObject = (MapScriptObject*)(*it);
+
+        if (thisCacheObject->ID == input_object_id) {
+
+            // Determine type of object and return it from cache. If it doesn't exist any longer, remove it from cache
+            switch (thisCacheObject->RTTI) {
+                case RTTI_BUILDING: {
+                    BuildingClass *this_building = Buildings.Ptr(thisCacheObject->classIndex);
+                    if (this_building != NULL) {
+                        return this_building;
+                    } else {
+                        it = Scen.mapScript->ObjectCache.erase(it); // Cache item exists but is invalidated; remove from cache
+                        return NULL;
+                    }
+                }break;
+                case RTTI_UNIT: {
+                    UnitClass* this_unit = Units.Ptr(thisCacheObject->classIndex);
+                    if (this_unit != NULL) {
+                        return this_unit;
+                    } else {
+                        it = Scen.mapScript->ObjectCache.erase(it); // Cache item exists but is invalidated; remove from cache
+                        return NULL;
+                    }
+                }break;
+                case RTTI_AIRCRAFT: {
+                    AircraftClass* this_aircraft = Aircraft.Ptr(thisCacheObject->classIndex);
+                    if (this_aircraft != NULL) {
+                        return this_aircraft;
+                    } else {
+                        it = Scen.mapScript->ObjectCache.erase(it); // Cache item exists but is invalidated; remove from cache
+                        return NULL;
+                    }
+                }break;
+                case RTTI_INFANTRY: {
+                    InfantryClass* this_infantry = Infantry.Ptr(thisCacheObject->classIndex);
+                    if (this_infantry != NULL) {
+                        return this_infantry;
+                    } else {
+                        it = Scen.mapScript->ObjectCache.erase(it); // Cache item exists but is invalidated; remove from cache
+                        return NULL;
+                    }
+                }break;
+                case RTTI_VESSEL: {
+                    VesselClass* this_vessel = Vessels.Ptr(thisCacheObject->classIndex);
+                    if (this_vessel != NULL) {
+                        return this_vessel;
+                    } else {
+                        it = Scen.mapScript->ObjectCache.erase(it); // Cache item exists but is invalidated; remove from cache
+                        return NULL;
+                    }
+                }break;
+            }
+
+        }
+
+    }
+    
+    // Not found in cache; let's find the object by ID the hard way... If scripting is done well, this doesn't get hit
+    int _objectIndex = -1;
+    MapScriptObject* CacheObject = new MapScriptObject;
+    CacheObject->ID = -1;
+    
+    _objectIndex = Script_BuildingIndexFromID(input_object_id);
+    BuildingClass* this_building = Buildings.Ptr(_objectIndex);
+    if (this_building != NULL) {
+        
+        CacheObject->ID = this_building->ID;
+        CacheObject->RTTI = this_building->RTTI;
+        CacheObject->classIndex = _objectIndex;
+        Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+        return this_building;
+
+    }else {
+        _objectIndex = Script_UnitIndexFromID(input_object_id);
+        UnitClass* this_unit = Units.Ptr(_objectIndex);
+        if (this_unit != NULL) {
+            
+            CacheObject->ID = this_unit->ID;
+            CacheObject->RTTI = this_unit->RTTI;
+            CacheObject->classIndex = _objectIndex;
+            Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+            return this_unit;
+
+        }else {
+            _objectIndex = Script_AircraftIndexFromID(input_object_id);
+            AircraftClass* this_aircraft = Aircraft.Ptr(_objectIndex);
+            if (this_aircraft != NULL) {
+                
+                CacheObject->ID = this_aircraft->ID;
+                CacheObject->RTTI = this_aircraft->RTTI;
+                CacheObject->classIndex = _objectIndex;
+                Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                return this_aircraft;
+
+            }else {
+                _objectIndex = Script_VesselIndexFromID(input_object_id);
+                VesselClass* this_vessel = Vessels.Ptr(_objectIndex);
+                if (this_vessel != NULL) {
+
+                    CacheObject->ID = this_vessel->ID;
+                    CacheObject->RTTI = this_vessel->RTTI;
+                    CacheObject->classIndex = _objectIndex;
+                    Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                    return this_vessel;
+                    
+                }else {
+                    _objectIndex = Script_InfantryIndexFromID(input_object_id);
+                    InfantryClass* this_infantry = Infantry.Ptr(_objectIndex);
+                    if (this_infantry != NULL) {
+                        
+                        CacheObject->ID = this_infantry->ID;
+                        CacheObject->RTTI = this_infantry->RTTI;
+                        CacheObject->classIndex = _objectIndex;
+                        Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                        return this_infantry;
+
+                    }
+                }
+            }
+        }
+    }
+
+    // Looks like we didn't find anything. They probably shouldn't have gotten this far in the first place so it was worth a try.
+    delete CacheObject;
+
+    return NULL;
+}
+
+
 
 /***********************************************************************************************
  * Script_CountBuildings - Returns the amount of specific buildings for a player               *
@@ -1354,7 +1544,9 @@ static int Script_StopMissionTimer(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_CreateCellCallback(lua_State* L) {
+static int Script_CellCallback(lua_State* L) {
+
+    // TODO: option 6 arguments to allow x2,y2 (for a rect)
 
     int houseType = lua_tointeger(L, 1);
     int in_x = lua_tointeger(L, 2);
@@ -1399,7 +1591,7 @@ static int Script_CreateCellCallback(lua_State* L) {
 /***********************************************************************************************
  * Script_CreateSpiedByCallback - Creates a SPIED_BY trigger and attaches a callback           *
  *                                                                                             *
- *   SCRIPT INPUT:	buildingID (int)      - The building ID being spied                        *
+ *   SCRIPT INPUT:	objectID (int)        - The building ID being spied                        *
  *                	houseType (int)       - The house (player) index doing the spying          *
  *                  in_function (string)  - The callback function to execute upon trigger      *
  *                                                                                             *
@@ -1412,13 +1604,13 @@ static int Script_CreateCellCallback(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_CreateSpiedByCallback(lua_State* L) {
+static int Script_SpiedByCallback(lua_State* L) {
 
-    int buildingID = lua_tointeger(L, 1);
-    int houseType = lua_tointeger(L, 1);
+    int objectID = lua_tointeger(L, 1);
+    int houseType = lua_tointeger(L, 2);
     const char* in_function = lua_tostring(L, 3);
 
-    BuildingClass* this_building = Buildings.Ptr(buildingID);
+    BuildingClass* this_building = Buildings.Ptr(objectID);
 
     // A house must be specified
     if (houseType >= 0 && houseType < HouseTypes.Count() && this_building != NULL) {
@@ -1453,6 +1645,120 @@ static int Script_CreateSpiedByCallback(lua_State* L) {
 
     return 1;
 }
+
+
+/***********************************************************************************************
+ * Script_CreateDiscoveryCallback - Creates a TEVENT_DISCOVERED trigger and attaches a callback*
+ *                                                                                             *
+ *   SCRIPT INPUT:	objectID (int)        - The object's ID being discovered                   *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_DiscoveryCallback(lua_State* L) {
+
+    int objectID = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (objectID >= 0 ) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HousesType::HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_DISCOVERED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        Script_SetObjectTrigger(objectID, this_trigger);
+
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_HouseDiscoveredCallback - Initiates when given house is discovered                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index that has been discovered  *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_HouseDiscoveredCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = PlayerPtr->Class->House;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::VOLATILE;
+
+        this_trigger_type->Event1 = TEVENT_HOUSE_DISCOVERED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+
+        TriggerClass* editor_trigger = Triggers.Ptr(0);
+        TriggerTypeClass* editor_trigger_type = editor_trigger->Class;
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[PlayerPtr->Class->House].Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
 
 
 /***********************************************************************************************
@@ -1516,6 +1822,190 @@ static int Script_TriggerAddCell(lua_State* L) {
 static int Script_SetBriefingText(lua_State* L) {
     strcpy(Scen.BriefingText, lua_tostring(L, -1));
     return 1;
+}
+
+/***********************************************************************************************
+ * Script_SetObjectTrigger -- Figures out what kind of object is given and sets up trigger     *
+ *                                                                                             *
+ * INPUT:  input_object (ObjectClass*)   - Input object                                        *
+ *         input_trigger (TriggerClass*) - Input Trigger                                       *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the object found? Does the trigger exist?                                *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+bool Script_SetObjectTrigger(int input_object_id, TriggerClass* input_trigger) {
+
+    if (input_object_id < 0) {
+        return false;
+    }
+
+    if (input_trigger == NULL) {
+        return false;
+    }
+
+    ObjectClass* this_object = Script_GetCacheObject(input_object_id);
+
+    if (this_object != NULL) {
+
+        switch (this_object->RTTI) {
+            case RTTI_BUILDING:{
+                input_trigger->Class->Event1.Data.Structure = dynamic_cast<BuildingClass*>(this_object)->Class->Type;
+                dynamic_cast<BuildingClass*>(this_object)->Trigger = input_trigger;
+            }break;
+            case RTTI_UNIT:{
+                input_trigger->Class->Event1.Data.Unit = dynamic_cast<UnitClass*>(this_object)->Class->Type;
+                dynamic_cast<UnitClass*>(this_object)->Trigger = input_trigger;
+            }break;
+            case RTTI_AIRCRAFT:{
+                input_trigger->Class->Event1.Data.Aircraft = dynamic_cast<AircraftClass*>(this_object)->Class->Type;
+                dynamic_cast<AircraftClass*>(this_object)->Trigger = input_trigger;
+            }break;
+            case RTTI_INFANTRY:{
+                input_trigger->Class->Event1.Data.Infantry = dynamic_cast<InfantryClass*>(this_object)->Class->Type;
+                dynamic_cast<InfantryClass*>(this_object)->Trigger = input_trigger;
+            }break;
+        }
+
+    }
+
+    return false;
+}
+
+/***********************************************************************************************
+ * Script_BuildingIndexFromID -- Returns BuildingClass or NULL depending on the input               *
+ *                                                                                             *
+ * INPUT:  input_object_id (int)   - Input object ID                                           *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the object found? Does the trigger exist?                                *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+int Script_BuildingIndexFromID(int input_object_id) {
+
+    if (input_object_id < 0) {
+        return false;
+    }
+
+    for (int _index = 0; _index < Buildings.Count(); _index++) {
+        BuildingClass* _object = Buildings.Ptr(_index);
+
+        if (_object->ID == input_object_id) {
+            return _index;
+        }
+    }
+
+    return -1;
+}
+
+/***********************************************************************************************
+ * Script_UnitIndexFromID -- Returns UnitClass* or NULL depending on the input                      *
+ *                                                                                             *
+ * INPUT:  input_unit_id (int)   - Input Unit ID                                               *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the object found? Does the trigger exist?                                *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+int Script_UnitIndexFromID(int input_object_id) {
+
+    if (input_object_id < 0) {
+        return false;
+    }
+
+    for (int _index = 0; _index < Units.Count(); _index++) {
+        UnitClass* _object = Units.Ptr(_index);
+
+        if (_object->ID == input_object_id) {
+            return _index;
+        }
+    }
+
+    return -1;
+}
+
+/***********************************************************************************************
+ * Script_AircraftIndexFromID -- Returns AircraftClass* or NULL depending on the input              *
+ *                                                                                             *
+ * INPUT:  input_object_id (int)   - Input object ID                                           *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the object found? Does the trigger exist?                                *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+int Script_AircraftIndexFromID(int input_object_id) {
+
+    if (input_object_id < 0) {
+        return false;
+    }
+
+    for (int _index = 0; _index < Aircraft.Count(); _index++) {
+        AircraftClass* _object = Aircraft.Ptr(_index);
+
+        if (_object->ID == input_object_id) {
+            return _index;
+        }
+    }
+
+    return -1;
+}
+
+/***********************************************************************************************
+ * Script_InfantryIndexFromID -- Returns InfantryClass* or NULL depending on the input              *
+ *                                                                                             *
+ * INPUT:  input_unit_id (int)   - Input Infantry ID                                           *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the object found? Does the trigger exist?                                *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+int Script_InfantryIndexFromID(int input_object_id) {
+
+    if (input_object_id < 0) {
+        return false;
+    }
+
+    for (int _index = 0; _index < Infantry.Count(); _index++) {
+        InfantryClass* _object = Infantry.Ptr(_index);
+
+        if (_object->ID == input_object_id) {
+            return _index;
+        }
+    }
+
+    return -1;
+}
+
+/***********************************************************************************************
+ * Script_VesselIndexFromID -- Returns VesselClass* or NULL depending on the input                  *
+ *                                                                                             *
+ * INPUT:  input_unit_id (int)   - Input vessel ID                                             *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the object found? Does the trigger exist?                                *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+int Script_VesselIndexFromID(int input_object_id) {
+
+    if (input_object_id < 0) {
+        return false;
+    }
+
+    for (int _index = 0; _index < Vessels.Count(); _index++) {
+        VesselClass* _object = Vessels.Ptr(_index);
+
+        if (_object->ID == input_object_id) {
+            return _index;
+        }
+    }
+
+    return -1;
 }
 
 
@@ -1611,6 +2101,9 @@ bool MapScript::Init(const char* mapName) {
         return false;
     }
 
+    // Reserve object cache memory
+    ObjectCache.reserve(2000);
+
     /**********************************************************************************************
     * Red Alert Vanilla Actions                                                                   *
     *=============================================================================================*/
@@ -1646,11 +2139,12 @@ bool MapScript::Init(const char* mapName) {
 * Red Alert Vanilla Events                                                                    *
 *=============================================================================================*/
 
-    lua_register(L, "CreateCellCallback", Script_CreateCellCallback);               // player enters this square
-    lua_register(L, "CreateSpiedByCallback", Script_CreateSpiedByCallback);         // Spied by.
-// Thieved by (raided or stolen vehicle).
-// player discovers this object
-// House has been discovered.
+    lua_register(L, "CellCallback", Script_CellCallback);               // player enters this square (or group of squares)
+    lua_register(L, "SpiedByCallback", Script_SpiedByCallback);         // Spied by.
+    // Thieved by (raided or stolen vehicle).                                       // This doesn't appear to be implemented in the engine (?)
+    lua_register(L, "ObjectDiscoveryCallback", Script_DiscoveryCallback);     // player discovers this object
+    lua_register(L, "DiscoveryCallback", Script_DiscoveryCallback);     // player discovers this object
+    lua_register(L, "HouseDiscoveredCallback", Script_HouseDiscoveredCallback); // House has been discovered.
 // player attacks this object
 // player destroys this object
 // Any object event will cause the trigger.
@@ -1689,7 +2183,8 @@ bool MapScript::Init(const char* mapName) {
     lua_register(L, "SetBriefingText", Script_SetBriefingText);						// Sets the [text] on the mission briefing screen
     lua_register(L, "GiveCredits", Script_GiveCredits);                             // Give [credits] to [player] 
     lua_register(L, "GetCredits", Script_GetCredits);                               // Get [player]'s [credits]
-    lua_register(L, "GetCellBuilding", Script_GetCellBuilding);	                    // Gets a building, if any, at [Cell/X],[Cell/Y]
+
+    lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
     
     lua_register(L, "CountBuildings", Script_CountBuildings);	                    // Number of buildings of [type] for given [player]
     lua_register(L, "CountAircraft", Script_CountAircraft);	                        // Number of units of [type] for given [player]
@@ -1715,3 +2210,23 @@ bool MapScript::Init(const char* mapName) {
     return true;
 }
 
+/***********************************************************************************************
+ * MapScript::Deinit - Deinitialize/free any data used by MapScript (used within destructor)   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	none                                                                       *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+void MapScript::Deinit() {
+
+    for (int i = 0; i < ObjectCache.size(); ++i)
+    {
+        delete ObjectCache[i];
+    }
+
+    ObjectCache.clear();
+
+}
