@@ -46,7 +46,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-
+#include	"image.h"
 
 static TemplateTypeClass const Empty(
 	TEMPLATE_CLEAR1,
@@ -3137,7 +3137,16 @@ void TemplateTypeClass::Init(TheaterType theater)
 			((unsigned char &)tplate.Width) = Get_IconSet_MapWidth(ptr);
 			((unsigned char &)tplate.Height) = Get_IconSet_MapHeight(ptr);
 
+			// Try and load HD assets first.
+			Image_t *hdImage = Load_StampHD(Theaters[theater].Name, fullname, tplate.ImageData);
+			if (hdImage)
 			{
+				Get_Stamp_Size(tplate.ImageData, hdImage->renderwidth, hdImage->renderheight);
+				((void const*&)tplate.HDImageData) = hdImage;
+			}
+			else
+			{
+				// If no HD assets, load the legacy assets into a texture.
 				char tmp[512];
 				sprintf(tmp, "icon_%s", fullname);
 				((void const*&)tplate.HDImageData) = Load_Stamp(fullname, tplate.ImageData);
@@ -3189,20 +3198,23 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 
 	for (index = 0; index < w*h; index++) {
 		if (map[index] != 0xFF) {
-			HidPage.Draw_Stamp(iconset, index, 0, 0, NULL, WINDOW_MAIN);
-			Buffer_Enable_HD_Texture(true); // At this point, Draw_Stamp creates a 32bit image.
-			if (scale) {
-				HidPage.Scale((*LogicPage), 0, 0,
-					x + ((index % w)*(ICON_PIXEL_W/2)),
-					y + ((index / w)*(ICON_PIXEL_H/2)),
-					ICON_PIXEL_W, ICON_PIXEL_H,
-					ICON_PIXEL_W/2, ICON_PIXEL_H/2, (char *)NULL);
-
-			} else {
-				HidPage.Blit((*LogicPage), 0, 0, x + ((index % w)*(ICON_PIXEL_W)),
-					y + ((index / w)*(ICON_PIXEL_H)), ICON_PIXEL_W, ICON_PIXEL_H);
-			}
-			Buffer_Enable_HD_Texture(false);
+// jmarshall - even if using legacy data, always use hdimage.
+			HidPage.Draw_Stamp(Get_HDImage_Data(), index, 0, 0, NULL, WINDOW_MAIN);
+			// Disabled legacy blit code.
+			//Buffer_Enable_HD_Texture(true); // At this point, Draw_Stamp creates a 32bit image.
+			//if (scale) {
+			//	HidPage.Scale((*LogicPage), 0, 0,
+			//		x + ((index % w)*(ICON_PIXEL_W/2)),
+			//		y + ((index / w)*(ICON_PIXEL_H/2)),
+			//		ICON_PIXEL_W, ICON_PIXEL_H,
+			//		ICON_PIXEL_W/2, ICON_PIXEL_H/2, (char *)NULL);
+			//
+			//} else {
+			//	HidPage.Blit((*LogicPage), 0, 0, x + ((index % w)*(ICON_PIXEL_W)),
+			//		y + ((index / w)*(ICON_PIXEL_H)), ICON_PIXEL_W, ICON_PIXEL_H);
+			//}
+			//Buffer_Enable_HD_Texture(false);
+// jmarshall end
 		}
 	}
 }

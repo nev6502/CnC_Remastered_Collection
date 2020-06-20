@@ -190,7 +190,81 @@ void __cdecl Buffer_Draw_Stamp2(GraphicViewPortClass& viewport, IconControlType*
     }
 }
 
-struct Image_t *__cdecl Load_Stamp(const char *name, const void* icondata)
+Image_t* Load_StampHD(const char* theaterName, const char* iconName, const void* icondata) {
+    char filename[2048];
+    Image_t* image = NULL;
+
+	IconControlType* tileset = (IconControlType*)icondata;
+
+	if (!tileset) {
+		return NULL;
+	}
+
+	if (LastIconset != tileset) {
+		Init_Stamps(tileset);
+	}
+
+    // This is because were trying to avoid parsing the XML's and the filenames aren't consistant.
+    char* baseFileNameTemplate = "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s/%s-%04d.DDS";
+    char* fileNameTemplate = baseFileNameTemplate;
+
+    for (int i = 0; i < IconCount; i++)
+    {
+        sprintf(filename, fileNameTemplate, theaterName, iconName, iconName, i);
+        if (image == NULL) {
+            image = Image_LoadImage(filename);
+            if (image == NULL) {
+                fileNameTemplate = "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s/%s-%04d-0000.DDS";
+                sprintf(filename, fileNameTemplate, theaterName, iconName, iconName, i);
+				image = Image_LoadImage(filename);
+                if (image == NULL) {
+					fileNameTemplate = "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s/%s-%04d-00.DDS";
+					sprintf(filename, fileNameTemplate, theaterName, iconName, iconName, i);
+					image = Image_LoadImage(filename);
+                    if (image == NULL) {
+                        fileNameTemplate = baseFileNameTemplate; // Restore back to the original template.
+                        continue;
+                    }
+                }
+            }
+
+			//if (i != 0) {
+			//	image->image[0][i] = image->image[0][0];
+			//	image->image[0][0] = 0;
+			//}
+        }
+        else {
+            if (!Image_Add32BitImage(filename, image, -1, i)) {
+                continue;
+            }
+        }
+    }
+
+	//if (image) {
+	//	image->IconMapPtr = MapPtr;
+	//}
+
+    return image;
+}
+
+void Get_Stamp_Size(const void* icondata, int& width, int& height) {
+	IconControlType* tileset = (IconControlType*)icondata;
+
+	if (!tileset) {
+        width = -1;
+        height = -1;
+		return;
+	}
+
+	if (LastIconset != tileset) {
+		Init_Stamps(tileset);
+	}
+
+    width = IconWidth;
+    height = IconHeight;
+}
+
+Image_t * Load_Stamp(const char *name, const void* icondata)
 {
 	IconControlType* tileset = (IconControlType*)icondata;
 
@@ -239,8 +313,8 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
     uint8_t* MapPtr = (uint8_t * )iconImage->IconMapPtr;
 	int icon_index = MapPtr != nullptr ? MapPtr[icon] : icon;
 	{
-        int blit_height = IconHeight;
-        int blit_width = IconWidth;
+        int blit_height = iconImage->renderheight;
+        int blit_width = iconImage->renderwidth;
         
         int width = left + right;
         int xstart = left + x;
@@ -319,6 +393,9 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
                 //    dst += full_pitch * 4;
                 //    src += IconWidth;
                 //}
+
+                if (iconImage->image[0][icon_index] == 0)
+                    return;
 
                GL_SetClipRect(xstart, ystart, blit_width, blit_height);
                 GL_RenderImage(iconImage, xstart, ystart, blit_width, blit_height, 0, icon_index);

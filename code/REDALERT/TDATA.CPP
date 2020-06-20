@@ -690,6 +690,14 @@ void TerrainTypeClass::Init(TheaterType theater)
 				_makepath(fullname, NULL, NULL, terrain.IniName, Theaters[theater].Suffix);
 				((void const *&)terrain.ImageData) = MFCD::Retrieve(fullname);
 
+				// Try and load HD assets first.
+				Image_t* hdImage = Load_StampHD(Theaters[theater].Name, fullname, terrain.ImageData);
+				if (hdImage)
+				{
+					Get_Stamp_Size(terrain.ImageData, hdImage->renderwidth, hdImage->renderheight);
+					((void const*&)terrain.HDImageData) = hdImage;
+				}
+				else
 				{
 					char tmp[512];
 					sprintf(tmp, "icon_%s", fullname);

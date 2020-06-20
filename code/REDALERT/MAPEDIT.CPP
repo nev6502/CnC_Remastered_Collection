@@ -1584,11 +1584,16 @@ void MapEditClass::Main_Menu(void)
 		*/
 		Hide_Mouse();		// Do_Menu assumes the mouse is already hidden
 		selection = mainmenu_selection;
-		KeyNumType _key;
-		int _flags;
-		WWSDL_ProcessEvents(_key, _flags);
+
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
+
+		Call_Back();
+
 		Show_Mouse();
-		if (UnknownKey==KN_ESC || _key == KN_RMOUSE) {
+
+		if (UnknownKey==KN_ESC || g_globalKeyNumType == KN_RMOUSE) {
 			break;
 		}
 
@@ -1702,7 +1707,9 @@ void MapEditClass::Main_Menu(void)
 			case 7:
 				if (Changed) {
 					Imgui_Dialog_Function = nullptr;
-					WWSDL_ProcessEvents(_key, _flags);
+
+					UserInput.Process_Input();
+
 					rc = WWMessageBox().Process("Save Changes?", TXT_YES, TXT_NO, TXT_CANCEL);
 					HidPage.Clear();
 					Flag_To_Redraw(true);
@@ -1779,12 +1786,16 @@ void MapEditClass::AI_Menu(void)
 		*/
 		Call_Back();
 
+		UserInput.Process_Input();
+
 		/*
 		**	Invoke menu
 		*/
 		Hide_Mouse();		// Do_Menu assumes the mouse is already hidden
+
 		selection = Do_Menu(&_menus[0], true);
 		Show_Mouse();
+
 		if (UnknownKey==KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) {
 			break;
 		}

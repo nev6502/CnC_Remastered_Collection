@@ -433,7 +433,9 @@ void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int
 	delete buffer;
 }
 
-
+bool Image_Add32BitImage(const char *name, Image_t* image, int HouseId, int ShapeID) {
+	return Image_loadHDImage(image, name, HouseId, ShapeID, image->namehash, false);	
+}
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
 	// Todo implement resoluton scaling.
@@ -960,7 +962,7 @@ void __cdecl SetPalette(unsigned char *palette, long, unsigned long)
 
 
 void WWSDL_ProcessEvents(KeyNumType& key, int& flags, bool presentBuffer) {
-	UserInput.Process_Input(key, flags, presentBuffer);
+	//UserInput.Process_Input(key, flags);
 }
 
 #ifndef NDEBUG

@@ -1427,9 +1427,9 @@ void ScoreClass::Input_Name(char str[], int xpos, int ypos, char const pal[])
 // jmarshall - temp disable high school writing.
 //	do {
 //// jmarshall
-//		KeyNumType _key;
-//		int flags;
-//		WWSDL_ProcessEvents(_key, flags);
+//	g_globalKeyNumType = KN_NONE;
+//	g_globalKeyFlags = 0;
+//	UserInput.Process_Input();
 //// jmarshall end
 //		Call_Back();
 //		Animate_Score_Objs();
