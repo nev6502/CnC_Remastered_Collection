@@ -158,7 +158,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 			if (Data[(i * 4) + 1] > Data[(i * 4) + 0] && Data[(i * 4) + 1] > Data[(i * 4) + 2]) {
 				float g = (Data[(i * 4) + 1] / 255.0f);
 				for (int c = 0; c < 3; c++) {
-					float f = ((remap[2 - c]) / 255.0f) * min(g + 0.25, 1);
+					float f = ((remap[2 - c]) / 255.0f) * min(g, 1);
 					f = f * 255.0f;
 					Data[(i * 4) + c] = ((unsigned int) f); //((unsigned char)(f * 255.0f)) << 2; //((unsigned char)f) << 2;
 				}				
