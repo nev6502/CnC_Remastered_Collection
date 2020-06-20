@@ -21,6 +21,7 @@ struct Image_t {
 __forceinline Image_t::Image_t() {
 	IconMapPtr = NULL;
 	numAnimFrames = 0;
+	memset(image, 0, sizeof(image));
 }
 
 __forceinline Image_t::~Image_t() {
@@ -30,3 +31,4 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims = false, bool loadHous
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char* data, unsigned char *remap = NULL);
 Image_t* Find_Image(const char* name);
 void Image_Add8BitImage(Image_t* image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap);
+bool Image_Add32BitImage(const char* name, Image_t* image, int HouseId, int ShapeID);

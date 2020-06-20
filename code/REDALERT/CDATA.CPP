@@ -46,7 +46,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
-
+#include	"image.h"
 
 static TemplateTypeClass const Empty(
 	TEMPLATE_CLEAR1,
@@ -3137,7 +3137,16 @@ void TemplateTypeClass::Init(TheaterType theater)
 			((unsigned char &)tplate.Width) = Get_IconSet_MapWidth(ptr);
 			((unsigned char &)tplate.Height) = Get_IconSet_MapHeight(ptr);
 
+			// Try and load HD assets first.
+			Image_t *hdImage = Load_StampHD(Theaters[theater].Name, fullname, tplate.ImageData);
+			if (hdImage)
 			{
+				Get_Stamp_Size(tplate.ImageData, hdImage->renderwidth, hdImage->renderheight);
+				((void const*&)tplate.HDImageData) = hdImage;
+			}
+			else
+			{
+				// If no HD assets, load the legacy assets into a texture.
 				char tmp[512];
 				sprintf(tmp, "icon_%s", fullname);
 				((void const*&)tplate.HDImageData) = Load_Stamp(fullname, tplate.ImageData);
