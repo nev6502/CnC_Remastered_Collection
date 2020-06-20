@@ -93,6 +93,8 @@ void Show_OldFrameBuffer(bool show) {
 
 std::vector<Image_t *> loaded_images;
 
+unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheight, int outwidth, int outheight);
+
 /*
 ================
 return a hash value for the filename
@@ -133,6 +135,11 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	ILubyte* Data = ilGetData();
 
 	if (Bpp == 4 && houseId != -1) {
+		//Buffer_Enable_HD_Texture(true);
+		//Data = Draw_Dropsample(Data, Width, Height, Width / 2, Height / 2);
+		//Buffer_Enable_HD_Texture(false);
+		//Width = Width / 2;
+		//Height = Height / 2;
 		for (int i = 0; i < Width * Height; i++) {			
 			RenderTeamPalette(&Data[i * 4], *houseColors[houseId]);
 		}
@@ -169,11 +176,8 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
-	image->buffer = new unsigned char[Width * Height * Bpp];
-
-	if (houseid == 0 && animid == 0) {
-		memcpy(image->buffer, Data, Width * Height * Bpp);
-	}
+	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
+	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
 	ilDeleteImages(1, &ImageName);
 	return true;
@@ -242,7 +246,7 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
 
 	Image_t* image = new Image_t();
-	image->buffer = new unsigned char[Width * Height * 4];
+	unsigned char *buffer = new unsigned char[Width * Height * 4];
 
 	for (int i = 0; i < Width * Height; i++) {
 		unsigned char c = data[i];
@@ -266,10 +270,10 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 		}
 
 
-		image->buffer[(i * 4) + 0] = r;
-		image->buffer[(i * 4) + 1] = g;
-		image->buffer[(i * 4) + 2] = b;
-		image->buffer[(i * 4) + 3] = a;
+		buffer[(i * 4) + 0] = r;
+		buffer[(i * 4) + 1] = g;
+		buffer[(i * 4) + 2] = b;
+		buffer[(i * 4) + 3] = a;
 	}
 
 
@@ -277,7 +281,7 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image->buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
@@ -289,6 +293,7 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
 	loaded_images.push_back(image);
+	delete buffer;
 	return image;
 }
 

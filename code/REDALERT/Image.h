@@ -15,19 +15,19 @@ struct Image_t {
 	int height;
 	int renderwidth;
 	int renderheight;	
-	unsigned char* buffer;
+	//unsigned char* buffer[MAX_HOUSE_COLORS][MAX_IMAGE_FRAMES];
 };
 
 __forceinline Image_t::Image_t() {
-	buffer = NULL;
+//	buffer = NULL;
 	numAnimFrames = 0;
 }
 
 __forceinline Image_t::~Image_t() {
-	if (buffer) {
-		delete buffer;
-		buffer = NULL;
-	}
+	//if (buffer) {
+	//	delete buffer;
+	//	buffer = NULL;
+	//}
 }
 
 Image_t* Image_LoadImage(const char* name, bool loadAnims = false, bool loadHouseColor = false);
