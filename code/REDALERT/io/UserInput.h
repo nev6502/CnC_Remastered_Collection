@@ -78,6 +78,11 @@ std::map<SDL_KeyCode, KeyNumType> const sdl_keyMapping = {
 	{ SDLK_KP_ENTER, KN_RETURN },
 	{ SDLK_RETURN, KN_RETURN },
 	{ SDLK_ESCAPE, KN_ESC },
+
+	{ SDLK_UP, KN_UP },
+	{ SDLK_DOWN, KN_DOWN },
+	{ SDLK_LEFT, KN_LEFT },
+	{ SDLK_RIGHT, KN_RIGHT },
 };
 
 class UserInputClass

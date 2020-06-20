@@ -325,7 +325,7 @@ void SidebarClass::Init_IO(void)
 
 		Zoom.IsSticky = true;
 		Zoom.ID = BUTTON_ZOOM;
-		Zoom.X = 1024 - (640 - ((0x24c/2)*RESFACTOR));
+		Zoom.X = ScreenWidth - (640 - ((0x24c/2)*RESFACTOR));
 		Zoom.Y = (0x96/2)*RESFACTOR;
 		Zoom.IsPressed = false;
 		Zoom.Set_Shape(MFCD::Retrieve("MAP.SHP"));
