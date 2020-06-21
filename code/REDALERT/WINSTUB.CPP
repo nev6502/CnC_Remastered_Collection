@@ -160,7 +160,7 @@ void Image_WriteTGA(const char* filename, const byte* data, int width, int heigh
 
 static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int64_t hash) {
 	static char generatedFileName[1024];
-	sprintf(generatedFileName, "cache/%d.%d.%d.tga", hash, houseid, animid);
+	sprintf(generatedFileName, "cache/v2.%d.%d.%d.tga", hash, houseid, animid);
 	return &generatedFileName[0];
 }
 
@@ -183,9 +183,12 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	}
 
 	bool swapBGR = false;
-	if (strstr(name, ".TGA")) {
-		iluFlipImage();
-		swapBGR = true;
+	if (strstr(name, ".TGA") || strstr(name, ".tga")) {
+		if (!writeGenerated)
+		{
+			iluFlipImage();
+			swapBGR = true;
+		}
 	}
 
 	ILuint Width, Height, Bpp;

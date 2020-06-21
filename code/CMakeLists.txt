@@ -134,6 +134,7 @@ set(src_redalert
 	./RedAlert/BASE64.CPP
 	./RedAlert/BASE64.H
 	./RedAlert/BBDATA.CPP
+	./RedAlert/BDATAXML.CPP
 	./RedAlert/BDATA.CPP
 	./RedAlert/BENCH.CPP
 	./RedAlert/BENCH.H

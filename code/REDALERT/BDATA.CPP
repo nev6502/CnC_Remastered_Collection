@@ -3141,12 +3141,9 @@ void BuildingTypeClass::One_Time(void)
 		_makepath(fullname, NULL, NULL, building.Graphic_Name(), ".SHP");
 		((void const *&)building.ImageData) = MFCD::Retrieve(fullname);
 		{
-			char imageFileName[512];
-			sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", building.Graphic_Name(), building.Graphic_Name());
-			((void const*&)building.HDImageData) = Image_LoadImage(imageFileName, true, true);
+			const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 
-			if (!building.HDImageData) {
-				sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000-0000.TGA", building.Graphic_Name(), building.Graphic_Name());
+			if (imageFileName) {
 				((void const*&)building.HDImageData) = Image_LoadImage(imageFileName, true, true);
 			}
 
@@ -3393,15 +3390,11 @@ void BuildingTypeClass::Init(TheaterType theater)
 				((void const *&)classptr->ImageData) = MFCD::Retrieve(fullname);
 // jmarshall				
 				{
-					char imageFileName[512];
+					const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 
-					// Try load the theatre specific asset first 
-					sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s.%s/%s.%s-0000.DDS", Theaters[theater].Name, classptr->Graphic_Name(), Theaters[theater].Suffix, classptr->Graphic_Name(), Theaters[theater].Suffix);
-					((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName);
-
-					if (!((BuildingTypeClass*)classptr)->HDImageData) {
-						sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", classptr->Graphic_Name(), classptr->Graphic_Name());
-						((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName);
+					// Try load the theatre specific asset first 	
+					if (imageFileName) {
+						((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName, true, true);
 					}
 
 					if (classptr->ImageData != NULL && classptr->HDImageData != NULL) {

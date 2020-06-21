@@ -389,6 +389,7 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 
 	// Load all of the XML files.
 	Tileset_LoadRules();
+	Buildings_LoadRules();
 
 	if (Parse_Command_Line(argc, argv)) {
 
