@@ -913,8 +913,7 @@ static int Script_Lose(lua_State* L) {
                 PlayerPtr->Flag_To_Win();
             }
 
-            bool success = this_house->Fire_Sale();
-            lua_pushboolean(L, int(success));
+            lua_pushboolean(L, 1);
         }
     }
 
@@ -1082,6 +1081,7 @@ static int Script_Reinforcements(lua_State* L) {
         lua_pushboolean(L, 0);
     }
 
+    
 
 
     return 1;
@@ -1479,7 +1479,7 @@ static int Script_PlaySpeech(lua_State* L) {
 /***********************************************************************************************
  * Script_StartMissionTimer - Starts the in-game mission timer                                 *
  *                                                                                             *
- *   SCRIPT INPUT:	ret (int) - amount of time in tenths of a minute                           *
+ *   SCRIPT INPUT:	none                                                                       *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -1491,8 +1491,6 @@ static int Script_PlaySpeech(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 static int Script_StartMissionTimer(lua_State* L) {
-    int ret = lua_tointeger(L, -1);
-    Scen.MissionTimer = Scen.MissionTimer + (ret * (TICKS_PER_MINUTE / 10));
     Scen.MissionTimer.Start();
     Map.Redraw_Tab();
     return 1;
@@ -1513,19 +1511,385 @@ static int Script_StartMissionTimer(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 static int Script_StopMissionTimer(lua_State* L) {
-    Scen.MissionTimer.Start();
+    Scen.MissionTimer.Stop();
     return 1;
 }
 
+/***********************************************************************************************
+ * Script_IncreaseMissionTimer - Increases the mission timer by the given amount               *
+ *                                                                                             *
+ *   SCRIPT INPUT:	ret (int) - amount of time in tenths of a minute to increase by            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_IncreaseMissionTimer(lua_State* L) {
+    int ret = lua_tointeger(L, -1);
+    Scen.MissionTimer = Scen.MissionTimer + (ret * (TICKS_PER_MINUTE / 10));
+    Map.Redraw_Tab();
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_DecreaseMissionTimer - Decreases the mission timer by the given amount               *
+ *                                                                                             *
+ *   SCRIPT INPUT:	ret (int) - amount of time in tenths of a minute to decrease by            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_DecreaseMissionTimer(lua_State* L) {
+    int ret = lua_tointeger(L, -1);
+    Scen.MissionTimer = Scen.MissionTimer - (ret * (TICKS_PER_MINUTE / 10));
+    if (Scen.MissionTimer < 0) { Scen.MissionTimer = 0; }
+    Map.Redraw_Tab();
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_SetMissionTimer - Sets and starts the in-game mission timer                          *
+ *                                                                                             *
+ *   SCRIPT INPUT:	ret (int) - amount of time in tenths of a minute                           *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_SetMissionTimer(lua_State* L) {
+    int ret = lua_tointeger(L, -1);
+    Scen.MissionTimer = Scen.MissionTimer + (ret * (TICKS_PER_MINUTE / 10));
+    Scen.MissionTimer.Start();
+    Map.Redraw_Tab();
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_SetGlobalValue - Sets the global value to "set" position (on)                        *
+ *                                                                                             *
+ *   SCRIPT INPUT:	global_value (int) - The global to set to "set"                            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_SetGlobalValue(lua_State* L) {
+    int global_value = lua_tointeger(L, -1);
+    Scen.Set_Global_To(global_value, true);
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_ClearGlobalValue - Sets the global value to "clear" position (off)                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	global_value (int) - The global to set to "off"                            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_ClearGlobalValue(lua_State* L) {
+    int global_value = lua_tointeger(L, -1);
+    Scen.Set_Global_To(global_value, false);
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_AutoBaseBuilding - Sets AI basebuilding on/off for given house                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)    - The player (house) index of the AI                    *
+ *                	on_off (bool)      - Enable / disable auto base building                   *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AutoBaseBuilding(lua_State* L) {
+    int houseType = lua_tointeger(L, 1);
+    bool on_off = lua_toboolean(L, 2);
+
+    HouseClass* this_house = Houses.Ptr(houseType);
+    if (this_house != NULL) {
+        this_house->IsBaseBuilding = on_off;
+    }
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_StopMissionTimer - Stops the in-game mission timer                                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	none                                                                       *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CreepShadow(lua_State* L) {
+    Map.Encroach_Shadow(PlayerPtr);
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_DestroyTriggerBuilding - Stops the in-game mission timer                             *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerIndex (int) - The index of the trigger previously created           *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_DestroyTriggerBuilding(lua_State* L) {
+    int triggerIndex = lua_tointeger(L, -1);
+
+    TriggerClass* this_trigger = Triggers.Ptr(triggerIndex);
+
+    for (int index = 0; index < Buildings.Count(); index++) {
+        
+        BuildingClass* this_building = Buildings.Ptr(index);
+
+        if (this_building->Trigger == this_trigger && this_building->Strength > 0) {
+            int damage = this_building->Strength;
+            this_building->Take_Damage(damage, 0, WARHEAD_AP, 0, true);
+        }
+
+    }
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_GiveOneTimeSpecialWeapon - Gives specified house a one time special weapon           *
+ *                                                                                             *
+ *   SCRIPT INPUT:	weaponType (int) - The special weapon type to give                         *
+ *                	houseType (int)  - The player (house) index to give this to (-1 for all)   *
+ *                	immediate(bool)  - should the weapon be fully charged?                     *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GiveOneTimeSpecialWeapon(lua_State* L) {
+
+    int weaponType = lua_tointeger(L, 1);
+
+    int houseType = -1;
+    bool immediate = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) >= 2) {
+        houseType = lua_tointeger(L, 2);
+    }
+
+    // Optional immediate parameter
+    if (lua_gettop(L) >= 2) {
+        immediate = lua_toboolean(L, 3);
+    }
+
+    for (int h_index = 0; h_index < Houses.Count(); h_index++) {
+
+        HouseClass* house = Houses.Ptr(h_index);
+
+        if (house->ID == houseType || houseType == -1) {
+
+            house->SuperWeapon[weaponType].Enable(TACTION_1_SPECIAL, true);
+
+            if (immediate) {
+                house->SuperWeapon[weaponType].Forced_Charge(true);
+            }
+
+            if (PlayerPtr == house) {
+                Map.Add(RTTI_SPECIAL, weaponType);
+                Map.Column[1].Flag_To_Redraw();
+            }
+
+            if (houseType >= 0) {
+                break;
+            }
+        }
+
+    }
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_GiveSpecialWeapon - Gives specified house a repeating special weapon                 *
+ *                                                                                             *
+ *   SCRIPT INPUT:	weaponType (int) - The special weapon type to give                         *
+ *                	houseType (int)  - The player (house) index to give this to (-1 for all)   *
+ *                	immediate(bool)  - should the weapon be fully charged?                     *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GiveSpecialWeapon(lua_State* L) {
+
+    int weaponType = lua_tointeger(L, 1);
+
+    int houseType = -1;
+    bool immediate = -1;
+
+    // Optional houseType parameter
+    if (lua_gettop(L) >= 2) {
+        houseType = lua_tointeger(L, 2);
+    }
+
+    // Optional immediate parameter
+    if (lua_gettop(L) ==3) {
+        immediate = lua_toboolean(L, 3);
+    }
+
+    for (int h_index = 0; h_index < Houses.Count(); h_index++) {
+
+        HouseClass* house = Houses.Ptr(h_index);
+
+        if (house->ID == houseType || houseType == -1) {
+
+            house->SuperWeapon[weaponType].Enable(TACTION_FULL_SPECIAL, true);
+
+            if (immediate) {
+                house->SuperWeapon[weaponType].Forced_Charge(true);
+            }
+
+            if (PlayerPtr == house) {
+                Map.Add(RTTI_SPECIAL, weaponType);
+                Map.Column[1].Flag_To_Redraw();
+            }
+
+            if (houseType >= 0) {
+                break;
+            }
+        }
+
+    }
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_DesignatePreferredTarget - Gives specified house a repeating special weapon          *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)  - The player (house) index to set targetting for (or -1)  *
+ *                	targetType (int) - The target type index to set to                         *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_DesignatePreferredTarget(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    unsigned char targetType = lua_tointeger(L, 2);
+
+    if(targetType >= 1 && targetType <= 11){
+
+        for (int h_index = 0; h_index < Houses.Count(); h_index++) {
+
+            HouseClass* house = Houses.Ptr(h_index);
+
+            if (house->ID == houseType || houseType == -1) {
 
 
 
+                house->PreferredTarget = (QuarryType)targetType;
 
+                // Discontinue giving out free cash if a specific house was specified
+                if (houseType >= 0) {
+                    break;
+                }
 
+            }
 
+        }
 
+    }
 
+    return 1;
+}
 
+/***********************************************************************************************
+ * Script_LaunchFakeNukes - All nuke silos begin launching duds                                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	none                                                                       *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_LaunchFakeNukes(lua_State* L) {
+    
+    for (int index = 0; index < Buildings.Count(); index++) {
+        BuildingClass* bldg = Buildings.Ptr(index);
+        if (*bldg == STRUCT_MSLO) {
+            bldg->Assign_Mission(MISSION_MISSILE);
+        }
+    }
+
+    return 1;
+}
 
 /***********************************************************************************************
  * Script_CreateCellCallback - Creates an ENTERED_BY trigger and attaches a callback           *
@@ -1650,6 +2014,8 @@ static int Script_SpiedByCallback(lua_State* L) {
 /***********************************************************************************************
  * Script_CreateDiscoveryCallback - Creates a TEVENT_DISCOVERED trigger and attaches a callback*
  *                                                                                             *
+ *  Trigger is sprung when the given object is discovered                                      *
+ *                                                                                             *
  *   SCRIPT INPUT:	objectID (int)        - The object's ID being discovered                   *
  *                  in_function (string)  - The callback function to execute upon trigger      *
  *                                                                                             *
@@ -1662,7 +2028,7 @@ static int Script_SpiedByCallback(lua_State* L) {
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-static int Script_DiscoveryCallback(lua_State* L) {
+static int Script_ObjectDiscoveryCallback(lua_State* L) {
 
     int objectID = lua_tointeger(L, 1);
     const char* in_function = lua_tostring(L, 2);
@@ -1705,6 +2071,8 @@ static int Script_DiscoveryCallback(lua_State* L) {
 /***********************************************************************************************
  * Script_HouseDiscoveredCallback - Initiates when given house is discovered                   *
  *                                                                                             *
+ *  Trigger is sprung when an object belonging to the given house is discovered                *
+ *                                                                                             *
  *   SCRIPT INPUT:	houseType (int)       - The house (player) index that has been discovered  *
  *                  in_function (string)  - The callback function to execute upon trigger      *
  *                                                                                             *
@@ -1727,7 +2095,7 @@ static int Script_HouseDiscoveredCallback(lua_State* L) {
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
-        this_trigger_type->House = PlayerPtr->Class->House;
+        this_trigger_type->House = HOUSE_NONE;
         this_trigger_type->IsActive = 1;
         this_trigger_type->IsPersistant = TriggerTypeClass::VOLATILE;
 
@@ -1738,8 +2106,1319 @@ static int Script_HouseDiscoveredCallback(lua_State* L) {
 
         // Create instance of trigger type
 
-        TriggerClass* editor_trigger = Triggers.Ptr(0);
-        TriggerTypeClass* editor_trigger_type = editor_trigger->Class;
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[PlayerPtr->Class->House].Add(this_trigger); 
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_ObjectAttackedCallback - Trigger that springs when object is attacked by anyone      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	objectID (int)        - The object's ID being discovered                   *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_ObjectAttackedCallback(lua_State* L) {
+
+    int objectID = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // An object must be specified
+    if (objectID >= 0) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HousesType::HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_ATTACKED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        Script_SetObjectTrigger(objectID, this_trigger);
+
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_ObjectDestroyedCallback - Trigger that springs when object is attacked by anyone     *
+ *                                                                                             *
+ *   SCRIPT INPUT:	objectID (int)        - The object's ID being discovered                   *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_ObjectDestroyedCallback(lua_State* L) {
+
+    int objectID = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // An object must be specified
+    if (objectID >= 0) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HousesType::HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_DESTROYED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        Script_SetObjectTrigger(objectID, this_trigger);
+
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+
+/***********************************************************************************************
+ * Script_AnyEventCallback -                                                                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	objectID (int)        - The object's ID being discovered                   *
+ *                  houseType (int)       - The house (player) index                           *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AnyEventCallback(lua_State* L) {
+
+    const char* in_function = lua_tostring(L, 1);
+
+
+    // Create trigger type
+    TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+    this_trigger_type->House = HousesType::HOUSE_NONE;
+    this_trigger_type->IsActive = 1;
+    this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+    this_trigger_type->Event1 = TEVENT_ANY;
+    this_trigger_type->EventControl = MULTI_ONLY;
+
+    // Create instance of trigger type
+    TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+    // Copy the callback function into the trigger
+    strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+    LogicTriggers.Add(this_trigger);
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, this_trigger->ID);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_AllUnitsDestroyedCallback -  Called when all of a house's units are destroyed        *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index owner of said units       *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AllUnitsDestroyedCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HousesType::HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_UNITS_DESTROYED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        
+        HouseTriggers[(HousesType)houseType].Add(this_trigger); 
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_AllBuildingsDestroyedCallback -  Called when all of a house's buildings are destroyed*
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index owner of said buildings   *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AllBuildingsDestroyedCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HousesType::HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_BUILDINGS_DESTROYED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger); 
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_AllDestroyedCallback -  Called when everything belonging to a house is destyroyed    *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index that got pwned            *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AllDestroyedCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HousesType::HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_ALL_DESTROYED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger); 
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+
+/***********************************************************************************************
+ * Script_CreditsReachedCallback -  Called when given house meets given amount of credits      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index to test against           *
+ *                  in_credits (int)      - The amount of credits                              *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CreditsReachedCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_credits = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_CREDITS;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value= in_credits;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger); 
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_TimeReachedCallback -  Called when the given amount of time has elapsed              *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_time (int)         - The time (in tenths of a second) that was reached  *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_TimeReachedCallback(lua_State* L) {
+
+    int in_time = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // Create trigger type
+    TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+    this_trigger_type->House = HOUSE_NONE;
+    this_trigger_type->IsActive = 1;
+    this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+    this_trigger_type->Event1 = TEVENT_TIME;
+    this_trigger_type->EventControl = MULTI_ONLY;
+    this_trigger_type->Event1.Data.Value = in_time;
+
+    // Create instance of trigger type
+    TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+    // Copy the callback function into the trigger
+    strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+    LogicTriggers.Add(this_trigger);
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, this_trigger->ID);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_MissionTimerCallback -  Called when the mission timer has expired                    *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_MissionTimerCallback(lua_State* L) {
+
+    const char* in_function = lua_tostring(L, 1);
+
+    // Create trigger type
+    TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+    this_trigger_type->House = HOUSE_NONE;
+    this_trigger_type->IsActive = 1;
+    this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+    this_trigger_type->Event1 = TEVENT_MISSION_TIMER_EXPIRED;
+    this_trigger_type->EventControl = MULTI_ONLY;
+
+    // Create instance of trigger type
+    TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+    // Copy the callback function into the trigger
+    strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+    LogicTriggers.Add(this_trigger);
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, this_trigger->ID);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_UnitsDestroyedCallback -  Called when given number of a house's units are destroyed  *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index owner of said units       *
+ *                  in_number (int)       - The number of units that have must be destroyed    *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_UnitsDestroyedCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_number = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_NUNITS_DESTROYED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = in_number;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger);
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+/************************************************************************************************
+ * Script_BuildingsDestroyedCallback -  Called when number of a house's buildings are destroyed *
+ *                                                                                              *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index owner of said buildings    *
+ *                  in_number (int)       - The number of buildings that have must be destroyed *
+ *                  in_function (string)  - The callback function to execute upon trigger       *
+ *                                                                                              *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions   *
+ *                                                                                              *
+ * INPUT:  lua_State - The current Lua state                                                    *
+ *                                                                                              *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                    *
+ *                                                                                              *
+ * WARNINGS:  ?                                                                                 *
+ *                                                                                              *
+ *==============================================================================================*/
+static int Script_BuildingsDestroyedCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_number = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_NBUILDINGS_DESTROYED;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = in_number;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger);
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_NoFactoriesCallback -  Called when no more factories exist for a house               *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index that got pwned            *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_NoFactoriesCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_NOFACTORIES;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = -1;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger);
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+
+/***********************************************************************************************
+ * Script_CivilianEscapeCallback - Called when civilians get evacuated from map                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner of civilians escaped      *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_CivilianEscapeCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+    
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_EVAC_CIVILIAN;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = -1;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        LogicTriggers.Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_BuildingBuiltCallback - Called when a specified house builds a specified building    *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that built the building   *
+ *                  objectType (int)      - The index / building type to check for             *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_BuildingBuiltCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int objectType = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_BUILD;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = objectType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[houseType].Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_UnitBuiltCallback - Called when a specified house builds a specified unit            *
+ *                                                                                             *
+ *  Does not trigger for units that spawn with buildings (ie. ore truck)                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that built the unit       *
+ *                  objectType (int)      - The index / unit type to check for                 *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_UnitBuiltCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int objectType = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_BUILD_UNIT;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = objectType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[houseType].Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_InfantryBuiltCallback - Called when a specified house builds a specified infantry    *
+ *                                                                                             *
+ *  Does not trigger for infantry gained by selling a building                                 *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that built the infantry   *
+ *                  objectType (int)      - The index / infantry type to check for             *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_InfantryBuiltCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int objectType = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_BUILD_INFANTRY;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = objectType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[houseType].Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_AircraftBuiltCallback - Called when a specified house builds a specified aircraft    *
+ *                                                                                             *
+ *  Does not trigger for units that spawn with buildings                                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that built the unit       *
+ *                  objectType (int)      - The index / unit type to check for                 *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AircraftBuiltCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int objectType = lua_tointeger(L, 2);
+    const char* in_function = lua_tostring(L, 3);
+
+    if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_BUILD_AIRCRAFT;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = objectType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[houseType].Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_TeamLeavesMapCallback - Called when the specified team leaves the map                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_team (int)         - The team index that has left the map               *
+ *                	in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_TeamLeavesMapCallback(lua_State* L) {
+
+    int in_team = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    TeamTypeClass* this_team = TeamTypes.Ptr(in_team);
+
+    if (this_team != NULL) {
+        
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = this_team->House;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_LEAVES_MAP;
+        this_trigger_type->EventControl = MULTI_ONLY;
+
+        
+        this_trigger_type->Event1.Team = this_team;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        LogicTriggers.Add(this_trigger);
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_ZoneEntryCallback - Called when a specified house enters zone of given position      *
+ *                                                                                             *
+ *  Does not trigger for units that spawn with buildings                                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that built the unit       *
+ *                  in_x (int)            - The cell/X location of the cell to test            *
+ *                  in_y (int)            - The cell/Y location of the cell to test            *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_ZoneEntryCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_x = lua_tointeger(L, 2);
+    int in_y = lua_tointeger(L, 3);
+
+    const char* in_function = lua_tostring(L, 4);
+
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_ENTERS_ZONE;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        // Get the cell and set the trigger
+        this_trigger->Cell = XY_Cell(in_x, in_y);
+        MapTriggers.Add(this_trigger);
+        
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_HorizontalCrossCallback - Called when a specified house's units cross the given X    *
+ *                                                                                             *
+ *  Does not trigger for units that spawn with buildings                                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that owns the unit        *
+ *                  in_x (int)            - The cell/X location that must be crossed           *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_HorizontalCrossCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_x = lua_tointeger(L,2);
+
+    const char* in_function = lua_tostring(L, 3);
+
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_CROSS_VERTICAL; 
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        // Find a free spot and set the trigger
+        int addY = 0;
+        for (addY = 0; addY < Map.MapCellHeight; addY++) {
+            TriggerClass* trigger = Map[XY_Cell(in_x, Map.MapCellY + addY)].Trigger;
+            if (trigger == NULL) {
+                this_trigger->Cell = XY_Cell(in_x, Map.MapCellY + addY);
+                Map[XY_Cell(in_x, Map.MapCellY + addY)].Trigger = this_trigger;
+                break;
+            }
+        }
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+
+/***********************************************************************************************
+ * Script_VerticalCrossCallback - Called when a specified house's units cross the given Y      *
+ *                                                                                             *
+ *  Does not trigger for units that spawn with buildings                                       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) owner that owns the unit        *
+ *                  in_y (int)            - The cell/Y location that must be crossed           *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_VerticalCrossCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    int in_y = lua_tointeger(L, 2);
+
+    const char* in_function = lua_tostring(L, 3);
+
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_CROSS_HORIZONTAL; // <- Their description doesn't make sense, not mine
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        // Find a free spot and set the trigger
+        int addX = 0;
+        for (addX = 0; addX < Map.MapCellWidth; addX++) {
+            TriggerClass* trigger = Map[XY_Cell(Map.MapCellX + addX, in_y)].Trigger;
+            if (trigger == NULL) {
+                this_trigger->Cell = XY_Cell(Map.MapCellX+ addX, in_y);
+                Map[XY_Cell(Map.MapCellX+ addX, in_y)].Trigger = this_trigger;
+                break;
+            }
+        }
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+
+}
+
+
+/***********************************************************************************************
+ * Script_GlobalSetCallback -  activated when the global value is in the "set" poisition       *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_global             - The global value to set                            *
+ *                	in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GlobalSetCallback(lua_State* L) {
+
+    int in_global = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // Create trigger type
+    TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+    this_trigger_type->House = HOUSE_NONE;
+    this_trigger_type->IsActive = 1;
+    this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+    this_trigger_type->Event1 = TEVENT_GLOBAL_SET;
+    this_trigger_type->EventControl = MULTI_ONLY;
+    this_trigger_type->Event1.Data.Value = in_global;
+
+    // Create instance of trigger type
+    TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+    // Copy the callback function into the trigger
+    strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+    LogicTriggers.Add(this_trigger);
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, this_trigger->ID);
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_GlobalSetCallback -  activated when the global value is in the "cleared" poisition   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_global             - The global value to set to "cleared"               *
+ *                	in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GlobalClearedCallback(lua_State* L) {
+
+    int in_global = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // Create trigger type
+    TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+    this_trigger_type->House = HOUSE_NONE;
+    this_trigger_type->IsActive = 1;
+    this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+    this_trigger_type->Event1 = TEVENT_GLOBAL_CLEAR;
+    this_trigger_type->EventControl = MULTI_ONLY;
+    this_trigger_type->Event1.Data.Value = in_global;
+
+    // Create instance of trigger type
+    TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+    // Copy the callback function into the trigger
+    strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+    LogicTriggers.Add(this_trigger);
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, this_trigger->ID);
+
+    return 1;
+}
+
+
+/***********************************************************************************************
+ * Script_LowPowerCallback - Initiates when given house becomes low on power                   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	houseType (int)       - The house (player) index that has been discovered  *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_LowPowerCallback(lua_State* L) {
+
+    int houseType = lua_tointeger(L, 1);
+    const char* in_function = lua_tostring(L, 2);
+
+    // A house must be specified
+    if (houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = HOUSE_NONE;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::VOLATILE;
+
+        this_trigger_type->Event1 = TEVENT_LOW_POWER;
+        this_trigger_type->EventControl = MULTI_ONLY;
+
+        this_trigger_type->Event1.Data.House = (HousesType)houseType;
+
+        // Create instance of trigger type
+
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
         // Copy the callback function into the trigger
@@ -1759,6 +3438,110 @@ static int Script_HouseDiscoveredCallback(lua_State* L) {
     return 1;
 }
 
+/***********************************************************************************************
+ * Script_AllBridgesDestroyedCallback - Called when all map's bridges have been destroyed      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_AllBridgesDestroyedCallback(lua_State* L) {
+
+    const char* in_function = lua_tostring(L, 1);
+
+
+    // Create trigger type
+    TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+    this_trigger_type->House = HousesType::HOUSE_NONE;
+    this_trigger_type->IsActive = 1;
+    this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+    this_trigger_type->Event1 = TEVENT_ALL_BRIDGES_DESTROYED;
+    this_trigger_type->EventControl = MULTI_ONLY;
+
+    // Create instance of trigger type
+    TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+    // Copy the callback function into the trigger
+    strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+    LogicTriggers.Add(this_trigger);
+
+    // Output the new trigger's ID
+    lua_pushnumber(L, this_trigger->ID);
+
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_BuildingExistsCallback - Called if a given building exists for a given house         *
+ *                                                                                             *
+ *   SCRIPT INPUT:	buildingType (int)    - The building type to check for                     *
+ *                  houseType (int)       - The house (player) index owner of said building    *
+ *                  in_function (string)  - The callback function to execute upon trigger      *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID - The ID of the trigger created for use with Trigger Functions  *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_BuildingExistsCallback(lua_State* L) {
+
+    int buildingType = lua_tointeger(L, 1);
+    int houseType = lua_tointeger(L,2);
+    const char* in_function = lua_tostring(L,3);
+
+    // A house must be specified
+    if (buildingType>=0 && houseType >= 0 && houseType < HouseTypes.Count()) {
+
+        // Create trigger type
+        TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
+        this_trigger_type->House = (HousesType)houseType;
+        this_trigger_type->IsActive = 1;
+        this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
+
+        this_trigger_type->Event1 = TEVENT_BUILDING_EXISTS;
+        this_trigger_type->EventControl = MULTI_ONLY;
+        this_trigger_type->Event1.Data.Value = buildingType;
+
+        // Create instance of trigger type
+        TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
+
+        // Copy the callback function into the trigger
+        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+
+        HouseTriggers[(HousesType)houseType].Add(this_trigger);
+
+
+        // Output the new trigger's ID
+        lua_pushnumber(L, this_trigger->ID);
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return 1;
+}
+
+
+
+
+// ========================================================================================================================================
+// ========================================================================================================================================
 
 
 /***********************************************************************************************
@@ -2108,70 +3891,83 @@ bool MapScript::Init(const char* mapName) {
     * Red Alert Vanilla Actions                                                                   *
     *=============================================================================================*/
 
-    lua_register(L, "Win", Script_Win);                                             // player wins!
-    lua_register(L, "Lose", Script_Lose);                                           // player loses.
-    lua_register(L, "BeginProduction", Script_BeginProduction);                     // computer begins factory production.
-    lua_register(L, "CreateTeam", Script_CreateTeam);                               // computer creates a certain type of team
-    lua_register(L, "DestroyTeam", Script_DestroyTeam);                             // destroy team (comment was redacted. was something offensive originally written?)
-    lua_register(L, "AllHunt", Script_AllHunt);                                     // all enemy units go into hunt mode (teams destroyed).
-    lua_register(L, "Reinforcements", Script_Reinforcements);                       // player gets reinforcements (house that gets them is determined by the Reinforcement instance)
-    lua_register(L, "DropZoneFlare", Script_DropZoneFlare);                         // Deploy drop zone smoke.
-    lua_register(L, "FireSale", Script_FireSale);	                                // Sell all buildings and go on rampage.
-    lua_register(L, "PlayMovie", Script_PlayMovie);							        // Play movie (temporarily suspend game).
-    lua_register(L, "TriggerText", Script_TriggerText);                             // Triggers a text message display.
-    lua_register(L, "DestroyTrigger", Script_DestroyTrigger);                       // Destroy specified trigger.
-    lua_register(L, "AutoCreate", Script_AutoCreate);                               // Computer to autocreate teams.
-                                                                                    // Win if captured, lose if destroyed ( function does not exist )
-    lua_register(L, "AllowWin", Script_AllowWin);                                   // Allows winning if triggered.
+        lua_register(L, "Win", Script_Win);                                             // player wins!
+        lua_register(L, "Lose", Script_Lose);                                           // player loses.
+        lua_register(L, "BeginProduction", Script_BeginProduction);                     // computer begins factory production.
+        lua_register(L, "CreateTeam", Script_CreateTeam);                               // computer creates a certain type of team
+        lua_register(L, "DestroyTeam", Script_DestroyTeam);                             // destroy team (comment was redacted. was something offensive originally written?)
+        lua_register(L, "AllHunt", Script_AllHunt);                                     // all enemy units go into hunt mode (teams destroyed).
+        lua_register(L, "Reinforcements", Script_Reinforcements);                       // player gets reinforcements (house that gets them is determined by the Reinforcement instance)
+        lua_register(L, "DropZoneFlare", Script_DropZoneFlare);                         // Deploy drop zone smoke.
+        lua_register(L, "FireSale", Script_FireSale);	                                // Sell all buildings and go on rampage.
+        lua_register(L, "PlayMovie", Script_PlayMovie);							        // Play movie (temporarily suspend game).
+        lua_register(L, "TriggerText", Script_TriggerText);                             // Triggers a text message display.
+        lua_register(L, "DestroyTrigger", Script_DestroyTrigger);                       // Destroy specified trigger.
+        lua_register(L, "AutoCreate", Script_AutoCreate);                               // Computer to autocreate teams.
+                                                                                        // Win if captured, lose if destroyed ( function does not exist )
+        lua_register(L, "AllowWin", Script_AllowWin);                                   // Allows winning if triggered.
 
-    lua_register(L, "RevealAll", Script_RevealAll);                                 // Reveal the entire map.
-    lua_register(L, "RevealCell", Script_RevealCell);                               // Reveal map around cell #.
-    lua_register(L, "RevealZone", Script_RevealZone);                               // Reveal all of specified zone.
-    lua_register(L, "PlaySound", Script_PlaySound);                                 // Play sound effect.
-    lua_register(L, "PlayMusic", Script_PlayMusic);                                 // Play musical score.
-    lua_register(L, "PlaySpeech", Script_PlaySpeech);						        // Play EVA speech.
-        // TODO: Force trigger to activate.
-    lua_register(L, "StartMissionTimer", Script_StartMissionTimer);			        // Start mission timer.
-    lua_register(L, "StopMissionTimer", Script_StopMissionTimer);			        // Stop mission timer.
+        lua_register(L, "RevealAll", Script_RevealAll);                                 // Reveal the entire map.
+        lua_register(L, "RevealCell", Script_RevealCell);                               // Reveal map around cell #.
+        lua_register(L, "RevealZone", Script_RevealZone);                               // Reveal all of specified zone.
+        lua_register(L, "PlaySound", Script_PlaySound);                                 // Play sound effect.
+        lua_register(L, "PlayMusic", Script_PlayMusic);                                 // Play musical score.
+        lua_register(L, "PlaySpeech", Script_PlaySpeech);						        // Play EVA speech.
+            // TODO: Force trigger to activate.
+        lua_register(L, "StartMissionTimer", Script_StartMissionTimer);			        // Start mission timer.
+        lua_register(L, "StopMissionTimer", Script_StopMissionTimer);			        // Stop mission timer.
+        lua_register(L, "IncreaseMissionTimer", Script_IncreaseMissionTimer);           // Increase mission timer time.
+        lua_register(L, "DecreaseMissionTimer", Script_DecreaseMissionTimer);           // Decrease mission timer time.
+        lua_register(L, "SetMissionTimer", Script_SetMissionTimer);                     // Set and start the mission timer.
+        lua_register(L, "SetGlobalValue", Script_SetGlobalValue);	                    // Set global variable.
+        lua_register(L, "ClearGlobalValue", Script_ClearGlobalValue);                   // Clear global variable.
+        lua_register(L, "AutoBaseBuilding", Script_AutoBaseBuilding);                   // Automated base building.
+        lua_register(L, "CreepShadow", Script_CreepShadow);                             // Shadow grows back one 'step'.
+
+        lua_register(L, "DestroyTriggerBuilding", Script_DestroyTriggerBuilding);       // Destroys the building this trigger is attached to. (in the case of scripging, we can supply the trigger)
+        lua_register(L, "GiveOneTimeSpecialWeapon", Script_GiveOneTimeSpecialWeapon);   // Add a one-time special weapon ability to house.
+        lua_register(L, "GiveSpecialWeapon", Script_GiveSpecialWeapon);                 // Add a repeating special weapon ability to house.
+
+        lua_register(L, "DesignatePreferredTarget", Script_DesignatePreferredTarget);   // Designates preferred target for house.
+        lua_register(L, "LaunchFakeNukes", Script_LaunchFakeNukes);                     // Launch fake nuclear missiles from all silos
 
 
-/**********************************************************************************************
-* Red Alert Vanilla Events                                                                    *
-*=============================================================================================*/
+    /**********************************************************************************************
+    * Red Alert Vanilla Events                                                                    *
+    *=============================================================================================*/
 
-    lua_register(L, "CellCallback", Script_CellCallback);               // player enters this square (or group of squares)
-    lua_register(L, "SpiedByCallback", Script_SpiedByCallback);         // Spied by.
-    // Thieved by (raided or stolen vehicle).                                       // This doesn't appear to be implemented in the engine (?)
-    lua_register(L, "ObjectDiscoveryCallback", Script_DiscoveryCallback);     // player discovers this object
-    lua_register(L, "DiscoveryCallback", Script_DiscoveryCallback);     // player discovers this object
-    lua_register(L, "HouseDiscoveredCallback", Script_HouseDiscoveredCallback); // House has been discovered.
-// player attacks this object
-// player destroys this object
-// Any object event will cause the trigger.
-// all house's units destroyed
-// all house's buildings destroyed
-// all house's units & buildings destroyed
-// house reaches this many credits
-// Scenario elapsed time from start.
-// Pre expired mission timer.
-// Number of buildings destroyed.
-// Number of units destroyed.
-// No factories left.
-// Civilian has been evacuated.
-// Specified building has been built.
-// Specified unit has been built.
-// Specified infantry has been built.
-// Specified aircraft has been built.
-// Specified team member leaves map.
-// Enters same zone as waypoint 'x'.
-// Crosses horizontal trigger line.
-// Crosses vertical trigger line.
-// If specified global has been set.
-// If specified global has been cleared.
-// If all fake structures are gone.
-// When power drops below 100%.
-// All bridges destroyed.
-// Check for building existing.
+        lua_register(L, "CellCallback", Script_CellCallback);                                   // player enters this square (or group of squares)
+        lua_register(L, "SpiedByCallback", Script_SpiedByCallback);                             // Spied by.
+        // Thieved by (raided or stolen vehicle).                                               // This doesn't appear to be implemented in the engine (?)
+        lua_register(L, "ObjectDiscoveryCallback", Script_ObjectDiscoveryCallback);             // player discovers this object
+        lua_register(L, "HouseDiscoveredCallback", Script_HouseDiscoveredCallback);             // House has been discovered.
+        lua_register(L, "ObjectAttackedCallback", Script_ObjectAttackedCallback);               // player attacks this object
+        lua_register(L, "ObjectDestroyedCallback", Script_ObjectDestroyedCallback);             // player destroys this object
+        lua_register(L, "AnyEventCallback", Script_AnyEventCallback);                           // Any object event will cause the trigger.
+        lua_register(L, "AllUnitsDestroyedCallback", Script_AllUnitsDestroyedCallback);         // all house's units destroyed
+        lua_register(L, "AllBuildingsDestroyedCallback", Script_AllBuildingsDestroyedCallback); // all house's buildings destroyed
+        lua_register(L, "AllDestroyedCallback", Script_AllDestroyedCallback);                   // all house's units & buildings destroyed
+        lua_register(L, "CreditsReachedCallback", Script_CreditsReachedCallback);               // house reaches this many credits
+        lua_register(L, "TimeReachedCallback", Script_TimeReachedCallback);                     // Scenario elapsed time from start.
+        lua_register(L, "MissionTimerCallback", Script_MissionTimerCallback);                   // Pre expired mission timer.
+        lua_register(L, "BuildingsDestroyedCallback", Script_BuildingsDestroyedCallback);       // Number of buildings destroyed.
+        lua_register(L, "UnitsDestroyedCallback", Script_UnitsDestroyedCallback);               // Number of units destroyed.
+        lua_register(L, "NoFactoriesCallback", Script_NoFactoriesCallback);                     // No factories left.
+        lua_register(L, "CivilianEscapeCallback", Script_CivilianEscapeCallback);               // Civilian has been evacuated.
+        lua_register(L, "BuildingBuiltCallback", Script_BuildingBuiltCallback);                 // Specified building has been built.
+        lua_register(L, "UnitBuiltCallback", Script_UnitBuiltCallback);                         // Specified unit has been built.
+        lua_register(L, "InfantryBuiltCallback", Script_InfantryBuiltCallback);                 // Specified infantry has been built.
+        lua_register(L, "AircraftBuiltCallback", Script_AircraftBuiltCallback);                 // Specified aircraft has been built.
+        lua_register(L, "TeamLeavesMapCallback", Script_TeamLeavesMapCallback);                 // Specified team member leaves map.
+        lua_register(L, "ZoneEntryCallback", Script_ZoneEntryCallback);                         // Enters same zone as waypoint 'x'.
+        lua_register(L, "HorizontalCrossCallback", Script_HorizontalCrossCallback);             // Crosses horizontal trigger line.
+        lua_register(L, "VerticalCrossCallback", Script_VerticalCrossCallback);                 // Crosses vertical trigger line.
+        lua_register(L, "GlobalSetCallback", Script_GlobalSetCallback);                         // If specified global has been set. (somewhat useless with Scripting)
+        lua_register(L, "GlobalClearedCallback", Script_GlobalClearedCallback);                 // If specified global has been cleared. (somewhat useless with Scripting)
+        // If all fake structures are gone.                                                     // This doesn't appear to be implemented in the engine (?)
+        lua_register(L, "LowPowerCallback", Script_LowPowerCallback);                           // When power drops below 100%.
+        lua_register(L, "AllBridgesDestroyedCallback", Script_AllBridgesDestroyedCallback);     // All bridges destroyed.
+        lua_register(L, "BuildingExistsCallback", Script_BuildingExistsCallback);               // Check for building existing.
 
 
 /**********************************************************************************************
