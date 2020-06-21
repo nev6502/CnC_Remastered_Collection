@@ -207,26 +207,36 @@ Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
     // This is because were trying to avoid parsing the XML's and the filenames aren't consistant.
     const char* theaterName = Theaters[theater].Name;
     for (int i = 0; i < IconCount; i++)
-    {
+    {        
         char filename[512];
         char fixedIconName[512];
         strcpy(fixedIconName, iconName);
         COM_SetExtension(fixedIconName, strlen(fixedIconName), "");
-        const char* tileEntryName = Tileset_FindHDTexture(theater, fixedIconName, i);
-        sprintf(filename, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s", Theaters[theater].Name, tileEntryName);
-        COM_SetExtension(filename, sizeof(filename), ".dds");
-                
-        if (image == NULL) {
-            image = Image_LoadImage(filename);     
 
-            if (image != NULL && i != 0) {
-                image->image[0][i] = image->image[0][0];
-                image->image[0][0] = 0;
+        int numFrames = Tileset_GetNumFramesForTile(theater, fixedIconName, i);
+
+        for (int d = 0; d < numFrames; d++)
+        {
+            const char* tileEntryName = Tileset_FindHDTexture(theater, fixedIconName, i, d);
+            sprintf(filename, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s", Theaters[theater].Name, tileEntryName);
+            COM_SetExtension(filename, sizeof(filename), ".dds");
+
+            if (image == NULL) {
+                image = Image_LoadImage(filename);
+
+                if (image != NULL && i != 0) {
+                    image->HouseImages[0].image[i][d] = image->HouseImages[0].image[0][d];
+                    image->HouseImages[0].image[0][d] = 0;
+                }
+
+                if (image != NULL) {
+                    image->numFrames = numFrames;
+                }
             }
-        }
-        else {
-            if (!Image_Add32BitImage(filename, image, -1, i)) {
-                continue;
+            else {
+                if (!Image_Add32BitImage(filename, image, -1, i, d)) {
+                    continue;
+                }
             }
         }
     }
@@ -385,7 +395,7 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
                 //    src += IconWidth;
                 //}
 
-                if (iconImage->image[0][icon_index] == 0)
+                if (iconImage->HouseImages[0].image[icon_index] == 0)
                     return;
 
                GL_SetClipRect(xstart, ystart, blit_width, blit_height);

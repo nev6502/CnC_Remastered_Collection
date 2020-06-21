@@ -77,6 +77,7 @@ SurfaceMonitorClass AllSurfaces;
 SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
+float animFrameNum = 0;
 
 extern std::vector<const ObjectClass*> renderedFrameObjects;
 
@@ -163,12 +164,12 @@ static char* Image_GetGeneratedName(Image_t* image, const char* name, int housei
 	return &generatedFileName[0];
 }
 
-static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, bool writeGenerated) {	
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int frameId, int64_t hash, bool writeGenerated) {	
 	// Check to see if we can load a generated image first.
 	// We only generate images that need a houseid
 	if (!writeGenerated && houseid >= 0) {
 		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
-		if (Image_loadHDImage(image, generatedImageName, houseid, animid, hash, true)) {
+		if (Image_loadHDImage(image, generatedImageName, houseid, animid, frameId, hash, true)) {
 			return true;
 		}
 	}
@@ -233,9 +234,9 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	strcpy(image->name, name);
 
 	if(houseid == -1)
-		image->image[0][animid] = texture;
+		image->HouseImages[0].image[animid][frameId] = texture;
 	else
-		image->image[houseid][animid] = texture;
+		image->HouseImages[houseid].image[animid][frameId] = texture;
 	image->namehash = hash;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
@@ -271,7 +272,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 
 	if (!loadAnims) {
 		unsigned char remap[3] = { 0, 0, 0 };
-		if (!Image_loadHDImage(image, name, -1, 0, hash, false)) {
+		if (!Image_loadHDImage(image, name, -1, 0, 0, hash, false)) {
 			delete image;
 			return NULL;
 		}
@@ -279,7 +280,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 	else {
 		byte* palette = (byte *)CCPalette.Get_Data();
 		for (int i = 0; i < MAX_MPLAYER_COLORS; i++) {
-			if (!Image_loadHDImage(image, name, i, 0, hash, false)) {
+			if (!Image_loadHDImage(image, name, i, 0, 0, hash, false)) {
 				delete image;
 				return NULL;
 			}
@@ -369,7 +370,7 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 
 	
 	strcpy(image->name, name);
-	image->image[0][0] = texture;
+	image->HouseImages[0].image[0][0] = texture;
 	image->numAnimFrames = -1;
 	image->namehash = hash;
 	image->renderwidth = image->width = Width;
@@ -425,7 +426,7 @@ void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 
-	image->image[HouseId][ShapeID] = texture;
+	image->HouseImages[HouseId].image[ShapeID][0] = texture;
 	image->numAnimFrames = -1;
 	image->renderwidth = image->width = Width;
 	image->renderheight = image->height = Height;
@@ -433,8 +434,8 @@ void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int
 	delete buffer;
 }
 
-bool Image_Add32BitImage(const char *name, Image_t* image, int HouseId, int ShapeID) {
-	return Image_loadHDImage(image, name, HouseId, ShapeID, image->namehash, false);	
+bool Image_Add32BitImage(const char *name, Image_t* image, int HouseId, int ShapeID, int frameId) {
+	return Image_loadHDImage(image, name, HouseId, ShapeID, frameId, image->namehash, false);	
 }
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
@@ -526,7 +527,7 @@ void Device_Present(void) {
 	// Last thing we do is execute any console commands
 	Console_Tick();
 
-	ImGui_NewFrame();
+	ImGui_NewFrame();	
 }
 
 

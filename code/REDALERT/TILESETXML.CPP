@@ -22,14 +22,24 @@ struct TilesetXMLInfo_t {
 
 TilesetXMLInfo_t theaterXMLRules[3];
 
-const char* Tileset_FindHDTexture(int theaterType, const char* shapeFileName, int shapeNum) {
+const char* Tileset_FindHDTexture(int theaterType, const char* shapeFileName, int shapeNum, int frameNum) {
 	int64_t hash = generateHashValue(shapeFileName, strlen(shapeFileName));
 	for (int i = 0; i < theaterXMLRules[theaterType].tiles.size(); i++) {
 		if (theaterXMLRules[theaterType].tiles[i].hash == hash && theaterXMLRules[theaterType].tiles[i].shape == shapeNum) {
-			return theaterXMLRules[theaterType].tiles[i].frames[0].c_str();
+			return theaterXMLRules[theaterType].tiles[i].frames[frameNum].c_str();
 		}
 	}
 	return NULL;
+}
+
+int Tileset_GetNumFramesForTile(int theaterType, const char* shapeFileName, int shapeNum) {
+	int64_t hash = generateHashValue(shapeFileName, strlen(shapeFileName));
+	for (int i = 0; i < theaterXMLRules[theaterType].tiles.size(); i++) {
+		if (theaterXMLRules[theaterType].tiles[i].hash == hash && theaterXMLRules[theaterType].tiles[i].shape == shapeNum) {
+			return theaterXMLRules[theaterType].tiles[i].frames.size();
+		}
+	}
+	return 0;
 }
 
 void Tileset_ParseTile(tinyxml2::XMLNode* tile, TilesetTileRule_t& tileRule) {
@@ -43,7 +53,11 @@ void Tileset_ParseTile(tinyxml2::XMLNode* tile, TilesetTileRule_t& tileRule) {
 	tileRule.name = NameNode->FirstChild()->ToText()->Value();
 	tileRule.hash = generateHashValue(tileRule.name.c_str(), tileRule.name.size());
 	tileRule.shape = atoi(ShapeNode->FirstChild()->ToText()->Value());
-	tileRule.frames.push_back(FrameNode->FirstChild()->ToText()->Value());
+
+	while (FrameNode != NULL) {
+		tileRule.frames.push_back(FrameNode->FirstChild()->ToText()->Value());
+		FrameNode = FrameNode->NextSiblingElement("Frame");
+	}
 }
 
 void Tileset_LoadRuleXML(const char* path, TilesetXMLInfo_t& info) {
@@ -51,6 +65,9 @@ void Tileset_LoadRuleXML(const char* path, TilesetXMLInfo_t& info) {
 	doc.LoadFile(path);
 
 	tinyxml2::XMLElement* root = doc.FirstChildElement();
+	if (root == NULL)
+		return;
+
 	tinyxml2::XMLNode* tilesetTypeClassNode = root->FirstChild();
 
 	tinyxml2::XMLNode* tilesParent = tilesetTypeClassNode->FirstChildElement("Tiles");

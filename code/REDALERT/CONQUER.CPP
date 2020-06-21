@@ -2138,6 +2138,7 @@ static void Sync_Delay(void)
 			Map.Render();
 		}		
 	}
+	animFrameNum+=0.5f; // This is garbage and needs to be fixed with proper delta time bits!!!
 	if (!FrameTimer) {
 		Color_Cycle();
 		Call_Back();
