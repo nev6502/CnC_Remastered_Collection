@@ -666,10 +666,10 @@ oh_dear_its_a_label:
 		...................... Refresh display if needed ......................
 		*/
 		{
-			if (housebtn.IsDropped) {
-				housebtn.Collapse();
-				display = REDRAW_BACKGROUND;
-			}
+			//if (housebtn.IsDropped) {
+				//housebtn.Collapse();
+				//display = REDRAW_BACKGROUND;
+			//}
 			Hide_Mouse();
 
 			/*
@@ -775,7 +775,7 @@ oh_dear_its_a_label:
 			.......................... Redraw buttons ..........................
 			*/
 			{
-				commands->Flag_List_To_Redraw();
+				//commands->Flag_List_To_Redraw();
 				commands->Draw_All();
 			}
 
@@ -788,12 +788,14 @@ oh_dear_its_a_label:
 		*/
 		messages_have_focus = Session.Messages.Has_Edit_Focus();
 		bool droplist_is_dropped = housebtn.IsDropped;
+
 		input = commands->Input();
 
 		/*
 		........................ Invoke game callback .........................
 		*/
-		Call_Back();
+		//Call_Back();
+		Device_Present();
 
 		Load_Title_Page(true);
 
