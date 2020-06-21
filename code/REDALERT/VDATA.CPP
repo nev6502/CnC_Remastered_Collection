@@ -609,19 +609,19 @@ void VesselTypeClass::Turret_Adjust(DirType dir, int & x, int & y) const
 
 	switch (Type) {
 		case VESSEL_CA:
-			Move_Point(xx, yy, dir, 22);
+			Normal_Move_Point(xx, yy, dir, 22);
 			x = xx;
 			y = yy-4;
 			break;
 
 		case VESSEL_PT:
-			Move_Point(xx, yy, dir, 14);
+			Normal_Move_Point(xx, yy, dir, 14);
 			x = xx;
 			y = yy+1;
 			break;
 
 		case VESSEL_DD:
-			Move_Point(xx, yy, dir+DIR_S, 8);
+			Normal_Move_Point(xx, yy, dir+DIR_S, 8);
 			x = xx;
 			y = yy-4;
 			break;

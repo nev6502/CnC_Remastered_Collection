@@ -569,6 +569,7 @@ void Shake_The_Screen(int shakes, HousesType house = HOUSE_NONE);
 **	COORD.CPP
 */
 short const * Coord_Spillage_List(COORDINATE coord, Rect const & rect, bool nocenter=true);
+void Normal_Move_Point(short& x, short& y, register DirType dir, unsigned short distance);
 void Move_Point(short &x, short &y, register DirType dir, unsigned short distance);
 COORDINATE Coord_Move(COORDINATE start, DirType facing, unsigned short distance);
 COORDINATE Coord_Scatter(COORDINATE coord, unsigned distance, bool lock=false);

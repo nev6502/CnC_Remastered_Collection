@@ -425,6 +425,12 @@ int MapEditClass::Placement_Dialog(void)
 		*/
 		Call_Back();
 
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
+
+		Device_Present();
+
 		/*
 		**	Refresh display if needed
 		*/
