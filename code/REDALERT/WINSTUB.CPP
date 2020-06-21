@@ -158,9 +158,9 @@ void Image_WriteTGA(const char* filename, const byte* data, int width, int heigh
 }
 
 
-static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int64_t hash) {
+static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int frameId, int64_t hash) {
 	static char generatedFileName[1024];
-	sprintf(generatedFileName, "cache/v2.%d.%d.%d.tga", hash, houseid, animid);
+	sprintf(generatedFileName, "cache/v4.%d.%d.%d.%d.tga", frameId, houseid, animid, hash);
 	return &generatedFileName[0];
 }
 
@@ -168,7 +168,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	// Check to see if we can load a generated image first.
 	// We only generate images that need a houseid
 	if (!writeGenerated && houseid >= 0) {
-		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
 		if (Image_loadHDImage(image, generatedImageName, houseid, animid, frameId, hash, true)) {
 			return true;
 		}
@@ -247,7 +247,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
 	if (!writeGenerated && Bpp == 4 && houseid >= 0) {
-		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
 		Image_WriteTGA(generatedImageName, Data, Width, Height, false);
 	}
 

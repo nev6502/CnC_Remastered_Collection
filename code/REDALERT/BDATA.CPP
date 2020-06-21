@@ -3144,7 +3144,19 @@ void BuildingTypeClass::One_Time(void)
 			const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 
 			if (imageFileName) {
-				((void const*&)building.HDImageData) = Image_LoadImage(imageFileName, true, true);
+				Image_t *image = Image_LoadImage(imageFileName, true, true);
+				int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
+				if (numBuildingAnims > 0)
+				{
+					for (int i = 1; i < numBuildingAnims; i++) {
+						imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+							Image_Add32BitImage(imageFileName, image, d, 0, i);
+						}
+					}
+				}
+				image->numFrames = numBuildingAnims;
+				((void const*&)building.HDImageData) = image;
 			}
 
 			if (building.ImageData != NULL && building.HDImageData != NULL) {
@@ -3393,8 +3405,21 @@ void BuildingTypeClass::Init(TheaterType theater)
 					const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 
 					// Try load the theatre specific asset first 	
-					if (imageFileName) {
+					if (imageFileName) {						
 						((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName, true, true);
+
+						int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
+						if (numBuildingAnims > 0)
+						{
+							for (int i = 1; i < numBuildingAnims; i++) {
+								imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+								for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+									Image_Add32BitImage(imageFileName, ((BuildingTypeClass*)classptr)->HDImageData, d, 0, i);
+								}
+							}
+						}
+
+						((BuildingTypeClass*)classptr)->HDImageData->numFrames = numBuildingAnims;
 					}
 
 					if (classptr->ImageData != NULL && classptr->HDImageData != NULL) {

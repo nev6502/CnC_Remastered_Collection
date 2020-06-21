@@ -38,7 +38,10 @@ const char* Buildings_FindHDTexture(const char* shapeFileName, int shapeNum, int
 }
 
 int Buildings_GetNumFramesForTile(const char* shapeFileName, int shapeNum) {
-	int64_t hash = generateHashValue(shapeFileName, strlen(shapeFileName));
+	char tmpFileName[2048];
+	strcpy(tmpFileName, shapeFileName);
+	COM_SetExtension(tmpFileName, strlen(tmpFileName), "");
+	int64_t hash = generateHashValue(tmpFileName, strlen(tmpFileName));
 	for (int i = 0; i < buildingsXmlRules.tiles.size(); i++) {
 		if (buildingsXmlRules.tiles[i].hash == hash && buildingsXmlRules.tiles[i].shape == shapeNum) {
 			return buildingsXmlRules.tiles[i].frames.size();
