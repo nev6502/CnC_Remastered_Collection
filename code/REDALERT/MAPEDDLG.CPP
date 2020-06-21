@@ -655,6 +655,8 @@ int MapEditClass::Pick_Scenario(char const * caption, int & scen_nump, ScenarioP
 		g_globalKeyNumType = KN_NONE;
 		g_globalKeyFlags = 0;
 		UserInput.Process_Input();
+
+		Device_Present();
 	}
 
 	Imgui_Dialog_Function = nullptr;
@@ -1121,6 +1123,8 @@ int MapEditClass::Size_Map(int x, int y, int w, int h)
 			g_globalKeyNumType = KN_NONE;
 			g_globalKeyFlags = 0;
 			UserInput.Process_Input();
+
+			Device_Present();
 
 		//	display = REDRAW_NONE;
 		
@@ -1958,9 +1962,10 @@ int MapEditClass::Scenario_Dialog(void)
 		*/
 		KeyNumType input = KN_NONE; //commands->Input();
 
-		g_globalKeyNumType = KN_NONE;
+		//g_globalKeyNumType = KN_NONE;
 		g_globalKeyFlags = 0;
-		UserInput.Process_Input();
+
+		UserInput.Process_Input(input);
 
 		/*
 		**	Process input
@@ -2553,6 +2558,8 @@ int MapEditClass::Select_Trigger(void)
 		g_globalKeyNumType = KN_NONE;
 		g_globalKeyFlags = 0;
 		UserInput.Process_Input();
+
+		Device_Present();
 
 		/*
 		**	Get user input

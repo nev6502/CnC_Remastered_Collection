@@ -67,7 +67,6 @@ DynamicVectorClass<EgoClass *> EgoList;
 ** Names of slideshow pictures to play behind the text
 */
 char SlideNames[NUM_SLIDES][13]={
-
 	"aftr_hi.pcx",
 	"aly1.pcx",
 	"apc_hi.pcx",
@@ -85,29 +84,6 @@ char SlideNames[NUM_SLIDES][13]={
 	"spy.pcx",
 	"stalin.pcx",
 	"tent.pcx"
-};
-
-/*
-** Names of low res slideshow pictures to play behind the text
-*/
-char LoresSlideNames[NUM_SLIDES][13]={
-	"malo0107.cps",
-	"mig_lo.cps",
-	"mtfactlo.cps",
-	"needl-lo.cps",
-	"sov2-lo.cps",
-	"spy-lo.cps",
-	"staln-lo.cps",
-	"tent-lo.cps",
-	"aftr_lo.cps",
-	"aly1-lo.cps",
-	"apc_lo.cps",
-	"aplo0049.cps",
-	"bnlo0020.cps",
-	"dclo0040.cps",
-	"frlo0166.cps",
-	"lab-lo.cps",
-	"lands-lo.cps"
 };
 
 /*
@@ -293,7 +269,9 @@ void EgoClass::Wipe (GraphicBufferClass *background)
 		}
 	}
 
-	background->Blit(*LogicPage, x-1, YPos, x-1, YPos, width+2, 7 * RESFACTOR +1, false);
+	GL_FillRect( TBLACK, x - 1, YPos, width + 2, 7 * RESFACTOR + 1 );
+
+	//background->Blit(*LogicPage, x-1, YPos, x-1, YPos, width+2, 7 * RESFACTOR +1, false);
 }
 
 
@@ -744,9 +722,9 @@ void Show_Who_Was_Responsible (void)
 	*/
 	for (index = 0 ; index < NUM_SLIDES ; index++)
 	{
-		SlideBuffers[index] = new GraphicBufferClass;
-		SlideBuffers[index]->Init (SeenBuff.Get_Width(), SeenBuff.Get_Height(), NULL , 0 , (GBC_Enum)0);
-		Load_Title_Screen( &SlideNames[index][0], SlideBuffers[index], (unsigned char*) &SlidePals[index][0] );
+		//SlideBuffers[index] = new GraphicBufferClass;
+		//SlideBuffers[index]->Init (SeenBuff.Get_Width(), SeenBuff.Get_Height(), NULL , 0 , (GBC_Enum)0);
+		//Load_Title_Screen( &SlideNames[index][0], SlideBuffers[index], (unsigned char*) &SlidePals[index][0] );
 	}
 
 	/*
@@ -812,7 +790,7 @@ void Show_Who_Was_Responsible (void)
 		/*
 		** Do the slideshow background.
 		*/
-		Slide_Show (slide_number, picture_frame);
+		//Slide_Show (slide_number, picture_frame);
 
 		/*
 		** Scroll the text. If any text goes off the top then delete that object.
@@ -854,6 +832,7 @@ void Show_Who_Was_Responsible (void)
 		** clip vertically and looks ugly when it suddenly appears and disappears.
 		*/
 		HidPage.Blit(SeenBuff, 0, 8 * RESFACTOR, 0, 8*RESFACTOR, SeenBuff.Get_Width(), SeenBuff.Get_Height() - 16* RESFACTOR, false);
+
 
 		/*
 		** If user hits escape then break.

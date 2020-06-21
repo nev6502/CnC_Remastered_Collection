@@ -702,6 +702,7 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	SDL_Init(SDL_INIT_VIDEO);
 	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);	
 	game_context = SDL_GL_CreateContext(game_window);
+	SDL_GL_SetSwapInterval(0);
 
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);

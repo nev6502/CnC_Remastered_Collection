@@ -243,31 +243,8 @@ const char* XlatNames[] = {
 
 #endif
 
-
-
-#ifndef WIN32	 //VG
-
-	#define	OPTION_WIDTH	236
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-#error Can never again build without WIN32 defined.
-	#define	OPTION_HEIGHT	162
-#else
-	#define	OPTION_HEIGHT	162
-#endif
-	#define	OPTION_X			((320 - OPTION_WIDTH) / 2)
-	#define	OPTION_Y			(200 - OPTION_HEIGHT) / 2
-
-#else
-
-	#define	OPTION_WIDTH	560
-#ifdef FIXIT_CSII	//	checked - ajw 9/28/98
-	#define	OPTION_HEIGHT	332
-#else
-	#define	OPTION_HEIGHT	300
-#endif
-	#define	OPTION_X			((640 - OPTION_WIDTH) / 2)
-	#define	OPTION_Y			(400 - OPTION_HEIGHT) / 2
-#endif
+#define	OPTION_WIDTH	560
+#define	OPTION_HEIGHT	332
 
 struct EObjectClass
 {
@@ -355,11 +332,7 @@ void EListClass::Draw_Entry(int index, int x, int y, int width, int selected)
 		}
 	}
 
-#ifndef WIN32
-        Conquer_Clip_Text_Print(buffer, x, y, scheme, TBLACK, flags & ~(TPF_CENTER), width, Tabs);
-#else
 	Conquer_Clip_Text_Print(buffer, x + 100, y, scheme, TBLACK, flags & ~(TPF_CENTER), width, Tabs);
-#endif
 }
 
 #ifdef FIXIT_VERSION_3
@@ -369,6 +342,8 @@ bool Expansion_Dialog(void)
 #endif
 {
 	GadgetClass * buttons = NULL;
+	int OPTION_X = (SeenBuff.Get_Width() - OPTION_WIDTH) / 2;
+	int OPTION_Y = (SeenBuff.Get_Height() - OPTION_HEIGHT) / 2;
 
 #ifndef WIN32
 	TextButtonClass ok(200, TXT_OK, TPF_BUTTON, OPTION_X+40, OPTION_Y+OPTION_HEIGHT-15);

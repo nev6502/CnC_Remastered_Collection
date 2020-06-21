@@ -245,11 +245,7 @@ int Check_Menu(int menu, char const * text[], char *, long field, int index, Key
 		key = 0;
 		UnknownKey = 0;
 		if (Keyboard->Check()) {
-#ifdef WIN32
 			key = (Keyboard->Get() & ~(WWKEY_SHIFT_BIT | WWKEY_ALT_BIT | WWKEY_CTRL_BIT));			/* mask off all but release bit	*/
-#else
-			key = (Keyboard->Get() & 0x08FF);			/* mask off all but release bit	*/
-#endif
 		}
 	}
 	else {
@@ -441,18 +437,23 @@ int Do_Menu(char const ** strings, bool )
 	Keyboard->Clear();
 	selection = -1;
 	UnknownKey = 0;
+
+	// AI options main selection loop
 	while (selection == -1) {
-// jmarshall
+		Call_Back();
+
 		g_globalKeyNumType = KN_NONE;
 		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
 
-		Call_Back();
+		Device_Present();
 
 		Show_Mouse(true);
 
 		selection = Check_Menu(0, strings, NULL, 0xFFL, 0, (KeyNumType)g_globalKeyFlags);
-		if (UnknownKey != 0 || UnknownKey == KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) break;
+		if ( UnknownKey != 0 || UnknownKey == KN_ESC || UnknownKey==KN_LMOUSE || UnknownKey==KN_RMOUSE) break;
 	}
+
 	Keyboard->Clear();
 	Hide_Mouse();
 
