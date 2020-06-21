@@ -241,14 +241,17 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	else
 		image->HouseImages[houseid].image[animid][frameId] = texture;
 	image->namehash = hash;
-	image->renderwidth = image->width = Width;
-	image->renderheight = image->height = Height;
+	image->renderwidth[animid] = image->width = Width;
+	image->renderheight[animid] = image->height = Height;
 	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
 	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
 	if (!writeGenerated && Bpp == 4 && houseid >= 0) {
 		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
 		Image_WriteTGA(generatedImageName, Data, Width, Height, false);
+
+		Console_Printf("Writing %s to cache %s\n", image->name, name);
+		Sleep(0);
 	}
 
 	ilDeleteImages(1, &ImageName);
@@ -376,8 +379,8 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	image->HouseImages[0].image[0][0] = texture;
 	image->numAnimFrames = -1;
 	image->namehash = hash;
-	image->renderwidth = image->width = Width;
-	image->renderheight = image->height = Height;
+	image->renderwidth[0] = image->width = Width;
+	image->renderheight[0] = image->height = Height;
 	loaded_images.push_back(image);
 	delete buffer;
 	return image;
@@ -431,8 +434,8 @@ void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int
 
 	image->HouseImages[HouseId].image[ShapeID][0] = texture;
 	image->numAnimFrames = -1;
-	image->renderwidth = image->width = Width;
-	image->renderheight = image->height = Height;
+	image->renderwidth[ShapeID] = image->width = Width;
+	image->renderheight[ShapeID] = image->height = Height;
 
 	delete buffer;
 }

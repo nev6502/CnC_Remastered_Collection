@@ -3173,15 +3173,18 @@ void BuildingTypeClass::One_Time(void)
 				}
 				image->numFrames = numBuildingAnims;
 				((void const*&)building.HDImageData) = image;
-			}
 
-			if (building.ImageData != NULL && building.HDImageData != NULL) {
-				int width = Get_Build_Frame_Width(building.ImageData);
-				int height = Get_Build_Frame_Height(building.ImageData);
+				if (building.ImageData != NULL && building.HDImageData != NULL) {
+					int width = Get_Build_Frame_Width(building.ImageData);
+					int height = Get_Build_Frame_Height(building.ImageData);
 
-				building.HDImageData->renderwidth = width;
-				building.HDImageData->renderheight = height;
-			}
+					for (int d = 0; d < shapeId; d++)
+					{
+						building.HDImageData->renderwidth[d] = width;
+						building.HDImageData->renderheight[d] = height;
+					}
+				}
+			}			
 		}
 	}
 
@@ -3261,7 +3264,7 @@ void BuildingTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 		//CC_Draw_Shape((Image_t *)Get_HDImage_Data(), 0, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL, NULL, NULL, DIR_N);
 		x += WindowList[window][WINDOWX];
 		y += WindowList[window][WINDOWY];
-		GL_RenderImage(hdimage, x, y, hdimage->renderwidth, hdimage->renderheight);
+		GL_RenderImage(hdimage, x, y, hdimage->renderwidth[0], hdimage->renderheight[0]);
 	}
 	else {
 		void const* ptr = Get_Cameo_Data();
@@ -3458,8 +3461,8 @@ void BuildingTypeClass::Init(TheaterType theater)
 						int width = Get_Build_Frame_Width(classptr->ImageData);
 						int height = Get_Build_Frame_Height(classptr->ImageData);
 
-						classptr->HDImageData->renderwidth = width;
-						classptr->HDImageData->renderheight = height;
+						classptr->HDImageData->renderwidth[0] = width;
+						classptr->HDImageData->renderheight[0] = height;
 					}
 				}
 // jmarshall end

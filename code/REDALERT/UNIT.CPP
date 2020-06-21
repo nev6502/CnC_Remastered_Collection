@@ -2051,11 +2051,13 @@ void UnitClass::Draw_It(int x, int y, WindowNumberType window) const
 	int			tfacing = Dir_To_32(SecondaryFacing);
 	DirType		rotation = DIR_N;
 	int			scale = 0x0100;
+	Image_t*	hdShapeFile;
 
 	/*
 	**	Verify the legality of the unit class.
 	*/
 	shapefile = Get_Image_Data();
+	hdShapeFile = Get_HDImage_Data();
 	if (shapefile == NULL) return;
 
 	/*
@@ -2076,7 +2078,12 @@ void UnitClass::Draw_It(int x, int y, WindowNumberType window) const
 		/*
 		**	Actually perform the draw. Overlay an optional shimmer effect as necessary.
 		*/
-		Techno_Draw_Object(shapefile, shapenum, x, y, window, rotation, scale);
+		if (hdShapeFile) {
+			Techno_Draw_Object_HD(hdShapeFile, shapenum, x, y, window, rotation, scale);
+		}
+		else {
+			Techno_Draw_Object(shapefile, shapenum, x, y, window, rotation, scale);
+		}
 
 		/*
 		**	If there is a rotating radar dish, draw it now.
@@ -2086,7 +2093,12 @@ void UnitClass::Draw_It(int x, int y, WindowNumberType window) const
 				int x2 = x, y2 = y;
 				shapenum = 32 + (Frame & 7);
 				Class->Turret_Adjust(PrimaryFacing, x2, y2);
-				Techno_Draw_Object(shapefile, shapenum, x2, y2, window);
+				if (hdShapeFile) {
+					Techno_Draw_Object_HD(hdShapeFile, shapenum, x, y, window);
+				}
+				else {
+					Techno_Draw_Object(shapefile, shapenum, x2, y2, window);
+				}
 			} else {
 //#ifdef FIXIT_PHASETRANSPORT	//	checked - ajw 9/28/98
 //				if (*this == UNIT_PHASE) {
@@ -2099,9 +2111,19 @@ void UnitClass::Draw_It(int x, int y, WindowNumberType window) const
 //#endif
 #ifdef FIXIT_CSII	//	checked - ajw 9/28/98
 				if (*this == UNIT_TESLATANK) {
-					Techno_Draw_Object(shapefile, shapenum, x, y, window);
+					if (hdShapeFile) {
+						Techno_Draw_Object_HD(hdShapeFile, shapenum, x, y, window);
+					}
+					else {
+						Techno_Draw_Object(shapefile, shapenum, x, y, window);
+					}
 				} else {
-					Techno_Draw_Object(shapefile, shapenum, x, y-5, window);
+					if (hdShapeFile) {
+						Techno_Draw_Object_HD(hdShapeFile, shapenum, x, y - 5, window);
+					}
+					else {
+						Techno_Draw_Object(shapefile, shapenum, x, y - 5, window);
+					}
 				}
 #else
 				Techno_Draw_Object(shapefile, shapenum, x, y-5, window);
@@ -2139,7 +2161,12 @@ void UnitClass::Draw_It(int x, int y, WindowNumberType window) const
 			/*
 			**	Actually perform the draw. Overlay an optional shimmer effect as necessary.
 			*/
-			Techno_Draw_Object(shapefile, shapenum, xx, yy, window);
+			if (hdShapeFile) {
+				Techno_Draw_Object_HD(hdShapeFile, shapenum, xx, yy - 4, window); // jmarshall - 4 pixel offset for turrets feels wrong, but visually looks alright. 
+			}
+			else {
+				Techno_Draw_Object(shapefile, shapenum, xx, yy, window);
+			}
 		}
 	}
 

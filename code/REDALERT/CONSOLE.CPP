@@ -229,11 +229,11 @@ void Console_Printf(const char* fmt, ...) {
 	vsprintf(msg, fmt, argptr);
 	va_end(argptr);
 
-	int len = strlen(msg);
-	strcpy(&console_text[console_text_len], msg);
+	//int len = strlen(msg);
+	//strcpy(&console_text[console_text_len], msg);
 
 	OutputDebugStringA(msg);
-	console_text_len += len;
+	//console_text_len += len;
 }
 
 /*

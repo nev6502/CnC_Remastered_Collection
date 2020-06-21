@@ -248,12 +248,14 @@ Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
     return image;
 }
 
-void Get_Stamp_Size(const void* icondata, int& width, int& height) {
+void Get_Stamp_Size(const void* icondata, int* width, int* height) {
 	IconControlType* tileset = (IconControlType*)icondata;
 
 	if (!tileset) {
-        width = -1;
-        height = -1;
+        for (int i = 0; i < MAX_IMAGE_SHAPES; i++) {
+            *width = -1;
+            *height = -1;
+        }
 		return;
 	}
 
@@ -261,8 +263,10 @@ void Get_Stamp_Size(const void* icondata, int& width, int& height) {
 		Init_Stamps(tileset);
 	}
 
-    width = IconWidth;
-    height = IconHeight;
+    for (int i = 0; i < MAX_IMAGE_SHAPES; i++) {
+        width[i] = IconWidth;
+        height[i] = IconHeight;
+    }
 }
 
 Image_t * Load_Stamp(const char *name, const void* icondata)
@@ -314,8 +318,8 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
     uint8_t* MapPtr = (uint8_t * )iconImage->IconMapPtr;
 	int icon_index = MapPtr != nullptr ? MapPtr[icon] : icon;
 	{
-        int blit_height = iconImage->renderheight;
-        int blit_width = iconImage->renderwidth;
+        int blit_height = iconImage->renderheight[0];
+        int blit_width = iconImage->renderwidth[0];
         
         int width = left + right;
         int xstart = left + x;

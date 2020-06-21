@@ -427,6 +427,7 @@ set(src_redalert
 	./RedAlert/OPTIONS.H
 	./RedAlert/OVERLAY.CPP
 	./RedAlert/OVERLAY.H
+	./RedAlert/UNITXML.CPP
 	./RedAlert/PACKET.CPP
 	./RedAlert/PACKET.H
 	./RedAlert/PALETTEC.CPP

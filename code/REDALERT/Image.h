@@ -19,8 +19,9 @@ struct Image_t {
 	unsigned int numAnimFrames;
 	int width;
 	int height;
-	int renderwidth;
-	int renderheight;	
+	int renderwidth[MAX_IMAGE_SHAPES];
+	int renderheight[MAX_IMAGE_SHAPES];
+	bool perFrameRenderDimen;
 	int numFrames;
 	void* IconMapPtr;
 };
@@ -28,6 +29,7 @@ struct Image_t {
 __forceinline Image_t::Image_t() {
 	IconMapPtr = NULL;
 	numAnimFrames = 0;
+	perFrameRenderDimen = false;
 	memset(HouseImages, 0, sizeof(HouseImages));
 }
 

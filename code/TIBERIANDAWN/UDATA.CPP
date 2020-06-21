@@ -1684,7 +1684,7 @@ void UnitTypeClass::One_Time(void)
 		}
 #endif //PETROGLYPH_EXAMPLE_MOD
 
-		((void const *&)uclass.ImageData) = ptr;
+		((void const *&)uclass.ImageData) = ptr;		
 		if (ptr) {
 
 			if (index == UNIT_MLRS || index == UNIT_MSAM) {

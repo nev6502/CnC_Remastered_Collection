@@ -1181,11 +1181,14 @@ __forceinline void COM_SetExtension(char* path, int maxSize, const char* extensi
 
 void Tileset_LoadRules(void);
 void Buildings_LoadRules(void);
+void Units_LoadRules(void);
 
 const char* Tileset_FindHDTexture(int theaterType, const char* shapeFileName, int shapeNum, int frameNum);
 int Tileset_GetNumFramesForTile(int theaterType, const char* shapeFileName, int shapeNum);
 int Buildings_GetNumFramesForTile(const char* shapeFileName, int shapeNum);
 const char* Buildings_FindHDTexture(const char* shapeFileName, int shapeNum, int frameNum);
+int Units_GetNumFramesForTile(const char* shapeFileName, int shapeNum);
+const char* Units_FindHDTexture(const char* shapeFileName, int shapeNum, int frameNum);
 
 extern bool g_inMainMenu;
 extern KeyNumType	g_globalKeyNumType;

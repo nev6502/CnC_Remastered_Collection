@@ -3499,8 +3499,8 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 
 	if (image != NULL && shapenum != -1) {
 
-		int width = image->renderwidth;
-		int height = image->renderheight;
+		int width = image->renderwidth[shapenum];
+		int height = image->renderheight[shapenum];
 
 #ifdef NEVER
 		/*

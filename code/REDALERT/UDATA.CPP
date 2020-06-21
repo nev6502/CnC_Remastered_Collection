@@ -48,6 +48,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
+#include	"image.h"
 
 /*
 **	This is the list of animation stages to use when the harvester
@@ -1113,10 +1114,51 @@ void UnitTypeClass::One_Time(void)
 
 		((void const *&)uclass.ImageData) = ptr;
 		if (ptr != NULL) {
-
 			largest = max(largest, (int)Get_Build_Frame_Width(ptr));
 			largest = max(largest, (int)Get_Build_Frame_Height(ptr));
 		}
+		{
+			const char* imageFileName = Units_FindHDTexture(fullname, 0, 0);
+
+			if (imageFileName) {
+				Image_t* image = Image_LoadImage(imageFileName, true, true);
+				int numUnitsAnims = Units_GetNumFramesForTile(fullname, 0);
+				int shapeId = 1;
+
+				// Load the old school animation pipeline.
+				{
+					while (true) {
+						imageFileName = Units_FindHDTexture(fullname, shapeId, 0);
+						if (imageFileName == NULL)
+							break;
+
+						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+							Image_Add32BitImage(imageFileName, image, d, shapeId, 0);							
+						}
+						shapeId++;
+					}
+				}
+
+				for (int d = 0; d < shapeId; d++) {
+					image->renderwidth[d] = image->renderwidth[d] / 5;
+					image->renderheight[d] = image->renderheight[d] / 5;
+				}
+
+				if (numUnitsAnims > 0)
+				{
+					for (int i = 1; i < numUnitsAnims; i++) {
+						imageFileName = Units_FindHDTexture(fullname, 0, i);
+						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+							Image_Add32BitImage(imageFileName, image, d, 0, i);
+						}
+					}
+				}
+
+				image->numFrames = numUnitsAnims;
+				((void const*&)uclass.HDImageData) = image;
+			}
+		}
+
 
 		((int &)uclass.MaxSize) = max(largest, 8);
 	}
