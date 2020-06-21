@@ -185,3 +185,12 @@
         TARGET_TYPE_BASE_THREATS=9
         TARGET_TYPE_POWER=10
         TARGET_TYPE_FAKE_BUILDINGS=11
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Trigger persistance                                  *
+    -- *                                                       *
+    -- *********************************************************
+        TRIGGER_VOLATILE=0
+        TRIGGER_SEMI_PERSISTENT=1
+        TRIGGER_PERSISTENT=2

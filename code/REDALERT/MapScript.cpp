@@ -2643,8 +2643,7 @@
             TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
             this_trigger_type->House = (HousesType)houseType;
             this_trigger_type->IsActive = 1;
-            this_trigger_type->IsPersistant = TriggerTypeClass::PERSISTANT;
-
+            this_trigger_type->IsPersistant = TriggerTypeClass::VOLATILE;
             this_trigger_type->Event1 = TEVENT_BUILDING_EXISTS;
             this_trigger_type->EventControl = MULTI_ONLY;
             this_trigger_type->Event1.Data.Value = buildingType;
@@ -2857,24 +2856,43 @@
         int mergeTriggerIndex = lua_tointeger(L, 2);
 
         TriggerClass* resulting_trigger = Triggers.Ptr(triggerIndex);
+        TriggerTypeClass* resulting_trigger_type = resulting_trigger->Class;
         TriggerClass* merge_trigger = Triggers.Ptr(mergeTriggerIndex);
 
         if (resulting_trigger != NULL && merge_trigger != NULL) {
 
             // Set event 2 to event 1 of the merge trigger
-            resulting_trigger->Class->Event2 = merge_trigger->Class->Event1;
+            resulting_trigger_type->Event2.Event = (TEventType)merge_trigger->Class->Event1.Event;
+            resulting_trigger_type->Event2.Data.Value = (long)merge_trigger->Class->Event1.Data.Value;
+            resulting_trigger_type->Event2.Team = (TeamTypeClass*)merge_trigger->Class->Event1.Team;
 
             // Make this an "AND" coniditional trigger (event 1 AND event 2)
             resulting_trigger->Class->EventControl = MULTI_AND;
+            resulting_trigger->Class->ActionControl = MULTI_ONLY;
 
             // TODO: only do these individual cleanups for actions that they represent (for efficiency)
 
             // Now switch over any LogicTrigger references (we're getting rid of the second trigger)
             for (int t_index = 0; t_index < LogicTriggers.Count(); t_index++) {
+
                 TriggerClass* _trigger = LogicTriggers[t_index];
 
                 if (_trigger == merge_trigger) {
-                    LogicTriggers[t_index] = resulting_trigger;
+
+                    LogicTriggers.Delete(t_index);
+
+                    bool find_existing_result;
+                    for (int t2_index = 0; t2_index < LogicTriggers.Count(); t2_index++) {
+                        if (LogicTriggers[t2_index] == resulting_trigger) {
+                            find_existing_result = true;
+                            break;
+                        }
+                    }
+                    if (!find_existing_result) {
+                        LogicTriggers.Add(resulting_trigger);
+                    }
+
+                    break;
                 }
 
             }
@@ -2885,7 +2903,21 @@
 
                 if (_trigger != NULL) {
                     if (_trigger == merge_trigger) {
-                        MapTriggers[t_index] = resulting_trigger;
+
+                        MapTriggers.Delete(t_index);
+
+                        bool find_existing_result;
+                        for (int t2_index = 0; t2_index < MapTriggers.Count(); t2_index++) {
+                            if (MapTriggers[t2_index] == resulting_trigger) {
+                                find_existing_result = true;
+                                break;
+                            }
+                        }
+                        if (!find_existing_result) {
+                            MapTriggers.Add(resulting_trigger);
+                        }
+
+                        break;
                     }
                 }
 
@@ -2899,7 +2931,21 @@
 
                     if(_trigger != NULL){
                         if (_trigger == merge_trigger) {
-                            HouseTriggers[h_index][t_index] = resulting_trigger;
+
+                            HouseTriggers[h_index].Delete(t_index);
+
+                            bool find_existing_result;
+                            for (int t2_index = 0; t2_index < HouseTriggers[h_index].Count(); t2_index++) {
+                                if (HouseTriggers[h_index][t2_index] == resulting_trigger) {
+                                    find_existing_result = true;
+                                    break;
+                                }
+                            }
+                            if (!find_existing_result) {
+                                HouseTriggers[h_index].Add(resulting_trigger);
+                            }
+
+                            break;
                         }
                     }
 
@@ -2915,14 +2961,16 @@
                 }
             }
 
+            //TriggerClass* Editor_trigger = Triggers.Ptr(0);
+            //TriggerTypeClass* Editor_trigger_type = Editor_trigger->Class;
+
             // Now that we've merged the contents, and it's no longer being referred to, we can safely delete the merge trigger
+            Detach_This_From_All(merge_trigger->As_Target());
             delete merge_trigger;
         }
 
         return 1;
     }
-
-
 
     /***********************************************************************************************
      * Script_GetTriggerByName - Gets the trigger with a given name                                *
@@ -2966,6 +3014,42 @@
 
         return -1;
     }
+
+    /***********************************************************************************************
+     * Script_TriggerSetPersistence - Sets whether a trigger runs once or indefinitely             *
+     *                                                                                             *
+     *   SCRIPT INPUT:	triggerIndex (int)     - The trigger ID of which this will apply           *
+     *                	isPersistent (int)     - The persistence value                             *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_TriggerSetPersistence(lua_State* L) {
+
+        int triggerIndex = lua_tointeger(L, 1);
+        unsigned char isPersistent = lua_tointeger(L, 2);
+
+        TriggerClass* trigger = Triggers.Ptr(triggerIndex);
+
+        if (trigger != NULL) {
+
+            TriggerTypeClass* trigger_type = trigger->Class;
+
+            trigger_type->IsPersistant = (TriggerTypeClass::PersistantType)isPersistent;
+
+
+        }
+
+        return -1;
+    }
+
+    
 
 /**********************************************************************************************
 * Mission Utility Functions                                                                   *
@@ -4169,6 +4253,7 @@
             lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
             lua_register(L, "MergeTriggers", Script_MergeTriggers);	                        // Combines the events of two triggers (for multi-event triggers :)
             lua_register(L, "GetTriggerByName", Script_GetTriggerByName);	                // Gets the ID of the trigger with a given name
+            lua_register(L, "TriggerSetPersistence", Script_TriggerSetPersistence);	        // Does a trigger go on and on or just run once?
 
         /**********************************************************************************************
         * Mission Utility Functions                                                                   *
