@@ -4,7 +4,9 @@
 #include "FUNCTION.H"
 #include "MapScript.h"
 
-
+/**********************************************************************************************
+* Red Alert Vanilla Actions                                                                   *
+*=============================================================================================*/
 
 /***********************************************************************************************
  * Script_GiveCredits - Gives or takes a given amount of credits to / from a player            *
@@ -99,71 +101,6 @@ static int Script_GetCredits(lua_State* L) {
 }
 
 
-/***********************************************************************************************
- * Script_GetCellObject - Gets an object (if any) on a cell and returns the ID                 *
- *                                                                                             *
- *   SCRIPT INPUT:	in_x (int)       - The cell/X location of the cell to pick from            *
- *                  in_y (int)       - The cell/Y location of the cell to pick from            *
- *                                                                                             *
- *   SCRIPT OUTPUT:  result (number) - The ID of the building on the cell, or -1 if none       *
- *                                                                                             *
- * INPUT:  lua_State - The current Lua state                                                   *
- *                                                                                             *
- * OUTPUT:  int; Did the function run successfully? Return 1                                   *
- *                                                                                             *
- * WARNINGS:  ?                                                                                *
- *                                                                                             *
- *=============================================================================================*/
-static int Script_GetCellObject(lua_State* L) {
-
-    int in_x = lua_tointeger(L, 1);
-    int in_y = lua_tointeger(L, 2);
-
-    long result = -1;
-    
-    ObjectClass* this_object = Map[XY_Cell(in_x, in_y)].Cell_Object();
-
-    if (this_object == NULL) {
-
-        lua_pushnumber(L, -1);
-        return 1;
-    }
-
-    MapScriptObject* CacheObject = new MapScriptObject;
-
-    CacheObject->ID = this_object->ID;
-    CacheObject->RTTI = this_object->RTTI;
-    CacheObject->classIndex = -1;
-
-    switch (this_object->RTTI) {
-        case RTTI_BUILDING: {
-            CacheObject->classIndex = Script_BuildingIndexFromID(this_object->ID);
-        }break;
-        case RTTI_UNIT: {
-            CacheObject->classIndex = Script_UnitIndexFromID(this_object->ID);
-        }break;
-        case RTTI_AIRCRAFT: {
-            CacheObject->classIndex = Script_AircraftIndexFromID(this_object->ID);
-        }break;
-        case RTTI_INFANTRY: {
-            CacheObject->classIndex = Script_InfantryIndexFromID(this_object->ID);
-        }break;
-        case RTTI_VESSEL: {
-            CacheObject->classIndex = Script_VesselIndexFromID(this_object->ID);
-        }break;
-    }
-
-    if (CacheObject->classIndex == -1 || CacheObject->ID < 0) {
-        delete CacheObject;
-        lua_pushnumber(L, -1);
-    }else {
-        Scen.mapScript->ObjectCache.push_back(CacheObject);
-        lua_pushnumber(L, CacheObject->ID); // Return index for ultrafast lookup
-    }
-
-    return 1;
-}
-
 
 /***********************************************************************************************
  * MapScript::GetCacheObject -- Returns ObjectClass from cache with given ID                   *
@@ -186,6 +123,7 @@ ObjectClass* Script_GetCacheObject(int input_object_id) {
 
         MapScriptObject* thisCacheObject = (MapScriptObject*)(*it);
 
+        // Here it is
         if (thisCacheObject->ID == input_object_id) {
 
             // Determine type of object and return it from cache. If it doesn't exist any longer, remove it from cache
@@ -317,8 +255,6 @@ ObjectClass* Script_GetCacheObject(int input_object_id) {
     return NULL;
 }
 
-
-
 /***********************************************************************************************
  * Script_CountBuildings - Returns the amount of specific buildings for a player               *
  *                                                                                             *
@@ -373,8 +309,7 @@ static int Script_CountBuildings(lua_State* L) {
         in_x2 = in_x1;
         in_y2 = in_y1;
         within_area = true;
-    }
-    else if (lua_gettop(L) == 6) {
+    } else if (lua_gettop(L) == 6) {
         in_x1 = lua_tointeger(L, 3);
         in_y1 = lua_tointeger(L, 4);
         in_x2 = lua_tointeger(L, 5);
@@ -411,7 +346,6 @@ static int Script_CountBuildings(lua_State* L) {
     lua_pushnumber(L, result);
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_CountAircraft - Returns the amount of specific aircraft for a player                 *
@@ -598,7 +532,6 @@ static int Script_CountUnits(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_CountInfantry - Returns the amount of specific infantry for a player                 *
  *                                                                                             *
@@ -691,7 +624,6 @@ static int Script_CountInfantry(lua_State* L) {
     lua_pushnumber(L, result);
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_CountVessels - Returns the amount of specific vessels for a player                   *
@@ -786,63 +718,6 @@ static int Script_CountVessels(lua_State* L) {
     return 1;
 }
 
-
-/***********************************************************************************************
- * Script_SetTriggerCallback - Adds a lua callback to an existing trigger                      *
- *                                                                                             *
- *   SCRIPT INPUT:	triggerName (string)     - The ININame of the trigger via its class        *
- *                                                                                             *
- *                	callbackName (string)    - The function name to be called when the         *
- *                                             actions have been met                           *
- *                                                                                             *
- *                  actionIndex (int) (opt.) - 0: always callback on any of the given paths    *
- *                                                of the trigger                               *
- *                                             1: only callback on first action                *
- *                                             2: only callback on second action               *
- *                                                                                             *
- *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
- *                                                                                             *
- * INPUT:  lua_State - The current Lua state                                                   *
- *                                                                                             *
- * OUTPUT:  int; Did the function run successfully? Return 1                                   *
- *                                                                                             *
- * WARNINGS:  ?                                                                                *
- *                                                                                             *
- *=============================================================================================*/
-static int Script_SetTriggerCallback(lua_State* L) {
-
-    const char* triggerName = lua_tostring(L, 1);
-    const char* callbackName = lua_tostring(L, 2);
-    char actionIndex = 0;
-
-    // Optional actionIndex parameter
-    if (lua_gettop(L) == 3) {
-        actionIndex = lua_tointeger(L, 2);
-    }
-
-    // Find the trigger and set up callback
-    for (int t_index = 0; t_index < Triggers.Count(); t_index++) {
-        TriggerClass* trigger = Triggers.Ptr(t_index);
-
-        if (trigger != NULL) {
-            
-            if (strcmp(trigger->Name(), triggerName) == 0) {
-
-                strncpy(trigger->MapScriptCallback,callbackName,sizeof(trigger->MapScriptCallback ) - 1);
-                trigger->MapScriptActionIndex = actionIndex;
-
-                break;
-            }
-
-        }
-        
-    }
-
-    return 1;
-}
-
-
-
 /***********************************************************************************************
  * Script_Win - The specified player wins                                                      *
  *                                                                                             *
@@ -920,7 +795,6 @@ static int Script_Lose(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_BeginProduction - This will enable production to begin for the house specified       *
  *                                                                                             *
@@ -950,7 +824,6 @@ static int Script_BeginProduction(lua_State* L) {
 
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_CreateTeam - Attempts to create team (as defined in map)                             *
@@ -991,7 +864,6 @@ static int Script_CreateTeam(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_DestroyTeam - Destroy all teams of the type specified                                *
  *                                                                                             *
@@ -1020,7 +892,6 @@ static int Script_DestroyTeam(lua_State* L) {
 
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_AllHunt - Force all units of specified house to go into hunt mode                    *
@@ -1052,7 +923,6 @@ static int Script_AllHunt(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_Reinforcements - Attempts to create reinforcements as defined by team                *
  *                                                                                             *
@@ -1081,17 +951,14 @@ static int Script_Reinforcements(lua_State* L) {
         lua_pushboolean(L, 0);
     }
 
-    
-
-
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_DropZoneFlare - Places drop down smoke at specified waypoint location                *
  *                                                                                             *
- *   SCRIPT INPUT:	ret (int) - The waypoint index of which to drop the smoke                  *
+ *   SCRIPT INPUT:	in_x (int) - The Cell/X location to drop the smoke                         *
+ *                	in_y (int) - The Cell/Y location to drop the smoke                         *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -1103,15 +970,14 @@ static int Script_Reinforcements(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 static int Script_DropZoneFlare(lua_State* L) {
-    int ret = lua_tointeger(L, -1);
 
-    if (ret > 0 && ret < sizeof(Scen.Waypoint)) {
-        new AnimClass(ANIM_LZ_SMOKE, Cell_Coord(Scen.Waypoint[ret]));
-    }
+    int in_x = lua_tointeger(L, 1);
+    int in_y = lua_tointeger(L, 2);
+
+    new AnimClass(ANIM_LZ_SMOKE, Cell_Coord(XY_Cell(in_x,in_y)));
 
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_FireSale - Make AI house give up, selling everything and going all in on attack      *
@@ -1144,7 +1010,6 @@ static int Script_FireSale(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_PlayMovie - Plays the given movie                                                    *
  *                                                                                             *
@@ -1164,7 +1029,6 @@ static int Script_PlayMovie(lua_State* L) {
     Play_Movie((VQType)ret);
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_TriggerText - Triggers text to display in-game                                       *
@@ -1194,11 +1058,10 @@ static int Script_TriggerText(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
- * Script_DestroyTrigger - Reveals the entire map                                              *
+ * Script_DestroyTrigger - Destroys a given trigger                                            *
  *                                                                                             *
- *   SCRIPT INPUT:	ret (int) - The waypoint index of which to reveal                          *
+ *   SCRIPT INPUT:	ret (int) - The index/id of the trigger of which to destroy                *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -1210,11 +1073,14 @@ static int Script_TriggerText(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 static int Script_DestroyTrigger(lua_State* L) {
-    if (!PlayerPtr->IsVisionary) {
-        PlayerPtr->IsVisionary = true;
-        for (CELL cell = 0; cell < MAP_CELL_TOTAL; cell++) {
-            Map.Map_Cell(cell, PlayerPtr);
-        }
+
+    int triggerIndex = lua_tointeger(L, -1);
+
+    TriggerClass* this_trigger = Triggers.Ptr(triggerIndex);
+
+    if (this_trigger != NULL) {
+        Detach_This_From_All(this_trigger->As_Target());
+        delete Triggers.Ptr(triggerIndex);
     }
 
     return 1;
@@ -1316,7 +1182,6 @@ static int Script_AllowWin(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_RevealAll - Reveals the entire map  TODO: input player                               *
  *                                                                                             *
@@ -1400,7 +1265,6 @@ static int Script_RevealZone(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_PlaySound - Plays the given Sound                                                    *
  *                                                                                             *
@@ -1422,7 +1286,6 @@ static int Script_PlaySound(lua_State* L) {
 
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_PlayMusic - Plays the given Music score.                                             *
@@ -1453,7 +1316,6 @@ static int Script_PlayMusic(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_PlaySpeech - Plays the given Speech audio                                            *
  *                                                                                             *
@@ -1473,8 +1335,6 @@ static int Script_PlaySpeech(lua_State* L) {
     Speak((VoxType)ret);
     return 1;
 }
-
-
 
 /***********************************************************************************************
  * Script_StartMissionTimer - Starts the in-game mission timer                                 *
@@ -1685,15 +1545,17 @@ static int Script_DestroyTriggerBuilding(lua_State* L) {
 
     TriggerClass* this_trigger = Triggers.Ptr(triggerIndex);
 
-    for (int index = 0; index < Buildings.Count(); index++) {
+    if(this_trigger != NULL){
+        for (int index = 0; index < Buildings.Count(); index++) {
         
-        BuildingClass* this_building = Buildings.Ptr(index);
+            BuildingClass* this_building = Buildings.Ptr(index);
 
-        if (this_building->Trigger == this_trigger && this_building->Strength > 0) {
-            int damage = this_building->Strength;
-            this_building->Take_Damage(damage, 0, WARHEAD_AP, 0, true);
+            if (this_building->Trigger == this_trigger && this_building->Strength > 0) {
+                int damage = this_building->Strength;
+                this_building->Take_Damage(damage, 0, WARHEAD_AP, 0, true);
+            }
+
         }
-
     }
 
     return 1;
@@ -1847,8 +1709,6 @@ static int Script_DesignatePreferredTarget(lua_State* L) {
 
             if (house->ID == houseType || houseType == -1) {
 
-
-
                 house->PreferredTarget = (QuarryType)targetType;
 
                 // Discontinue giving out free cash if a specific house was specified
@@ -1890,6 +1750,10 @@ static int Script_LaunchFakeNukes(lua_State* L) {
 
     return 1;
 }
+
+/**********************************************************************************************
+* Red Alert Vanilla Events                                                                    *
+*=============================================================================================*/
 
 /***********************************************************************************************
  * Script_CreateCellCallback - Creates an ENTERED_BY trigger and attaches a callback           *
@@ -2010,7 +1874,6 @@ static int Script_SpiedByCallback(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_CreateDiscoveryCallback - Creates a TEVENT_DISCOVERED trigger and attaches a callback*
  *                                                                                             *
@@ -2053,8 +1916,6 @@ static int Script_ObjectDiscoveryCallback(lua_State* L) {
 
         Script_SetObjectTrigger(objectID, this_trigger);
 
-
-
         // Output the new trigger's ID
         lua_pushnumber(L, this_trigger->ID);
 
@@ -2066,7 +1927,6 @@ static int Script_ObjectDiscoveryCallback(lua_State* L) {
 
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_HouseDiscoveredCallback - Initiates when given house is discovered                   *
@@ -2125,7 +1985,6 @@ static int Script_HouseDiscoveredCallback(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_ObjectAttackedCallback - Trigger that springs when object is attacked by anyone      *
  *                                                                                             *
@@ -2166,8 +2025,6 @@ static int Script_ObjectAttackedCallback(lua_State* L) {
 
         Script_SetObjectTrigger(objectID, this_trigger);
 
-
-
         // Output the new trigger's ID
         lua_pushnumber(L, this_trigger->ID);
 
@@ -2181,7 +2038,7 @@ static int Script_ObjectAttackedCallback(lua_State* L) {
 }
 
 /***********************************************************************************************
- * Script_ObjectDestroyedCallback - Trigger that springs when object is attacked by anyone     *
+ * Script_ObjectDestroyedCallback - Trigger that springs when object is destroyed by anyone    *
  *                                                                                             *
  *   SCRIPT INPUT:	objectID (int)        - The object's ID being discovered                   *
  *                  in_function (string)  - The callback function to execute upon trigger      *
@@ -2233,8 +2090,6 @@ static int Script_ObjectDestroyedCallback(lua_State* L) {
 
     return 1;
 }
-
-
 
 /***********************************************************************************************
  * Script_AnyEventCallback -                                                                   *
@@ -2389,7 +2244,6 @@ static int Script_AllBuildingsDestroyedCallback(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_AllDestroyedCallback -  Called when everything belonging to a house is destyroyed    *
  *                                                                                             *
@@ -2443,8 +2297,6 @@ static int Script_AllDestroyedCallback(lua_State* L) {
 
     return 1;
 }
-
-
 
 /***********************************************************************************************
  * Script_CreditsReachedCallback -  Called when given house meets given amount of credits      *
@@ -2501,7 +2353,6 @@ static int Script_CreditsReachedCallback(lua_State* L) {
 
     return 1;
 }
-
 
 /***********************************************************************************************
  * Script_TimeReachedCallback -  Called when the given amount of time has elapsed              *
@@ -2689,7 +2540,6 @@ static int Script_BuildingsDestroyedCallback(lua_State* L) {
 
         HouseTriggers[(HousesType)houseType].Add(this_trigger);
 
-
         // Output the new trigger's ID
         lua_pushnumber(L, this_trigger->ID);
 
@@ -2755,8 +2605,6 @@ static int Script_NoFactoriesCallback(lua_State* L) {
 
     return 1;
 }
-
-
 
 /***********************************************************************************************
  * Script_CivilianEscapeCallback - Called when civilians get evacuated from map                *
@@ -3211,7 +3059,6 @@ static int Script_HorizontalCrossCallback(lua_State* L) {
             }
         }
 
-
         // Output the new trigger's ID
         lua_pushnumber(L, this_trigger->ID);
 
@@ -3224,7 +3071,6 @@ static int Script_HorizontalCrossCallback(lua_State* L) {
     return 1;
 
 }
-
 
 /***********************************************************************************************
  * Script_VerticalCrossCallback - Called when a specified house's units cross the given Y      *
@@ -3292,7 +3138,6 @@ static int Script_VerticalCrossCallback(lua_State* L) {
     return 1;
 
 }
-
 
 /***********************************************************************************************
  * Script_GlobalSetCallback -  activated when the global value is in the "set" poisition       *
@@ -3382,7 +3227,6 @@ static int Script_GlobalClearedCallback(lua_State* L) {
     return 1;
 }
 
-
 /***********************************************************************************************
  * Script_LowPowerCallback - Initiates when given house becomes low on power                   *
  *                                                                                             *
@@ -3456,7 +3300,6 @@ static int Script_AllBridgesDestroyedCallback(lua_State* L) {
 
     const char* in_function = lua_tostring(L, 1);
 
-
     // Create trigger type
     TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
     this_trigger_type->House = HousesType::HOUSE_NONE;
@@ -3524,7 +3367,6 @@ static int Script_BuildingExistsCallback(lua_State* L) {
 
         HouseTriggers[(HousesType)houseType].Add(this_trigger);
 
-
         // Output the new trigger's ID
         lua_pushnumber(L, this_trigger->ID);
 
@@ -3537,21 +3379,20 @@ static int Script_BuildingExistsCallback(lua_State* L) {
     return 1;
 }
 
-
-
-
-// ========================================================================================================================================
-// ========================================================================================================================================
-
+/**********************************************************************************************
+* Trigger Utility Functions                                                                   *
+*=============================================================================================*/
 
 /***********************************************************************************************
  * Script_Script_TriggerAddCell - Adds a cell to any cell based callback                       *
  *                                                                                             *
  *  The map editor will always be the fastest way to do this, but here in case it's needed     *
  *                                                                                             *
- *   SCRIPT INPUT:	triggerIndex (int)     - The trigger ID of which to add a cell             *
- *                  in_x (int)             - The Cell/X location of the new cell               *
- *                  in_y (int)             - The Cell/Y location of the new cell               *
+ *   SCRIPT INPUT:	triggerIndex (int)       - The trigger ID of which to add a cell           *
+ *                  in_x (int)               - The Cell/X location of the new cell             *
+ *                  in_y (int)               - The Cell/Y location of the new cell             *
+ *                  in_x2 (int) (opt. gr. 2) - The second Cell/X location (for bounding box)   *
+ *                  in_y2 (int) (opt. gr. 2) - The second Cell/Y location (for bounding box)   *
  *                                                                                             *
  *   SCRIPT OUTPUT:  void                                                                      *
  *                                                                                             *
@@ -3569,24 +3410,338 @@ static int Script_TriggerAddCell(lua_State* L) {
     int in_x = lua_tointeger(L, 2);
     int in_y = lua_tointeger(L, 3);
 
+    int in_x2=in_x;
+    int in_y2=in_y;
+
+    // Optional secondary group bounding box parameter
+    if (lua_gettop(L) == 5) {
+        in_x2 = lua_tointeger(L, 4);
+        in_y2 = lua_tointeger(L, 5);
+    }
+
     TriggerClass* this_trigger = Triggers.Ptr(triggerIndex);
 
-    Map[XY_Cell(in_x, in_y)].Trigger = this_trigger;
+    if(this_trigger != NULL){
+        for (int _x = in_x; _x <= in_x2; _x++) {
+            for (int _y = in_y; _y <= in_y2; _y++) {
+                Map[XY_Cell(_x, _y)].Trigger = this_trigger;
+            }
+        }
+    }
     
+    
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_SetTriggerCallback - Adds a lua callback to an existing trigger                      *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerIndex (int)       - The trigger of which to get                     *
+ *                                                                                             *
+ *                	callbackName (string)    - The function name to be called when the         *
+ *                                             actions have been met                           *
+ *                                                                                             *
+ *                  actionIndex (int) (opt.) - 0: always callback on any of the given paths    *
+ *                                                of the trigger                               *
+ *                                             1: only callback on first action                *
+ *                                             2: only callback on second action               *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_SetTriggerCallback(lua_State* L) {
+
+    int triggerIndex = lua_tointeger(L, 1);
+
+    const char* callbackName = lua_tostring(L, 2);
+    char actionIndex = 0;
+
+    // Optional actionIndex parameter
+    if (lua_gettop(L) == 3) {
+        actionIndex = lua_tointeger(L, 2);
+    }
+
+    TriggerClass* trigger = Triggers.Ptr(triggerIndex);
+
+    if (trigger != NULL) {
+
+        strncpy(trigger->MapScriptCallback, callbackName, sizeof(trigger->MapScriptCallback) - 1);
+        trigger->MapScriptActionIndex = actionIndex;
+
+    }
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_GetCellObject - Gets an object (if any) on a cell and returns the ID                 *
+ *                                                                                             *
+ *   SCRIPT INPUT:	in_x (int)       - The cell/X location of the cell to pick from            *
+ *                  in_y (int)       - The cell/Y location of the cell to pick from            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The ID of the building on the cell, or -1 if none       *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GetCellObject(lua_State* L) {
+
+    int in_x = lua_tointeger(L, 1);
+    int in_y = lua_tointeger(L, 2);
+
+    long result = -1;
+
+    ObjectClass* this_object = Map[XY_Cell(in_x, in_y)].Cell_Object();
+
+    if (this_object == NULL) {
+
+        lua_pushnumber(L, -1);
+        return 1;
+    }
+
+    MapScriptObject* CacheObject = new MapScriptObject;
+
+    CacheObject->ID = this_object->ID;
+    CacheObject->RTTI = this_object->RTTI;
+    CacheObject->classIndex = -1;
+
+    switch (this_object->RTTI) {
+    case RTTI_BUILDING: {
+        CacheObject->classIndex = Script_BuildingIndexFromID(this_object->ID);
+    }break;
+    case RTTI_UNIT: {
+        CacheObject->classIndex = Script_UnitIndexFromID(this_object->ID);
+    }break;
+    case RTTI_AIRCRAFT: {
+        CacheObject->classIndex = Script_AircraftIndexFromID(this_object->ID);
+    }break;
+    case RTTI_INFANTRY: {
+        CacheObject->classIndex = Script_InfantryIndexFromID(this_object->ID);
+    }break;
+    case RTTI_VESSEL: {
+        CacheObject->classIndex = Script_VesselIndexFromID(this_object->ID);
+    }break;
+    }
+
+    if (CacheObject->classIndex == -1 || CacheObject->ID < 0) {
+        delete CacheObject;
+        lua_pushnumber(L, -1);
+    }
+    else {
+        Scen.mapScript->ObjectCache.push_back(CacheObject);
+        lua_pushnumber(L, CacheObject->ID); // Return index for ultrafast lookup
+    }
+
+    return 1;
+}
+
+/***********************************************************************************************
+ * Script_Merge_Triggers - Adds the event from trigger 2 to trigger 1 and discards trigger 2   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerIndex (int)     - The trigger ID of which will be the result        *
+ *                  mergeTriggerIndex (int)- The trigger ID of which is being merged           *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  result (number) - The amount of matching buildings for that player        *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_MergeTriggers(lua_State* L) {
+
+    int triggerIndex = lua_tointeger(L, 1);
+    int mergeTriggerIndex = lua_tointeger(L, 2);
+
+    TriggerClass* resulting_trigger = Triggers.Ptr(triggerIndex);
+    TriggerClass* merge_trigger = Triggers.Ptr(mergeTriggerIndex);
+
+    if (resulting_trigger != NULL && merge_trigger != NULL) {
+
+        // Set event 2 to event 1 of the merge trigger
+        resulting_trigger->Class->Event2 = merge_trigger->Class->Event1;
+
+        // Make this an "AND" coniditional trigger (event 1 AND event 2)
+        resulting_trigger->Class->EventControl = MULTI_AND;
+
+        // TODO: only do these individual cleanups for actions that they represent (for efficiency)
+
+        // Now switch over any LogicTrigger references (we're getting rid of the second trigger)
+        for (int t_index = 0; t_index < LogicTriggers.Count(); t_index++) {
+            TriggerClass* _trigger = LogicTriggers[t_index];
+
+            if (_trigger == merge_trigger) {
+                LogicTriggers[t_index] = resulting_trigger;
+            }
+
+        }
+
+        // Now switch over any MapTrigger references (we're getting rid of the second trigger)
+        for (int t_index = 0; t_index < MapTriggers.Count(); t_index++) {
+            TriggerClass* _trigger = MapTriggers[t_index];
+
+            if (_trigger != NULL) {
+                if (_trigger == merge_trigger) {
+                    MapTriggers[t_index] = resulting_trigger;
+                }
+            }
+
+        }
+
+        // Now switch over any HouseTrigger references (we're getting rid of the second trigger)
+        for (int h_index = 0; h_index < Houses.Count(); h_index++) {
+            for (int t_index = 0; t_index < HouseTriggers[h_index].Count(); t_index++) {
+
+                TriggerClass* _trigger = HouseTriggers[h_index][t_index];
+
+                if(_trigger != NULL){
+                    if (_trigger == merge_trigger) {
+                        HouseTriggers[h_index][t_index] = resulting_trigger;
+                    }
+                }
+
+            }
+        }
+        
+        // Go through the map and replace any celltriggers
+        for (int _x = Map.MapCellX; _x <= Map.MapCellX + Map.MapCellWidth; _x++) {
+            for (int _y = Map.MapCellY; _y <= Map.MapCellY + Map.MapCellHeight; _y++) {
+                if (Map[XY_Cell(_x, _y)].Trigger == merge_trigger) {
+                    Map[XY_Cell(_x, _y)].Trigger = resulting_trigger;
+                }
+            }
+        }
+
+        // Now that we've merged the contents, and it's no longer being referred to, we can safely delete the merge trigger
+        delete merge_trigger;
+    }
 
     return 1;
 }
 
 
 
+/***********************************************************************************************
+ * Script_GetTriggerByName - Gets the trigger with a given name                                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	triggerName (string); The input trigger name                               *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  triggerID (int) - The index of the trigger with this name                 *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GetTriggerByName(lua_State* L) {
 
+    const char* triggerName= lua_tostring(L, 1);
 
+    // Find the trigger and set up callback
+    for (int t_index = 0; t_index < Triggers.Count(); t_index++) {
+        TriggerClass* trigger = Triggers.Ptr(t_index);
 
+        if (trigger != NULL) {
 
+            if (strcmp(trigger->Name(), triggerName) == 0) {
 
+                TriggerTypeClass* this_type = trigger->Class;
+                lua_pushnumber(L, t_index);
 
+                return 1;
 
+                break;
+            }
 
+        }
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return -1;
+}
+
+/***********************************************************************************************
+ * Script_GetWaypointX - Gets the Cell/X Coordinate of Waypoint                                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	waypointIndex (int) - The waypoint's index to grab the X coordinate for    *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  outX (int) - The Cell/X coordinate of the waypoint                        *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GetWaypointX(lua_State* L) {
+
+    int ret = lua_tointeger(L, -1);
+
+    if (ret > 0 && ret < sizeof(Scen.Waypoint)) {
+       
+        lua_pushnumber(L, Cell_X(Scen.Waypoint[ret]));
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return -1;
+}
+
+/***********************************************************************************************
+ * Script_GetWaypointY - Gets the Cell/Y Coordinate of Waypoint                                *
+ *                                                                                             *
+ *   SCRIPT INPUT:	waypointIndex (int) - The waypoint's index to grab the Y coordinate for    *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  outX (int) - The Cell/Y coordinate of the waypoint                        *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_GetWaypointY(lua_State* L) {
+
+    int ret = lua_tointeger(L, -1);
+
+    if (ret > 0 && ret < sizeof(Scen.Waypoint)) {
+
+        lua_pushnumber(L, Cell_Y(Scen.Waypoint[ret]));
+
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+
+    return -1;
+}
+
+/**********************************************************************************************
+* Mission Utility Functions                                                                   *
+*=============================================================================================*/
 
 /***********************************************************************************************
  * Script_SetBriefingText - Sets the text on the mission briefing screen                       *
@@ -3604,8 +3759,12 @@ static int Script_TriggerAddCell(lua_State* L) {
  *=============================================================================================*/
 static int Script_SetBriefingText(lua_State* L) {
     strcpy(Scen.BriefingText, lua_tostring(L, -1));
-    return 1;
+    return -1;
 }
+
+/**********************************************************************************************
+* MapScript Internal Functions                                                                *
+*=============================================================================================*/
 
 /***********************************************************************************************
  * Script_SetObjectTrigger -- Figures out what kind of object is given and sets up trigger     *
@@ -3791,7 +3950,6 @@ int Script_VesselIndexFromID(int input_object_id) {
     return -1;
 }
 
-
 /***********************************************************************************************
  * MapScript::CallFunction - Calls a given function within the current script                  *
  *                                                                                             *
@@ -3807,8 +3965,7 @@ void MapScript::CallFunction(const char* functionName) {
     lua_getglobal(L, functionName);
     lua_pcall(L, 0, 0, 0);
     
-} //BriefingText
-
+} 
 
 /***********************************************************************************************
  * MapScript::setLuaPath - Sets Lua's path / extensions to search for scripts                  *
@@ -3842,7 +3999,26 @@ void MapScript::SetLuaPath( const char* input_path)
     lua_pop(L, 1);
 }
 
+/***********************************************************************************************
+ * MapScript::Deinit - Deinitialize/free any data used by MapScript (used within destructor)   *
+ *                                                                                             *
+ *   SCRIPT INPUT:	none                                                                       *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+void MapScript::Deinit() {
 
+    for (int i = 0; i < ObjectCache.size(); ++i)
+    {
+        delete ObjectCache[i];
+    }
+
+    ObjectCache.clear();
+
+}
 
 /***********************************************************************************************
  * MapScript::Init -- Loads and initializes script for a given map                             *
@@ -3904,9 +4080,8 @@ bool MapScript::Init(const char* mapName) {
         lua_register(L, "TriggerText", Script_TriggerText);                             // Triggers a text message display.
         lua_register(L, "DestroyTrigger", Script_DestroyTrigger);                       // Destroy specified trigger.
         lua_register(L, "AutoCreate", Script_AutoCreate);                               // Computer to autocreate teams.
-                                                                                        // Win if captured, lose if destroyed ( function does not exist )
+        // Win if captured, lose if destroyed                                           // function does not exist
         lua_register(L, "AllowWin", Script_AllowWin);                                   // Allows winning if triggered.
-
         lua_register(L, "RevealAll", Script_RevealAll);                                 // Reveal the entire map.
         lua_register(L, "RevealCell", Script_RevealCell);                               // Reveal map around cell #.
         lua_register(L, "RevealZone", Script_RevealZone);                               // Reveal all of specified zone.
@@ -3923,14 +4098,11 @@ bool MapScript::Init(const char* mapName) {
         lua_register(L, "ClearGlobalValue", Script_ClearGlobalValue);                   // Clear global variable.
         lua_register(L, "AutoBaseBuilding", Script_AutoBaseBuilding);                   // Automated base building.
         lua_register(L, "CreepShadow", Script_CreepShadow);                             // Shadow grows back one 'step'.
-
         lua_register(L, "DestroyTriggerBuilding", Script_DestroyTriggerBuilding);       // Destroys the building this trigger is attached to. (in the case of scripging, we can supply the trigger)
         lua_register(L, "GiveOneTimeSpecialWeapon", Script_GiveOneTimeSpecialWeapon);   // Add a one-time special weapon ability to house.
         lua_register(L, "GiveSpecialWeapon", Script_GiveSpecialWeapon);                 // Add a repeating special weapon ability to house.
-
         lua_register(L, "DesignatePreferredTarget", Script_DesignatePreferredTarget);   // Designates preferred target for house.
         lua_register(L, "LaunchFakeNukes", Script_LaunchFakeNukes);                     // Launch fake nuclear missiles from all silos
-
 
     /**********************************************************************************************
     * Red Alert Vanilla Events                                                                    *
@@ -3969,60 +4141,45 @@ bool MapScript::Init(const char* mapName) {
         lua_register(L, "AllBridgesDestroyedCallback", Script_AllBridgesDestroyedCallback);     // All bridges destroyed.
         lua_register(L, "BuildingExistsCallback", Script_BuildingExistsCallback);               // Check for building existing.
 
+    /**********************************************************************************************
+    * Trigger Utility Functions                                                                   *
+    *=============================================================================================*/
 
-/**********************************************************************************************
-* Utility Functions                                                                           *
-*=============================================================================================*/
+        lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	            // Initiates a given [callback] on an existing [trigger] // TODO: Make this work via name OR ID
+        lua_register(L, "TriggerAddCell", Script_TriggerAddCell);	                    // Initiates a given [callback] on an existing [trigger]
+        lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
+        lua_register(L, "MergeTriggers", Script_MergeTriggers);	                        // Combines the events of two triggers (for multi-event triggers :)
+        lua_register(L, "GetTriggerByName", Script_GetTriggerByName);	                // Gets the ID of the trigger with a given name
 
+    /**********************************************************************************************
+    * Mission Utility Functions                                                                   *
+    *=============================================================================================*/
+
+        lua_register(L, "SetBriefingText", Script_SetBriefingText);						// Sets the [text] on the mission briefing screen
+
+    /**********************************************************************************************
+    * Status / Location Utility Functions                                                         *
+    *=============================================================================================*/
+        
+        lua_register(L, "GiveCredits", Script_GiveCredits);                             // Give [credits] to [player] 
+        lua_register(L, "GetCredits", Script_GetCredits);                               // Get [player]'s [credits]
+
+        lua_register(L, "CountBuildings", Script_CountBuildings);	                    // Number of buildings of [type] for given [player]
+        lua_register(L, "CountAircraft", Script_CountAircraft);	                        // Number of units of [type] for given [player]
+        lua_register(L, "CountUnits", Script_CountUnits);	                            // Number of units of [type] for given [player]
+        lua_register(L, "CountInfantry", Script_CountInfantry);	                        // Number of infantry of [type] for given [player]
+        lua_register(L, "CountVessels", Script_CountVessels);	                        // Number of vessels of [type] for given [player]
+
+        lua_register(L, "GetWaypointX", Script_GetWaypointX);	                        // Get Cell/X of waypoint
+        lua_register(L, "GetWaypointY", Script_GetWaypointY);	                        // Get Cell/Y of waypoint
     
+    /**********************************************************************************************
+    * Script Globals                                                                              *
+    *=============================================================================================*/
 
-    lua_register(L, "SetBriefingText", Script_SetBriefingText);						// Sets the [text] on the mission briefing screen
-    lua_register(L, "GiveCredits", Script_GiveCredits);                             // Give [credits] to [player] 
-    lua_register(L, "GetCredits", Script_GetCredits);                               // Get [player]'s [credits]
-
-    lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
-    
-    lua_register(L, "CountBuildings", Script_CountBuildings);	                    // Number of buildings of [type] for given [player]
-    lua_register(L, "CountAircraft", Script_CountAircraft);	                        // Number of units of [type] for given [player]
-    lua_register(L, "CountUnits", Script_CountUnits);	                            // Number of units of [type] for given [player]
-    lua_register(L, "CountInfantry", Script_CountInfantry);	                        // Number of infantry of [type] for given [player]
-    lua_register(L, "CountVessels", Script_CountVessels);	                        // Number of vessels of [type] for given [player]
-
-    //CreateCellCallback(10, 10, MyCellCallback)
-
-    
-    lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	            // Initiates a given [callback] on an existing [trigger] // TODO: Make this work via name OR ID
-    lua_register(L, "TriggerAddCell", Script_TriggerAddCell);	                    // Initiates a given [callback] on an existing [trigger]
-
-    
-/**********************************************************************************************
-* Script Globals                                                                              *
-*=============================================================================================*/
-
-    lua_pushnumber(L, PlayerPtr->ID);                                                // Local player (house) index
-    lua_setglobal(L, "_localPlayer");
+        lua_pushnumber(L, PlayerPtr->ID);                                                // Local player (house) index
+        lua_setglobal(L, "_localPlayer");
 
 
     return true;
-}
-
-/***********************************************************************************************
- * MapScript::Deinit - Deinitialize/free any data used by MapScript (used within destructor)   *
- *                                                                                             *
- *   SCRIPT INPUT:	none                                                                       *
- *                                                                                             *
- *   SCRIPT OUTPUT:  void                                                                      *
- *                                                                                             *
- * WARNINGS:  ?                                                                                *
- *                                                                                             *
- *=============================================================================================*/
-void MapScript::Deinit() {
-
-    for (int i = 0; i < ObjectCache.size(); ++i)
-    {
-        delete ObjectCache[i];
-    }
-
-    ObjectCache.clear();
-
 }
