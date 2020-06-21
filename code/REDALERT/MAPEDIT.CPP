@@ -1589,7 +1589,7 @@ void MapEditClass::Main_Menu(void)
 		g_globalKeyFlags = 0;
 		UserInput.Process_Input();
 
-		Call_Back();
+		Device_Present();
 
 		Show_Mouse();
 
@@ -1786,7 +1786,11 @@ void MapEditClass::AI_Menu(void)
 		*/
 		Call_Back();
 
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
 		UserInput.Process_Input();
+
+		Device_Present();
 
 		/*
 		**	Invoke menu

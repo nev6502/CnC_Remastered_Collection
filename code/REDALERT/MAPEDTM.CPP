@@ -330,6 +330,12 @@ int MapEditClass::Select_Team(char const * )
 		/*
 		**	Get user input
 		*/
+		g_globalKeyNumType = KN_NONE;
+		g_globalKeyFlags = 0;
+		UserInput.Process_Input();
+
+		//Device_Present();
+
 		KeyNumType input = commands->Input();
 
 		/*
