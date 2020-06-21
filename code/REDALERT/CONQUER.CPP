@@ -3585,18 +3585,18 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 			Buffer_Enable_HD_Texture(true);
 			//if (draw_window.Lock()) {
 				if ((flags & (SHAPE_GHOST | SHAPE_FADING)) == (SHAPE_GHOST | SHAPE_FADING)) {
-					Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+					Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
 				}
 				else {
 					if (flags & SHAPE_FADING) {
-						Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
+						Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
 					}
 					else {
 						if (flags & SHAPE_PREDATOR) {
-							Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, predoffset);
+							Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, predoffset);
 						}
 						else {
-							Buffer_Frame_To_Page(x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
+							Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
 						}
 					}
 				}
@@ -3786,15 +3786,15 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 
 			{
 				if ((flags & (SHAPE_GHOST|SHAPE_FADING)) == (SHAPE_GHOST|SHAPE_FADING)) {
-					Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+					Buffer_Frame_To_Page(-1, x, y, width, height, shape_image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
 				} else {
 					if (flags & SHAPE_FADING) {
-						Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
+						Buffer_Frame_To_Page(-1, x, y, width, height, shape_image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
 					} else {
 						if (flags & SHAPE_PREDATOR) {
-							Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, predoffset);
+							Buffer_Frame_To_Page(-1, x, y, width, height, shape_image, window, flags | SHAPE_TRANS, predoffset);
 						} else {
-							Buffer_Frame_To_Page(x, y, width, height, shape_image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
+							Buffer_Frame_To_Page(-1, x, y, width, height, shape_image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
 						}
 					}
 				}

@@ -30,6 +30,9 @@ const char* Buildings_FindHDTexture(const char* shapeFileName, int shapeNum, int
 	for (int i = 0; i < buildingsXmlRules.tiles.size(); i++) {
 		if (buildingsXmlRules.tiles[i].hash == hash && buildingsXmlRules.tiles[i].shape == shapeNum) {
 			static char hdTexturePath[2048];
+			if (buildingsXmlRules.tiles[i].frames.size() == 0)
+				return NULL;
+
 			sprintf(hdTexturePath, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s", buildingsXmlRules.tiles[i].frames[frameNum].c_str());
 			return &hdTexturePath[0];
 		}

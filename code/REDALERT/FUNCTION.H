@@ -709,7 +709,7 @@ void Buffer_Enable_HD_Texture(bool hdTextureEnabled);
 /*
 **	KEYFBUFF.ASM
 */
-long __cdecl Buffer_Frame_To_Page(int x, int y, int w, int h, Image_t* image, unsigned int Window, int flags, ...);
+long __cdecl Buffer_Frame_To_Page(int shapeNum, int x, int y, int w, int h, Image_t* image, unsigned int Window, int flags, ...);
 
 /*
 **	KEYFRAME.CPP

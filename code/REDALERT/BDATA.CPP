@@ -3146,6 +3146,22 @@ void BuildingTypeClass::One_Time(void)
 			if (imageFileName) {
 				Image_t *image = Image_LoadImage(imageFileName, true, true);
 				int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
+				int shapeId = 1;
+
+				// Load the old school animation pipeline.
+				{
+					while (true) {
+						imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
+						if (imageFileName == NULL)
+							break;
+
+						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+							Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
+						}
+						shapeId++;
+					}
+				}
+
 				if (numBuildingAnims > 0)
 				{
 					for (int i = 1; i < numBuildingAnims; i++) {
@@ -3406,7 +3422,23 @@ void BuildingTypeClass::Init(TheaterType theater)
 
 					// Try load the theatre specific asset first 	
 					if (imageFileName) {						
-						((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName, true, true);
+						Image_t *image = ((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName, true, true);
+
+						// Load the old school animation pipeline.
+						int shapeId = 1;
+						{
+							while (true) {
+								imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
+								if (imageFileName == NULL)
+									break;
+
+								for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+									Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
+								}
+								shapeId++;
+							}
+						}
+
 
 						int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
 						if (numBuildingAnims > 0)
