@@ -2961,9 +2961,6 @@
                 }
             }
 
-            //TriggerClass* Editor_trigger = Triggers.Ptr(0);
-            //TriggerTypeClass* Editor_trigger_type = Editor_trigger->Class;
-
             // Now that we've merged the contents, and it's no longer being referred to, we can safely delete the merge trigger
             Detach_This_From_All(merge_trigger->As_Target());
             delete merge_trigger;
