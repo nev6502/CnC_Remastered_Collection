@@ -67,7 +67,7 @@ DynamicVectorClass<EgoClass *> EgoList;
 ** Names of slideshow pictures to play behind the text
 */
 char SlideNames[NUM_SLIDES][13]={
-Credits 	"aftr_hi.pcx",
+	"aftr_hi.pcx",
 	"aly1.pcx",
 	"apc_hi.pcx",
 	"aphi0049.pcx",
