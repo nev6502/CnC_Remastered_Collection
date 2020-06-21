@@ -77,6 +77,7 @@ SurfaceMonitorClass AllSurfaces;
 SDL_Window* game_window;
 SDL_GLContext game_context;
 int OverlappedVideoBlits = 0;
+float animFrameNum = 0;
 
 extern std::vector<const ObjectClass*> renderedFrameObjects;
 
@@ -102,7 +103,7 @@ unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheigh
 return a hash value for the filename
 ================
 */
-static int64_t generateHashValue(const char* fname, const int size) {
+int64_t generateHashValue(const char* fname, const int size) {
 	uint32_t hash = 0x811c9dc5;
 	uint32_t prime = 0x1000193;
 
@@ -157,18 +158,18 @@ void Image_WriteTGA(const char* filename, const byte* data, int width, int heigh
 }
 
 
-static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int64_t hash) {
+static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int frameId, int64_t hash) {
 	static char generatedFileName[1024];
-	sprintf(generatedFileName, "cache/%d.%d.%d.tga", hash, houseid, animid);
+	sprintf(generatedFileName, "cache/v4.%d.%d.%d.%d.tga", frameId, houseid, animid, hash);
 	return &generatedFileName[0];
 }
 
-static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int64_t hash, bool writeGenerated) {	
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int frameId, int64_t hash, bool writeGenerated) {	
 	// Check to see if we can load a generated image first.
 	// We only generate images that need a houseid
 	if (!writeGenerated && houseid >= 0) {
-		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
-		if (Image_loadHDImage(image, generatedImageName, houseid, animid, hash, true)) {
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
+		if (Image_loadHDImage(image, generatedImageName, houseid, animid, frameId, hash, true)) {
 			return true;
 		}
 	}
@@ -182,9 +183,12 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	}
 
 	bool swapBGR = false;
-	if (strstr(name, ".TGA")) {
-		iluFlipImage();
-		swapBGR = true;
+	if (strstr(name, ".TGA") || strstr(name, ".tga")) {
+		if (!writeGenerated)
+		{
+			iluFlipImage();
+			swapBGR = true;
+		}
 	}
 
 	ILuint Width, Height, Bpp;
@@ -233,18 +237,21 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	strcpy(image->name, name);
 
 	if(houseid == -1)
-		image->image[0][animid] = texture;
+		image->HouseImages[0].image[animid][frameId] = texture;
 	else
-		image->image[houseid][animid] = texture;
+		image->HouseImages[houseid].image[animid][frameId] = texture;
 	image->namehash = hash;
-	image->renderwidth = image->width = Width;
-	image->renderheight = image->height = Height;
+	image->renderwidth[animid] = image->width = Width;
+	image->renderheight[animid] = image->height = Height;
 	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
 	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
 	if (!writeGenerated && Bpp == 4 && houseid >= 0) {
-		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, hash);
+		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
 		Image_WriteTGA(generatedImageName, Data, Width, Height, false);
+
+		Console_Printf("Writing %s to cache %s\n", image->name, name);
+		Sleep(0);
 	}
 
 	ilDeleteImages(1, &ImageName);
@@ -271,7 +278,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 
 	if (!loadAnims) {
 		unsigned char remap[3] = { 0, 0, 0 };
-		if (!Image_loadHDImage(image, name, -1, 0, hash, false)) {
+		if (!Image_loadHDImage(image, name, -1, 0, 0, hash, false)) {
 			delete image;
 			return NULL;
 		}
@@ -279,7 +286,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 	else {
 		byte* palette = (byte *)CCPalette.Get_Data();
 		for (int i = 0; i < MAX_MPLAYER_COLORS; i++) {
-			if (!Image_loadHDImage(image, name, i, 0, hash, false)) {
+			if (!Image_loadHDImage(image, name, i, 0, 0, hash, false)) {
 				delete image;
 				return NULL;
 			}
@@ -288,6 +295,25 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 
 	loaded_images.push_back(image);
 	return image;
+}
+
+Image_t *Find_Image(const char* name) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+
+	return NULL;
 }
 
 Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
@@ -350,16 +376,73 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 
 	
 	strcpy(image->name, name);
-	image->image[0][0] = texture;
+	image->HouseImages[0].image[0][0] = texture;
 	image->numAnimFrames = -1;
 	image->namehash = hash;
-	image->renderwidth = image->width = Width;
-	image->renderheight = image->height = Height;
+	image->renderwidth[0] = image->width = Width;
+	image->renderheight[0] = image->height = Height;
 	loaded_images.push_back(image);
 	delete buffer;
 	return image;
 }
 
+void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap) {	
+	unsigned char* buffer = new unsigned char[Width * Height * 4];
+	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+
+	if (image->width != Width || image->height != Height) {
+		assert(!"Image_Add8BitImage: Invalid new dimensions!");
+	}
+
+	for (int i = 0; i < Width * Height; i++) {
+		unsigned char c = data[i];
+		if (remap) {
+			c = remap[c];
+		}
+
+		unsigned char r = ccpalete[(c * 3) + 0] << 2;
+		unsigned char g = ccpalete[(c * 3) + 1] << 2;
+		unsigned char b = ccpalete[(c * 3) + 2] << 2;
+		unsigned char a = 0;
+
+		if ((r == 84 && g == 252 && b == 84) || (r == 0 && g == 168 && b == 0)) {
+			r = 0;
+			g = 0;
+			b = 0;
+			a = 128;
+		}
+		else if (c != 0) {
+			a = 255;
+		}
+
+
+		buffer[(i * 4) + 0] = r;
+		buffer[(i * 4) + 1] = g;
+		buffer[(i * 4) + 2] = b;
+		buffer[(i * 4) + 3] = a;
+	}
+
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+
+	image->HouseImages[HouseId].image[ShapeID][0] = texture;
+	image->numAnimFrames = -1;
+	image->renderwidth[ShapeID] = image->width = Width;
+	image->renderheight[ShapeID] = image->height = Height;
+
+	delete buffer;
+}
+
+bool Image_Add32BitImage(const char *name, Image_t* image, int HouseId, int ShapeID, int frameId) {
+	return Image_loadHDImage(image, name, HouseId, ShapeID, frameId, image->namehash, false);	
+}
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
 	// Todo implement resoluton scaling.
@@ -450,7 +533,7 @@ void Device_Present(void) {
 	// Last thing we do is execute any console commands
 	Console_Tick();
 
-	ImGui_NewFrame();
+	ImGui_NewFrame();	
 }
 
 

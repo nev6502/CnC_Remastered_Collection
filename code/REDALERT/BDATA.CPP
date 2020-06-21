@@ -3141,17 +3141,50 @@ void BuildingTypeClass::One_Time(void)
 		_makepath(fullname, NULL, NULL, building.Graphic_Name(), ".SHP");
 		((void const *&)building.ImageData) = MFCD::Retrieve(fullname);
 		{
-			char imageFileName[512];
-			sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", building.Graphic_Name(), building.Graphic_Name());
-			((void const*&)building.HDImageData) = Image_LoadImage(imageFileName, true, true);
+			const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 
-			if (building.ImageData != NULL && building.HDImageData != NULL) {
-				int width = Get_Build_Frame_Width(building.ImageData);
-				int height = Get_Build_Frame_Height(building.ImageData);
+			if (imageFileName) {
+				Image_t *image = Image_LoadImage(imageFileName, true, true);
+				int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
+				int shapeId = 1;
 
-				building.HDImageData->renderwidth = width;
-				building.HDImageData->renderheight = height;
-			}
+				// Load the old school animation pipeline.
+				{
+					while (true) {
+						imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
+						if (imageFileName == NULL)
+							break;
+
+						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+							Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
+						}
+						shapeId++;
+					}
+				}
+
+				if (numBuildingAnims > 0)
+				{
+					for (int i = 1; i < numBuildingAnims; i++) {
+						imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+							Image_Add32BitImage(imageFileName, image, d, 0, i);
+						}
+					}
+				}
+				image->numFrames = numBuildingAnims;
+				((void const*&)building.HDImageData) = image;
+
+				if (building.ImageData != NULL && building.HDImageData != NULL) {
+					int width = Get_Build_Frame_Width(building.ImageData);
+					int height = Get_Build_Frame_Height(building.ImageData);
+
+					for (int d = 0; d < shapeId; d++)
+					{
+						building.HDImageData->renderwidth[d] = width;
+						building.HDImageData->renderheight[d] = height;
+					}
+				}
+			}			
 		}
 	}
 
@@ -3231,7 +3264,7 @@ void BuildingTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 		//CC_Draw_Shape((Image_t *)Get_HDImage_Data(), 0, x, y, window, SHAPE_CENTER | SHAPE_WIN_REL, NULL, NULL, DIR_N);
 		x += WindowList[window][WINDOWX];
 		y += WindowList[window][WINDOWY];
-		GL_RenderImage(hdimage, x, y, hdimage->renderwidth, hdimage->renderheight);
+		GL_RenderImage(hdimage, x, y, hdimage->renderwidth[0], hdimage->renderheight[0]);
 	}
 	else {
 		void const* ptr = Get_Cameo_Data();
@@ -3388,23 +3421,48 @@ void BuildingTypeClass::Init(TheaterType theater)
 				((void const *&)classptr->ImageData) = MFCD::Retrieve(fullname);
 // jmarshall				
 				{
-					char imageFileName[512];
+					const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 
-					// Try load the theatre specific asset first 
-					sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s.%s/%s.%s-0000.DDS", Theaters[theater].Name, classptr->Graphic_Name(), Theaters[theater].Suffix, classptr->Graphic_Name(), Theaters[theater].Suffix);
-					((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName);
+					// Try load the theatre specific asset first 	
+					if (imageFileName) {						
+						Image_t *image = ((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName, true, true);
 
-					if (!((BuildingTypeClass*)classptr)->HDImageData) {
-						sprintf(imageFileName, "DATA/ART/TEXTURES/SRGB/RED_ALERT/STRUCTURES/%s/%s-0000.TGA", classptr->Graphic_Name(), classptr->Graphic_Name());
-						((BuildingTypeClass*)classptr)->HDImageData = Image_LoadImage(imageFileName);
+						// Load the old school animation pipeline.
+						int shapeId = 1;
+						{
+							while (true) {
+								imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
+								if (imageFileName == NULL)
+									break;
+
+								for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+									Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
+								}
+								shapeId++;
+							}
+						}
+
+
+						int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
+						if (numBuildingAnims > 0)
+						{
+							for (int i = 1; i < numBuildingAnims; i++) {
+								imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+								for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+									Image_Add32BitImage(imageFileName, ((BuildingTypeClass*)classptr)->HDImageData, d, 0, i);
+								}
+							}
+						}
+
+						((BuildingTypeClass*)classptr)->HDImageData->numFrames = numBuildingAnims;
 					}
 
 					if (classptr->ImageData != NULL && classptr->HDImageData != NULL) {
 						int width = Get_Build_Frame_Width(classptr->ImageData);
 						int height = Get_Build_Frame_Height(classptr->ImageData);
 
-						classptr->HDImageData->renderwidth = width;
-						classptr->HDImageData->renderheight = height;
+						classptr->HDImageData->renderwidth[0] = width;
+						classptr->HDImageData->renderheight[0] = height;
 					}
 				}
 // jmarshall end

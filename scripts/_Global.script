@@ -1,0 +1,196 @@
+-- *=======================================================*
+-- *                                                       *
+-- *  Mapscript Global Helper Header                       *
+-- *                                                       *
+-- *=======================================================*
+
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Buildings                                            *
+    -- *                                                       *
+    -- *********************************************************
+
+        BUILDING_ATEK=0   -- Allied Technology Centre
+        BUILDING_IRON=1   -- Iron Curtain
+        BUILDING_WEAP=2   -- Weapons Factory
+        BUILDING_PDOX=3   -- Chronosphere
+        BUILDING_PBOX=4   -- Pillbox
+        BUILDING_HBOX=5   -- Camouflaged Pillbox
+        BUILDING_DOME=6   -- Radar Dome
+        BUILDING_GAP =7   -- Gap Generator
+        BUILDING_GUN =8   -- Gun Turret
+        BUILDING_AGUN=9   -- Anti-Aircraft Gun
+        BUILDING_FTUR=10  -- Flame Turret
+        BUILDING_FACT=11  -- Construction Yard
+        BUILDING_PROC=12  -- Ore Refinery
+        BUILDING_SILO=13  -- Ore Silo
+        BUILDING_HPAD=14  -- Helicopter Pad
+        BUILDING_SAM =15  -- SAM Site
+        BUILDING_AFLD=16  -- Airfield
+        BUILDING_POWR=17  -- Power Plant
+        BUILDING_APWR=18  -- Advanced Power Plant
+        BUILDING_STEK=19  -- Soviet Technology Centre
+        BUILDING_HOSP=20  -- Hospital
+        BUILDING_BARR=21  -- Barracks (Allied)
+        BUILDING_TENT=22  -- Barracks (Soviet)
+        BUILDING_KENN=23  -- Dog Kennel
+        BUILDING_FIX =24  -- Service Depot
+        BUILDING_BIO =25  -- Bio-Research Laboratory
+        BUILDING_MISS=26  -- Technology Centre/Prison
+        BUILDING_SYRD=27  -- Ship Yard
+        BUILDING_SPEN=28  -- Sub Pen
+        BUILDING_MSLO=29  -- Missile Silo
+        BUILDING_FCOM=30  -- Forward Command Post
+        BUILDING_TSLA=31  -- Tesla Coil
+        BUILDING_WEAF=32  -- Fake Weapons Factory
+        BUILDING_FACF=33  -- Fake Construction Yard
+        BUILDING_SYRF=34  -- Fake Ship Yard
+        BUILDING_SPEF=35  -- Fake Sub Pen
+        BUILDING_DOMF=36  -- Fake Radar Dome
+        BUILDING_MINV=43  -- Anti-vehicle mine
+        BUILDING_MINP=44  -- Anti-personnel mine
+
+        -- Counterstrike
+
+        BUILDING_QUEE=84  -- Queen ant structure
+        BUILDING_LAR1=85  -- Ant - single ant larva
+        BUILDING_LAR2=86  -- Ant - two ant larvae
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Infantry                                             *
+    -- *                                                       *
+    -- *********************************************************
+
+        INFANTRY_E1=0         -- Rifle Infantry
+        INFANTRY_E2=1         -- Grenadier
+        INFANTRY_E3=2         -- Rocket Soldier
+        INFANTRY_E4=3         -- Flamethrower
+        INFANTRY_E6=4         -- Engineer
+        INFANTRY_E7=5         -- Tanya
+        INFANTRY_SPY=6        -- Spy
+        INFANTRY_THF=7        -- Thief
+        INFANTRY_MEDI=8       -- Field Medic
+        INFANTRY_GNRL=9       -- General
+        INFANTRY_DOG=10       -- Attack Dog
+        INFANTRY_C1=11        -- Joe
+        INFANTRY_C2=12        -- Barry
+        INFANTRY_C3=13        -- Shelly
+        INFANTRY_C4=14        -- Maria
+        INFANTRY_C5=15        -- Karen
+        INFANTRY_C6=16        -- Steve
+        INFANTRY_C7=17        -- Phil
+        INFANTRY_C8=18        -- Dwight
+        INFANTRY_C9=19        -- Erik
+        INFANTRY_C10=20       -- Scientist
+        INFANTRY_EINSTEIN=21  -- Prof. Einstein
+        INFANTRY_DELPHI=22    -- Special 1
+        INFANTRY_CHAN=23      -- Special 2
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Vehicle                                              *
+    -- *                                                       *
+    -- *********************************************************
+
+        VEHICLE_4TNK=0     -- Mammoth Tank
+        VEHICLE_3TNK=1     -- Heavy Tank
+        VEHICLE_2TNK=2     -- Medium Tank
+        VEHICLE_1TNK=3     -- Light Tank
+        VEHICLE_APC=4      -- Armoured Personnel Carrier
+        VEHICLE_MNLY=5     -- Mine Layer
+        VEHICLE_JEEP=6     -- Ranger
+        VEHICLE_HARV=7     -- Ore Truck
+        VEHICLE_ARTY=8     -- Artillery
+        VEHICLE_MRJ=9      -- Mobile Radar Jammer
+        VEHICLE_MGG=10     -- Mobile Gap Generator
+        VEHICLE_MCV=11     -- Mobile Construction Vehicle
+        VEHICLE_2VRL=12    -- V2 Rocket Launcher
+        VEHICLE_TRUK=13    -- Convoy Truck
+
+        -- Counterstrike only:
+        VEHICLE_ANT1=14    -- First ant type
+        VEHICLE_ANT2=15    -- Second ant type
+        VEHICLE_ANT3=16    -- Third ant type
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Aircraft                                             *
+    -- *                                                       *
+    -- *********************************************************
+
+        AIRCRAFT_TRAN=0   -- Chinook Helicopter
+        AIRCRAFT_BADR=1   -- Badger Bomber
+        AIRCRAFT_U2=2     -- Spy Plane
+        AIRCRAFT_MIG=3    -- MIG Attack Plane
+        AIRCRAFT_YAK=4    -- Yak Attack Plane
+        AIRCRAFT_HELI=5   -- Longbow Helicopter
+        AIRCRAFT_HIND=6   -- Hind Helicopter
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Houses (players)                                     *
+    -- *                                                       *
+    -- *********************************************************
+
+        HOUSE_SPAIN= 0     --  YELLOW/GOLD
+        HOUSE_GREECE=1     --  BLUE-GREY
+        HOUSE_USSR=2       --  RED
+        HOUSE_ENGLAND=3    --  GREEN
+        HOUSE_UKRAINE=4    --  ORANGE
+        HOUSE_GERMANY=5    --  KHAKI/LIGHT BROWN
+        HOUSE_FRANCE=6     --  AQUA
+        HOUSE_TURKEY=7     --  RED-OCHRE
+        HOUSE_GOODGUY=8    --  BLUE-GREY
+        HOUSE_BADGUY=9     --  RED
+        HOUSE_NEUTRAL=10   --  YELLOW/GOLD
+        HOUSE_SPECIAL=11   --  YELLOW/GOLD
+        HOUSE_MULTI1=12    --  YELLOW/GOLD
+        HOUSE_MULTI2=13    --  BLUE-GREY
+        HOUSE_MULTI3=14    --  RED
+        HOUSE_MULTI4=15    --  GREEN
+        HOUSE_MULTI5=16    --  ORANGE
+        HOUSE_MULTI6=17    --  KHAKI/LIGHT BROWN
+        HOUSE_MULTI7=18    --  AQUA
+        HOUSE_MULTI8=19    --  RED-OCHRE
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Special weapons                                      *
+    -- *                                                       *
+    -- *********************************************************
+        SPECIAL_WEAPON_SONAR=0
+        SPECIAL_WEAPON_NUKE=1
+        SPECIAL_WEAPON_CHRONO=2
+        SPECIAL_WEAPON_PARABOMB=3
+        SPECIAL_WEAPON_PARATROOPS=4
+        SPECIAL_WEAPON_SPY_PLANE=5
+        SPECIAL_WEAPON_IRON_CURTAIN=6
+        SPECIAL_WEAPON_GPS=7
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Target types (for use with DesignatePreferredTarget) *
+    -- *                                                       *
+    -- *********************************************************
+        TARGET_TYPE_ANYTHING=1
+        TARGET_TYPE_BUILDINGS=2
+        TARGET_TYPE_HARVESTERS=3
+        TARGET_TYPE_INFANTRY=4
+        TARGET_TYPE_VEHICLES=5
+        TARGET_TYPE_SHIPS=6
+        TARGET_TYPE_FACTORIES=7
+        TARGET_TYPE_BASE_DEFENCES=8
+        TARGET_TYPE_BASE_THREATS=9
+        TARGET_TYPE_POWER=10
+        TARGET_TYPE_FAKE_BUILDINGS=11
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Trigger persistance                                  *
+    -- *                                                       *
+    -- *********************************************************
+        TRIGGER_VOLATILE=0
+        TRIGGER_SEMI_PERSISTENT=1
+        TRIGGER_PERSISTENT=2

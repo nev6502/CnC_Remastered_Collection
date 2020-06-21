@@ -108,6 +108,9 @@ unsigned char DisplayClass::TranslucentTable[(MAGIC_COL_COUNT+1)*256];
 unsigned char DisplayClass::WhiteTranslucentTable[(1+1)*256];
 unsigned char DisplayClass::MouseTranslucentTable[(4+1)*256];
 void const * DisplayClass::TransIconset;
+// jmarshall 
+Image_t*	DisplayClass::TransIconsetHD;
+// jmarshall end
 unsigned char DisplayClass::UnitShadow[(USHADOW_COL_COUNT+1)*256];
 unsigned char DisplayClass::UnitShadowAir[(USHADOW_COL_COUNT+1)*256];
 unsigned char DisplayClass::SpecialGhost[2*256];
@@ -187,6 +190,7 @@ DisplayClass::DisplayClass(void) :
 {
 	ShadowShapes = 0;
 	TransIconset = 0;
+	TransIconsetHD = 0;
 
 	Set_View_Dimensions(0, 8 * RESFACTOR, ScreenWidth, ScreenHeight);
 }
@@ -228,6 +232,9 @@ void DisplayClass::One_Time(void)
 	**	Load the generic transparent icon set.
 	*/
 	TransIconset = MFCD::Retrieve("TRANS.ICN");
+// jmarshall
+	TransIconsetHD = Load_Stamp("TRANS_ICON", TransIconset);
+// jmarshall end
 
 	#ifndef NDEBUG
 		RawFileClass file("SHADOW.SHP");

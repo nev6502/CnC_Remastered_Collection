@@ -38,6 +38,7 @@
 #include	"map.h"
 #include	"layer.h"
 
+struct Image_t;
 
 #define	ICON_PIXEL_W	 		24
 #define	ICON_PIXEL_H			24
@@ -114,6 +115,9 @@ class DisplayClass: public MapClass
 		static unsigned char WhiteTranslucentTable[(1+1)*256];
 		static unsigned char MouseTranslucentTable[(4+1)*256];
 		static void const *TransIconset;
+// jmarshall
+		static Image_t* TransIconsetHD;
+// jmarshall end
 		static unsigned char UnitShadow[(USHADOW_COL_COUNT+1)*256];
 		static unsigned char UnitShadowAir[(USHADOW_COL_COUNT+1)*256];
 		static unsigned char SpecialGhost[2*256];

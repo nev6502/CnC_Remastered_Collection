@@ -61,6 +61,12 @@ extern "C" {
 	 void * __cdecl Get_Font_Palette_Ptr ( void );
 }
 
+struct Image_t;
+
+Image_t* Load_Stamp(const char* name, const void* icondata);
+void Get_Stamp_Size(const void* icondata, int *width, int *height);
+Image_t* Load_StampHD(int theater, const char* iconName, const void *icondata);
+
 extern GraphicViewPortClass *LogicPage;
 extern BOOL AllowHardwareBlitFills;
 #endif

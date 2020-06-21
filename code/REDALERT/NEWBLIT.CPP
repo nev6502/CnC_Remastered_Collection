@@ -18,10 +18,20 @@ void GL_ResetClipRect(void) {
 	ImGui::GetForegroundDrawList()->PopClipRect();
 }
 
-void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int colorRemap) {
+void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int colorRemap, int shapeId) {
 	ImVec2 mi(x, y);
 	ImVec2 ma(x + width, y + height);
-	ImGui::GetForegroundDrawList()->AddImage((ImTextureID)image->image[colorRemap][0], mi, ma);
+
+	if (image->numFrames > 0) {
+		if(image->HouseImages[colorRemap].image[shapeId][((int)animFrameNum) % image->numFrames] == 0)
+			ImGui::GetForegroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][0], mi, ma);
+		else
+			ImGui::GetForegroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][((int)animFrameNum) % image->numFrames], mi, ma);
+	}
+	else {
+		ImGui::GetForegroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][0], mi, ma);
+	}
+
 }
 
 void GL_FillRect(int color, int x, int y, int width, int height) {

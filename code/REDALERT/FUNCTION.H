@@ -710,7 +710,7 @@ void Buffer_Enable_HD_Texture(bool hdTextureEnabled);
 /*
 **	KEYFBUFF.ASM
 */
-long __cdecl Buffer_Frame_To_Page(int x, int y, int w, int h, Image_t* image, unsigned int Window, int flags, ...);
+long __cdecl Buffer_Frame_To_Page(int shapeNum, int x, int y, int w, int h, Image_t* image, unsigned int Window, int flags, ...);
 
 /*
 **	KEYFRAME.CPP
@@ -1180,7 +1180,19 @@ __forceinline void COM_SetExtension(char* path, int maxSize, const char* extensi
 	sprintf(path, "%s%s", oldPath, extension);
 }
 
+void Tileset_LoadRules(void);
+void Buildings_LoadRules(void);
+void Units_LoadRules(void);
+
+const char* Tileset_FindHDTexture(int theaterType, const char* shapeFileName, int shapeNum, int frameNum);
+int Tileset_GetNumFramesForTile(int theaterType, const char* shapeFileName, int shapeNum);
+int Buildings_GetNumFramesForTile(const char* shapeFileName, int shapeNum);
+const char* Buildings_FindHDTexture(const char* shapeFileName, int shapeNum, int frameNum);
+int Units_GetNumFramesForTile(const char* shapeFileName, int shapeNum);
+const char* Units_FindHDTexture(const char* shapeFileName, int shapeNum, int frameNum);
+
 extern bool g_inMainMenu;
 extern KeyNumType	g_globalKeyNumType;
 extern int			g_globalKeyFlags;
+extern float       animFrameNum;
 #endif
