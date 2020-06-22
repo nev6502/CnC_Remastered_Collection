@@ -95,6 +95,8 @@ RemapControlType SidebarScheme;
 extern bool bNoMovies;
 #endif
 
+bool g_loadingPlague = false;
+
 /****************************************
 **	Function prototypes for this module **
 *****************************************/
@@ -388,15 +390,12 @@ bool Init_Game(int , char * [])
 	**	If not automatically launching into the intro, then display the title
 	**	page while the bulk data is cached.
 	*/
-	if (!Special.IsFromInstall) {
-		Load_Title_Page(true);
-
-		Hide_Mouse();
-		Fancy_Text_Print(TXT_STAND_BY, 160*RESFACTOR, 120*RESFACTOR, &ColorRemaps[PCOLOR_DIALOG_BLUE], TBLACK, TPF_CENTER|TPF_TEXT|TPF_DROPSHADOW);
-		Show_Mouse();
-
-		CCPalette.Set(FADE_PALETTE_SLOW);
+	if (!Special.IsFromInstall) {		
+// jmarshall
+		g_loadingPlague = true;
+		//CCPalette.Set(FADE_PALETTE_SLOW);
 		Call_Back();
+// jmarshall end
 	}
 
 	/*

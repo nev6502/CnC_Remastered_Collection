@@ -321,10 +321,13 @@ bool Start_Scenario(char * name, bool briefing)
 {
 //BG	Theme.Queue_Song(THEME_QUIET);
 	Console_Printf("Start_Scenario: %s\n", name);
+	g_loadingPlague = true;
+	Call_Back();
 
 	Theme.Stop();
 	IsTanyaDead = SaveTanya;
 	if (!Read_Scenario(name)) {
+		g_loadingPlague = false;
 		Console_Printf("Failed to load scenario!\n");
 		return(false);
 	}
@@ -391,6 +394,8 @@ bool Start_Scenario(char * name, bool briefing)
 		Play_Movie(Scen.BriefMovie);
 	}
 // jmarshall end
+	g_loadingPlague = false;
+
 	/*
 	** If there's no briefing movie, restate the mission at the beginning.
 	*/
@@ -949,8 +954,11 @@ void Do_Win(void)
 		};
 		Speak(VOX_ACCOMPLISHED);
 		while (CountDownTimer || Is_Speaking()) {
+// jmarshall
+			Fancy_Text_Print(TXT_SCENARIO_WON, (SeenBuff.Get_Width() / 2), 90 * RESFACTOR, &ColorRemaps[PCOLOR_RED], TBLACK, TPF_CENTER | TPF_VCR | TPF_USE_GRAD_PAL | TPF_DROPSHADOW);
 			Call_Back();
-			Device_Present();
+//			Device_Present();
+// jmarshall end
 		}
 	}
 

@@ -24,16 +24,22 @@ struct Image_t {
 	bool perFrameRenderDimen;
 	int numFrames;
 	void* IconMapPtr;
+	uint8_t* ScratchBuffer;
 };
 
 __forceinline Image_t::Image_t() {
 	IconMapPtr = NULL;
 	numAnimFrames = 0;
+	ScratchBuffer = NULL;
 	perFrameRenderDimen = false;
 	memset(HouseImages, 0, sizeof(HouseImages));
 }
 
 __forceinline Image_t::~Image_t() {
+	if (ScratchBuffer) {
+		delete ScratchBuffer;
+		ScratchBuffer = NULL;
+	}
 }
 
 Image_t* Image_LoadImage(const char* name, bool loadAnims = false, bool loadHouseColor = false);
@@ -41,3 +47,8 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 Image_t* Find_Image(const char* name);
 void Image_Add8BitImage(Image_t* image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap);
 bool Image_Add32BitImage(const char* name, Image_t* image, int HouseId, int ShapeID, int frameId);
+
+Image_t* Image_CreateBlankImage(const char* name, int width, int height);
+void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t *palette);
+
+void Sys_SetOverlayImage(Image_t* image);

@@ -68,6 +68,7 @@
 #include <iff.h>
 //#include <mem.h>
 #include <string.h>
+#include "../Image.h"
 
 //
 // WSA animation header allocation type.
@@ -92,8 +93,9 @@
 #define	TO_VIEWPORT				0x0
 #define	TO_PAGE					0x02
 
-
-
+static Image_t*					wsa_hardware_image = NULL;
+uint8_t* wsa_palette;
+extern int ScreenWidth, ScreenHeight;
 
 typedef struct {
 	unsigned short current_frame;
@@ -177,7 +179,7 @@ void * __cdecl Open_Animation(char const *file_name, char *user_buffer, long use
 	char						*target_buffer;
 	char						*delta_buffer, *delta_back;
 	SysAnimHeaderType		*sys_header;
-	WSA_FileHeaderType	file_header;
+	WSA_FileHeaderType	file_header;	
 
 	/*======================================================================*/
 	/* Open the file to get the header information									*/
@@ -247,6 +249,12 @@ void * __cdecl Open_Animation(char const *file_name, char *user_buffer, long use
 		anim_flags |= WSA_TARGET_IN_BUFFER;
 		target_buffer_size = (unsigned long) file_header.pixel_width * file_header.pixel_height;
 	}
+
+	if (wsa_hardware_image == NULL) {
+		wsa_hardware_image = Image_CreateBlankImage("wsa", file_header.pixel_width, file_header.pixel_height);
+	}
+	Sys_SetOverlayImage(wsa_hardware_image);
+	wsa_palette = palette;
 
 	// NOTE:"THIS IS A BAD THING. SINCE sizeof(SysAnimHeaderType) CHANGED, THE ANIMATE.EXE
 	// UTILITY DID NOT KNOW I UPDATED IT, IT ADDS IT TO largest_frame_size BEFORE SAVING
@@ -489,7 +497,9 @@ BOOL __cdecl Animate_Frame(void *handle, GraphicViewPortClass& view,
 	if (view.Lock()!=TRUE) return (FALSE);
 
 	// Decide if we are going to a page or a viewport (part of a buffer).
-	dest_width	= view.Get_Width() + view.Get_XAdd() + view.Get_Pitch();
+// jmarshall
+	dest_width = wsa_hardware_image->width;//view.Get_Width() + view.Get_XAdd() + view.Get_Pitch();
+// jmarshall end
 
 	//
 	// adjust x_pixel and y_pixel by system pixel_x and pixel_y respectively.
@@ -635,6 +645,8 @@ BOOL __cdecl Animate_Frame(void *handle, GraphicViewPortClass& view,
 										  magic_cols, magic);
 #endif
 	}
+
+	Image_UploadRaw(wsa_hardware_image, (uint8_t *)view.Get_Offset(), true, wsa_palette);
 
 	view.Unlock();
 	return TRUE;
