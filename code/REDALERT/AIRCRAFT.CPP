@@ -409,6 +409,7 @@ void AircraftClass::Draw_It(int x, int y, WindowNumberType window) const
 	**	Verify the legality of the unit class.
 	*/
 	void const * shapefile = Get_Image_Data();
+	Image_t* hdShapeFile = Get_HDImage_Data();
 	if (!shapefile) return;
 
 	int shapenum = Shape_Number();
@@ -440,33 +441,39 @@ void AircraftClass::Draw_It(int x, int y, WindowNumberType window) const
 		static int _jitter[] = {0,0,0,0,1,1,1,0,0,0,0,0,-1,-1,-1,0};
 		jitter = _jitter[::Frame % 16];
 	}
+// jmarshall
+//	// Virtual window needs to draw the body first so it's considered the primary object and the shadow is a sub-object
+//	if (window == WINDOW_VIRTUAL) {
+//		/*
+//		**	Draw the root body of the unit.
+//		*/
+//		Techno_Draw_Object(shapefile, shapenum, x, y+jitter, window, rotation);
+//
+//		/*
+//		**	Special manual shadow draw code.
+//		*/
+//		if (Visual_Character() <= VISUAL_DARKEN) {
+//			CC_Draw_Shape(this, shapefile, shapenum, x+1, y+2, window, SHAPE_PREDATOR|SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_FADING, DisplayClass::FadingShade, NULL);
+//		}
+//	} else {
+//		/*
+//		**	Special manual shadow draw code.
+//		*/
+//		if (Visual_Character() <= VISUAL_DARKEN) {
+//			CC_Draw_Shape(this, shapefile, shapenum, x+1, y+2, window, SHAPE_PREDATOR|SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_FADING, DisplayClass::FadingShade, NULL);
+//		}
 
-	// Virtual window needs to draw the body first so it's considered the primary object and the shadow is a sub-object
-	if (window == WINDOW_VIRTUAL) {
 		/*
 		**	Draw the root body of the unit.
 		*/
-		Techno_Draw_Object(shapefile, shapenum, x, y+jitter, window, rotation);
-
-		/*
-		**	Special manual shadow draw code.
-		*/
-		if (Visual_Character() <= VISUAL_DARKEN) {
-			CC_Draw_Shape(this, shapefile, shapenum, x+1, y+2, window, SHAPE_PREDATOR|SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_FADING, DisplayClass::FadingShade, NULL);
+		if (hdShapeFile) {
+			Techno_Draw_Object_HD(hdShapeFile, shapenum, x, y + jitter, window, rotation);
 		}
-	} else {
-		/*
-		**	Special manual shadow draw code.
-		*/
-		if (Visual_Character() <= VISUAL_DARKEN) {
-			CC_Draw_Shape(this, shapefile, shapenum, x+1, y+2, window, SHAPE_PREDATOR|SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_FADING, DisplayClass::FadingShade, NULL);
+		else {
+			Techno_Draw_Object(shapefile, shapenum, x, y + jitter, window, rotation);
 		}
-
-		/*
-		**	Draw the root body of the unit.
-		*/
-		Techno_Draw_Object(shapefile, shapenum, x, y+jitter, window, rotation);
-	}
+//	}
+// jmarshall end
 
 	/*
 	**	If this aircraft is equipped with rotor blades, then draw them at this time.
