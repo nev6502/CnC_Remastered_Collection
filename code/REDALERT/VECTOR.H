@@ -361,7 +361,7 @@ class BooleanVectorClass
 		int First_False(void) const {
 			if (LastIndex != -1) Fixup(-1);
 
-			int retval = First_False_Bit(&BitArray[0]);
+			int retval = First_False_Bit(&BitArray[0], BitArray.Length());
 			if (retval < BitCount) return(retval);
 
 			/*
@@ -375,7 +375,7 @@ class BooleanVectorClass
 		int First_True(void) const {
 			if (LastIndex != -1) Fixup(-1);
 
-			int retval = First_True_Bit(&BitArray[0]);
+			int retval = First_True_Bit(&BitArray[0], BitArray.Length());
 			if (retval < BitCount) return(retval);
 
 			/*
@@ -854,7 +854,7 @@ int VectorClass<T>::operator == (VectorClass<T> const & vector) const
 template<class T>
 inline int VectorClass<T>::ID(T const * ptr)
 {
-	return(((unsigned long)ptr - (unsigned long)&(*this)[0]) / sizeof(T));
+	return(((INT_PTR)ptr - (INT_PTR)&(*this)[0]) / sizeof(T));
 }
 
 

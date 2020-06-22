@@ -18,8 +18,8 @@
 ** 
 **   Misc. assembly code moved from headers
 ** 
-** 
-** 
+**   jmarshall: This file heavily uses Chronoshift code to replace inline assembly functions
+**   https://github.com/TheAssemblyArmada/Chronoshift
 ** 
 ** 
 */
@@ -32,151 +32,6 @@ extern "C" void __cdecl Mem_Copy(void const *source, void *dest, unsigned long b
 {
 	memcpy(dest, source, bytes_to_copy);
 }			  
-
-
-/***********************************************************************************************
- * Distance -- Determines the lepton distance between two coordinates.                         *
- *                                                                                             *
- *    This routine is used to determine the distance between two coordinates. It uses the      *
- *    Dragon Strike method of distance determination and thus it is very fast.                 *
- *                                                                                             *
- * INPUT:   coord1   -- First coordinate.                                                      *
- *                                                                                             *
- *          coord2   -- Second coordinate.                                                     *
- *                                                                                             *
- * OUTPUT:  Returns the lepton distance between the two coordinates.                           *
- *                                                                                             *
- * WARNINGS:   none                                                                            *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   05/27/1994 JLB : Created.                                                                 *
- *=============================================================================================*/
-int Distance_Coord(COORDINATE coord1, COORDINATE coord2)
-{
-	__asm {
-		mov	eax,[coord1]
-		mov	ebx,[coord2]
-		mov	dx,ax			
-		sub	dx,bx			
-		jg	okx				
-		neg	dx				
-		okx:					
-		shr	eax,16			
-		shr	ebx,16			
-		sub	ax,bx			
-		jg	oky				
-		neg	ax				
-oky:					
-		cmp	ax,dx			
-		jg	ok				
-		xchg	ax,dx			
-ok:						
-		shr	dx,1				
-		add	ax,dx
-	}
-}			  
-
-
-
-
-/*
-;***************************************************************************
-;* DESIRED_FACING16 -- Converts coordinates into a facing number.          *
-;*                                                                         *
-;*      This converts coordinates into a desired facing number that ranges *
-;*      from 0 to 15 (0 equals North and going clockwise).                 *
-;*                                                                         *
-;* INPUT:       x1,y1   -- Position of origin point.                       *
-;*                                                                         *
-;*              x2,y2   -- Position of target.                             *
-;*                                                                         *
-;* OUTPUT:      Returns desired facing as a number from 0 to 255 but       *
-;*              accurate to 22.5 degree increments.                        *
-;*                                                                         *
-;* WARNINGS:    If the two coordinates are the same, then -1 will be       *
-;*              returned.  It is up to you to handle this case.            *
-;*                                                                         *
-;* HISTORY:                                                                *
-;*   08/14/1991 JLB : Created.                                             *
-;*=========================================================================*
-*/
-
-long __cdecl Desired_Facing16(long x1, long y1, long x2, long y2)
-{
-	static const char _new_facing16[] = {
-		3, 2, 4,-1, 1, 2,0,-1,
-		13,14,12,-1,15,14,0,-1,
-		5, 6, 4,-1, 7, 6,8,-1,
-		11,10,12,-1, 9,10,8,-1
-	};
-
-	
-	__asm {		  
-		xor	ebx,ebx			//; Index byte (built).
-
-		//; Determine Y axis difference.
-		mov	edx,[y1]
-		mov	ecx,[y2]
-		sub	edx,ecx			//; DX = Y axis (signed).
-		jns	short absy
-		inc	ebx			//; Set the signed bit.
-		neg	edx			//; ABS(y)
-absy:
-
-		//; Determine X axis difference.
-		shl	ebx,1
-		mov	eax,[x1]
-		mov	ecx,[x2]
-		sub	ecx,eax			//; CX = X axis (signed).
-		jns	short absx
-		inc	ebx			//; Set the signed bit.
-		neg	ecx			//; ABS(x)
-absx:
-
-		//; Determine the greater axis.
-		cmp	ecx,edx
-		jb	short dxisbig
-		xchg	ecx,edx
-dxisbig:
-		rcl	ebx,1			//; Y > X flag bit.
-
-		//; Determine the closeness or farness of lesser axis.
-		mov	eax,edx
-		inc	eax			//; Round up.
-		shr	eax,1
-		inc	eax			//; Round up.
-		shr	eax,1			//; 1/4 of greater axis.
-
-		cmp	ecx,eax
-		rcl	ebx,1			//; Very close to major axis bit.
-
-		sub	edx,eax
-		cmp	edx,ecx
-		rcl	ebx,1			//; Very far from major axis bit.
-
-		xor	eax,eax
-		mov	al,[_new_facing16+ebx]
-
-		//; Normalize to 0..FF range.
-		shl	eax,4
-
-//		ret
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 ;***************************************************************************
@@ -201,92 +56,52 @@ dxisbig:
 ;*   12/24/1991 JLB : Adapted.                                             *
 ;*=========================================================================*/
 
-int __cdecl Desired_Facing256(LONG srcx, LONG srcy, LONG dstx, LONG dsty)
+int __cdecl Desired_Facing256(LONG x1, LONG y1, LONG x2, LONG y2)
 {
-	
-	__asm {
-			xor	ebx,ebx			//; Facing number.
+	int8_t unk1 = 0;
 
-			////; Determine absolute X delta and left/right direction.
-			mov	ecx,[dstx]
-			sub	ecx,[srcx]
-			jge	short xnotneg
-			neg	ecx
-			mov	ebx,11000000b		//; Set bit 7 and 6 for leftward.
-xnotneg:
+	int x_diff = x2 - x1;
 
-			//; Determine absolute Y delta and top/bottom direction.
-			mov	eax,[srcy]
-			sub	eax,[dsty]
-			jge	short ynotneg
-			xor	ebx,01000000b		//; Complement bit 6 for downward.
-			neg	eax
-ynotneg:
-
-			//; Set DX=64 for quadrants 0 and 2.
-			mov	edx,ebx
-			and	edx,01000000b
-			xor	edx,01000000b
-
-			//; Determine if the direction is closer to the Y axis and make sure that
-			//; CX holds the larger of the two deltas.  This is in preparation for the
-			//; divide.
-			cmp	eax,ecx
-			jb	short gotaxis
-			xchg	eax,ecx
-			xor	edx,01000000b		//; Closer to Y axis so make DX=64 for quad 0 and 2.
-gotaxis:
-
-			//; If closer to the X axis then add 64 for quadrants 0 and 2.  If
-			//; closer to the Y axis then add 64 for quadrants 1 and 3.  Determined
-			//; add value is in DX and save on stack.
-			push	edx
-
-			//; Make sure that the division won't overflow.  Reduce precision until
-			//; the larger number is less than 256 if it appears that an overflow
-			//; will occur.  If the high byte of the divisor is not zero, then this
-			//; guarantees no overflow, so just abort shift operation.
-			test	eax,0FFFFFF00h
-			jnz	short nooverflow
-again:
-			test	ecx,0FFFFFF00h
-			jz	short nooverflow
-			shr	ecx,1
-			shr	eax,1
-			jmp	short again
-nooverflow:
-
-			//; Make sure that the division won't underflow (divide by zero).  If
-			//; this would occur, then set the quotient to $FF and skip divide.
-			or	ecx,ecx
-			jnz	short nounderflow
-			mov	eax,0FFFFFFFFh
-			jmp	short divcomplete
-
-			//; Derive a pseudo angle number for the octant.  The angle is based
-			//; on $00 = angle matches long axis, $00 = angle matches $FF degrees.
-nounderflow:
-			xor	edx,edx
-			shld	edx,eax,8	//; shift high byte of eax into dl
-			shl	eax,8
-			div	ecx
-divcomplete:
-
-			//; Integrate the 5 most significant bits into the angle index.  If DX
-			//; is not zero, then it is 64.  This means that the dividend must be negated
-			//; before it is added into the final angle value.
-			shr	eax,3
-			pop	edx
-			or	edx,edx
-			je	short noneg
-			dec	edx
-			neg	eax
-noneg:
-			add	eax,edx
-			add	eax,ebx
-			and	eax,0FFH
-//			ret
+	if (x_diff < 0) {
+		x_diff = -x_diff;
+		unk1 = -64;
 	}
+
+	int y_diff = y1 - y2;
+
+	if (y_diff < 0) {
+		unk1 ^= 64;
+		y_diff = -y_diff;
+	}
+
+	int s_diff;
+	unsigned l_diff;
+
+	if (x_diff != 0 || y_diff != 0) {
+		if (x_diff >= y_diff) {
+			s_diff = y_diff;
+			l_diff = x_diff;
+		}
+		else {
+			s_diff = x_diff;
+			l_diff = y_diff;
+		}
+
+		unsigned unk2 = 32 * s_diff / l_diff;
+		int ranged_dir = unk1 & 64;
+
+		if (x_diff > y_diff) {
+			ranged_dir = ranged_dir ^ 64;
+		}
+
+		if (ranged_dir != 0) {
+			unk2 = ranged_dir - unk2 - 1;
+		}
+
+		return (DirType)((unk2 + unk1) & 255);
+	}
+
+	return 255;
 }		 
 
 
@@ -371,255 +186,48 @@ GLOBAL	 C Desired_Facing8	:NEAR
 int __cdecl Desired_Facing8(long x1, long y1, long x2, long y2)
 {
 	
-	static const char _new_facing8[] = {1,2,1,0,7,6,7,0,3,2,3,4,5,6,5,4};
-	
-	__asm {
-		
-		xor	ebx,ebx			//; Index byte (built).
+	int xdiff = 0;
+	int ydiff = 0;
+	char dirtype = 0;
 
-		//; Determine Y axis difference.
-		mov	edx,[y1]
-		mov	ecx,[y2]
-		sub	edx,ecx			//; DX = Y axis (signed).
-		jns	short absy
-		inc	ebx			//; Set the signed bit.
-		neg	edx			//; ABS(y)
-absy:
+	xdiff = x2 - x1;
 
-		//; Determine X axis difference.
-		shl	ebx,1
-		mov	eax,[x1]
-		mov	ecx,[x2]
-		sub	ecx,eax			//; CX = X axis (signed).
-		jns	short absx
-		inc	ebx			//; Set the signed bit.
-		neg	ecx			//; ABS(x)
-absx:
-
-		//; Determine the greater axis.
-		cmp	ecx,edx
-		jb	short dxisbig
-		xchg	ecx,edx
-dxisbig:
-		rcl	ebx,1			//; Y > X flag bit.
-
-		//; Determine the closeness or farness of lesser axis.
-		mov	eax,edx
-		inc	eax			//; Round up.
-		shr	eax,1
-
-		cmp	ecx,eax
-		rcl	ebx,1			//; Close to major axis bit.
-
-		xor	eax,eax
-		mov	al,[_new_facing8+ebx]
-
-		//; Normalize to 0..FF range.
-		shl	eax,5
-
-//		ret
-
+	if (xdiff < 0) {
+		dirtype = -64;
+		xdiff = -xdiff;
 	}
-	
-}
 
+	ydiff = y1 - y2;
 
-
-#if (0)
-
-/*
-	; $Header: //depot/Projects/Mobius/QA/Project/Run/SOURCECODE/REDALERT/MiscAsm.cpp#33 $
-;***************************************************************************
-;**   C O N F I D E N T I A L --- W E S T W O O D   A S S O C I A T E S   **
-;***************************************************************************
-;*                                                                         *
-;*                 Project Name : Support Library                          *
-;*                                                                         *
-;*                    File Name : FACING16.ASM                             *
-;*                                                                         *
-;*                   Programmer : Joe L. Bostic                            *
-;*                                                                         *
-;*                   Start Date : May 8, 1991                              *
-;*                                                                         *
-;*                  Last Update : February 6, 1995  [BWG]                  *
-;*                                                                         *
-;*-------------------------------------------------------------------------*
-;* Functions:                                                              *
-;*   Desired_Facing16 -- Converts coordinates into a facing number.        *
-;* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - *
-
-
-IDEAL
-P386
-MODEL USE32 FLAT
-
-GLOBAL	 C Desired_Facing16	:NEAR
-;	INCLUDE	"wwlib.i"
-
-	DATASEG
-
-; 16 direction desired facing lookup table.  Build the index according
-; to the following bits:
-;
-; bit 4 = Is y2 < y1?
-; bit 3 = Is x2 < x1?
-; bit 2 = Is the ABS(x2-x1) < ABS(y2-y1)?
-; bit 1 = Is the lesser absolute difference very close to zero?
-; bit 0 = Is the lesser absolute difference very close to the greater dist?
-NewFacing16	DB	 3, 2, 4,-1, 1, 2,0,-1
-		DB	13,14,12,-1,15,14,0,-1
-		DB	 5, 6, 4,-1, 7, 6,8,-1
-		DB	11,10,12,-1, 9,10,8,-1
-
-	CODESEG
-
-;***************************************************************************
-;* DESIRED_FACING16 -- Converts coordinates into a facing number.          *
-;*                                                                         *
-;*      This converts coordinates into a desired facing number that ranges *
-;*      from 0 to 15 (0 equals North and going clockwise).                 *
-;*                                                                         *
-;* INPUT:       x1,y1   -- Position of origin point.                       *
-;*                                                                         *
-;*              x2,y2   -- Position of target.                             *
-;*                                                                         *
-;* OUTPUT:      Returns desired facing as a number from 0 to 255 but       *
-;*              accurate to 22.5 degree increments.                        *
-;*                                                                         *
-;* WARNINGS:    If the two coordinates are the same, then -1 will be       *
-;*              returned.  It is up to you to handle this case.            *
-;*                                                                         *
-;* HISTORY:                                                                *
-;*   08/14/1991 JLB : Created.                                             *
-;*=========================================================================*
-*/
-long __cdecl Desired_Facing16(long x1, long y1, long x2, long y2)
-{
-	
-	__asm {
-			xor	ebx,ebx			; Index byte (built).
-
-			; Determine Y axis difference.
-			mov	edx,[y1]
-			mov	ecx,[y2]
-			sub	edx,ecx			//; DX = Y axis (signed).
-			jns	short absy
-			inc	ebx			//; Set the signed bit.
-			neg	edx			//; ABS(y)
-absy:
-
-			//; Determine X axis difference.
-			shl	ebx,1
-			mov	eax,[x1]
-			mov	ecx,[x2]
-			sub	ecx,eax			//; CX = X axis (signed).
-			jns	short absx
-			inc	ebx			//; Set the signed bit.
-			neg	ecx			//; ABS(x)
-absx:
-
-			//; Determine the greater axis.
-			cmp	ecx,edx
-			jb	short dxisbig
-			xchg	ecx,edx
-dxisbig:
-			rcl	ebx,1			//; Y > X flag bit.
-
-			//; Determine the closeness or farness of lesser axis.
-			mov	eax,edx
-			inc	eax			//; Round up.
-			shr	eax,1
-			inc	eax			//; Round up.
-			shr	eax,1			//; 1/4 of greater axis.
-
-			cmp	ecx,eax
-			rcl	ebx,1			//; Very close to major axis bit.
-
-			sub	edx,eax
-			cmp	edx,ecx
-			rcl	ebx,1			//; Very far from major axis bit.
-
-			xor	eax,eax
-			mov	al,[NewFacing16+ebx]
-
-			//; Normalize to 0..FF range.
-			shl	eax,4
-
-//			ret
+	if (ydiff < 0) {
+		dirtype ^= 0x40;
+		ydiff = -ydiff;
 	}
+
+	unsigned int lower_diff;
+
+	if (xdiff >= ydiff) {
+		lower_diff = ydiff;
+		ydiff = xdiff;
+	}
+	else {
+		lower_diff = xdiff;
+	}
+
+	char ranged_dir;
+
+	if (((unsigned)(ydiff + 1) >> 1) > lower_diff) {
+		ranged_dir = ((unsigned)dirtype) & 64;
+
+		if (xdiff == ydiff) {
+			ranged_dir ^= 64;
+		}
+
+		return (DirType)(dirtype + ranged_dir);
+	}
+
+	return (DirType)(dirtype + 32);
 }
-		
-	
-			  
-	
-#if (0)
-	PROC	Desired_Facing16 C near
-	USES	ebx, ecx, edx
-
-	ARG	x1:DWORD
-	ARG	y1:DWORD
-	ARG	x2:DWORD
-	ARG	y2:DWORD
-
-	xor	ebx,ebx			; Index byte (built).
-
-	; Determine Y axis difference.
-	mov	edx,[y1]
-	mov	ecx,[y2]
-	sub	edx,ecx			; DX = Y axis (signed).
-	jns	short ??absy
-	inc	ebx			; Set the signed bit.
-	neg	edx			; ABS(y)
-??absy:
-
-	; Determine X axis difference.
-	shl	ebx,1
-	mov	eax,[x1]
-	mov	ecx,[x2]
-	sub	ecx,eax			; CX = X axis (signed).
-	jns	short ??absx
-	inc	ebx			; Set the signed bit.
-	neg	ecx			; ABS(x)
-??absx:
-
-	; Determine the greater axis.
-	cmp	ecx,edx
-	jb	short ??dxisbig
-	xchg	ecx,edx
-??dxisbig:
-	rcl	ebx,1			; Y > X flag bit.
-
-	; Determine the closeness or farness of lesser axis.
-	mov	eax,edx
-	inc	eax			; Round up.
-	shr	eax,1
-	inc	eax			; Round up.
-	shr	eax,1			; 1/4 of greater axis.
-
-	cmp	ecx,eax
-	rcl	ebx,1			; Very close to major axis bit.
-
-	sub	edx,eax
-	cmp	edx,ecx
-	rcl	ebx,1			; Very far from major axis bit.
-
-	xor	eax,eax
-	mov	al,[NewFacing16+ebx]
-
-	; Normalize to 0..FF range.
-	shl	eax,4
-
-	ret
-
-	ENDP	Desired_Facing16
-
-	END
-#endif
-#endif
-
-
-
-
 
 
 
@@ -660,24 +268,13 @@ dxisbig:
 
 unsigned int __cdecl Cardinal_To_Fixed(unsigned base, unsigned cardinal)
 {
-	__asm {
-		
-				mov	eax, 0FFFFFFFFh	//; establish default return value
+	// jmarshall: this is from me, hope this is right.
+	unsigned int result; // eax
 
-				mov	ebx,[base]
-				or		ebx, ebx
-				jz		retneg1		//; if base==0, return 4294967295
-
-				mov	eax,[cardinal]		//; otherwise, return (cardinal*65536)/base
-				shl	eax,16
-				xor	edx,edx
-				div	ebx
-
-retneg1:
-				//ret
-
-		  
-	}	
+	result = -1;
+	if (base)
+		result = (cardinal << 16) / base;
+	return result;
 }
 
 #if (0)
@@ -724,138 +321,123 @@ retneg1:
 
 unsigned int __cdecl Fixed_To_Cardinal(unsigned base, unsigned fixed)
 {
-//	PROC	Fixed_To_Cardinal C near
-//	USES	edx
-
-//	ARG	base:DWORD
-//	ARG	fixed:DWORD
-
-	__asm {
-		mov	eax,[base]
-		mul	[fixed]
-		add	eax,08000h		//; eax = (base * fixed) + 0x8000
-
-		shr	eax,16			//; return eax/65536
-		//ret
-	}
-
-
-#if (0)
-	mov	eax,[base]
-	mul	[fixed]
-	add	eax,080h		; eax = (base * fixed) + 0x80
-
-	test	eax,0FF000000h		; if high byte set, return FFFF
-	jnz	??rneg1
-	shr	eax,8			; else, return eax/256
-	ret
-??rneg1	:
-	mov	eax,0FFFFh		; establish default return value
-	ret
-
-	ENDP	Fixed_To_Cardinal
-
-	END
-#endif
-
-
+	// jmarshall: this one is from me I hope its right.
+	return (fixed * base + 0x8000) >> 16;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// jmarshall: this is from chronoshift
 void __cdecl Set_Bit(void * array, int bit, int value)
 {
-	__asm {
-		mov	ecx, [bit]
-		mov	eax, [value]
-		mov	esi, [array]
-		mov	ebx,ecx					
-		shr	ebx,5					
-		and	ecx,01Fh				
-		btr	[esi+ebx*4],ecx		
-		or	eax,eax					
-		jz	ok						
-		bts	[esi+ebx*4],ecx		
-ok:
+	// Don't try and handle a negative value
+	if (bit < 0) {
+		return;
+	}
+
+	uint8_t* byte_array = (uint8_t*)array;
+
+	if (value) {
+		byte_array[bit / 8] |= 1 << (bit % 8);
+	}
+	else {
+		byte_array[bit / 8] &= ~(1 << (bit % 8));
 	}
 }
 
 
 int __cdecl Get_Bit(void const * array, int bit)
 {
-	__asm {
-		mov	eax, [bit]
-		mov	esi, [array]
-		mov	ebx,eax					
-		shr	ebx,5					
-		and	eax,01Fh				
-		bt	[esi+ebx*4],eax		
-		setc	al
+	// If negative it is out of range so can't be set
+	if (bit < 0) {
+		return false;
 	}
+
+	const uint8_t* byte_array = (const uint8_t*)array;
+
+	return byte_array[bit / 8] & (1 << (bit % 8)) ? true : false;
 }
 
-int __cdecl First_True_Bit(void const * array)
+/**
+ * @brief Scans through the data and returns the position of the first set bit found.
+ */
+int First_True_Bit(const void* array, int size)
 {
-	__asm {
-		mov	esi, [array]
-		mov	eax,-32					
-again:							
-		add	eax,32					
-		mov	ebx,[esi]				
-		add	esi,4					
-		bsf	ebx,ebx					
-		jz	again					
-		add	eax,ebx
+	const uint8_t* byte_array = (const uint8_t*)array;
+
+	int bytenum = 0;
+	int bitnum = 0;
+
+	// Find the first none zero byte as it must contain the first bit.
+	for (bytenum = 0; bytenum < size; ++bytenum) {
+		if (byte_array[bytenum] != 0) {
+			break;
+		}
 	}
+
+	if (bytenum >= size) {
+		return 8 * bytenum;
+	}
+
+	// Scan through the bits of the byte until we find the first set bit.
+	for (bitnum = 0; bitnum < 8; ++bitnum) {
+		if (Get_Bit(&byte_array[bytenum], bitnum)) {
+			break;
+		}
+	}
+
+	return 8 * bytenum + bitnum;
 }
 
-
-int __cdecl First_False_Bit(void const * array)
+/**
+ * @brief Scans through the data and returns the position of the first clear bit found.
+ */
+int First_False_Bit(const void* array, int size)
 {
-	__asm {
-		
-		mov	esi, [array]
-		mov	eax,-32					
-again:							
-		add	eax,32					
-		mov	ebx,[esi]				
-		not	ebx						
-		add	esi,4					
-		bsf	ebx,ebx					
-		jz	again					
-		add	eax,ebx
+	const uint8_t* byte_array = (const uint8_t*)array;
+
+	int bytenum = 0;
+	int bitnum = 0;
+
+	// Find the first byte with an unset bit as it must contain the first bit.
+	for (bytenum = 0; bytenum < size; ++bytenum) {
+		if (byte_array[bytenum] != 0xFF) {
+			break;
+		}
 	}
+
+	if (bytenum >= size) {
+		return 8 * bytenum;
+	}
+
+	// Scan through the bits until we find one that isn't set.
+	for (bitnum = 0; bitnum < 8; ++bitnum) {
+		if (!Get_Bit(&byte_array[bytenum], bitnum)) {
+			break;
+		}
+	}
+
+	return 8 * bytenum + bitnum;
 }
 
 int __cdecl Bound(int original, int min, int max)
 {		
-	__asm {
-		mov	eax,[original]
-		mov	ebx,[min]
-		mov	ecx,[max]
-		cmp	ebx,ecx					
-		jl	okorder					
-		xchg	ebx,ecx					
-okorder: cmp	eax,ebx		
-		jg	okmin					
-		mov	eax,ebx					
-okmin: cmp	eax,ecx			
-		jl	okmax					
-		mov	eax,ecx					
-okmax:
+	// jmarshall: this is just a clamp, todo simplify me!
+	int result; // eax
+	int v4; // ebx
+	int v5; // ecx
+
+	result = original;
+	v4 = min;
+	v5 = max;
+	if (min >= max)
+	{
+		v4 = max;
+		v5 = min;
 	}
+	if (original <= v4)
+		result = v4;
+	if (result >= v5)
+		result = v5;
+	return result;
 }
 
 
@@ -1069,189 +651,40 @@ GLOBAL	C Shake_Screen	:NEAR
 ;*   10/07/1992 JLB : Created.                                             *
 ;*=========================================================================*/
 
-void * __cdecl Conquer_Build_Fading_Table(void const *palette, void *dest, int color, int frac)
+// This function is from Chronoshift.
+void * __cdecl Conquer_Build_Fading_Table(void const *paletteptr, void *fade_table, int color, int frac)
 {	
-	/*
-	global C	Conquer_Build_Fading_Table : NEAR
-	PROC	Conquer_Build_Fading_Table C near
-	USES	ebx, ecx, edi, esi
+	const PaletteClass& palette = *((const PaletteClass*)paletteptr);
+	if (fade_table) {
+		uint8_t* dst = static_cast<uint8_t*>(fade_table);
+		RGBClass const* target_col = &palette[color];
 
-	ARG	palette:DWORD
-	ARG	dest:DWORD
-	ARG	color:DWORD
-	ARG	frac:DWORD
+		for (int i = 0; i < 256; ++i) {
+			if (i <= 240 && i) {
+				RGBClass tmp = palette[i];
+				tmp.Adjust(frac, *target_col);
 
-	LOCAL	matchvalue:DWORD	; Last recorded match value.
-	LOCAL	targetred:BYTE		; Target gun red.
-	LOCAL	targetgreen:BYTE	; Target gun green.
-	LOCAL	targetblue:BYTE		; Target gun blue.
-	LOCAL	idealred:BYTE
-	LOCAL	idealgreen:BYTE
-	LOCAL	idealblue:BYTE
-	LOCAL	matchcolor:BYTE		; Tentative match color.
-	
-ALLOWED_COUNT	EQU	16
-ALLOWED_START	EQU	256-ALLOWED_COUNT
-	*/
+				int index = 0;
+				int prevdiff = -1;
 
-#define	ALLOWED_COUNT	16
-#define	ALLOWED_START	256-ALLOWED_COUNT
+				for (int j = 240; j < 255; ++j) {
+					int difference = palette[j].Difference(tmp);
 
-	int matchvalue = 0;	//:DWORD	; Last recorded match value.
-	unsigned char targetred = 0;		//BYTE		; Target gun red.
-	unsigned char targetgreen = 0;	//BYTE		; Target gun green.
-	unsigned char targetblue = 0;		//BYTE		; Target gun blue.
-	unsigned char idealred = 0;		//BYTE	
-	unsigned char idealgreen = 0;		//BYTE	
-	unsigned char idealblue = 0;		//BYTE	
-	unsigned char matchcolor = 0;		//:BYTE		; Tentative match color.
+					if (prevdiff == -1 || difference < prevdiff) {
+						index = j;
+						prevdiff = difference;
+					}
+				}
 
-	__asm {
-	
-			cld
-
-			; If the source palette is NULL, then just return with current fading table pointer.
-			cmp	[palette],0
-			je	fini1
-			cmp	[dest],0
-			je	fini1
-
-			; Fractions above 255 become 255.
-			mov	eax,[frac]
-			cmp	eax,0100h
-			jb	short ok
-			mov	[frac],0FFh
-		ok:
-
-			; Record the target gun values.
-			mov	esi,[palette]
-			mov	ebx,[color]
-			add	esi,ebx
-			add	esi,ebx
-			add	esi,ebx
-			lodsb
-			mov	[targetred],al
-			lodsb
-			mov	[targetgreen],al
-			lodsb
-			mov	[targetblue],al
-
-			; Main loop.
-			xor	ebx,ebx			; Remap table index.
-
-			; Transparent black never gets remapped.
-			mov	edi,[dest]
-			mov	[edi],bl
-			inc	edi
-
-			; EBX = source palette logical number (1..255).
-			; EDI = running pointer into dest remap table.
-		mainloop:
-			inc	ebx
-			mov	esi,[palette]
-			add	esi,ebx
-			add	esi,ebx
-			add	esi,ebx
-
-			mov	edx,[frac]
-			shr	edx,1
-			; new = orig - ((orig-target) * fraction);
-
-			lodsb				; orig
-			mov	dh,al			; preserve it for later.
-			sub	al,[targetred]		; al = (orig-target)
-			imul	dl			; ax = (orig-target)*fraction
-			shl	eax,1
-			sub	dh,ah			; dh = orig - ((orig-target) * fraction)
-			mov	[idealred],dh		; preserve ideal color gun value.
-
-			lodsb				; orig
-			mov	dh,al			; preserve it for later.
-			sub	al,[targetgreen]	; al = (orig-target)
-			imul	dl			; ax = (orig-target)*fraction
-			shl	eax,1
-			sub	dh,ah			; dh = orig - ((orig-target) * fraction)
-			mov	[idealgreen],dh		; preserve ideal color gun value.
-
-			lodsb				; orig
-			mov	dh,al			; preserve it for later.
-			sub	al,[targetblue]		; al = (orig-target)
-			imul	dl			; ax = (orig-target)*fraction
-			shl	eax,1
-			sub	dh,ah			; dh = orig - ((orig-target) * fraction)
-			mov	[idealblue],dh		; preserve ideal color gun value.
-
-			; Sweep through a limited set of existing colors to find the closest
-			; matching color.
-
-			mov	eax,[color]
-			mov	[matchcolor],al		; Default color (self).
-			mov	[matchvalue],-1		; Ridiculous match value init.
-			mov	ecx,ALLOWED_COUNT
-
-			mov	esi,[palette]		; Pointer to original palette.
-			add	esi,(ALLOWED_START)*3
-
-			; BH = color index.
-			mov	bh,ALLOWED_START
-		innerloop:
-
-			xor	edx,edx			; Comparison value starts null.
-
-			; Build the comparison value based on the sum of the differences of the color
-			; guns squared.
-			lodsb
-			sub	al,[idealred]
-			mov	ah,al
-			imul	ah
-			add	edx,eax
-
-			lodsb
-			sub	al,[idealgreen]
-			mov	ah,al
-			imul	ah
-			add	edx,eax
-
-			lodsb
-			sub	al,[idealblue]
-			mov	ah,al
-			imul	ah
-			add	edx,eax
-			jz	short perfect		; If perfect match found then quit early.
-
-			cmp	edx,[matchvalue]
-			jae	short notclose
-			mov	[matchvalue],edx	; Record new possible color.
-			mov	[matchcolor],bh
-		notclose:
-			inc	bh			; Checking color index.
-			loop	innerloop
-			mov	bh,[matchcolor]
-		perfect:
-			mov	[matchcolor],bh
-			xor	bh,bh			; Make BX valid main index again.
-
-			; When the loop exits, we have found the closest match.
-			mov	al,[matchcolor]
-			stosb
-			cmp	ebx,ALLOWED_START-1
-			jne	mainloop
-
-			; Fill the remainder of the remap table with values
-			; that will remap the color to itself.
-			mov	ecx,ALLOWED_COUNT
-		fillerloop:
-			inc	bl
-			mov	al,bl
-			stosb
-			loop	fillerloop
-
-		fini1:
-			mov	esi,[dest]
-			mov	eax,esi
-			
-			//ret
+				dst[i] = index;
+			}
+			else {
+				dst[i] = i;
+			}
+		}
 	}
+
+	return fade_table;
 }
 
 
@@ -1261,31 +694,46 @@ ALLOWED_START	EQU	256-ALLOWED_COUNT
 
 extern "C" long __cdecl Reverse_Long(long number)
 {
+#if 0 // jmarshall
 	__asm {
 		mov	eax,dword ptr [number]
 		xchg	al,ah
 		ror	eax,16
 		xchg	al,ah
 	}
+#else
+	assert("Reverse_Long not implmeneted");
+	return number;
+#endif
 }
 
 
 extern "C" short __cdecl Reverse_Short(short number)
 {
+#if 0 // jmarshall
 	__asm {
 		mov	ax,[number]
 		xchg	ah,al
 	}
+#else
+	assert("Reverse_Short not implmeneted");
+	return number;
+#endif
 }	
 
 
 
 extern "C" long __cdecl Swap_Long(long number)
 {
+#if 0 // jmarshall
 	__asm {
 		mov	eax,dword ptr [number]
 		ror	eax,16
 	}
+#else
+	assert("Reverse_Short not implmeneted");
+	return number;
+#endif
 }
 
 
@@ -1324,43 +772,35 @@ extern "C" long __cdecl Swap_Long(long number)
 */
 void __cdecl strtrim(char *buffer)
 {
-	__asm {		  
-			cmp	[buffer],0
-			je	short fini
+	char* v1; // esi
+	char v2; // al
+	char* v3; // edi
+	char v4; // al
+	char* v5; // edi
 
-			; Prepare for string scanning by loading pointers.
-			cld
-			mov	esi,[buffer]
-			mov	edi,esi
-
-			; Strip white space from the start of the string.
-		looper:
-			lodsb
-			cmp	al,20h			; Space
-			je	short looper
-			cmp	al,9			; TAB
-			je	short looper
-			stosb
-
-			; Copy the rest of the string.
-		gruntloop:
-			lodsb
-			stosb
-			or	al,al
-			jnz	short gruntloop
-			dec	edi
-			; Strip the white space from the end of the string.
-		looper2:
-			mov	[edi],al
-			dec	edi
-			mov	ah,[edi]
-			cmp	ah,20h
-			je	short looper2
-			cmp	ah,9
-			je	short looper2
-
-		fini:
-			//ret
+	if (buffer)
+	{
+		v1 = buffer;
+		do
+		{
+			do
+				v2 = *v1++;
+			while (v2 == 32);
+		} while (v2 == 9);
+		*buffer = v2;
+		v3 = buffer + 1;
+		do
+		{
+			v4 = *v1++;
+			*v3++ = v4;
+		} while (v4);
+		v5 = v3 - 1;
+		do
+		{
+			do
+				*v5-- = 0;
+			while (*v5 == 32);
+		} while (*v5 == 9);
 	}
 }
 
@@ -1403,50 +843,7 @@ void __cdecl strtrim(char *buffer)
 
 void __cdecl Fat_Put_Pixel(int x, int y, int color, int siz, GraphicViewPortClass &gpage)
 {
-	__asm {
-				  
-			cmp	[siz],0
-			je	short exit_label
 
-			; Set EDI to point to start of logical page memory.
-			;*===================================================================
-			; Get the viewport information and put bytes per row in ecx
-			;*===================================================================
-			mov	ebx,[gpage]				; get a pointer to viewport
-			mov	edi,[ebx]GraphicViewPortClass.Offset	; get the correct offset
-
-			; Verify the the Y pixel offset is legal.
-			mov	eax,[y]
-			cmp	eax,[ebx]GraphicViewPortClass.Height	;YPIXEL_MAX
-			jae	short exit_label
-			mov	ecx,[ebx]GraphicViewPortClass.Width
-			add	ecx,[ebx]GraphicViewPortClass.XAdd
-			add	ecx,[ebx]GraphicViewPortClass.Pitch
-			mul	ecx
-			add	edi,eax
-
-			; Verify the the X pixel offset is legal.
-	
-			mov	edx,[ebx]GraphicViewPortClass.Width
-			cmp	edx,[x]
-			mov	edx,ecx
-			jbe	short exit_label
-			add	edi,[x]
-
-			; Write the pixel to the screen.
-			mov	ebx,[siz]		; Copy of pixel size.
-			sub	edx,ebx			; Modulo to reach start of next row.
-			mov	eax,[color]
-		again:
-			mov	ecx,ebx
-			rep stosb
-			add	edi,edx			; EDI points to start of next row.
-			dec	[siz]
-			jnz	short again
-
-		exit_label:
-			//ret
-	}
 }
 
 

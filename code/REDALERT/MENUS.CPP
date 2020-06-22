@@ -499,6 +499,8 @@ int Main_Menu(unsigned long )
 
 	static int	max_buttons = 7;
 
+	g_loadingPlague = false;
+
 	/*
 	**	Button enumerations:
 	*/

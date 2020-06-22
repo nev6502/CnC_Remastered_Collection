@@ -323,7 +323,7 @@ void GraphicBufferClass::Init(int w, int h, void *buffer, long size, GBC_Enum fl
 			Buffer		= new BYTE[Size];				// otherwise allocate it and
 			Allocated	= TRUE;							//		mark it system alloced
 		}
-		Offset			= (long)Buffer;				// Get offset to the buffer
+		Offset			= (INT_PTR)Buffer;				// Get offset to the buffer
 		IsDirectDraw	= FALSE;
 	}
 

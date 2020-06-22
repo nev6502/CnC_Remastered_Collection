@@ -282,6 +282,7 @@ char const * Map_Selection(void)
 			}
 		}
 	}
+	Sys_SetOverlayImage(NULL);
 
 	Hide_Mouse();
 

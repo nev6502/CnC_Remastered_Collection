@@ -1638,6 +1638,13 @@ void Color_Cycle(void)
  *=============================================================================================*/
 void Call_Back(void)
 {
+	if (g_loadingPlague) {
+		Hide_Mouse();
+		Load_Title_Screen("LOADING.PCX", &HidPage, NULL);
+		//Fancy_Text_Print(TXT_STAND_BY, (ScreenWidth / 2), (ScreenHeight / 2), &ColorRemaps[PCOLOR_DIALOG_BLUE], TBLACK, TPF_CENTER | TPF_TEXT | TPF_DROPSHADOW);
+		Show_Mouse();
+	}
+
 	Device_Present();
 
 	/*
@@ -3649,7 +3656,7 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 {
 	int predoffset;
 #ifdef WIN32
-	unsigned	long	shape_pointer;
+	INT_PTR	shape_pointer;
 #endif	//WIN32
 
 

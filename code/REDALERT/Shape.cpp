@@ -1260,9 +1260,9 @@ void* Build_Frame2(void* shape, uint16_t frame, void* buffer)
     return buffer;
 }
 
-unsigned long Build_Frame(void const* dataptr, unsigned short framenumber, void* buffptr) {
+INT_PTR Build_Frame(void const* dataptr, unsigned short framenumber, void* buffptr) {
     UseBigShapeBuffer = false;
-    return (unsigned long)Build_Frame2((void *)dataptr, framenumber, buffptr); // 32 bit to 64 bit issue
+    return (INT_PTR)Build_Frame2((void *)dataptr, framenumber, buffptr); // 32 bit to 64 bit issue
 }
 
 unsigned short Get_Build_Frame_Count(void* shape)

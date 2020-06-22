@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "misc.h"
+#include <assert.h>
 
 
 
@@ -50,6 +51,7 @@ extern "C" unsigned long RandNumb = 0x12349876;
 
 int IRandom(int minval, int maxval)
 {
+#if 0 // jmarshall - not used.
 	int num,mask;
 
 	// Keep minval and maxval straight.
@@ -63,12 +65,17 @@ int IRandom(int minval, int maxval)
 
 	while( (num = (rand() & mask) + minval) > maxval ) ;
 	return(num);
+#else
+	assert(!"Random function not implmented!");
+	return 0;
+#endif
 }
 
 
 
 unsigned char Random(void)
 {
+#if 0 // jmarshall - not used.
 	__asm {
 		lea	esi, [RandNumb]		//; get offset in segment of RandNumb
 		xor	eax,eax
@@ -84,22 +91,29 @@ unsigned char Random(void)
 		mov	al,[esi]					//; reload byte 1 of RandNumb
 		xor	al,[esi+1]				//; xor with byte 2 of RandNumb
 	}
+#else
+	assert(!"Random function not implmented!");
+	return 0;
+#endif
 }		 
 
 
 
 int Get_Random_Mask(int maxval)
 {
-	__asm {
-		
-		bsr	ecx,[maxval]		//	; put bit position of highest bit in ecx
-		mov	eax, 1				//	; set one bit on in eax
-		jz		invalid				//	; if BSR shows maxval==0, return eax=1
-		inc	ecx					// ; get one bit higher than count showed
-		shl	eax,cl				// ; move our EAX bit into position
-		dec	eax					// ; dec it to create the mask.
-invalid:
-	}
+#if 0 // jmarshall - not used.
+	bool v1; // zf
+	DWORD v2; // ecx
+	int result; // eax
+
+	v1 = !_BitScanReverse((DWORD*)&v2, maxval);
+	result = 1;
+	if (!v1)
+		result = (1 << (v2 + 1)) - 1;
+	return result;
+#else
+	return 0;
+#endif
 }
 
 

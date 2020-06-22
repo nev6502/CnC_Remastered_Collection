@@ -45,7 +45,9 @@ void GL_FillRect(int color, int x, int y, int width, int height) {
 
 void GL_DrawText(int color, int x, int y, char* text) {
 	ImVec2 pos(x, y);
-	color = g_ColorXlat[color % 15];
+	if (color == 0 || color == 160) { // This is a hack!
+		color = g_ColorXlat[color % 15];
+	}
 	float r = backbuffer_palette[(color * 3) + 0] / 255.0f;
 	float g = backbuffer_palette[(color * 3) + 1] / 255.0f;
 	float b = backbuffer_palette[(color * 3) + 2] / 255.0f;

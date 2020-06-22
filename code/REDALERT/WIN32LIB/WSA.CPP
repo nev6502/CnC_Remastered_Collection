@@ -68,6 +68,7 @@
 #include <iff.h>
 //#include <mem.h>
 #include <string.h>
+#include "../Image.h"
 
 //
 // WSA animation header allocation type.
@@ -92,8 +93,9 @@
 #define	TO_VIEWPORT				0x0
 #define	TO_PAGE					0x02
 
-
-
+static Image_t*					wsa_hardware_image = NULL;
+uint8_t* wsa_palette;
+extern int ScreenWidth, ScreenHeight;
 
 typedef struct {
 	unsigned short current_frame;
@@ -142,7 +144,7 @@ typedef struct {
 /* The following PRIVATE functions are in this file:                       */
 /*=========================================================================*/
 
-PRIVATE unsigned long Get_Resident_Frame_Offset( char *file_buffer, int frame );
+PRIVATE INT_PTR Get_Resident_Frame_Offset( char *file_buffer, int frame );
 PRIVATE unsigned long Get_File_Frame_Offset( int file_handle, int frame, int palette_adjust);
 PRIVATE BOOL Apply_Delta(SysAnimHeaderType *sys_header, int curr_frame, char *dest_ptr, int dest_w);
 /*= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =*/
@@ -177,7 +179,7 @@ void * __cdecl Open_Animation(char const *file_name, char *user_buffer, long use
 	char						*target_buffer;
 	char						*delta_buffer, *delta_back;
 	SysAnimHeaderType		*sys_header;
-	WSA_FileHeaderType	file_header;
+	WSA_FileHeaderType	file_header;	
 
 	/*======================================================================*/
 	/* Open the file to get the header information									*/
@@ -247,6 +249,12 @@ void * __cdecl Open_Animation(char const *file_name, char *user_buffer, long use
 		anim_flags |= WSA_TARGET_IN_BUFFER;
 		target_buffer_size = (unsigned long) file_header.pixel_width * file_header.pixel_height;
 	}
+
+	if (wsa_hardware_image == NULL) {
+		wsa_hardware_image = Image_CreateBlankImage("wsa", file_header.pixel_width, file_header.pixel_height);
+	}
+	Sys_SetOverlayImage(wsa_hardware_image);
+	wsa_palette = palette;
 
 	// NOTE:"THIS IS A BAD THING. SINCE sizeof(SysAnimHeaderType) CHANGED, THE ANIMATE.EXE
 	// UTILITY DID NOT KNOW I UPDATED IT, IT ADDS IT TO largest_frame_size BEFORE SAVING
@@ -489,7 +497,9 @@ BOOL __cdecl Animate_Frame(void *handle, GraphicViewPortClass& view,
 	if (view.Lock()!=TRUE) return (FALSE);
 
 	// Decide if we are going to a page or a viewport (part of a buffer).
-	dest_width	= view.Get_Width() + view.Get_XAdd() + view.Get_Pitch();
+// jmarshall
+	dest_width = wsa_hardware_image->width;//view.Get_Width() + view.Get_XAdd() + view.Get_Pitch();
+// jmarshall end
 
 	//
 	// adjust x_pixel and y_pixel by system pixel_x and pixel_y respectively.
@@ -635,6 +645,8 @@ BOOL __cdecl Animate_Frame(void *handle, GraphicViewPortClass& view,
 										  magic_cols, magic);
 #endif
 	}
+
+	Image_UploadRaw(wsa_hardware_image, (uint8_t *)view.Get_Offset(), true, wsa_palette);
 
 	view.Unlock();
 	return TRUE;
@@ -1017,13 +1029,13 @@ unsigned long __cdecl Get_Animation_Size(void const *handle)
  * HISTORY:                                                                *
  *   11/26/1991  SB : Created.                                             *
  *=========================================================================*/
-PRIVATE unsigned long Get_Resident_Frame_Offset( char *file_buffer, int frame )
+PRIVATE INT_PTR Get_Resident_Frame_Offset( char *file_buffer, int frame )
 {
-	unsigned long frame0_size;
-	unsigned long *lptr;
+	INT_PTR frame0_size;
+	unsigned int *lptr;
 
 	// If there is a frame 0, the calculate its size.
-	lptr = (unsigned long *) file_buffer;
+	lptr = (unsigned int *) file_buffer;
 
 	if (*lptr) {
 		frame0_size = lptr[1] - *lptr;
@@ -1084,7 +1096,7 @@ PRIVATE BOOL Apply_Delta(SysAnimHeaderType *sys_header, int curr_frame, char *de
 {
 	char *data_ptr, *delta_back;
 	int file_handle, palette_adjust;
-	unsigned long frame_data_size, frame_offset;
+	INT_PTR frame_data_size, frame_offset;
 
 
 	palette_adjust = ((sys_header->flags & WSA_PALETTE_PRESENT) ? 768 : 0);
@@ -1098,14 +1110,18 @@ PRIVATE BOOL Apply_Delta(SysAnimHeaderType *sys_header, int curr_frame, char *de
 		// copy it into buffer
 
 		frame_offset = Get_Resident_Frame_Offset(sys_header->file_buffer, curr_frame);
+// jmarshall - hack for crash!
+		if (frame_offset < 0)
+			return 0;
 		frame_data_size = Get_Resident_Frame_Offset(sys_header->file_buffer, curr_frame + 1) -	frame_offset;
 
 	  	data_ptr 	= (char *)Add_Long_To_Pointer(sys_header->file_buffer, frame_offset);
 	  	delta_back 	= (char *)Add_Long_To_Pointer(delta_back,
 	  						 sys_header->largest_frame_size - frame_data_size);
-
-		Mem_Copy( data_ptr, delta_back, frame_data_size );
-
+// jmarshall - 64bit
+		//Mem_Copy( data_ptr, delta_back, frame_data_size );
+		memcpy(delta_back, data_ptr, frame_data_size);
+// jmarshall end1
 	} else if (sys_header -> flags & WSA_FILE) {
 
 		//	Open up file because not file not in RAM.

@@ -715,7 +715,7 @@ long __cdecl Buffer_Frame_To_Page(int shapeNum, int x, int y, int w, int h, Imag
 /*
 **	KEYFRAME.CPP
 */
-unsigned long Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr);
+INT_PTR Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr);
 unsigned short Get_Build_Frame_Count(void const *dataptr);
 unsigned short Get_Build_Frame_X(void const *dataptr);
 unsigned short Get_Build_Frame_Y(void const *dataptr);
@@ -1191,8 +1191,13 @@ const char* Buildings_FindHDTexture(const char* shapeFileName, int shapeNum, int
 int Units_GetNumFramesForTile(const char* shapeFileName, int shapeNum);
 const char* Units_FindHDTexture(const char* shapeFileName, int shapeNum, int frameNum);
 
+struct Image_t;
+void Sys_SetOverlayImage(Image_t* image);
+
 extern bool g_inMainMenu;
 extern KeyNumType	g_globalKeyNumType;
 extern int			g_globalKeyFlags;
 extern float       animFrameNum;
+
+extern bool g_loadingPlague;
 #endif

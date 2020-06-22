@@ -261,7 +261,7 @@ class GraphicViewPortClass {
 		/*===================================================================*/
 		/* define functions to get at the private data members					*/
 		/*===================================================================*/
-		long	Get_Offset(void);
+		INT_PTR	Get_Offset(void);
 		int	Get_Height(void);
 		int	Get_Width(void);
 		int	Get_XAdd(void);
@@ -351,7 +351,7 @@ class GraphicViewPortClass {
 		/*===================================================================*/
 		/* Define the data used by a GraphicViewPortClass							*/
 		/*===================================================================*/
-		long					Offset;			// offset to graphic page
+		INT_PTR					Offset;			// offset to graphic page
 		int						Width;			// width of graphic page
 		int						Height;			// height of graphic page
 		int						XAdd;			// xadd for graphic page (0)
@@ -506,10 +506,10 @@ inline BOOL GraphicViewPortClass::Unlock(void)
  * HISTORY:                                                                *
  *   06/07/1994 PWG : Created.                                             *
  *=========================================================================*/
-inline long GraphicViewPortClass::Get_Offset(void)
+inline INT_PTR GraphicViewPortClass::Get_Offset(void)
 {
 	if(Offset == 0) {
-		return (long)Get_Graphic_Buffer()->GetMemoryBuffer();
+		return (INT_PTR)Get_Graphic_Buffer()->GetMemoryBuffer();
 	}
 
 	return(Offset);

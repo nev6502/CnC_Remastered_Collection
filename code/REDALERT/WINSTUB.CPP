@@ -94,6 +94,12 @@ void Show_OldFrameBuffer(bool show) {
 	memset(backbuffer_data_raw, 0, ScreenWidth * ScreenHeight * 4);
 }
 
+Image_t* overlay_image = NULL;
+
+void Sys_SetOverlayImage(Image_t* image) {
+	overlay_image = image;
+}
+
 std::vector<Image_t *> loaded_images;
 
 unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheight, int outwidth, int outheight);
@@ -257,6 +263,69 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	ilDeleteImages(1, &ImageName);
 
 	return true;
+}
+
+Image_t* Image_CreateBlankImage(const char* name, int width, int height) {
+	int64_t hash = generateHashValue(name, strlen(name));
+
+	int image_table_size = loaded_images.size();
+	if (image_table_size > 0)
+	{
+		Image_t** image_table = &loaded_images[0];
+
+		// Check to see if the image is already loaded.
+		for (int i = 0; i < image_table_size; i++) {
+			if (image_table[i]->namehash == hash) {
+				return image_table[i];
+			}
+		}
+	}
+	Image_t* image = new Image_t();
+
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+
+	strcpy(image->name, name);
+
+	image->HouseImages[0].image[0][0] = texture;
+	image->namehash = hash;
+	image->renderwidth[0] = image->width = width;
+	image->renderheight[0] = image->height = height;
+
+	loaded_images.push_back(image);
+	return image;
+}
+
+void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t* palette) {
+	if (image->ScratchBuffer == NULL && paletteRebuild) {
+		image->ScratchBuffer = new uint8_t[image->width * image->height * 4];
+	}
+
+	if (paletteRebuild) {
+		for (int i = 0; i < image->width * image->height; i++) {
+			unsigned char c = data[i];
+			
+			unsigned char r = palette[(c * 3) + 0] << 2;
+			unsigned char g = palette[(c * 3) + 1] << 2;
+			unsigned char b = palette[(c * 3) + 2] << 2;
+
+			image->ScratchBuffer[(i * 4) + 0] = r;
+			image->ScratchBuffer[(i * 4) + 1] = g;
+			image->ScratchBuffer[(i * 4) + 2] = b;
+			image->ScratchBuffer[(i * 4) + 3] = 255;
+		}
+	}
+
+	glBindTexture(GL_TEXTURE_2D, image->HouseImages[0].image[0][0]);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image->width, image->height, GL_RGBA, GL_UNSIGNED_BYTE, image->ScratchBuffer);
 }
 
 Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) {
@@ -489,6 +558,9 @@ void ImGui_NewFrame(void) {
 }
 
 void Device_Present(void) {	
+	if (overlay_image) {
+		GL_RenderImage(overlay_image, 0, 0, ScreenWidth, ScreenHeight);
+	}
 
 	// Rasterize the palette.
 	//for (int i = 0; i < ScreenWidth * ScreenHeight; i++) {
@@ -497,23 +569,24 @@ void Device_Present(void) {
 	//	backbuffer_data[(i * 4) + 2] = backbuffer_palette[(backbuffer_data_raw[i] * 3) + 2];
 	//	backbuffer_data[(i * 4) + 3] = 255;
 	//}
-	glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data_raw);
+	//glBindTexture(GL_TEXTURE_2D, backbuffer_texture);
+	//glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ScreenWidth, ScreenHeight, GL_RGBA, GL_UNSIGNED_BYTE, backbuffer_data_raw);
 
 	bool ScreenActive;
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
 	ImGui::SetNextWindowSize(ImVec2(ScreenWidth, ScreenHeight));
 	ImGui::SetNextWindowPos(ImVec2(0, 0));
-	ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs);
-		if (show_oldframebuffer)
-		{
-			ImVec2 desktopSize(ScreenWidth, ScreenHeight);
-			ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
-		}
-
-	ImGui::End();
-
+// jmarshall - I'm removing this because we don't render the legacy buffer anymore.
+	//ImGui::Begin("RenderWindow", &ScreenActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMouseInputs);
+	//	if (show_oldframebuffer)
+	//	{
+	//		ImVec2 desktopSize(ScreenWidth, ScreenHeight);
+	//		ImGui::Image((ImTextureID)backbuffer_texture, desktopSize);
+	//	}
+	//
+	//ImGui::End();
+// jmarshall end
 
 	if (Imgui_Dialog_Function) {
 		Imgui_Dialog_Function();		

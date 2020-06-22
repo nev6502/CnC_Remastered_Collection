@@ -284,7 +284,7 @@ void GraphicBufferClass::Init(int w, int h, void *buffer, long size, GBC_Enum fl
 			Buffer		= new BYTE[Size];				// otherwise allocate it and
 			Allocated	= TRUE;							//		mark it system alloced
 		}
-		Offset			= (long)Buffer;				// Get offset to the buffer
+		Offset			= (INT_PTR)Buffer;				// Get offset to the buffer
 		IsDirectDraw	= FALSE;
 	}
 
@@ -502,7 +502,7 @@ BOOL GraphicBufferClass::Lock(void)
 		return(TRUE);
 	}
 
-	Offset = (unsigned long)backbuffer_data_raw; // 32bit to 64bit issue here.
+	Offset = (INT_PTR)backbuffer_data_raw; 
 	//Pitch = Width;
 
 	LockCount++;		// increment count so we can track if

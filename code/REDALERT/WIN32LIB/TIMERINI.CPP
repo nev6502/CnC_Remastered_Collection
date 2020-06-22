@@ -119,7 +119,7 @@ WinTimerClass::WinTimerClass (UINT freq, BOOL partial)
 	//
 	//TimerHandle = timeSetEvent ( 1000/freq , 1 , Timer_Callback , 0 , TIME_PERIODIC);				
 	// Add TIME_KILL_SYNCHRONOUS flag. ST - 2/13/2019 5:07PM
-	TimerHandle = timeSetEvent ( 1000/freq , 1 , Timer_Callback , 0 , TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
+	TimerHandle = timeSetEvent ( 1000/freq , 1 , (LPTIMECALLBACK)Timer_Callback , 0 , TIME_PERIODIC | TIME_KILL_SYNCHRONOUS);
 	TimerSystemOn = success = ( TimerHandle !=0 );
 
 	if (success)  {
@@ -185,7 +185,7 @@ WinTimerClass::~WinTimerClass( void )
  *=============================================================================================*/
 
 
-void CALLBACK Timer_Callback (UINT , UINT , DWORD , DWORD , DWORD)
+void CALLBACK Timer_Callback (UINT , UINT , DWORD , DWORD, DWORD)
 {
 	//CONTEXT	context;
 
