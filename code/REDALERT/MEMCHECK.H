@@ -1561,7 +1561,9 @@ extern  int         _MCAPI mc_in_source (void);
 extern  int         _MCAPI mc_is_active (void);
 extern  MCSL        _MCAPI mc_line (void);
 extern  char *      _MCAPI mc_location_text (void);
-#define  mc_load_debugger()     _asm int 3
+// jmarshall - added debug break.
+#define  mc_load_debugger()     __debugbreak()
+// jmarshall end
 extern  unsigned long _MCAPI mc_memory_leaked (void);
 extern  char *      _MCAPI mc_memrec_text (MEMRECP);
 extern  MEMRECP     _MCAPI mc_memrec (void);

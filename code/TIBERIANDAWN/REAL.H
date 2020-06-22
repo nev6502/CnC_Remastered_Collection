@@ -833,31 +833,8 @@ extern int Load_Interpolated_Palettes(char const *filename, BOOL add=FALSE);
  * HISTORY:                                                                                    *
  *   05/27/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-int Distance_Coord(COORDINATE coord1, COORDINATE coord2);
-#pragma aux Distance_Coord parm [eax] [ebx] \
-	modify [edx ebx] \
-	value [eax]		= 				\
-	"mov	dx,ax"			\
-	"sub	dx,bx"			\
-	"jg	okx"				\
-	"neg	dx"				\
-	"okx:"					\
-	"shr	eax,16"			\
-	"shr	ebx,16"			\
-	"sub	ax,bx"			\
-	"jg	oky"				\
-	"neg	ax"				\
-	"oky:"					\
-	"cmp	ax,dx"			\
-	"jg	ok"				\
-	"xchg	ax,dx"			\
-	"ok:"						\
-	"shr	dx,1"				\
-	"add	ax,dx"
-
 inline int Distance(COORDINATE coord1, COORDINATE coord2)
 {
-#ifdef NEVER
 	int	diff1, diff2;
 
 	diff1 = Coord_Y(coord1) - Coord_Y(coord2);
@@ -868,9 +845,6 @@ inline int Distance(COORDINATE coord1, COORDINATE coord2)
 		return(diff1 + (diff2>>1));
 	}
 	return(diff2 + (diff1>>1));
-#else
-	return(Distance_Coord(coord1, coord2));
-#endif
 }
 
 
