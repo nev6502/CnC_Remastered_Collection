@@ -1,6 +1,3 @@
-// MapScript.cpp
-//
-
 #include "FUNCTION.H"
 #include "MapScript.h"
 
@@ -1069,7 +1066,13 @@
         int houseType = lua_tointeger(L, 1);
         int in_x = lua_tointeger(L, 2);
         int in_y = lua_tointeger(L, 3);
-        const char* in_function = lua_tostring(L, 4);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 4) {
+            in_function = (char*)lua_tostring(L, 4);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1087,8 +1090,10 @@
             // Create instance of trigger type
             TriggerClass * this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             // Get the cell and set the trigger
             this_trigger->Cell = XY_Cell(in_x, in_y);
@@ -1126,7 +1131,13 @@
 
         int objectID = lua_tointeger(L, 1);
         int houseType = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         BuildingClass* this_building = Buildings.Ptr(objectID);
 
@@ -1146,8 +1157,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             // Set the building
             this_building->Trigger = this_trigger;
@@ -1184,7 +1197,13 @@
     static int Script_ObjectDiscoveryCallback(lua_State* L) {
 
         int objectID = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (objectID >= 0 ) {
@@ -1201,8 +1220,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             Script_SetObjectTrigger(objectID, this_trigger);
 
@@ -1238,7 +1259,13 @@
     static int Script_HouseDiscoveredCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1258,8 +1285,10 @@
 
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[PlayerPtr->Class->House].Add(this_trigger); 
 
@@ -1293,7 +1322,13 @@
     static int Script_ObjectAttackedCallback(lua_State* L) {
 
         int objectID = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // An object must be specified
         if (objectID >= 0) {
@@ -1310,8 +1345,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             Script_SetObjectTrigger(objectID, this_trigger);
 
@@ -1345,7 +1382,13 @@
     static int Script_ObjectDestroyedCallback(lua_State* L) {
 
         int objectID = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // An object must be specified
         if (objectID >= 0) {
@@ -1362,8 +1405,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             Script_SetObjectTrigger(objectID, this_trigger);
 
@@ -1399,8 +1444,12 @@
      *=============================================================================================*/
     static int Script_AnyEventCallback(lua_State* L) {
 
-        const char* in_function = lua_tostring(L, 1);
+        char* in_function = "";
 
+        // Optional callback function
+        if (lua_gettop(L) >= 1) {
+            in_function = (char*)lua_tostring(L, 1);
+        }
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
@@ -1414,8 +1463,10 @@
         // Create instance of trigger type
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-        // Copy the callback function into the trigger
-        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        if (in_function[0] != '\0') {
+            // Copy the callback function into the trigger
+            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        }
 
         LogicTriggers.Add(this_trigger);
 
@@ -1444,7 +1495,13 @@
     static int Script_AllUnitsDestroyedCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1462,11 +1519,12 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
-        
-            HouseTriggers[(HousesType)houseType].Add(this_trigger); 
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
+            HouseTriggers[(HousesType)houseType].Add(this_trigger); 
 
             // Output the new trigger's ID
             lua_pushnumber(L, this_trigger->ID);
@@ -1498,7 +1556,13 @@
     static int Script_AllBuildingsDestroyedCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1516,11 +1580,12 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger); 
-
 
             // Output the new trigger's ID
             lua_pushnumber(L, this_trigger->ID);
@@ -1552,7 +1617,13 @@
     static int Script_AllDestroyedCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1570,11 +1641,12 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger); 
-
 
             // Output the new trigger's ID
             lua_pushnumber(L, this_trigger->ID);
@@ -1608,7 +1680,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int in_credits = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1626,11 +1704,12 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger); 
-
 
             // Output the new trigger's ID
             lua_pushnumber(L, this_trigger->ID);
@@ -1662,7 +1741,13 @@
     static int Script_TimeReachedCallback(lua_State* L) {
 
         int in_time = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
@@ -1677,8 +1762,10 @@
         // Create instance of trigger type
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-        // Copy the callback function into the trigger
-        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        if (in_function[0] != '\0') {
+            // Copy the callback function into the trigger
+            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        }
 
         LogicTriggers.Add(this_trigger);
 
@@ -1705,7 +1792,12 @@
      *=============================================================================================*/
     static int Script_MissionTimerCallback(lua_State* L) {
 
-        const char* in_function = lua_tostring(L, 1);
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 1) {
+            in_function = (char*)lua_tostring(L, 1);
+        }
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
@@ -1719,8 +1811,10 @@
         // Create instance of trigger type
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-        // Copy the callback function into the trigger
-        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        if (in_function[0] != '\0') {
+            // Copy the callback function into the trigger
+            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        }
 
         LogicTriggers.Add(this_trigger);
 
@@ -1751,7 +1845,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int in_number = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1769,8 +1869,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger);
 
@@ -1807,7 +1909,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int in_number = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1825,8 +1933,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger);
 
@@ -1860,7 +1970,13 @@
     static int Script_NoFactoriesCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -1878,8 +1994,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger);
 
@@ -1914,8 +2032,14 @@
     static int Script_CivilianEscapeCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
-    
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
+
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
 
             // Create trigger type
@@ -1931,8 +2055,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             LogicTriggers.Add(this_trigger);
 
@@ -1968,7 +2094,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int objectType = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -1985,8 +2117,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[houseType].Add(this_trigger);
 
@@ -2025,7 +2159,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int objectType = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -2042,8 +2182,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[houseType].Add(this_trigger);
 
@@ -2082,7 +2224,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int objectType = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -2099,8 +2247,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[houseType].Add(this_trigger);
 
@@ -2139,7 +2289,13 @@
 
         int houseType = lua_tointeger(L, 1);
         int objectType = lua_tointeger(L, 2);
-        const char* in_function = lua_tostring(L, 3);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         if (objectType >= 0 && houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -2156,8 +2312,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[houseType].Add(this_trigger);
 
@@ -2192,8 +2350,13 @@
     static int Script_TeamLeavesMapCallback(lua_State* L) {
 
         int in_team = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
 
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
         TeamTypeClass* this_team = TeamTypes.Ptr(in_team);
 
         if (this_team != NULL) {
@@ -2213,8 +2376,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             LogicTriggers.Add(this_trigger);
 
@@ -2257,7 +2422,12 @@
         int in_x = lua_tointeger(L, 2);
         int in_y = lua_tointeger(L, 3);
 
-        const char* in_function = lua_tostring(L, 4);
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 4) {
+            in_function = (char*)lua_tostring(L, 4);
+        }
 
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -2274,8 +2444,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             // Get the cell and set the trigger
             this_trigger->Cell = XY_Cell(in_x, in_y);
@@ -2318,7 +2490,12 @@
         int houseType = lua_tointeger(L, 1);
         int in_x = lua_tointeger(L,2);
 
-        const char* in_function = lua_tostring(L, 3);
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -2335,8 +2512,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             // Find a free spot and set the trigger
             int addY = 0;
@@ -2385,7 +2564,12 @@
         int houseType = lua_tointeger(L, 1);
         int in_y = lua_tointeger(L, 2);
 
-        const char* in_function = lua_tostring(L, 3);
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
 
@@ -2402,8 +2586,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             // Find a free spot and set the trigger
             int addX = 0;
@@ -2447,7 +2633,13 @@
     static int Script_GlobalSetCallback(lua_State* L) {
 
         int in_global = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
@@ -2462,8 +2654,10 @@
         // Create instance of trigger type
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-        // Copy the callback function into the trigger
-        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        if (in_function[0] != '\0') {
+            // Copy the callback function into the trigger
+            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        }
 
         LogicTriggers.Add(this_trigger);
 
@@ -2491,7 +2685,13 @@
     static int Script_GlobalClearedCallback(lua_State* L) {
 
         int in_global = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
@@ -2506,8 +2706,10 @@
         // Create instance of trigger type
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-        // Copy the callback function into the trigger
-        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        if (in_function[0] != '\0') {
+            // Copy the callback function into the trigger
+            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        }
 
         LogicTriggers.Add(this_trigger);
 
@@ -2535,7 +2737,13 @@
     static int Script_LowPowerCallback(lua_State* L) {
 
         int houseType = lua_tointeger(L, 1);
-        const char* in_function = lua_tostring(L, 2);
+        
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 2) {
+            in_function = (char*)lua_tostring(L, 2);
+        }
 
         // A house must be specified
         if (houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -2555,8 +2763,10 @@
 
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[PlayerPtr->Class->House].Add(this_trigger);
 
@@ -2588,7 +2798,12 @@
      *=============================================================================================*/
     static int Script_AllBridgesDestroyedCallback(lua_State* L) {
 
-        const char* in_function = lua_tostring(L, 1);
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 1) {
+            in_function = (char*)lua_tostring(L, 1);
+        }
 
         // Create trigger type
         TriggerTypeClass* this_trigger_type = new TriggerTypeClass();
@@ -2602,8 +2817,10 @@
         // Create instance of trigger type
         TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-        // Copy the callback function into the trigger
-        strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        if (in_function[0] != '\0') {
+            // Copy the callback function into the trigger
+            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+        }
 
         LogicTriggers.Add(this_trigger);
 
@@ -2634,7 +2851,13 @@
 
         int buildingType = lua_tointeger(L, 1);
         int houseType = lua_tointeger(L,2);
-        const char* in_function = lua_tostring(L,3);
+
+        char* in_function = "";
+
+        // Optional callback function
+        if (lua_gettop(L) >= 3) {
+            in_function = (char*)lua_tostring(L, 3);
+        }
 
         // A house must be specified
         if (buildingType>=0 && houseType >= 0 && houseType < HouseTypes.Count()) {
@@ -2651,8 +2874,10 @@
             // Create instance of trigger type
             TriggerClass* this_trigger = Find_Or_Make(this_trigger_type);
 
-            // Copy the callback function into the trigger
-            strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            if (in_function[0] != '\0') {
+                // Copy the callback function into the trigger
+                strncpy(this_trigger->MapScriptCallback, in_function, sizeof(this_trigger->MapScriptCallback) - 1);
+            }
 
             HouseTriggers[(HousesType)houseType].Add(this_trigger);
 
