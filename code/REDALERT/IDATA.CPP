@@ -49,6 +49,7 @@
 
 #include	"function.h"
 #include	"type.h"
+#include "image.h"
 
 static DoInfoStruct DogDoControls[DO_COUNT] = {
 	{0,	1,	1},					// DO_STAND_READY
@@ -1420,6 +1421,47 @@ void InfantryTypeClass::One_Time(void)
 		#else
 			((void const *&)uclass->ImageData) = MFCD::Retrieve(fullname);
 		#endif
+			{
+				const char* imageFileName = Units_FindHDTexture(fullname, 0, 0);
+
+				if (imageFileName) {
+					Image_t* image = Image_LoadImage(imageFileName, true, true);
+					int numUnitsAnims = Units_GetNumFramesForTile(fullname, 0);
+					int shapeId = 1;
+
+					// Load the old school animation pipeline.
+					{
+						while (true) {
+							imageFileName = Units_FindHDTexture(fullname, shapeId, 0);
+							if (imageFileName == NULL)
+								break;
+
+							for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+								Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
+							}
+							shapeId++;
+						}
+					}
+
+					for (int d = 0; d < shapeId; d++) {
+						image->renderwidth[d] = image->renderwidth[d] / 5;
+						image->renderheight[d] = image->renderheight[d] / 5;
+					}
+
+					if (numUnitsAnims > 0)
+					{
+						for (int i = 1; i < numUnitsAnims; i++) {
+							imageFileName = Units_FindHDTexture(fullname, 0, i);
+							for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+								Image_Add32BitImage(imageFileName, image, d, 0, i);
+							}
+						}
+					}
+
+					image->numFrames = numUnitsAnims;
+					((void const*&)uclass->HDImageData) = image;
+				}
+			}
 
 		/*
 		**	The small build image icon sized shapes are always generic.
