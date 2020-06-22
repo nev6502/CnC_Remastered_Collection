@@ -144,7 +144,7 @@ typedef struct {
 /* The following PRIVATE functions are in this file:                       */
 /*=========================================================================*/
 
-PRIVATE unsigned long Get_Resident_Frame_Offset( char *file_buffer, int frame );
+PRIVATE INT_PTR Get_Resident_Frame_Offset( char *file_buffer, int frame );
 PRIVATE unsigned long Get_File_Frame_Offset( int file_handle, int frame, int palette_adjust);
 PRIVATE BOOL Apply_Delta(SysAnimHeaderType *sys_header, int curr_frame, char *dest_ptr, int dest_w);
 /*= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =*/
@@ -1029,13 +1029,13 @@ unsigned long __cdecl Get_Animation_Size(void const *handle)
  * HISTORY:                                                                *
  *   11/26/1991  SB : Created.                                             *
  *=========================================================================*/
-PRIVATE unsigned long Get_Resident_Frame_Offset( char *file_buffer, int frame )
+PRIVATE INT_PTR Get_Resident_Frame_Offset( char *file_buffer, int frame )
 {
-	unsigned long frame0_size;
-	unsigned long *lptr;
+	INT_PTR frame0_size;
+	unsigned int *lptr;
 
 	// If there is a frame 0, the calculate its size.
-	lptr = (unsigned long *) file_buffer;
+	lptr = (unsigned int *) file_buffer;
 
 	if (*lptr) {
 		frame0_size = lptr[1] - *lptr;
@@ -1096,7 +1096,7 @@ PRIVATE BOOL Apply_Delta(SysAnimHeaderType *sys_header, int curr_frame, char *de
 {
 	char *data_ptr, *delta_back;
 	int file_handle, palette_adjust;
-	unsigned long frame_data_size, frame_offset;
+	INT_PTR frame_data_size, frame_offset;
 
 
 	palette_adjust = ((sys_header->flags & WSA_PALETTE_PRESENT) ? 768 : 0);
@@ -1110,14 +1110,18 @@ PRIVATE BOOL Apply_Delta(SysAnimHeaderType *sys_header, int curr_frame, char *de
 		// copy it into buffer
 
 		frame_offset = Get_Resident_Frame_Offset(sys_header->file_buffer, curr_frame);
+// jmarshall - hack for crash!
+		if (frame_offset < 0)
+			return 0;
 		frame_data_size = Get_Resident_Frame_Offset(sys_header->file_buffer, curr_frame + 1) -	frame_offset;
 
 	  	data_ptr 	= (char *)Add_Long_To_Pointer(sys_header->file_buffer, frame_offset);
 	  	delta_back 	= (char *)Add_Long_To_Pointer(delta_back,
 	  						 sys_header->largest_frame_size - frame_data_size);
-
-		Mem_Copy( data_ptr, delta_back, frame_data_size );
-
+// jmarshall - 64bit
+		//Mem_Copy( data_ptr, delta_back, frame_data_size );
+		memcpy(delta_back, data_ptr, frame_data_size);
+// jmarshall end1
 	} else if (sys_header -> flags & WSA_FILE) {
 
 		//	Open up file because not file not in RAM.

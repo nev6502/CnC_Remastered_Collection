@@ -715,7 +715,7 @@ long __cdecl Buffer_Frame_To_Page(int shapeNum, int x, int y, int w, int h, Imag
 /*
 **	KEYFRAME.CPP
 */
-unsigned long Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr);
+INT_PTR Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr);
 unsigned short Get_Build_Frame_Count(void const *dataptr);
 unsigned short Get_Build_Frame_X(void const *dataptr);
 unsigned short Get_Build_Frame_Y(void const *dataptr);

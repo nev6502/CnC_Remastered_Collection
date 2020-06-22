@@ -91,7 +91,7 @@ extern "C" {
 }
 
 
-inline void *Add_Long_To_Pointer(void const *ptr, long size)
+inline void *Add_Long_To_Pointer(void const *ptr, INT_PTR size)
 {
  	return ((void *) ( (char const *) ptr + size));
 }
