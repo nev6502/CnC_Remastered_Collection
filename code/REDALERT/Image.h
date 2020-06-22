@@ -1,7 +1,7 @@
 // Image.h
 //
 
-#define MAX_IMAGE_SHAPES 256
+#define MAX_IMAGE_SHAPES 1024
 #define MAX_IMAGE_FRAMES 12
 #define MAX_HOUSE_COLORS 8
 

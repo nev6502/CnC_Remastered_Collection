@@ -1,5 +1,8 @@
 # CnC_Remastered_Collection
 
+Join us on our discord!
+https://discord.gg/UfDzG9C
+
 How to use:
 
 You can use the vanilla assets, but this codebase supports the remaster assets as well. Please support EA and purchase the remaster!
