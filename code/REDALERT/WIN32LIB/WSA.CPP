@@ -117,7 +117,7 @@ typedef struct {
 // NOTE:"THIS IS A BAD THING. SINCE sizeof(SysAnimHeaderType) CHANGED, THE ANIMATE.EXE
 // UTILITY DID NOT KNOW I UPDATED IT, IT ADDS IT TO largest_frame_size BEFORE SAVING
 // IT TO THE FILE.  THIS MEANS I HAVE TO ADD THESE charS ON NOW FOR IT TO WORK.
-#define EXTRA_charS_ANIMATE_NOT_KNOW_ABOUT	(sizeof(short) + sizeof(unsigned long))
+#define EXTRA_charS_ANIMATE_NOT_KNOW_ABOUT	(sizeof(short) + sizeof(unsigned long) + sizeof(INT_PTR)) // Thanks OmniBlade for helping out with this one one. "Not enough, that will increase it by 4 bytes, but the struct contains 2 pointer so will have increased by 8 bytes."
 
 
 //
