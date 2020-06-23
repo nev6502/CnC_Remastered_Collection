@@ -1056,6 +1056,8 @@ void Do_Win(void)
 		}
 
 		Keyboard->Clear();
+
+		UserInput.Process_Input();
 	}
 
 	Scen.CarryOverMoney = PlayerPtr->Credits;

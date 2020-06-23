@@ -638,6 +638,7 @@ typedef enum KeyNumType {
 	KN_ALT_BIT   		= WWKEY_ALT_BIT,
 	KN_RLSE_BIT  		= WWKEY_RLS_BIT,
 	KN_BUTTON    		= WWKEY_BTN_BIT,
+	KN_CAPSLOCK_BIT		= WWKEY_SHIFT_BIT,
 } KeyNumType;
 
 

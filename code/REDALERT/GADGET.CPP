@@ -471,7 +471,9 @@ void GadgetClass::Draw_All(bool forced)
  *=========================================================================*/
 KeyNumType GadgetClass::Input(void)
 {	
-	KeyNumType key;
+	EventMessage* eventMessage = NULL;
+	KeyNumType key = KN_NONE;
+	int flags = 0;
 	int forced = false;
 
 	/*
@@ -488,77 +490,12 @@ KeyNumType GadgetClass::Input(void)
 	/*
 	**	Fetch any pending keyboard input.
 	*/
-	key = Keyboard->Check();
-	if (key != 0) {
-		key = Keyboard->Get();
+	UserInput.Process_Input(); // key, flags);
+
+	if ( EventQueue.Check() ) {
+		eventMessage = EventQueue.Get();
+		eventMessage->Key_Flags( key, flags );
 	}
-
-	/*
-	**	For mouse button clicks, the mouse position is actually held in the MouseQ...
-	**	globals rather than their normal Mouse... globals. This is because we need to
-	**	know the position of the mouse at the exact instant when the click occurred
-	**	rather the the mouse position at the time we get around to this function.
-	*/
-// jmarshall
-	int flags = g_globalKeyFlags;
-	UserInput.Process_Input( g_globalKeyNumType, flags );
-
-// jmarshall end
-
-	/*
-	**	Set the mouse button state flags. These will be passed to the individual
-	**	buttons so that they can determine what action to perform (if any).
-	*/	
-	//if (key) {
-	//	if (key == KN_LMOUSE) {
-	//		flags |= LEFTPRESS;
-	//	}
-	//	if (key == KN_RMOUSE) {
-	//		flags |= RIGHTPRESS;
-	//	}
-	//	if (key == (KN_LMOUSE | KN_RLSE_BIT)) {
-	//		flags |= LEFTRELEASE;
-	//	}
-	//	if (key == (KN_RMOUSE | KN_RLSE_BIT)) {
-	//		flags |= RIGHTRELEASE;
-	//	}
-	//}
-
-	/*
-	**	If the mouse wasn't responsible for this key code, then it must be from
-	**	the keyboard. Flag this fact.
-	*/
-	if (key && !flags) {
-		flags |= KEYBOARD;
-	}
-
-	/*
-	**	Mouse button up or down action is ignored if there is a keyboard event. This
-	**	allows keyboard events to fall through normally even if the mouse is over a
-	**	gadget that is flagged for LEFTUP or RIGHTUP.
-	*/
-// jmarshall
-	//if (!key) {
-	//
-	//	/*
-	//	**	Check for the mouse being held down. We can't use the normal input system
-	//	**	for this, so we must examine the actual current state of the mouse
-	//	**	buttons. As a side note, if we determine that the mouse button isn't being
-	//	**	held down, then we automatically know that it must be up -- set the flag
-	//	**	accordingly.
-	//	*/
-	//	if (Keyboard->Down(KN_LMOUSE)) {
-	//		flags |= LEFTHELD;
-	//	} else {
-	//		flags |= LEFTUP;
-	//	}
-	//	if (Keyboard->Down(KN_RMOUSE)) {
-	//		flags |= RIGHTHELD;
-	//	} else {
-	//		flags |= RIGHTUP;
-	//	}
-	//}
-// jmarshall end
 
 	/*
 	**	If "sticky" processing is active, then only process the stuck gadget.
@@ -567,18 +504,21 @@ KeyNumType GadgetClass::Input(void)
 		StuckOn->Draw_Me(false);
 		GadgetClass * oldstuck = StuckOn;
 		StuckOn->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
-		if (StuckOn) {
+
+		if (StuckOn) 
+		{
 			StuckOn->Draw_Me(false);
 		} else {
 			oldstuck->Draw_Me(false);
 		}
-	} else {
-
+	} 
+	else 
+	{
 		/*
 		**	If there is a gadget that has the keyboard focus, then route all keyboard
 		**	events to it.
 		*/
-		if (Focused && (flags & KEYBOARD)) {
+		if ( Focused && eventMessage != NULL && eventMessage->EventType == EventMessageType::EVENT_KEYBOARD ) {
 			Focused->Draw_Me(false);
 			Focused->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 			if (Focused) {
@@ -622,6 +562,7 @@ KeyNumType GadgetClass::Input(void)
 			}
 		}
 	}
+
 	return(key);
 }
 

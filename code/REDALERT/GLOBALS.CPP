@@ -257,6 +257,7 @@ RulesClass Rule;
 **	user input class pointer.
 */
 UserInputClass UserInput;
+EventQueueClass EventQueue;
 
 /***************************************************************************
 ** All keyboard input is routed through the object pointed to by this

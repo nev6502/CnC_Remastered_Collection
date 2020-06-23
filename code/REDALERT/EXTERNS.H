@@ -161,6 +161,7 @@ extern PKey							SlowKey;
 extern RulesClass					Rule;
 extern KeyboardClass *			Keyboard;
 extern UserInputClass			UserInput;
+extern EventQueueClass			EventQueue;
 extern RandomStraw				CryptRandom;
 extern RandomClass				NonCriticalRandomNumber;
 extern CarryoverClass *			Carryover;

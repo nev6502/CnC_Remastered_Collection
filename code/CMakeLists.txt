@@ -11,6 +11,8 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(src_io
 	./REDALERT/io/UserInput.cpp
 	./REDALERT/io/UserInput.h
+	./REDALERT/io/EventQueue.h
+	./REDALERT/io/EventQueue.cpp
 )
 
 set(src_win32lib
