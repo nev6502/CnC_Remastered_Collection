@@ -564,8 +564,8 @@ int PASCAL WinMain ( HINSTANCE instance , HINSTANCE , char * command_line , int 
 			VisiblePage.Init( ScreenWidth, ScreenHeight, NULL, 0 ,(GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM) );
 			HiddenPage.Init( ScreenWidth, ScreenHeight, NULL, 0 ,(GBC_Enum)(0) );
 
-			SeenBuff.Attach( &VisiblePage, 0, 0, 3072, 3072 );
-			HidPage.Attach( &HiddenPage, 0, 0, 3072, 3072 );
+			SeenBuff.Attach( &VisiblePage, 0, 0, 6072, 6072 );
+			HidPage.Attach( &HiddenPage, 0, 0, 6072, 6072 );
 			
 			Options.Adjust_Variables_For_Resolution();
 
@@ -733,8 +733,8 @@ bool InitDDraw(void)
 	VisiblePage.Init(ScreenWidth, ScreenHeight, NULL, 0, (GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM));
 	HiddenPage.Init(ScreenWidth, ScreenHeight, NULL, 0, (GBC_Enum)GBC_VIDEOMEM);
 
-	SeenBuff.Attach(&VisiblePage, 0, 0, 3072, 3072);
-	HidPage.Attach(&HiddenPage, 0, 0, 3072, 3072);
+	SeenBuff.Attach(&VisiblePage, 0, 0, 6072, 6072);
+	HidPage.Attach(&HiddenPage, 0, 0, 6072, 6072);
 
 	return true;
 }
@@ -930,8 +930,8 @@ void Read_Setup_Options( RawFileClass *config_file )
 		VideoBackBufferAllowed = ini.Get_Bool("Options", "VideoBackBuffer", true);
 		AllowHardwareBlitFills = ini.Get_Bool("Options", "HardwareFills", true);
 
-		ScreenWidth = 1280;
-		ScreenHeight = 720;
+		ScreenWidth = ini.Get_Int("Options", "Width", 1280);
+		ScreenHeight = ini.Get_Int("Options", "Height", 720);
 
 		/*
 		** See if an alternative socket number has been specified

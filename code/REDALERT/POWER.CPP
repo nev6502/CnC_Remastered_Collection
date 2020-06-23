@@ -169,7 +169,6 @@ void PowerClass::Draw_It(bool complete)
 // jmarshall - render the world before the power bar.
 	RadarClass::Draw_It(complete);
 // jmarshall end
-
 	{
 		BStart(BENCH_POWER);
 

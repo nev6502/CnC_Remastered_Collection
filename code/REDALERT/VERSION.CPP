@@ -732,9 +732,9 @@ char const * Version_Name(void) {
 
 	static char tmp[512];
 #ifdef _DEBUG
-	sprintf(tmp, "RA_DEBUG.AF%d.EA%d.%s.%s", AF_BUILDNUMBER, EA_REMASTER_PATCH, __DATE__, __TIME__);
+	sprintf(tmp, "RA_X64_DEBUG.AF%d.EA%d.%s.%s", AF_BUILDNUMBER, EA_REMASTER_PATCH, __DATE__, __TIME__);
 #else
-	sprintf(tmp, "RA_RELEASE.AF%d.EA%d.%s.%s", AF_BUILDNUMBER, EA_REMASTER_PATCH, __DATE__, __TIME__);
+	sprintf(tmp, "RA_X64_RELEASE.AF%d.EA%d.%s.%s", AF_BUILDNUMBER, EA_REMASTER_PATCH, __DATE__, __TIME__);
 #endif
 	return tmp;
 // jmarshall end

@@ -182,8 +182,8 @@ unsigned short			Hard_Error_Occured = 0;
 WWMouseClass *			WWMouse = NULL;
 GraphicBufferClass	SysMemPage(DEFAULT_SCREEN_WIDTH, 200, (void*)NULL);
 WinTimerClass *		WindowsTimer=NULL;
-int						ScreenWidth=3072;
-int						ScreenHeight=3072;
+int						ScreenWidth=6072;
+int						ScreenHeight=6072;
 GraphicBufferClass	ModeXBuff;
 bool						InMovie = FALSE;	//Are we currently playing a VQ movie?
 HANDLE					hInstance;
@@ -740,8 +740,8 @@ int MenuList[][8]={
 #ifdef WIN32
 GraphicBufferClass	VisiblePage;
 GraphicBufferClass	HiddenPage;
-GraphicViewPortClass	SeenBuff(&VisiblePage, 0, 0, 3072, 3072);
-GraphicViewPortClass	HidPage(&HiddenPage, 0, 0, 3072, 3072);
+GraphicViewPortClass	SeenBuff(&VisiblePage, 0, 0, 6072, 6072);
+GraphicViewPortClass	HidPage(&HiddenPage, 0, 0, 6072, 6072);
 #else
 GraphicBufferClass	HidPage(DEFAULT_SCREEN_WIDTH, 201, (void*)NULL);
 GraphicBufferClass	SeenBuff(320, 200, (void *)0xA0000L);

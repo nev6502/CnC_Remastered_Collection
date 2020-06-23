@@ -47,6 +47,7 @@
 #include	"il/il.h"
 #include	"il/ilu.h"
 #include	"image.h"
+#include    "texcache.h"
 
 #ifdef WINSOCK_IPX
 #include "WSProto.h"
@@ -104,85 +105,75 @@ std::vector<Image_t *> loaded_images;
 
 unsigned char* Draw_Dropsample(const unsigned char* in, int inwidth, int inheight, int outwidth, int outheight);
 
-/*
-================
-return a hash value for the filename
-================
-*/
-int64_t generateHashValue(const char* fname, const int size) {
-	uint32_t hash = 0x811c9dc5;
-	uint32_t prime = 0x1000193;
-
-	for (int i = 0; i < size; ++i) {
-		uint8_t value = fname[i];
-		hash = hash ^ value;
-		hash *= prime;
-	}
-
-	return hash;
-}
-
-/*
-================
-Image_WriteTGA
-================
-*/
-void Image_WriteTGA(const char* filename, const byte* data, int width, int height, bool flipVertical) {
-	byte* buffer;
-	int		i;
-	int		bufferSize = width * height * 4 + 18;
-	int     imgStart = 18;
-
-	buffer = (byte*)malloc(bufferSize);
-	memset(buffer, 0, 18);
-	buffer[2] = 2;		// uncompressed type
-	buffer[12] = width & 255;
-	buffer[13] = width >> 8;
-	buffer[14] = height & 255;
-	buffer[15] = height >> 8;
-	buffer[16] = 32;	// pixel size
-
-	if (!flipVertical) {
-		buffer[17] = (1 << 5);	// flip bit, for normal top to bottom raster order
-	}
-
-	// swap rgba to bgra
-	for (i = imgStart; i < bufferSize; i += 4) {
-		buffer[i] = data[i - imgStart + 2];			// blue
-		buffer[i + 1] = data[i - imgStart + 1];		// green
-		buffer[i + 2] = data[i - imgStart + 0];		// red
-		buffer[i + 3] = data[i - imgStart + 3];		// alpha
-	}
-	char temp[512];
-	strcpy(temp, filename);
-	COM_SetExtension(temp, strlen(temp), ".tga");
-	FILE* f = fopen(temp, "wb");
-	fwrite(buffer, 1, bufferSize, f);
-	fclose(f);
-
-	free(buffer);
-}
-
-
 static char* Image_GetGeneratedName(Image_t* image, const char* name, int houseid, int animid, int frameId, int64_t hash) {
 	static char generatedFileName[1024];
-	sprintf(generatedFileName, "cache/v4.%d.%d.%d.%d.tga", frameId, houseid, animid, hash);
+	sprintf(generatedFileName, "%s.%d.%d.%d.%d.tga", name, frameId, houseid, animid, hash);
 	return &generatedFileName[0];
 }
 
-static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int frameId, int64_t hash, bool writeGenerated) {	
+static bool Image_LoadFromCache(Image_t* image, const char* name, int houseid, int animid, int frameId, int64_t hash) {
+	static byte* Data = NULL;
+	if (Data == NULL) {
+		Data = new byte[8192 * 8192 * 4];
+	}
+
+	int Width, Height, Bpp;
+	if (!texCache.FindCachedImage(hash, Width, Height, Bpp, Data)) {
+		return false;
+	}
+
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	if (Bpp == 4) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_BGRA, GL_UNSIGNED_BYTE, Data);
+	}
+	else if (Bpp == 3) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
+	}
+	else if (Bpp == 1) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_R, GL_UNSIGNED_BYTE, Data);
+	}
+	else {
+		assert(!"Unknown BPP in image!");
+	}
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+
+	strcpy(image->name, name);
+
+	if (houseid == -1)
+		image->HouseImages[0].image[animid][frameId] = texture;
+	else
+		image->HouseImages[houseid].image[animid][frameId] = texture;
+	//image->namehash = hash;
+	image->renderwidth[animid] = image->width = Width;
+	image->renderheight[animid] = image->height = Height;
+	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
+	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
+
+	return true;
+}
+
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int frameId, int64_t hash) {		
+	const char* generatedName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
+	hash = generateHashValue(generatedName, strlen(generatedName));
+
 	// Check to see if we can load a generated image first.
 	// We only generate images that need a houseid
-	if (!writeGenerated && houseid >= 0) {
-		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
-		if (Image_loadHDImage(image, generatedImageName, houseid, animid, frameId, hash, true)) {
+	if (houseid >= 0) {
+		if (Image_LoadFromCache(image, generatedName, houseid, animid, frameId, hash)) {
 			return true;
 		}
 	}
 
 	ILuint ImageName;
 	ilGenImages(1, &ImageName);
-	ilBindImage(ImageName);
+	ilBindImage(ImageName); 
+
 	if (!ilLoadImage(name)) {
 		ilDeleteImages(1, &ImageName);
 		return false;
@@ -190,11 +181,8 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 
 	bool swapBGR = false;
 	if (strstr(name, ".TGA") || strstr(name, ".tga")) {
-		if (!writeGenerated)
-		{
-			iluFlipImage();
-			swapBGR = true;
-		}
+		iluFlipImage();
+		swapBGR = true;
 	}
 
 	ILuint Width, Height, Bpp;
@@ -203,7 +191,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	Bpp = ilGetInteger(IL_IMAGE_BPP);
 	ILubyte* Data = ilGetData();
 
-	if (Bpp == 4 && houseid != -1 && !writeGenerated) {
+	if (Bpp == 4 && houseid != -1) {
 		//Buffer_Enable_HD_Texture(true);
 		//Data = Draw_Dropsample(Data, Width, Height, Width / 2, Height / 2);
 		//Buffer_Enable_HD_Texture(false);
@@ -246,16 +234,14 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 		image->HouseImages[0].image[animid][frameId] = texture;
 	else
 		image->HouseImages[houseid].image[animid][frameId] = texture;
-	image->namehash = hash;
+	//image->namehash = hash;
 	image->renderwidth[animid] = image->width = Width;
 	image->renderheight[animid] = image->height = Height;
 	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
 	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
-	if (!writeGenerated && Bpp == 4 && houseid >= 0) {
-		char* generatedImageName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
-		Image_WriteTGA(generatedImageName, Data, Width, Height, false);
-
+	if (Bpp == 4 && houseid >= 0) {
+		texCache.AddImage(generatedName, Width, Height, Bpp, Data);
 		Console_Printf("Writing %s to cache %s\n", image->name, name);
 		Sleep(0);
 	}
@@ -347,7 +333,7 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 
 	if (!loadAnims) {
 		unsigned char remap[3] = { 0, 0, 0 };
-		if (!Image_loadHDImage(image, name, -1, 0, 0, hash, false)) {
+		if (!Image_loadHDImage(image, name, -1, 0, 0, hash)) {
 			delete image;
 			return NULL;
 		}
@@ -355,13 +341,13 @@ Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) 
 	else {
 		byte* palette = (byte *)CCPalette.Get_Data();
 		for (int i = 0; i < MAX_MPLAYER_COLORS; i++) {
-			if (!Image_loadHDImage(image, name, i, 0, 0, hash, false)) {
+			if (!Image_loadHDImage(image, name, i, 0, 0, hash)) {
 				delete image;
 				return NULL;
 			}
 		}
 	}
-
+	image->namehash = hash;
 	loaded_images.push_back(image);
 	return image;
 }
@@ -510,7 +496,7 @@ void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int
 }
 
 bool Image_Add32BitImage(const char *name, Image_t* image, int HouseId, int ShapeID, int frameId) {
-	return Image_loadHDImage(image, name, HouseId, ShapeID, frameId, image->namehash, false);	
+	return Image_loadHDImage(image, name, HouseId, ShapeID, frameId, image->namehash);	
 }
 
 BOOL Set_Video_Mode(HWND hwnd, int w, int h, int bits_per_pixel) {
@@ -771,6 +757,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	HWND        	hwnd ;
 
 	ilInit();
+
+	texCache.Init();
 
 	SDL_Init(SDL_INIT_VIDEO);
 	game_window = SDL_CreateWindow(WINDOW_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);	
