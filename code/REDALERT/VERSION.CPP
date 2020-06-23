@@ -725,124 +725,17 @@ unsigned long VersionClass::Max_Version(void)
 }	/* end of Max_Version */
 
 
-char const * Version_Name(void)
-{
-#ifdef NEVER
-	static char buffer[32];
+char const * Version_Name(void) {
+// jmarshall
+	#define AF_BUILDNUMBER 0 // Patch number for allied force.
+	#define EA_REMASTER_PATCH 2 // What version of the remaster source we are integrated with.
 
-	/*
-	**	Fetch the day and month components from the current
-	**	build date.
-	*/
-	static char * date = __DATE__;		// format: Mmm dd yyyy
-	strupr(date);
-	char const * tok = strtok(date, " ");
-	static char const * months = "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC";
-	char const * ptr = strstr(months, tok);
-	int monthnum = 0;
-	if (ptr != NULL) {
-		monthnum = (((ptr - months) / 3) + 1);
-	}
-
-	tok = strtok(NULL, " ");
-	int daynum = 0;
-	if (tok != NULL) {
-		daynum = atoi(tok);
-	}
-
-	/*
-	**	Fetch the time components from the current build time.
-	*/
-	static char * time = __TIME__;		// format: hh:mm:ss
-	tok = strtok(time, ": ");
-	int hournum = 0;
-	if (tok != NULL) {
-		hournum = atoi(tok);
-	}
-
-	tok = strtok(NULL, ": ");
-	int minnum = 0;
-	if (tok != NULL) {
-		minnum = atoi(tok);
-	}
-
-	sprintf(buffer, "%02d%02d%02d", monthnum, daynum, (hournum*4) + (minnum / 15));
-	return(buffer);
+	static char tmp[512];
+#ifdef _DEBUG
+	sprintf(tmp, "RA_DEBUG.AF%d.EA%d.%s.%s", AF_BUILDNUMBER, EA_REMASTER_PATCH, __DATE__, __TIME__);
 #else
-
-	static char buffer[128];
-
-	memset(buffer, '\0', sizeof(buffer));
-
-#ifdef FIXIT_VERSION_3
-	strcpy( buffer, "3.03" );
-
-	#ifdef ENGLISH
-	strcat(buffer, "E");
-	#else
-		#ifdef GERMAN
-		strcat(buffer, "G");
-		#else
-			#ifdef FRENCH
-			strcat(buffer, "F");
-			#endif
-		#endif
-	#endif
-
-#else	//	FIXIT_VERSION_3
-
-#ifdef FIXIT_PATCH_108
-	//strcpy(buffer, "1.08PE");
-    strcpy(buffer, "1.08P");
-
-#ifdef FIXIT_CSII
-	strcpy(buffer,"2.00");
-#ifdef DEV_VERSION
-	strcpy(buffer,VerNum.Version_Name());
+	sprintf(tmp, "RA_RELEASE.AF%d.EA%d.%s.%s", AF_BUILDNUMBER, EA_REMASTER_PATCH, __DATE__, __TIME__);
 #endif
-#ifdef DEV_VER_NAME
-	strcpy(buffer,__DATE__);		// format: Mmm dd yyyy
-#endif
-#endif
-
-	#ifdef ENGLISH
-	strcat(buffer, "E");
-	#else
-		#ifdef GERMAN
-		strcat(buffer, "G");
-		#else
-			#ifdef FRENCH
-			strcat(buffer, "F");
-			#endif
-		#endif
-	#endif
-
-#else
-	strcpy(buffer, "1.07E");
-#endif
-
-#endif //	FIXIT_VERSION_3
-
-	if (Is_Counterstrike_Installed ()){
-		strcat (buffer, "CS");
-	}
-	if (Is_Aftermath_Installed()) {
-		strcat (buffer, "AM");
-	}
-
-#if(TEN)
-	strcat(buffer, "Ten");		// Ten version
-#endif
-
-#if(MPATH)
-	strcat(buffer, "MPath");	// MPath version
-#endif
-
-	RawFileClass file("VERSION.TXT");
-	if (file.Is_Available()) {
-		strcat(buffer, "\r");
-		file.Read(&buffer[strlen(buffer)], 25);
-	}
-	return(buffer);
-#endif
+	return tmp;
+// jmarshall end
 }
