@@ -469,6 +469,7 @@ extern "C" {
 
 void GScreenClass::Blit_Display(void)
 {	
+#if 0
 		BEnd(BENCH_BLIT_DISPLAY);
 #ifdef WIN32
 		if (SeenBuff.Get_Width()!=320) {
@@ -482,6 +483,7 @@ void GScreenClass::Blit_Display(void)
 	#else
 		Shadow_Blit(0, 0, 320, 200, HidPage, SeenPage, ShadowPage->Get_Buffer());
 	#endif
+#endif
 }
 
 

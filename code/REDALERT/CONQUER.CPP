@@ -3659,7 +3659,6 @@ void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNum
 	INT_PTR	shape_pointer;
 #endif	//WIN32
 
-
 	/*
 	** Special kludge for E3 to prevent crashes
 	*/

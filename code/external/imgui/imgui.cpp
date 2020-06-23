@@ -3786,7 +3786,6 @@ void ImGui::NewFrame(bool clearCmdList)
 
         g.ForegroundDrawList.ResetForNewFrame();        
         g.ForegroundDrawList.PushClipRectFullScreen();
-
         g.DrawData.Clear();
     }
 

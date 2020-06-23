@@ -554,6 +554,8 @@ set(src_redalert
 	./RedAlert/TEXTBTN.H
 	./RedAlert/THEME.CPP
 	./RedAlert/THEME.H
+	./RedAlert/TEXCACHE.CPP
+	./RedAlert/TEXCACHE.H
 	./RedAlert/TILESET.CPP
 	./RedAlert/TOGGLE.CPP
 	./RedAlert/TOGGLE.H

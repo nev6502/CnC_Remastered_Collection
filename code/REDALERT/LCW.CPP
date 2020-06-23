@@ -32,6 +32,9 @@
  * Functions:                                                              *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+// jmarshall - force enabling optimizations, disable this if you need to debug it.
+#pragma optimize("", on)
+// jmarshall end
 
 /***************************************************************************
  * LCW_Uncomp -- Decompress an LCW encoded data block.                     *

@@ -95,7 +95,7 @@
  *=============================================================================================*/
 inline int Lepton_To_Pixel(LEPTON lepton)
 {
-	return (((int)(signed short)lepton * ICON_PIXEL_W) + (ICON_LEPTON_W / 2) - ((lepton < 0) ? (ICON_LEPTON_W - 1) : 0)) / ICON_LEPTON_W;
+	return (((int)(int)lepton * ICON_PIXEL_W) + (ICON_LEPTON_W / 2) - ((lepton < 0) ? (ICON_LEPTON_W - 1) : 0)) / ICON_LEPTON_W;
 }
 
 
