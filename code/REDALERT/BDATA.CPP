@@ -2759,6 +2759,7 @@ static BuildingTypeClass const ClassLarva2(
 );
 #endif
 void const * BuildingTypeClass::WarFactoryOverlay;
+Image_t* BuildingTypeClass::WarFactoryHDOverlay;
 void const * LightningShapes;
 
 
@@ -3034,6 +3035,47 @@ void BuildingTypeClass::Init_Heap(void)
 #endif
 }
 
+Image_t* BuildingTypeClass::LoadHDImage(const char* fullname, int& numHDShapes) {
+	const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
+	Image_t* image = NULL;
+	
+	numHDShapes = -1;
+
+	if (imageFileName) {
+		image = Image_LoadImage(imageFileName, true, true);
+		int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
+		int shapeId = 1;
+
+		// Load the old school animation pipeline.
+		{
+			while (true) {
+				imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
+				if (imageFileName == NULL)
+					break;
+
+				for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+					Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
+				}
+				shapeId++;
+			}
+		}
+
+		if (numBuildingAnims > 0)
+		{
+			for (int i = 1; i < numBuildingAnims; i++) {
+				imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+				for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+					Image_Add32BitImage(imageFileName, image, d, 0, i);
+				}
+			}
+		}
+		image->numFrames = numBuildingAnims;		
+		numHDShapes = shapeId;
+	}
+
+	
+	return image;
+}
 
 /***********************************************************************************************
  * BuildingTypeClass::One_Time -- Performs special one time action for buildings.              *
@@ -3135,63 +3177,45 @@ void BuildingTypeClass::One_Time(void)
 			building.Init_Anim(BSTATE_CONSTRUCTION, 0, count, timedelay);
 		}
 
+		int numhdimages = 0;
+
 		/*
 		**	Fetch the normal game shape for this building.
 		*/
 		_makepath(fullname, NULL, NULL, building.Graphic_Name(), ".SHP");
 		((void const *&)building.ImageData) = MFCD::Retrieve(fullname);
-		{
-			const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
+		((void const*&)building.HDImageData) = LoadHDImage(fullname, numhdimages);
 
-			if (imageFileName) {
-				Image_t *image = Image_LoadImage(imageFileName, true, true);
-				int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
-				int shapeId = 1;
+		if (building.ImageData != NULL && building.HDImageData != NULL) {
+			int width = Get_Build_Frame_Width(building.ImageData);
+			int height = Get_Build_Frame_Height(building.ImageData);
 
-				// Load the old school animation pipeline.
-				{
-					while (true) {
-						imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
-						if (imageFileName == NULL)
-							break;
-
-						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
-							Image_Add32BitImage(imageFileName, image, d, shapeId, 0);
-						}
-						shapeId++;
-					}
-				}
-
-				if (numBuildingAnims > 0)
-				{
-					for (int i = 1; i < numBuildingAnims; i++) {
-						imageFileName = Buildings_FindHDTexture(fullname, 0, i);
-						for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
-							Image_Add32BitImage(imageFileName, image, d, 0, i);
-						}
-					}
-				}
-				image->numFrames = numBuildingAnims;
-				((void const*&)building.HDImageData) = image;
-
-				if (building.ImageData != NULL && building.HDImageData != NULL) {
-					int width = Get_Build_Frame_Width(building.ImageData);
-					int height = Get_Build_Frame_Height(building.ImageData);
-
-					for (int d = 0; d < shapeId; d++)
-					{
-						building.HDImageData->renderwidth[d] = width;
-						building.HDImageData->renderheight[d] = height;
-					}
-				}
-			}			
+			for (int d = 0; d < numhdimages; d++)
+			{
+				building.HDImageData->renderwidth[d] = width;
+				building.HDImageData->renderheight[d] = height;
+			}
 		}
 	}
+
+	int specialNumHDImages = 0;
 
 	// Try to load weap2.shp and tesla coil's lightning shapes
 	char fullname[_MAX_FNAME+_MAX_EXT];
 	_makepath(fullname, NULL, NULL, (char const *)"WEAP2",".SHP");
 	WarFactoryOverlay = MFCD::Retrieve(fullname);
+	WarFactoryHDOverlay = LoadHDImage(fullname, specialNumHDImages);
+	if (WarFactoryOverlay != NULL && WarFactoryHDOverlay != NULL) {
+		int width = Get_Build_Frame_Width(WarFactoryOverlay);
+		int height = Get_Build_Frame_Height(WarFactoryOverlay);
+
+		for (int d = 0; d < specialNumHDImages; d++)
+		{
+			WarFactoryHDOverlay->renderwidth[d] = width;
+			WarFactoryHDOverlay->renderheight[d] = height;
+		}
+	}
+
 	_makepath(fullname, NULL, NULL, (char const *)"LITNING",".SHP");
 	LightningShapes = MFCD::Retrieve(fullname);
 

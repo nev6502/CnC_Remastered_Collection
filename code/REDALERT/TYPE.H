@@ -41,6 +41,7 @@
 class MapEditClass;
 class HouseClass;
 class WeaponTypeClass;
+struct Image_t;
 
 /***************************************************************************
 **	This is the abstract type class. It holds information common to all
@@ -815,6 +816,7 @@ class BuildingTypeClass : public TechnoTypeClass {
 		**	Special overlay for the weapons factory.
 		*/
 		static void const * WarFactoryOverlay;
+		static Image_t* WarFactoryHDOverlay;
 
 	private:
 
@@ -839,6 +841,7 @@ class BuildingTypeClass : public TechnoTypeClass {
 		void const * BuildupData;
 
 		void Init_Anim(BStateType state, int start, int count, int rate) const;
+		static Image_t* LoadHDImage(const char* fullname, int &numHDShapes);
 };
 
 
