@@ -586,8 +586,9 @@ void Device_Present(void) {
 	//ImGui::End();
 // jmarshall end
 
-	if (Imgui_Dialog_Function) {
-		Imgui_Dialog_Function();		
+	if (Imgui_Dialog_Function) {	
+		Map.Render();
+		Imgui_Dialog_Function();			
 	}
 
 	if (renderConsole) {
