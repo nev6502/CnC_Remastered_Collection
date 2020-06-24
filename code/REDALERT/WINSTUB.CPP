@@ -158,7 +158,19 @@ static bool Image_LoadFromCache(Image_t* image, const char* name, int houseid, i
 	return true;
 }
 
-static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int frameId, int64_t hash) {		
+static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int animid, int frameId, int64_t hash) {	
+	// Don't load the image if its already loaded.
+	if (houseid == -1) {
+		if (image->HouseImages[0].image[animid][frameId] != 0) {
+			return true;
+		}
+	}
+	else {
+		if (image->HouseImages[houseid].image[animid][frameId] != 0) {
+			return true;
+		}
+	}
+
 	const char* generatedName = Image_GetGeneratedName(image, name, houseid, animid, frameId, hash);
 	hash = generateHashValue(generatedName, strlen(generatedName));
 

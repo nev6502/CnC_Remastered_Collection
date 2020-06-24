@@ -194,7 +194,7 @@ Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
     char filename[2048];
     Image_t* image = NULL;
 
-	IconControlType* tileset = (IconControlType*)icondata;
+	IconControlType* tileset = (IconControlType*)icondata;    
 
 	if (!tileset) {
 		return NULL;
@@ -222,6 +222,13 @@ Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
             COM_SetExtension(filename, sizeof(filename), ".dds");
 
             if (image == NULL) {
+                // If the image is already loaded, then we are done.
+                image = Find_Image(filename);
+                if (image) {
+                    return image;
+                }
+
+                // Load the initial terrain image.
                 image = Image_LoadImage(filename);
 
                 if (image != NULL && i != 0) {
