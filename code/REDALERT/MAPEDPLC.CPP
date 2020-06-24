@@ -454,8 +454,19 @@ int MapEditClass::Placement_Dialog(void)
 			WindowList[WINDOW_EDITOR][WINDOWHEIGHT] = D_PICTURE_H;
 			Change_Window((int)WINDOW_EDITOR);
 		//	Draw_Box(D_PICTURE_X, D_PICTURE_Y, D_PICTURE_W, D_PICTURE_H, BOXSTYLE_DOWN, false);
-			curobj->Display(WinW/2, WinH>>1, WINDOW_EDITOR, LastHouse);
+			//curobj->Display(WinW/2, WinH>>1, WINDOW_EDITOR, LastHouse);
 //			curobj->Display(WinW<<2, WinH>>1, WINDOW_EDITOR, LastHouse);
+
+			Image_t* image = NULL;
+			if (curobj->Get_HDImage_Data()) {
+				image = curobj->Get_HDImage_Data();
+				GL_RenderForeGroundImage(image, 30, 100, 75, 75);
+			}
+			//else {
+			//	image = (Image_t *)curobj->Get_Image_Data();
+			//}
+
+			
 
 			/*
 			**	Erase the grid

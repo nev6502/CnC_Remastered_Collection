@@ -1594,7 +1594,7 @@ void MapEditClass::Main_Menu(void)
 		Show_Mouse();
 
 		if (UnknownKey==KN_ESC || g_globalKeyNumType == KN_RMOUSE) {
-// jmarshall - consume the RMOUSE DOWN
+// jmarshall - consume the RMOUSE DOWN so it doesn't bring up the context menu again.
 			Buttons->Input();
 // jmarshall end
 			break;
