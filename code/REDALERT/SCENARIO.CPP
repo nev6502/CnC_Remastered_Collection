@@ -63,6 +63,7 @@
 #ifdef WIN32
 #include "tcpip.h"
 #include "ccdde.h"
+#include "audiomix.h"
 
 extern bool SpawnedFromWChat;
 #endif
@@ -421,12 +422,19 @@ bool Start_Scenario(char * name, bool briefing)
 			Show_Mouse();
 			Play_Movie(Scen.ActionMovie, Scen.TransitTheme);
 		}
-	}
-	Debug_SkipBriefing = false;
+	}	
 
 	if (Scen.TransitTheme == THEME_NONE) {
 		Theme.Queue_Song(THEME_FIRST);
 	}
+// jmarshall
+	// If we are skipping the briefing, pausing the music(assuming in editor mode).
+	if (Debug_SkipBriefing) {
+		AudMix_SetMusicState(false);
+	}
+// jmarshall end
+
+	Debug_SkipBriefing = false;
 
 	/*
 	** Set the options values, since the palette has been initialized by Read_Scenario
