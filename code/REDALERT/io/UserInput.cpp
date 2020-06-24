@@ -11,6 +11,8 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 	Keyboard->MouseQX = Mouse.X;
 	Keyboard->MouseQY = Mouse.Y;
 
+	flags = 0;
+
 	static SDL_Event event;
 	memset(&event, 0, sizeof(SDL_Event));
 
@@ -51,7 +53,7 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 					Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_DOWN;
 
 					key = KN_LMOUSE;
-					flags = GadgetClass::LEFTPRESS;
+					flags |= GadgetClass::LEFTPRESS;
 
 					Keyboard->Put_Element(KN_LMOUSE);
 
@@ -64,7 +66,7 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 					Keyboard->Put_Element(KN_RMOUSE);
 
 					key = KN_RMOUSE;
-					flags = GadgetClass::RIGHTPRESS;
+					flags |= GadgetClass::RIGHTPRESS;
 
 					numFramesLMouse = 0;
 				}
@@ -74,13 +76,13 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_RELEASE;
 
-					flags = GadgetClass::LEFTRELEASE;
+					flags |= GadgetClass::LEFTRELEASE;
 					numFramesLMouse = 0;
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					Mouse.Button_Right == MouseButtonState::MOUSE_BUTTON_RELEASE;
 
-					flags = GadgetClass::RIGHTRELEASE;
+					flags |= GadgetClass::RIGHTRELEASE;
 					numFramesLMouse = 0;
 				}
 				break;
