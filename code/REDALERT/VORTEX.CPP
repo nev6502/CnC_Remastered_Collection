@@ -764,6 +764,9 @@ void ChronalVortexClass::Zap_Target (void)
 void ChronalVortexClass::Coordinate_Remap ( GraphicViewPortClass *inbuffer, int x, int y, int width, int height, unsigned char *remap_table)
 {
 	unsigned char	getx,gety, remap_color, pixel_color;
+// jmarshall - todo fix ChronalVortexClass
+	return;
+// jmarshall end
 
 
 	BufferClass destbuf (width * height);

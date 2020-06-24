@@ -399,26 +399,30 @@ bool Start_Scenario(char * name, bool briefing)
 	/*
 	** If there's no briefing movie, restate the mission at the beginning.
 	*/
-	char buffer[25];
-	if (Scen.BriefMovie != VQ_NONE) {
-		sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
-	}
-	if (Session.Type == GAME_NORMAL && ( Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available() ) ) {
-		/*
-		** Make sure the mouse is visible before showing the restatement.
-		*/
-		while(Get_Mouse_State()) {
-			Show_Mouse();
+	if (!Debug_SkipBriefing)
+	{
+		char buffer[25];
+		if (Scen.BriefMovie != VQ_NONE) {
+			sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
 		}
-		Restate_Mission(Scen.ScenarioName, TXT_OK, TXT_NONE);
-	}
+		if (Session.Type == GAME_NORMAL && (Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available())) {
+			/*
+			** Make sure the mouse is visible before showing the restatement.
+			*/
+			while (Get_Mouse_State()) {
+				Show_Mouse();
+			}
+			Restate_Mission(Scen.ScenarioName, TXT_OK, TXT_NONE);
+		}
 
-	if (briefing) {
-		Hide_Mouse();
-		VisiblePage.Clear();
-		Show_Mouse();
-		Play_Movie(Scen.ActionMovie, Scen.TransitTheme);
+		if (briefing) {
+			Hide_Mouse();
+			VisiblePage.Clear();
+			Show_Mouse();
+			Play_Movie(Scen.ActionMovie, Scen.TransitTheme);
+		}
 	}
+	Debug_SkipBriefing = false;
 
 	if (Scen.TransitTheme == THEME_NONE) {
 		Theme.Queue_Song(THEME_FIRST);

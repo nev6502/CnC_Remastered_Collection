@@ -549,8 +549,13 @@ int Main_Menu(unsigned long )
 
 	TextButtonClass multibtn(BUTTON_MULTI, TXT_MULTIPLAYER_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
 	d_button_y += d_button_dy;
-
+// jmarshall - Intro button is going to be the scenario editor button.
+#ifdef SCENARIO_EDITOR
+	TextButtonClass introbtn(BUTTON_INTRO, "Scenario Editor", TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+#else
 	TextButtonClass introbtn(BUTTON_INTRO, TXT_INTRO, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);
+#endif
+// jmarshall end
 	d_button_y += d_button_dy;
 
 	TextButtonClass exitbtn(BUTTON_EXIT, TXT_EXIT_GAME, TPF_BUTTON, d_button_x, d_button_y, d_button_w, d_button_h);

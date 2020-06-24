@@ -43,6 +43,7 @@ bool Debug_Remap = false;
 bool Debug_Icon = false;
 bool Debug_Flag = true;
 bool Debug_Lose = false;
+bool Debug_SkipBriefing = false;
 bool Debug_Win = false;
 bool Debug_Map = false;					// true = map editor mode
 bool Debug_Passable = false;			// true = show passable/impassable terrain
