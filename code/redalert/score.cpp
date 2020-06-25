@@ -1747,7 +1747,7 @@ void Animate_Score_Objs()
 		*/
 		if (AllSurfaces.SurfacesRestored) {
 			AllSurfaces.SurfacesRestored=FALSE;
-			PseudoSeenBuff->Blit(SeenPage);
+			//PseudoSeenBuff->Blit(SeenPage);
 		}
 #endif
 	for (int i = 0; i < MAXSCOREOBJS; i++) {

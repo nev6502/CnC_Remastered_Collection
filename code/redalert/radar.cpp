@@ -576,7 +576,7 @@ void RadarClass::Draw_It(bool forced)
 
 				if (oldpage == &SeenBuff) {
 					Hide_Mouse();
-					LogicPage->Blit(SeenBuff, RadX, RadY, RadX, RadY, RadWidth, RadHeight);
+//					LogicPage->Blit(SeenBuff, RadX, RadY, RadX, RadY, RadWidth, RadHeight); // jmarshall - removed
 					Show_Mouse();
 				}
 
@@ -2010,13 +2010,15 @@ void RadarClass::Set_Radar_Position(CELL cell)
 					** Overlapped blits are OK or we dont have a video memory hid page so blits are
 					** always done in software by the library anyway.
 					*/
-					HidPage.Blit(HidPage,
-									(((radx < 0) ? -radx : 0) * ZoomFactor) + RadX + RadOffX + BaseX,
-									(((rady < 0) ? -rady : 0) * ZoomFactor) + RadY + RadOffY + BaseY,
-									(((radx < 0) ? 0 : radx) * ZoomFactor) + RadX+ RadOffX + BaseX,
-									(((rady < 0) ? 0 : rady) * ZoomFactor) + RadY + RadOffY + BaseY,
-									radw * ZoomFactor,
-									radh * ZoomFactor);
+// jmarshall - removed
+//					HidPage.Blit(HidPage,
+//									(((radx < 0) ? -radx : 0) * ZoomFactor) + RadX + RadOffX + BaseX,
+//									(((rady < 0) ? -rady : 0) * ZoomFactor) + RadY + RadOffY + BaseY,
+//									(((radx < 0) ? 0 : radx) * ZoomFactor) + RadX+ RadOffX + BaseX,
+//									(((rady < 0) ? 0 : rady) * ZoomFactor) + RadY + RadOffY + BaseY,
+//									radw * ZoomFactor,
+//									radh * ZoomFactor);
+// jmarshall - removed
 
 				} else {
 					/*
@@ -2030,21 +2032,23 @@ void RadarClass::Set_Radar_Position(CELL cell)
 					/*
 					** Do the blit in 2 stages.
 					*/
-					HidPage.Blit(temp_surface,
-									(((radx < 0) ? -radx : 0) * ZoomFactor) + RadX + RadOffX + BaseX,
-									(((rady < 0) ? -rady : 0) * ZoomFactor) + RadY + RadOffY + BaseY,
-									0,
-									0,
-									RadarWidth,
-									RadarHeight);
-
-					temp_surface.Blit(HidPage,
-									0,
-									0,
-									(((radx < 0) ? 0 : radx) * ZoomFactor) + RadX+ RadOffX + BaseX,
-									(((rady < 0) ? 0 : rady) * ZoomFactor) + RadY + RadOffY + BaseY,
-									radw * ZoomFactor,
-									radh * ZoomFactor);
+// jmarshall - removed
+					//HidPage.Blit(temp_surface,
+					//				(((radx < 0) ? -radx : 0) * ZoomFactor) + RadX + RadOffX + BaseX,
+					//				(((rady < 0) ? -rady : 0) * ZoomFactor) + RadY + RadOffY + BaseY,
+					//				0,
+					//				0,
+					//				RadarWidth,
+					//				RadarHeight);
+					//
+					//temp_surface.Blit(HidPage,
+					//				0,
+					//				0,
+					//				(((radx < 0) ? 0 : radx) * ZoomFactor) + RadX+ RadOffX + BaseX,
+					//				(((rady < 0) ? 0 : rady) * ZoomFactor) + RadY + RadOffY + BaseY,
+					//				radw * ZoomFactor,
+					//				radh * ZoomFactor);
+ // jmarshall - removed
 				}
 
 				/*

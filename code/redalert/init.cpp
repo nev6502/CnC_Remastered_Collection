@@ -164,13 +164,10 @@ extern bool Is_Mission_Counterstrike (char *file_name);
 static void Load_Prolog_Page(void)
 {
 	Hide_Mouse();
-#ifdef WIN32
 	Load_Title_Screen("PROLOG.PCX", &HidPage, (unsigned char*)CCPalette.Get_Data());
-	HidPage.Blit(SeenPage);
-#else
-	Load_Picture("PROLOG.CPS", HidPage, HidPage, CCPalette, BM_DEFAULT);
-	HidPage.Blit(SeenPage);
-#endif
+// jmarshall - removed
+//	HidPage.Blit(SeenPage);
+// jmarshall - removed
 	CCPalette.Set();
 	Show_Mouse();
 }
@@ -669,8 +666,10 @@ bool Select_Game(bool fade)
 				*/
 				Load_Title_Page();
 				GamePalette = CCPalette;
+// jmarshall - removed
+//				HidPage.Blit(SeenPage);
+// jmarshall - removed
 
-				HidPage.Blit(SeenPage);
 //				if (fade) {
 //					WhitePalette.Set();
 //					CCPalette.Set(FADE_PALETTE_SLOW, Call_Back);
@@ -2516,17 +2515,12 @@ void Init_Random(void)
  *=============================================================================================*/
 void Load_Title_Page(bool visible)
 {
-#ifdef WIN32
 	Load_Title_Screen("TITLE.PCX", &HidPage, (unsigned char*)CCPalette.Get_Data());
-	if (visible) {
-		HidPage.Blit(SeenPage);
-	}
-#else
-	Load_Picture("TITLE.CPS", HidPage, HidPage, CCPalette, BM_DEFAULT);
-	if (visible) {
-		HidPage.Blit(SeenPage);
-	}
-#endif
+// jmarshall - removed
+	//if (visible) {
+	//	HidPage.Blit(SeenPage);
+	//}
+// jmarshall - removed
 }
 
 

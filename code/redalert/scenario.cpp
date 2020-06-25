@@ -1643,7 +1643,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 	}
 	Load_Uncompress(CCFileClass(filename), HidPage, HidPage, temp);
 #endif
-	HidPage.Blit(SeenPage);
+//	HidPage.Blit(SeenPage);
 
 	#ifdef WIN32
 	//VisiblePage.Blit(seen_buff_save);
@@ -1673,7 +1673,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 		if (AllSurfaces.SurfacesRestored) {
 			AllSurfaces.SurfacesRestored = false;
 			Hide_Mouse();
-			seen_buff_save.Blit(VisiblePage);
+//			seen_buff_save.Blit(VisiblePage);
 			display = true;
 			Show_Mouse();
 		}
@@ -1723,7 +1723,7 @@ int BGMessageBox(char const * msg, int btn1, int btn2)
 			if (AllSurfaces.SurfacesRestored) {
 				AllSurfaces.SurfacesRestored = false;
 				Hide_Mouse();
-				seen_buff_save.Blit(VisiblePage);
+//				seen_buff_save.Blit(VisiblePage);
 				display = true;
 				Show_Mouse();
 			}

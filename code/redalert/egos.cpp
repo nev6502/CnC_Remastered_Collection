@@ -343,9 +343,11 @@ void Slide_Show(int slide, int frame)
 		/*
 		** Blit in a quarter of the new frame to the background page.
 		*/
-		SlideBuffers[slide]->Blit (*BackgroundPage, 	0, (frame-1) * CHUNK_HEIGHT,
-																	0, (frame-1) * CHUNK_HEIGHT,
-																	SeenBuff.Get_Width(), CHUNK_HEIGHT, false);
+// jmarshall - removed
+//		SlideBuffers[slide]->Blit (*BackgroundPage, 	0, (frame-1) * CHUNK_HEIGHT,
+//																	0, (frame-1) * CHUNK_HEIGHT,
+//																	SeenBuff.Get_Width(), CHUNK_HEIGHT, false);
+// jmarshall - removed
 		return;
 	}
 
@@ -353,9 +355,11 @@ void Slide_Show(int slide, int frame)
 		/*
 		** Blit in a quarter of the new frame to the hid page.
 		*/
-		BackgroundPage->Blit (HidPage,	0, (frame-5) * CHUNK_HEIGHT,
-												0, (frame-5) * CHUNK_HEIGHT,
-												SeenBuff.Get_Width(), CHUNK_HEIGHT, false);
+// jmarshall - removed
+		//BackgroundPage->Blit (HidPage,	0, (frame-5) * CHUNK_HEIGHT,
+		//										0, (frame-5) * CHUNK_HEIGHT,
+		//										SeenBuff.Get_Width(), CHUNK_HEIGHT, false);
+// jmarshall - removed
 		return;
 	}
 
@@ -734,7 +738,7 @@ void Show_Who_Was_Responsible (void)
 	BackgroundPage = new GraphicBufferClass;
 	BackgroundPage->Init (SeenBuff.Get_Width(), SeenBuff.Get_Height(), NULL , 0 , (GBC_Enum)0);
 
-	SeenBuff.Blit(*BackgroundPage);
+	//SeenBuff.Blit(*BackgroundPage);
 
 	/*
 	** Go away nasty keyboard.
@@ -831,8 +835,9 @@ void Show_Who_Was_Responsible (void)
 		** Blit all but the top and bottom of the hid page. This is beacuse the text print doesn't
 		** clip vertically and looks ugly when it suddenly appears and disappears.
 		*/
-		HidPage.Blit(SeenBuff, 0, 8 * RESFACTOR, 0, 8*RESFACTOR, SeenBuff.Get_Width(), SeenBuff.Get_Height() - 16* RESFACTOR, false);
-
+// jmarshall - removed
+		//HidPage.Blit(SeenBuff, 0, 8 * RESFACTOR, 0, 8*RESFACTOR, SeenBuff.Get_Width(), SeenBuff.Get_Height() - 16* RESFACTOR, false);
+// jmarshall - removed
 
 		/*
 		** If user hits escape then break.

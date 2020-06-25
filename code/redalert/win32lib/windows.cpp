@@ -702,31 +702,31 @@ void Window_Print(char const string[], ...)
  *=========================================================================*/
 PRIVATE void Scroll_Window(void)
 {
-	int	y;		// Top pixel row of bottom line of window.
-
-	/*
-	**	Possibly prompt for more text.
-	*/
-	if (ScrollCounter >= WindowLines-1 && MoreOn) {
-		ScrollCounter = 0;
-
-		if (Window_More_Ptr) {
-//BG			if (LogicPage == SEENPAGE) Window_Show_Mouse();
-			Window_More_Ptr(TXT_MoreText, MoreSpace, MoreFColor, MoreBColor);
-//BG			if (LogicPage == SEENPAGE) Window_Hide_Mouse(Window);
-		}
-	}
-
-	/*
-	**	Scroll the window up one line.
-	*/
-	y = ((WinH / (FontHeight+FontYSpacing)) - 1) * (FontHeight+FontYSpacing);
-	LogicPage->Blit(*LogicPage,WinX<<3, WinY + (FontHeight+FontYSpacing), WinX<<3, WinY, WinW<<3, WinH - (FontHeight+FontYSpacing) );
-	LogicPage->Fill_Rect(WinX<<3,
-				WinY + y,
-				((WinX+WinW)<<3) - 1,
-				WinY + WinH - 1,
-				(unsigned char)WinB);
+//	int	y;		// Top pixel row of bottom line of window.
+//
+//	/*
+//	**	Possibly prompt for more text.
+//	*/
+//	if (ScrollCounter >= WindowLines-1 && MoreOn) {
+//		ScrollCounter = 0;
+//
+//		if (Window_More_Ptr) {
+////BG			if (LogicPage == SEENPAGE) Window_Show_Mouse();
+//			Window_More_Ptr(TXT_MoreText, MoreSpace, MoreFColor, MoreBColor);
+////BG			if (LogicPage == SEENPAGE) Window_Hide_Mouse(Window);
+//		}
+//	}
+//
+//	/*
+//	**	Scroll the window up one line.
+//	*/
+//	y = ((WinH / (FontHeight+FontYSpacing)) - 1) * (FontHeight+FontYSpacing);
+//	LogicPage->Blit(*LogicPage,WinX<<3, WinY + (FontHeight+FontYSpacing), WinX<<3, WinY, WinW<<3, WinH - (FontHeight+FontYSpacing) );
+//	LogicPage->Fill_Rect(WinX<<3,
+//				WinY + y,
+//				((WinX+WinW)<<3) - 1,
+//				WinY + WinH - 1,
+//				(unsigned char)WinB);
 }
 
 

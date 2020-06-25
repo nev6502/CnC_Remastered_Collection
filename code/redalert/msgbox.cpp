@@ -274,7 +274,7 @@ int WWMessageBox::Process(const char * msg, const char * b1txt, const char * b2t
 			*/
 			if (AllSurfaces.SurfacesRestored) {
 				AllSurfaces.SurfacesRestored = false;
-				seen_buff_save.Blit(VisiblePage);
+//				seen_buff_save.Blit(VisiblePage);
 				display = true;
 			}
 			#endif

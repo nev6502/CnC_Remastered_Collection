@@ -197,7 +197,7 @@ GameType Select_MPlayer_Game (void)
 			*/
 			if (AllSurfaces.SurfacesRestored) {
 				AllSurfaces.SurfacesRestored=FALSE;
-				seen_buff_save.Blit(VisiblePage);
+//				seen_buff_save.Blit(VisiblePage);
 				display = REDRAW_ALL;
 			}
 			#endif

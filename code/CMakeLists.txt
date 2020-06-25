@@ -720,11 +720,24 @@ set(src_external
 )
  
 
+if (MSVC)
 add_definitions(-D RA_AF -DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DWINDOWS_IGNORE_PACKING_MISMATCH -DTRUE_FALSE_DEFINED -DWIN32 -DWINDOWS -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 add_compile_options(/permissive+  /Zc:forScope- /Zp1)
+endif(MSVC)
+
+if (UNIX)
+add_definitions(-D RA_AF -DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DTRUE_FALSE_DEFINED -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
+endif(UNIX)
+
 add_executable(RedAlert ${src_io} ${src_win32lib} ${src_redalert} ${src_external})
 
+if (MSVC)
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../" )
-target_include_directories(RedAlert PRIVATE ./external/xml/;./external/devil/;./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
 target_link_libraries(RedAlert "opengl32.lib" "winmm.lib" "Ws2_32.lib" "${CMAKE_SOURCE_DIR}/external/devil/ilu.lib" "${CMAKE_SOURCE_DIR}/external/devil/DevIL.lib" "${CMAKE_SOURCE_DIR}/external/sdl2/lib/x64/SDL2.lib" "${CMAKE_SOURCE_DIR}/external/openal/out/build/x64-Release/OpenAL32.lib")
- 
+endif(MSVC)
+
+if (UNIX)
+set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert"  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.." )
+endif(UNIX)
+
+target_include_directories(RedAlert PRIVATE ./external/xml/;./external/devil/;./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)

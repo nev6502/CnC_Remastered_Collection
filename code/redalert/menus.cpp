@@ -457,7 +457,7 @@ int Do_Menu(char const ** strings, bool )
 	Keyboard->Clear();
 	Hide_Mouse();
 
-	HidPage.Blit(SeenPage);
+//	HidPage.Blit(SeenPage);
 //WindowList[WINDOW_MAIN][2] = SeenBuff.Get_Width();//BG
 	Change_Window((int)WINDOW_MAIN);
 	Map.Flag_To_Redraw(true);
@@ -658,7 +658,7 @@ int Main_Menu(unsigned long )
 		**	Copy the menu to the visible page.
 		*/
 		Hide_Mouse();
-		HidPage.Blit(SeenPage);
+//		HidPage.Blit(SeenPage);
 		Show_Mouse();
 
 		Set_Logic_Page(SeenBuff);

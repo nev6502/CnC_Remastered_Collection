@@ -1968,26 +1968,27 @@ ObjectClass * DisplayClass::Cell_Object(CELL cell, int x, int y) const
 				** If hid page is in video memory then blit from the seen page to avoid blitting
 				**  an overlapped region.
 				*/
-				if (HidPage.Get_IsDirectDraw()) {
-					Hide_Mouse();
-							SeenBuff.Blit(HidPage,
-									((oldx < 0) ? -oldx : 0) +TacPixelX,
-									((oldy < 0) ? -oldy : 0) +TacPixelY,
-									((oldx < 0) ? 0 : oldx) +TacPixelX,
-									((oldy < 0) ? 0 : oldy) +TacPixelY,
-									oldw,
-									oldh);
-					Show_Mouse();
-				} else {
-					HidPage.Blit(HidPage,
-									((oldx < 0) ? -oldx : 0) +TacPixelX,
-									((oldy < 0) ? -oldy : 0) +TacPixelY,
-									((oldx < 0) ? 0 : oldx) +TacPixelX,
-									((oldy < 0) ? 0 : oldy) +TacPixelY,
-									oldw,
-									oldh);
-				}
-
+// jmarshall - removed
+//				if (HidPage.Get_IsDirectDraw()) {
+//					Hide_Mouse();
+//							SeenBuff.Blit(HidPage,
+//									((oldx < 0) ? -oldx : 0) +TacPixelX,
+//									((oldy < 0) ? -oldy : 0) +TacPixelY,
+//									((oldx < 0) ? 0 : oldx) +TacPixelX,
+//									((oldy < 0) ? 0 : oldy) +TacPixelY,
+//									oldw,
+//									oldh);
+//					Show_Mouse();
+//				} else {
+//					HidPage.Blit(HidPage,
+//									((oldx < 0) ? -oldx : 0) +TacPixelX,
+//									((oldy < 0) ? -oldy : 0) +TacPixelY,
+//									((oldx < 0) ? 0 : oldx) +TacPixelX,
+//									((oldy < 0) ? 0 : oldy) +TacPixelY,
+//									oldw,
+//									oldh);
+//				}
+// jmarshall - removed
 			} else {
 				forced = true;
 			}

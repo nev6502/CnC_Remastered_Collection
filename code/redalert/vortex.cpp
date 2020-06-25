@@ -1065,7 +1065,7 @@ void ChronalVortexClass::Render (void)
 			** Blit our freshly draw cells and vortex into their correct position on the hidpage
 			*/
 			if (dest_width > 0 && dest_height > 0) {
-				RenderBuffer->Blit (target, source_x, source_y, dest_x, dest_y, dest_width, dest_height, false);
+//				RenderBuffer->Blit (target, source_x, source_y, dest_x, dest_y, dest_width, dest_height, false);
 			}
 
 		}

@@ -288,15 +288,7 @@ class GraphicViewPortClass {
 		long	To_Buffer(int x, int y, int w, int h, void *buff, long size);
 		long	To_Buffer(int x, int y, int w, int h, BufferClass *buff);
 		long	To_Buffer(BufferClass *buff);
-		HRESULT	Blit(	GraphicViewPortClass& dest, int x_pixel, int y_pixel, int dx_pixel,
-						int dy_pixel, int pixel_width, int pixel_height, BOOL trans = FALSE);
-		HRESULT	Blit(	GraphicViewPortClass& dest, int dx, int dy, BOOL trans = FALSE);
-		HRESULT	Blit(	GraphicViewPortClass& dest, BOOL trans = FALSE);
-		HRESULT	BlitLegacy(GraphicViewPortClass& dest, BOOL trans = FALSE);
-		HRESULT	Blit(	VideoViewPortClass& dest, int x_pixel, int y_pixel, int dx_pixel,
-						int dy_pixel, int pixel_width, int pixel_height, BOOL trans = FALSE);
-		HRESULT	Blit(	VideoViewPortClass& dest, int dx, int dy, BOOL trans = FALSE);
-		HRESULT	Blit(	VideoViewPortClass& dest, BOOL trans = FALSE);
+		void	BlitLegacy(GraphicViewPortClass& dest, BOOL trans = FALSE);		
 		BOOL	Scale(	GraphicViewPortClass &dest, int src_x, int src_y, int dst_x,
 							int dst_y, int src_w, int src_h, int dst_w, int dst_h, BOOL trans = FALSE, char *remap = NULL);
 		BOOL	Scale(	GraphicViewPortClass &dest, int src_x, int src_y, int dst_x,
@@ -760,66 +752,6 @@ inline long	GraphicViewPortClass::To_Buffer(BufferClass *buff)
 	return ( return_code );
 }
 
-/***************************************************************************
- * GVPC::BLIT -- stub 1 to call curr graphic mode Blit to GVPC					*
- *                                                                         *
- * INPUT:                                                                  *
- *                                                                         *
- * OUTPUT:                                                                 *
- *                                                                         *
- * WARNINGS:                                                               *
- *                                                                         *
- * HISTORY:                                                                *
- *   01/06/1995 PWG : Created.                                             *
- *=========================================================================*/
-inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int x_pixel, int y_pixel, int dx_pixel,
-				int dy_pixel, int pixel_width, int pixel_height, BOOL trans)
-{
-	HRESULT		return_code=0;
-
-	if (Lock()) {
-		if (dest.Lock()) {
-			return_code = (Linear_Blit_To_Linear(this, &dest, x_pixel, y_pixel
-				, dx_pixel, dy_pixel
-				, pixel_width, pixel_height, trans));
-		}
-		dest.Unlock();
-	}
-	Unlock();
-
-	return ( return_code );
-}
-
-/***************************************************************************
- * GVPC::BLIT -- Stub 2 to call curr graphic mode Blit to GVPC					*
- *                                                                         *
- * INPUT:                                                                  *
- *                                                                         *
- * OUTPUT:                                                                 *
- *                                                                         *
- * WARNINGS:                                                               *
- *                                                                         *
- * HISTORY:                                                                *
- *   01/06/1995 PWG : Created.                                             *
- *=========================================================================*/
-inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int dx, int dy, BOOL trans)
-{
-	HRESULT		return_code=0;
-
-
-	if (Lock()) {
-		if (dest.Lock()) {
-			return_code = (Linear_Blit_To_Linear(this, &dest, 0, 0
-				, dx, dy
-				, Width, Height, trans));
-		}
-		dest.Unlock();
-	}
-	Unlock();
-
-	return (return_code);
-
-}
 
 /***************************************************************************
  * GVPC::BLIT -- stub 3 to call curr graphic mode Blit to GVPC					*
@@ -833,15 +765,12 @@ inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, int dx, i
  * HISTORY:                                                                *
  *   01/06/1995 PWG : Created.                                             *
  *=========================================================================*/
-inline HRESULT	GraphicViewPortClass::BlitLegacy(GraphicViewPortClass& dest, BOOL trans)
+inline void	GraphicViewPortClass::BlitLegacy(GraphicViewPortClass& dest, BOOL trans)
 {
-	HRESULT		return_code = 0;
-
-
 	if (Lock()) {
 		if (dest.Lock()) {
 
-				return_code = (Linear_Blit_To_Linear_Pal(this, &dest, 0, 0
+				(Linear_Blit_To_Linear_Pal(this, &dest, 0, 0
 					, 0, 0
 					, Width, Height, trans));
 		
@@ -849,41 +778,6 @@ inline HRESULT	GraphicViewPortClass::BlitLegacy(GraphicViewPortClass& dest, BOOL
 		dest.Unlock();
 	}
 	Unlock();
-
-	return (return_code);
-
-}
-
-
-/***************************************************************************
- * GVPC::BLIT -- stub 3 to call curr graphic mode Blit to GVPC					*
- *                                                                         *
- * INPUT:                                                                  *
- *                                                                         *
- * OUTPUT:                                                                 *
- *                                                                         *
- * WARNINGS:                                                               *
- *                                                                         *
- * HISTORY:                                                                *
- *   01/06/1995 PWG : Created.                                             *
- *=========================================================================*/
-inline HRESULT	GraphicViewPortClass::Blit(	GraphicViewPortClass& dest, BOOL trans)
-{
-	HRESULT		return_code = 0;
-
-
-	if (Lock()) {
-		if (dest.Lock()) {
-			return_code = (Linear_Blit_To_Linear(this, &dest, 0, 0
-				, 0, 0
-				, Width, Height, trans));
-		}
-		dest.Unlock();
-	}
-	Unlock();
-
-	return (return_code);
-
 }
 
 
