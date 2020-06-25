@@ -8,6 +8,12 @@
 extern byte backbuffer_palette[768];
 extern uint8_t g_ColorXlat[16];
 
+bool forceForgegroundRender = false;
+
+void GL_ForceForegroundRender(bool force) {
+	forceForgegroundRender = force;
+}
+
 void GL_SetClipRect(int x, int y, int width, int height) {
 	ImVec2 mi(x, y);
 	ImVec2 ma(x + width, y + height);
@@ -21,6 +27,11 @@ void GL_ResetClipRect(void) {
 void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int colorRemap, int shapeId) {
 	ImVec2 mi(x, y);
 	ImVec2 ma(x + width, y + height);
+
+	if (forceForgegroundRender) {
+		GL_RenderForeGroundImage(image, x, y, width, height, colorRemap, shapeId);
+		return;
+	}
 
 	if (image->numFrames > 0) {
 		if(image->HouseImages[colorRemap].image[shapeId][((int)animFrameNum) % image->numFrames] == 0)

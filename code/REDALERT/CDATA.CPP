@@ -3198,23 +3198,10 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 
 	for (index = 0; index < w*h; index++) {
 		if (map[index] != 0xFF) {
-// jmarshall - even if using legacy data, always use hdimage.
-			HidPage.Draw_Stamp(Get_HDImage_Data(), index, 0, 0, NULL, WINDOW_MAIN);
-			// Disabled legacy blit code.
-			//Buffer_Enable_HD_Texture(true); // At this point, Draw_Stamp creates a 32bit image.
-			//if (scale) {
-			//	HidPage.Scale((*LogicPage), 0, 0,
-			//		x + ((index % w)*(ICON_PIXEL_W/2)),
-			//		y + ((index / w)*(ICON_PIXEL_H/2)),
-			//		ICON_PIXEL_W, ICON_PIXEL_H,
-			//		ICON_PIXEL_W/2, ICON_PIXEL_H/2, (char *)NULL);
-			//
-			//} else {
-			//	HidPage.Blit((*LogicPage), 0, 0, x + ((index % w)*(ICON_PIXEL_W)),
-			//		y + ((index / w)*(ICON_PIXEL_H)), ICON_PIXEL_W, ICON_PIXEL_H);
-			//}
-			//Buffer_Enable_HD_Texture(false);
-// jmarshall end
+			Image_t* image = Get_HDImage_Data();
+			int stamp_index = Stamp_GetIconIndex(image, index);
+
+			GL_RenderForeGroundImage(image, x + ((index % w) * (ICON_PIXEL_W / 2)), y + ((index / w) * (ICON_PIXEL_H / 2)), ICON_PIXEL_W / 2, ICON_PIXEL_H / 2, 0, stamp_index);
 		}
 	}
 }

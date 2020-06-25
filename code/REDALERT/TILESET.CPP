@@ -319,6 +319,11 @@ Image_t * Load_Stamp(const char *name, const void* icondata)
     return image;
 }
 
+int Stamp_GetIconIndex(Image_t* iconImage, int icon) {
+    uint8_t* MapPtr = (uint8_t*)iconImage->IconMapPtr;
+    return MapPtr != nullptr ? MapPtr[icon] : icon;
+}
+
 void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void *icondata, int icon, int x, int y, const void* remapper, int left, int top, int right, int bottom)
 {
     Image_t* iconImage = (Image_t*)icondata;
