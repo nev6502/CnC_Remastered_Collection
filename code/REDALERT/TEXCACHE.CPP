@@ -4,8 +4,8 @@
 #include "FUNCTION.H"
 #include "TEXCACHE.H"
 
-#define CACHE_HEADER_FILENAME		"cache/cache_header_v1.vhdr"
-#define CACHE_DATA_FILERNAME		"cache/cache_data_v1.vdata"
+#define CACHE_HEADER_FILENAME		"cache/cache_header_v2.vhdr"
+#define CACHE_DATA_FILERNAME		"cache/cache_data_v2.vdata"
 
 TexCache texCache;
 

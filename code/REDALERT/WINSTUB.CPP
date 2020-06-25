@@ -176,7 +176,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 
 	// Check to see if we can load a generated image first.
 	// We only generate images that need a houseid
-	if (houseid >= 0) {
+	{
 		if (Image_LoadFromCache(image, generatedName, houseid, animid, frameId, hash)) {
 			return true;
 		}
@@ -191,10 +191,8 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 		return false;
 	}
 
-	bool swapBGR = false;
 	if (strstr(name, ".TGA") || strstr(name, ".tga")) {
 		iluFlipImage();
-		swapBGR = true;
 	}
 
 	ILuint Width, Height, Bpp;
@@ -213,18 +211,20 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 			RenderTeamPalette(&Data[i * 4], *houseColors[houseid]);
 		}
 	}
+	else if (Bpp == 4) {
+		for (int i = 0; i < Width * Height; i++) {
+			byte b = Data[(i * 4) + 2];
+			Data[(i * 4) + 2] = Data[(i * 4) + 0];
+			Data[(i * 4) + 0] = b;
+		}
+	}
 
 	GLuint texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	if (Bpp == 4) {
-		if (swapBGR) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_BGRA, GL_UNSIGNED_BYTE, Data);
-		}
-		else {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
-		}
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_BGRA, GL_UNSIGNED_BYTE, Data);
 	}
 	else if (Bpp == 3) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
@@ -252,7 +252,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	//image->buffer[houseid][animid] = new unsigned char[Width * Height * Bpp];
 	//memcpy(image->buffer[houseid][animid], Data, Width * Height * Bpp);
 
-	if (Bpp == 4 && houseid >= 0) {
+	if (Bpp == 4) {
 		texCache.AddImage(generatedName, Width, Height, Bpp, Data);
 		Console_Printf("Writing %s to cache %s\n", image->name, name);
 		Sleep(0);
