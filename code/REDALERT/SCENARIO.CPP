@@ -63,6 +63,7 @@
 #ifdef WIN32
 #include "tcpip.h"
 #include "ccdde.h"
+#include "audiomix.h"
 
 extern bool SpawnedFromWChat;
 #endif
@@ -399,30 +400,41 @@ bool Start_Scenario(char * name, bool briefing)
 	/*
 	** If there's no briefing movie, restate the mission at the beginning.
 	*/
-	char buffer[25];
-	if (Scen.BriefMovie != VQ_NONE) {
-		sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
-	}
-	if (Session.Type == GAME_NORMAL && ( Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available() ) ) {
-		/*
-		** Make sure the mouse is visible before showing the restatement.
-		*/
-		while(Get_Mouse_State()) {
-			Show_Mouse();
+	if (!Debug_SkipBriefing)
+	{
+		char buffer[25];
+		if (Scen.BriefMovie != VQ_NONE) {
+			sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
 		}
-		Restate_Mission(Scen.ScenarioName, TXT_OK, TXT_NONE);
-	}
+		if (Session.Type == GAME_NORMAL && (Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available())) {
+			/*
+			** Make sure the mouse is visible before showing the restatement.
+			*/
+			while (Get_Mouse_State()) {
+				Show_Mouse();
+			}
+			Restate_Mission(Scen.ScenarioName, TXT_OK, TXT_NONE);
+		}
 
-	if (briefing) {
-		Hide_Mouse();
-		VisiblePage.Clear();
-		Show_Mouse();
-		Play_Movie(Scen.ActionMovie, Scen.TransitTheme);
-	}
+		if (briefing) {
+			Hide_Mouse();
+			VisiblePage.Clear();
+			Show_Mouse();
+			Play_Movie(Scen.ActionMovie, Scen.TransitTheme);
+		}
+	}	
 
 	if (Scen.TransitTheme == THEME_NONE) {
 		Theme.Queue_Song(THEME_FIRST);
 	}
+// jmarshall
+	// If we are skipping the briefing, pausing the music(assuming in editor mode).
+	if (Debug_SkipBriefing) {
+		AudMix_SetMusicState(false);
+	}
+// jmarshall end
+
+	Debug_SkipBriefing = false;
 
 	/*
 	** Set the options values, since the palette has been initialized by Read_Scenario

@@ -70,6 +70,7 @@ extern bool Debug_Cheat;
 extern bool Debug_Remap;
 extern bool Debug_Flag;
 extern bool Debug_Lose;
+extern bool Debug_SkipBriefing;
 extern bool Debug_Map;
 extern bool Debug_Win;
 extern bool Debug_Icon;

@@ -70,7 +70,7 @@ void ImGui_Placement_Editor(void) {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
 	ImGui::SetNextWindowSize(ImVec2(480, 220));
-	ImGui::SetNextWindowPos(ImVec2(0, 150));
+	ImGui::SetNextWindowPos(ImVec2(0, 0));
 	ImGui::Begin("Place Object", &toolActive, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground*/);
 		ImGui::Columns(3, "outer", true);
 		ImGui::LabelText("Test", "Object Name");
@@ -429,8 +429,6 @@ int MapEditClass::Placement_Dialog(void)
 		g_globalKeyFlags = 0;
 		UserInput.Process_Input();
 
-		Device_Present();
-
 		/*
 		**	Refresh display if needed
 		*/
@@ -442,9 +440,6 @@ int MapEditClass::Placement_Dialog(void)
 			Hide_Mouse();
 		//	Dialog_Box(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W, D_DIALOG_H);
 		//	Draw_Caption(TXT_PLACE_OBJECT, D_DIALOG_X, D_DIALOG_Y, D_DIALOG_W);
-// jmarshall - temp render a black background here so the tool works.
-			LogicPage->Fill_Rect(D_DIALOG_X, D_DIALOG_Y, D_DIALOG_X + D_DIALOG_W, D_DIALOG_Y + D_DIALOG_H, 0);
-// jamrshall end
 
 			/*
 			**	Display the current object:
@@ -459,8 +454,19 @@ int MapEditClass::Placement_Dialog(void)
 			WindowList[WINDOW_EDITOR][WINDOWHEIGHT] = D_PICTURE_H;
 			Change_Window((int)WINDOW_EDITOR);
 		//	Draw_Box(D_PICTURE_X, D_PICTURE_Y, D_PICTURE_W, D_PICTURE_H, BOXSTYLE_DOWN, false);
-			curobj->Display(WinW/2, WinH>>1, WINDOW_EDITOR, LastHouse);
+			//curobj->Display(WinW/2, WinH>>1, WINDOW_EDITOR, LastHouse);
 //			curobj->Display(WinW<<2, WinH>>1, WINDOW_EDITOR, LastHouse);
+
+			Image_t* image = NULL;
+			if (curobj->Get_HDImage_Data()) {
+				image = curobj->Get_HDImage_Data();
+				GL_RenderForeGroundImage(image, 30, 100, 75, 75);
+			}
+			//else {
+			//	image = (Image_t *)curobj->Get_Image_Data();
+			//}
+
+			
 
 			/*
 			**	Erase the grid

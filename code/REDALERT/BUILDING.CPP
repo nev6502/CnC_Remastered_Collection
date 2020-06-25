@@ -454,14 +454,8 @@ void BuildingClass::Draw_It(int x, int y, WindowNumberType window) const
 {
 	assert(Buildings.ID(this) == ID);
 	assert(IsActive);
-// jmarshall
+
 	Image_t* hdimage = Get_HDImage_Data();
-	if (hdimage != NULL) {
-		Techno_Draw_Object_HD(hdimage, Shape_Number(), x, y, window);
-		TechnoClass::Draw_It(x, y, window);
-		return;
-	}
-// jmarshall end
 
 	/*
 	**	The shape file to use for rendering depends on whether the building
@@ -474,7 +468,14 @@ void BuildingClass::Draw_It(int x, int y, WindowNumberType window) const
 	**	Actually draw the building shape.
 	*/
 	IsTheaterShape = Class->IsTheater;	//Let Build_Frame know if this is a theater specific shape
-	Techno_Draw_Object(shapefile, Shape_Number(), x, y, window);
+// jmarshall - added HD support
+	if (hdimage != NULL) {
+		Techno_Draw_Object_HD(hdimage, Shape_Number(), x, y, window);
+	}
+	else {
+		Techno_Draw_Object(shapefile, Shape_Number(), x, y, window);
+	}
+// jmarshall end
 	IsTheaterShape = false;
 
 	/*
@@ -504,9 +505,16 @@ void BuildingClass::Draw_It(int x, int y, WindowNumberType window) const
 		if ( (*this == STRUCT_WEAP || *this == STRUCT_FAKEWEAP)) {
 			int shapenum = Door_Stage();
 			if (Health_Ratio() <= Rule.ConditionYellow) shapenum += 4;
-			// Added override shape file name. ST - 8/1/2019 5:24PM
-			//Techno_Draw_Object(Class->WarFactoryOverlay, shapenum, x, y, window);
-			Techno_Draw_Object_Virtual(Class->WarFactoryOverlay, shapenum, x, y, window, DIR_N, 0x0100, "WEAP2");
+// jmarshall - added HD support.
+			if (Class->WarFactoryHDOverlay)
+			{
+				Techno_Draw_Object_HD(Class->WarFactoryHDOverlay, shapenum, x, y, window, DIR_N, 0x0100);
+			}
+			else
+			{
+				Techno_Draw_Object_Virtual(Class->WarFactoryOverlay, shapenum, x, y, window, DIR_N, 0x0100, "WEAP2");
+			}
+// jmarshall end
 		}
 
 		/*

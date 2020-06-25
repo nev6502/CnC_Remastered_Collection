@@ -1294,6 +1294,34 @@ bool Select_Game(bool fade)
 				**	Play a VQ
 				*/
 				case SEL_INTRO:
+// jmarshall 
+#ifdef SCENARIO_EDITOR
+					Debug_Map = true;					
+					Clear_Scenario();
+					//Scen.Set_Scenario_Name(1, SCEN_PLAYER_SPAIN, SCEN_DIR_EAST, SCEN_VAR_A);
+					strcpy(Scen.ScenarioName, "DEFAULTMAP.INI");
+					/*
+					**	Create houses
+					*/
+					for (HousesType house = HOUSE_FIRST; house < HOUSE_COUNT; house++) {
+						new HouseClass(house);
+					}
+
+					PlayerPtr = HouseClass::As_Pointer(HOUSE_SPAIN);
+					PlayerPtr->IsHuman = true;
+					Base.House = HOUSE_USSR;
+					//LastHouse = HOUSE_GOOD;
+					Fill_In_Data();
+					//Size_Map(-1, -1, 30, 30);
+					Scen.Waypoint[WAYPT_REINF] = XY_Cell(Map.MapCellX + Map.MapCellWidth / 2, Map.MapCellY + Map.MapCellHeight / 2);
+					Scen.Waypoint[WAYPT_HOME] = XY_Cell(Map.MapCellX + Map.MapCellWidth / 2, Map.MapCellY + Map.MapCellHeight / 2);
+//					(*this)[TacticalCoord].IsWaypoint = 1;
+					Map.Flag_Cell(Coord_Cell(Map.TacticalCoord));
+					Map.Set_Tactical_Position(Cell_Coord(Scen.Waypoint[WAYPT_HOME] - (MAP_CELL_W * 4 * RESFACTOR) - (5 * RESFACTOR)));
+					Go_Editor(true);
+					process = false;
+					Debug_SkipBriefing = true;
+#else
 					Theme.Fade_Out();
 
 					if (Debug_Flag) {
@@ -1313,7 +1341,8 @@ bool Select_Game(bool fade)
 					display = true;
 					fade = true;
 					selection = SEL_NONE;
-
+#endif
+// jmarshall end
 					break;
 
 				/*
