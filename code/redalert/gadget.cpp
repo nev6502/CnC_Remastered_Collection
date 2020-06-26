@@ -499,10 +499,9 @@ KeyNumType GadgetClass::Input(void)
 	**	know the position of the mouse at the exact instant when the click occurred
 	**	rather the the mouse position at the time we get around to this function.
 	*/
-// jmarshall
+// jmarshall	
+	UserInput.Process_Input( g_globalKeyNumType, g_globalKeyFlags);
 	int flags = g_globalKeyFlags;
-	UserInput.Process_Input( g_globalKeyNumType, flags );
-
 // jmarshall end
 
 	/*

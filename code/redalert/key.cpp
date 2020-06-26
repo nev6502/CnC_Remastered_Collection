@@ -364,6 +364,14 @@ char WWKeyboardClass::To_ASCII(unsigned short key)
  *=============================================================================================*/
 bool WWKeyboardClass::Down(unsigned short key)
 {
+	if (key == KN_LMOUSE) {
+		return g_globalKeyFlags & GadgetClass::LEFTPRESS;
+	}
+
+	if (key == KN_RMOUSE) {
+		return g_globalKeyFlags & GadgetClass::RIGHTPRESS;
+	}
+
 	return(GetAsyncKeyState(key & 0xFF) == 0 ? false : true);
 }
 

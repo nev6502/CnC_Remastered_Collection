@@ -65,7 +65,7 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 
 					Keyboard->Put_Element(KN_RMOUSE);
 
-					key = KN_RMOUSE;
+					key = KN_RMOUSE;					
 					flags |= GadgetClass::RIGHTPRESS;
 
 					numFramesLMouse = 0;
@@ -75,13 +75,14 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 			case SDL_MOUSEBUTTONUP:
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_RELEASE;
-
+					flags &= GadgetClass::LEFTPRESS;
 					flags |= GadgetClass::LEFTRELEASE;
 					numFramesLMouse = 0;
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					Mouse.Button_Right == MouseButtonState::MOUSE_BUTTON_RELEASE;
 
+					flags &= GadgetClass::RIGHTPRESS;
 					flags |= GadgetClass::RIGHTRELEASE;
 					numFramesLMouse = 0;
 				}
