@@ -969,7 +969,7 @@
     }
 
     /***********************************************************************************************
-     * Script_DesignatePreferredTarget - Gives specified house a repeating special weapon          *
+     * Script_DesignatePreferredTarget - Gives specified house a prefferable type of target        *
      *                                                                                             *
      *   SCRIPT INPUT:	houseType (int)  - The player (house) index to set targetting for (or -1)  *
      *                	targetType (int) - The target type index to set to                         *
@@ -3271,7 +3271,415 @@
         return -1;
     }
 
+
+/**********************************************************************************************
+* Modification Utility Functions                                                              *
+*=============================================================================================*/
     
+    /**********************************************************************************************
+    * Script_SetObjectAttribute - Sets attributes for specific objects                            *
+    *                                                                                             *
+    *   SCRIPT INPUT:	objectID        (int)  - The ID of the object                             *
+    *                	attribute_type  (int)  - The attribute to change                          *
+    *                	attribute_value (int)  - The value to set the attribute to                *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * INPUT:  lua_State - The current Lua state                                                   *
+    *                                                                                             *
+    * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetObjectAttribute(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+        int attribute_type = lua_tointeger(L, 2);
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        
+
+        // Get the appropriate technotype
+        if (this_object != NULL) {
+
+            
+
+
+            switch ((MapScriptAttributeType)attribute_type) {
+                case ATTRIBUTE_STRENGTH: {
+
+                    int attribute_value = lua_tointeger(L, 3);
+                    this_object->Strength = attribute_value;
+
+                }break;
+                default: {
+
+                    TechnoTypeClass* this_type_class;
+
+                    switch (this_object->RTTI) {
+                        case RTTI_BUILDING:
+
+                            this_type_class = BuildingTypes.Ptr(this_object->Class_Of().ID);
+
+                        break;
+                        case RTTI_UNIT:
+
+                            this_type_class = UnitTypes.Ptr(this_object->Class_Of().ID);
+
+                        break;
+                        case RTTI_INFANTRY:
+
+                            this_type_class = InfantryTypes.Ptr(this_object->Class_Of().ID);
+
+                        break;
+                        case RTTI_VESSEL:
+
+                            this_type_class = VesselTypes.Ptr(this_object->Class_Of().ID);
+
+                        break;
+                        case RTTI_AIRCRAFT:
+
+                            this_type_class = AircraftTypes.Ptr(this_object->Class_Of().ID);
+
+                        break;
+                        }
+                    
+
+                    if (this_type_class != NULL) {
+                        Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptAttributeType)attribute_type);
+                    }
+
+                }break;
+
+            }
+
+        }
+
+
+        return -1;
+    }
+
+    /**********************************************************************************************
+    * Script_SetBuildingTypeAttribute - Sets attributes for a building types                      *
+    *                                                                                             *
+    *   SCRIPT INPUT:	buildingTypeID  (int)  - The ID of the building type class                *
+    *                	attribute_type  (int)  - The attribute to change                          *
+    *                	attribute_value (int)  - The value to set the attribute to                *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * INPUT:  lua_State - The current Lua state                                                   *
+    *                                                                                             *
+    * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetBuildingTypeAttribute(lua_State* L) {
+
+        int buildingTypeID = lua_tointeger(L, 1);
+        int attribute_type = lua_tointeger(L, 2);
+
+        TechnoTypeClass* this_type_class = BuildingTypes.Ptr(buildingTypeID);
+
+        if (this_type_class != NULL) {
+            Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptAttributeType)attribute_type);
+        }
+
+        return -1;
+    }
+
+    /**********************************************************************************************
+    * Script_SetVehicleTypeAttribute - Sets attributes for vehicle types                          *
+    *                                                                                             *
+    *   SCRIPT INPUT:	vehicleTypeID  (int)   - The ID of the vehicle type class                 *
+    *                	attribute_type  (int)  - The attribute to change                          *
+    *                	attribute_value (int)  - The value to set the attribute to                *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * INPUT:  lua_State - The current Lua state                                                   *
+    *                                                                                             *
+    * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetVehicleTypeAttribute(lua_State* L) {
+
+        int vehicleTypeID = lua_tointeger(L, 1);
+        int attribute_type = lua_tointeger(L, 2);
+
+        TechnoTypeClass* this_type_class = UnitTypes.Ptr(vehicleTypeID);
+
+        if (this_type_class != NULL) {
+            Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptAttributeType)attribute_type);
+        }
+
+        return -1;
+    }
+
+    /**********************************************************************************************
+    * Script_SetInfantryTypeAttribute - Sets attributes for infantry types                        *
+    *                                                                                             *
+    *   SCRIPT INPUT:	infantryTypeID  (int)  - The ID of the infantry type class                *
+    *                	attribute_type  (int)  - The attribute to change                          *
+    *                	attribute_value (int)  - The value to set the attribute to                *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * INPUT:  lua_State - The current Lua state                                                   *
+    *                                                                                             *
+    * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetInfantryTypeAttribute(lua_State* L) {
+
+        int infantryTypeID = lua_tointeger(L, 1);
+        int attribute_type = lua_tointeger(L, 2);
+
+        TechnoTypeClass* this_type_class = InfantryTypes.Ptr(infantryTypeID);
+
+        if (this_type_class != NULL) {
+            Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptAttributeType)attribute_type);
+        }
+
+        return -1;
+    }
+
+    /**********************************************************************************************
+    * Script_SetVesselTypeAttribute - Sets attributes for vessel types                            *
+    *                                                                                             *
+    *   SCRIPT INPUT:	vesselTypeID    (int)  - The ID of the vessel type class                  *
+    *                	attribute_type  (int)  - The attribute to change                          *
+    *                	attribute_value (int)  - The value to set the attribute to                *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * INPUT:  lua_State - The current Lua state                                                   *
+    *                                                                                             *
+    * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetVesselTypeAttribute(lua_State* L) {
+
+        int vesselTypeID = lua_tointeger(L, 1);
+        int attribute_type = lua_tointeger(L, 2);
+
+        TechnoTypeClass* this_type_class = VesselTypes.Ptr(vesselTypeID);
+
+        if (this_type_class != NULL) {
+            Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptAttributeType)attribute_type);
+        }
+
+        return -1;
+    }
+
+    /**********************************************************************************************
+    * Script_SetAircraftTypeAttribute - Sets attributes for aircraft types                        *
+    *                                                                                             *
+    *   SCRIPT INPUT:	aircraftTypeID  (int)  - The ID of the aircraft type class                *
+    *                	attribute_type  (int)  - The attribute to change                          *
+    *                	attribute_value (int)  - The value to set the attribute to                *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * INPUT:  lua_State - The current Lua state                                                   *
+    *                                                                                             *
+    * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetAircraftTypeAttribute(lua_State* L) {
+
+        int aircraftTypeID = lua_tointeger(L, 1);
+        int attribute_type = lua_tointeger(L, 2);
+
+        TechnoTypeClass* this_type_class = AircraftTypes.Ptr(aircraftTypeID);
+
+        if (this_type_class != NULL) {
+            Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptAttributeType)attribute_type);
+        }
+
+        return -1;
+    }
+    
+    /**********************************************************************************************
+    * Script_SetObjectTypeAttribute - Sets attributes for specific object types globally          *
+    *                                                                                             *
+    *  Used internally by MapScript to retrieve input and set attributes for TechnoTypeClass      *
+    *                                                                                             *
+    *   SCRIPT INPUT:	this_type_class (TechnoTypeClass*) - The techno type                      *
+    *                	attribute_type  (MapScriptAttributeType)  - The attribute to change       *
+    *                                                                                             *
+    *   SCRIPT OUTPUT:  void                                                                      *
+    *                                                                                             *
+    * WARNINGS:  ?                                                                                *
+    *                                                                                             *
+    *=============================================================================================*/
+    static int Script_SetObjectTypeAttribute(lua_State* L, TechnoTypeClass* this_type_class, MapScriptAttributeType attribute_type) {
+
+        switch (attribute_type) {
+            case ATTRIBUTE_MAX_STRENGTH: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->MaxStrength = attribute_value;
+
+            }break;
+
+            case ATTRIBUTE_COST: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->Cost = attribute_value;
+
+            }break;
+            case ATTRIBUTE_SIGHT_RANGE: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->SightRange = attribute_value;
+
+            }break;
+            case ATTRIBUTE_TECH_LEVEL: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->Level = attribute_value;
+
+            }break;
+            case ATTRIBUTE_ARMOR: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->Armor = (ArmorType)attribute_value;
+
+            }break;
+            case ATTRIBUTE_PRIMARY_WEAPON: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                WeaponTypeClass* this_weapon = Weapons.Ptr(attribute_value);
+                if (this_weapon != NULL) {
+                    this_type_class->PrimaryWeapon = this_weapon;
+                }
+
+            }break;
+            case ATTRIBUTE_SECONDARY_WEAPON: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                WeaponTypeClass* this_weapon = Weapons.Ptr(attribute_value);
+                if (this_weapon != NULL) {
+                    this_type_class->SecondaryWeapon = this_weapon;
+                }
+
+            }break;
+            case ATTRIBUTE_SPEED: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->Speed = (SpeedType)attribute_value;
+
+            }break;
+            case ATTRIBUTE_MAX_SPEED: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->MaxSpeed = (MPHType)attribute_value;
+
+            }break;
+            case ATTRIBUTE_MAX_AMMO: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->MaxAmmo = attribute_value;
+
+            }break;
+            case ATTRIBUTE_ROTATION_SPEED: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->ROT = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_CRUSHABLE: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsCrushable = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_STEALTHY: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsStealthy = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_SELECTABLE: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsSelectable = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_LEGAL_TARGET: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsLegalTarget = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_REPAIRABLE: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsRepairable = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_SELF_HEALING: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsSelfHealing = attribute_value;
+
+            }break;
+            case ATTRIBUTE_IS_EXPLODING: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsExploding = attribute_value;
+
+            }break;
+            case ATTRIBUTE_HAS_CREW: {
+
+                unsigned int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->IsCrew = attribute_value;
+
+            }break;
+            case ATTRIBUTE_MAX_PASSENGERS: {
+
+                int attribute_value = lua_tointeger(L, 3);
+
+                this_type_class->MaxPassengers = attribute_value;
+
+            }break;
+
+        }
+
+
+        return -1;
+    }
 
 /**********************************************************************************************
 * Mission Utility Functions                                                                   *
@@ -4273,7 +4681,7 @@
         }
 
         return -1;
-    }
+    }    
 
     /***********************************************************************************************
      * MapScript::CallFunction - Calls a given function within the current script                  *
@@ -4472,10 +4880,20 @@
 
             lua_register(L, "SetTriggerCallback", Script_SetTriggerCallback);	            // Initiates a given [callback] on an existing [trigger] // TODO: Make this work via name OR ID
             lua_register(L, "TriggerAddCell", Script_TriggerAddCell);	                    // Initiates a given [callback] on an existing [trigger]
-            lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
             lua_register(L, "MergeTriggers", Script_MergeTriggers);	                        // Combines the events of two triggers (for multi-event triggers :)
             lua_register(L, "GetTriggerByName", Script_GetTriggerByName);	                // Gets the ID of the trigger with a given name
             lua_register(L, "TriggerSetPersistence", Script_TriggerSetPersistence);	        // Does a trigger go on and on or just run once?
+
+        /**********************************************************************************************
+        * Object Functions                                                                            *
+        *=============================================================================================*/
+            lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
+            lua_register(L, "SetObjectAttribute", Script_SetObjectAttribute);	            // Sets an object's attributes (strength, etc.)
+            lua_register(L, "SetBuildingTypeAttribute", Script_SetBuildingTypeAttribute);	// Sets the attribute of a Building type
+            lua_register(L, "SetVehicleTypeAttribute", Script_SetVehicleTypeAttribute);	    // Sets the attribute of a Vehicle type
+            lua_register(L, "SetInfantryTypeAttribute", Script_SetInfantryTypeAttribute);	// Sets the attribute of an Infantry type
+            lua_register(L, "SetVesselTypeAttribute", Script_SetVesselTypeAttribute);	    // Sets the attribute of a Vessel type
+            lua_register(L, "SetAircraftTypeAttribute", Script_SetAircraftTypeAttribute);	// Sets the attribute of an Aircraft type
 
         /**********************************************************************************************
         * Mission Utility Functions                                                                   *

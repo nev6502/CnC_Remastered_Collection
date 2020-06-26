@@ -194,3 +194,85 @@
         TRIGGER_VOLATILE=0
         TRIGGER_SEMI_PERSISTENT=1
         TRIGGER_PERSISTENT=2
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Attribite Types                                      *
+    -- *                                                       *
+    -- *********************************************************
+        ATTRIBUTE_NONE=0
+        ATTRIBUTE_STRENGTH=1            -- Object attribute
+        ATTRIBUTE_MAX_STRENGTH=2        -- Definition attribute
+        ATTRIBUTE_COST=3                -- Definition attribute
+        ATTRIBUTE_SIGHT_RANGE=4         -- Definition attribute
+        ATTRIBUTE_TECH_LEVEL=5          -- Definition attribute
+        ATTRIBUTE_ARMOR=6
+        ATTRIBUTE_PRIMARY_WEAPON=7
+        ATTRIBUTE_SECONDARY_WEAPON=8
+        ATTRIBUTE_SPEED=9
+        ATTRIBUTE_MAX_SPEED=10
+        ATTRIBUTE_MAX_AMMO=11
+        ATTRIBUTE_ROTATION_SPEED=12
+        ATTRIBUTE_IS_CRUSHABLE=13
+        ATTRIBUTE_IS_STEALTHY=14
+        ATTRIBUTE_IS_SELECTABLE=15
+        ATTRIBUTE_IS_LEGAL_TARGET=16
+        ATTRIBUTE_IS_REPAIRABLE=17
+        ATTRIBUTE_IS_SELF_HEALING=18
+        ATTRIBUTE_IS_EXPLODING=19
+        ATTRIBUTE_HAS_CREW=20
+        ATTRIBUTE_MAX_PASSENGERS=21
+        
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Armor Types                                          *
+    -- *                                                       *
+    -- *********************************************************
+        ARMOR_NONE=0
+        ARMOR_WOOD=1
+        ARMOR_ALUMINUM=2
+        ARMOR_STEEL=3
+        ARMOR_CONCRETE=4
+        
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Weapon Types                                         *
+    -- *                                                       *
+    -- *********************************************************
+        WEAPON_COLT45=0
+        WEAPON_ACK_ACK=1
+        WEAPON_VULCAN=2
+        WEAPON_MAVERICK=3
+        WEAPON_CAMERA=4
+        WEAPON_FIREBALL=5
+        WEAPON_RIFLE=6
+        WEAPON_CHAIN_GUN=7
+        WEAPON_PISTOL=8
+        WEAPON_M16=9
+        WEAPON_DRAGON=10
+        WEAPON_HELLFIRE=11
+        WEAPON_GRENADE=12
+        WEAPON_75MM=13
+        WEAPON_90MM=14
+        WEAPON_105MM=15
+        WEAPON_120MM=16
+        WEAPON_TURRET_GUN=17
+        WEAPON_MAMMOTH_TUSK=18
+        WEAPON_155MM=19
+        WEAPON_M60MG=20
+        WEAPON_NAPALM=21
+        WEAPON_TESLA_ZAP=22
+        WEAPON_NIKE=23
+        WEAPON_8INCH=24
+        WEAPON_STINGER=25
+        WEAPON_TORPEDO=26
+        WEAPON_2INCH=27
+        WEAPON_DEPTH_CHARGE=28
+        WEAPON_PARA_BOMB=29
+        WEAPON_DOGJAW=30
+        WEAPON_HEAL=31
+        WEAPON_SCUD=32
+        WEAPON_FLAMER=33
+        WEAPON_REDEYE=34
+
+    
