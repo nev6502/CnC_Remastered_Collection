@@ -187,6 +187,11 @@ public:
 		Active = active;
 	}
 
+	int GetActive()
+	{
+		return Active;
+	}
+
 	void Clear_All()
 	{
 		for (int i = FIRST; i < COUNT; ++i)
