@@ -2501,6 +2501,11 @@ Mono_Set_Cursor(0,0);
  *=========================================================================*/
 bool Map_Edit_Loop(void)
 {
+// jmarshall
+	int currentActiveSelectedHouse = CurrentObject.GetActive();
+	CurrentObject.Set_Active_Context(PlayerPtr->Class->House);
+// jmarshall end
+
 	/*
 	**	Redraw the map.
 	*/
@@ -2528,6 +2533,9 @@ bool Map_Edit_Loop(void)
 
 	Call_Back();								// maintains Theme.AI() for music
 	Color_Cycle();
+// jmarshall
+	CurrentObject.Set_Active_Context(currentActiveSelectedHouse);
+// jmarshall end
 
 	return(!GameActive);
 }
