@@ -40,9 +40,11 @@
 
 struct Image_t;
 
-#define	ICON_PIXEL_W	 		24
+// jmarshall - isometric
+#define	ICON_PIXEL_W	 		48
 #define	ICON_PIXEL_H			24
-#define	ICON_LEPTON_W			256
+// jmarshall end
+#define	ICON_LEPTON_W			512
 #define	ICON_LEPTON_H			256
 #define	CELL_PIXEL_W	 		ICON_PIXEL_W
 #define	CELL_PIXEL_H			ICON_PIXEL_H

@@ -569,10 +569,10 @@ short const * DisplayClass::Text_Overlap_List(char const * text, int x, int y) c
 void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 {
 	if (width == -1) width = SeenBuff.Get_Width();
-	TacLeptonWidth = Pixel_To_Lepton( width - x);
+	TacLeptonWidth = Pixel_To_Lepton( width - x) * 2;
 
 	if (height == -1) height = SeenBuff.Get_Height();
-	TacLeptonHeight = Pixel_To_Lepton(height - y);
+	TacLeptonHeight = Pixel_To_Lepton(height - y) * 2;
 
 	/*
 	**	Adjust the tactical cell if it is now in an invalid position
@@ -1756,6 +1756,17 @@ bool DisplayClass::Coord_To_Pixel(COORDINATE coord, int &x, int &y) const
 			if ((int)yoff <= TacLeptonHeight + EDGE_ZONE*2) {
 				x = Lepton_To_Pixel(xoff)-CELL_PIXEL_W*2;
 				y = Lepton_To_Pixel(yoff)-CELL_PIXEL_H*2;
+// jmarshall - isometric
+				int tileWidth = CELL_PIXEL_W;
+				int tileHeight = CELL_PIXEL_H;
+				int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
+				int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
+
+				x = sx + (CELL_PIXEL_W / 2);
+				y = sy + (CELL_PIXEL_W / 2);
+				
+				x = x + (ScreenWidth / 2);
+// jmarshall end
 				return(true);
 			}
 		}
@@ -2344,7 +2355,7 @@ void DisplayClass::Redraw_Icons(void)
 			/*
 			**	Only cells flagged to be redraw are examined.
 			*/
-			if (In_View(cell) && Is_Cell_Flagged(cell)) {
+			{
 				int xpixel;
 				int ypixel;
 
@@ -2403,7 +2414,7 @@ void DisplayClass::Redraw_OIcons(void)
 						cellptr->Draw_It(xpixel, ypixel, true);
 					}
 				}
-			}
+			}			
 		}
 	}
 }

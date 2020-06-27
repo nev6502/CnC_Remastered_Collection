@@ -219,7 +219,7 @@ Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
         {
             const char* tileEntryName = Tileset_FindHDTexture(theater, fixedIconName, i, d);
             sprintf(filename, "DATA/ART/TEXTURES/SRGB/RED_ALERT/TERRAIN/%s/%s", Theaters[theater].Name, tileEntryName);
-            COM_SetExtension(filename, sizeof(filename), ".dds");
+            //COM_SetExtension(filename, sizeof(filename), ".dds");
 
             if (image == NULL) {
                 // If the image is already loaded, then we are done.
@@ -330,8 +330,8 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
     uint8_t* MapPtr = (uint8_t * )iconImage->IconMapPtr;
 	int icon_index = MapPtr != nullptr ? MapPtr[icon] : icon;
 	{
-        int blit_height = iconImage->renderheight[0];
-        int blit_width = iconImage->renderwidth[0];
+        int blit_height = CELL_PIXEL_H;
+        int blit_width = CELL_PIXEL_W;
         
         int width = left + right;
         int xstart = left + x;
