@@ -1756,17 +1756,6 @@ bool DisplayClass::Coord_To_Pixel(COORDINATE coord, int &x, int &y) const
 			if ((int)yoff <= TacLeptonHeight + EDGE_ZONE*2) {
 				x = Lepton_To_Pixel(xoff)-CELL_PIXEL_W*2;
 				y = Lepton_To_Pixel(yoff)-CELL_PIXEL_H*2;
-// jmarshall - isometric
-				int tileWidth = CELL_PIXEL_W;
-				int tileHeight = CELL_PIXEL_H;
-				int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
-				int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
-
-				x = sx + (CELL_PIXEL_W / 2);
-				y = sy + (CELL_PIXEL_W / 2);
-				
-				x = x + (ScreenWidth / 2);
-// jmarshall end
 				return(true);
 			}
 		}
@@ -2323,6 +2312,19 @@ ObjectClass * DisplayClass::Cell_Object(CELL cell, int x, int y) const
 	}
 }
 
+// jmarshall - isometric
+void DisplayClass::ConvertCoordsToIsometric(int& x, int& y) {	
+	int tileWidth = CELL_PIXEL_W;
+	int tileHeight = CELL_PIXEL_H;
+	int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
+	int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
+
+	x = sx + (CELL_PIXEL_W / 2);
+	y = sy + (CELL_PIXEL_W / 2);
+
+	x = x + (ScreenWidth / 2);	
+}
+// jmarshall end
 
 /***********************************************************************************************
  * DisplayClass::Redraw_Icons -- Draws all terrain icons necessary.                            *
@@ -2360,6 +2362,8 @@ void DisplayClass::Redraw_Icons(void)
 				int ypixel;
 
 				if (Coord_To_Pixel(coord, xpixel, ypixel)) {
+					ConvertCoordsToIsometric(xpixel, ypixel);
+
 					CellClass * cellptr = &(*this)[coord];
 
 					/*
@@ -2390,7 +2394,7 @@ void DisplayClass::Redraw_Icons(void)
 void DisplayClass::Redraw_OIcons(void)
 {
 	for (int y = -Coord_YLepton(TacticalCoord); y <= TacLeptonHeight; y += CELL_LEPTON_H) {
-		for (int x = -Coord_XLepton(TacticalCoord); x <= TacLeptonWidth; x += CELL_LEPTON_W) {
+		for (int x = -Coord_XLepton(TacticalCoord); x <= TacLeptonWidth; x += CELL_LEPTON_W) {			
 			COORDINATE coord = Coord_Add(TacticalCoord, XY_Coord(x, y));
 			CELL cell = Coord_Cell(coord);
 			coord = Coord_Whole(Cell_Coord(cell));
@@ -2404,6 +2408,8 @@ void DisplayClass::Redraw_OIcons(void)
 
 				if (Coord_To_Pixel(coord, xpixel, ypixel)) {
 					CellClass * cellptr = &(*this)[coord];
+
+			//		ConvertCoordsToIsometric(xpixel, ypixel);
 
 					/*
 					**	If there is a portion of the underlying icon that could be visible,
