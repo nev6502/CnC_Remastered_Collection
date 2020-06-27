@@ -1238,10 +1238,19 @@ void CellClass::Draw_It(int x, int y, bool objects)
 				/*
 				**	Draw the hash-mark cursor:
 				*/
-				if (Map.ProximityCheck && Is_Clear_To_Build(loco)) {
-					LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 0, x, y, NULL, WINDOW_TACTICAL);
-				} else {
-					LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 2, x, y, NULL, WINDOW_TACTICAL);
+				{
+					int xx = x;
+					int yy = y;
+					ConvertCoordsToIsometric(xx, yy);
+					lastRenderX = xx;
+					lastRenderY = yy;
+
+					if (Map.ProximityCheck && Is_Clear_To_Build(loco)) {
+						LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 0, xx, yy, NULL, WINDOW_TACTICAL);
+					}
+					else {
+						LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 2, xx, yy, NULL, WINDOW_TACTICAL);
+					}
 				}
 
 	#ifdef SCENARIO_EDITOR
