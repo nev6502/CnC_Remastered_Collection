@@ -1318,7 +1318,7 @@ bool ObjectClass::Render(bool forced) const
 		const_cast<ObjectClass*>(this)->IsToDisplay = false;		// added const_cast ST - 5/9/2019
 
 		if (Map.Coord_To_Pixel(coord, x, y)) {
-
+			CellClass::ConvertCoordsToIsometric(x, y);
 			/*
 			**	Draw the object itself
 			*/

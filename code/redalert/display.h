@@ -222,9 +222,6 @@ class DisplayClass: public MapClass
 		*/
 		int TacPixelX;
 		int TacPixelY;
-// jmarshall
-		static void ConvertCoordsToIsometric(int& x, int& y);
-// jmarshall end
 
 		/*
 		**	This is the coordinate that the tactical map should be in at next available opportunity.

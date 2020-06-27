@@ -999,6 +999,47 @@ bool CellClass::Get_Template_Info(char *template_name, int &icon, void *&image_d
 	return false;
 }
 
+void CellClass::ConvertCoordsToIsometric(int& x, int& y) {
+	int tileWidth = CELL_PIXEL_W;
+	int tileHeight = CELL_PIXEL_H;
+	int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
+	int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
+
+	x = sx + (CELL_PIXEL_W / 2);
+	y = sy + (CELL_PIXEL_W / 2);
+
+	x = x + (ScreenWidth / 2);
+}
+
+bool CellClass::ScreenCoordsToIsoTile(int x, int y, int &tileX, int &tileY) {	
+	x = x - (ScreenWidth / 2);
+
+	float tempPt_x = (2 * y + x) / 2;
+	float tempPt_y = (2 * y - x) / 2;
+
+	tileX = floor(tempPt_x / (CELL_PIXEL_W * 0.5f));
+	tileY = floor(tempPt_y / (CELL_PIXEL_H * 0.5f));
+
+	if (tileX < 0 || tileY < 0 || tileX > 128 || tileY > 128)
+		return false;
+
+	return true;
+}
+
+bool CellClass::ScreenCoordsToIsoCoords(COORDINATE screenCoord, COORDINATE& isoCoord) {
+	int x, y;
+	Map.Coord_To_Pixel(screenCoord, x, y);
+	int tileX, tileY;
+	if (!CellClass::ScreenCoordsToIsoTile(x, y, tileX, tileY)) {
+		return false;
+	}
+	int worldTileX = tileX * CELL_PIXEL_W;
+	int worldTileY = tileY * CELL_PIXEL_H;
+	isoCoord = Map.Pixel_To_Coord(worldTileX, worldTileY);
+	return true;
+}
+
+
 /***********************************************************************************************
  * CellClass::Draw_It -- Draws the cell imagery at the location specified.                     *
  *                                                                                             *
@@ -1022,7 +1063,7 @@ bool CellClass::Get_Template_Info(char *template_name, int &icon, void *&image_d
  *   04/25/1995 JLB : Smudges drawn BELOW overlays.                                            *
  *   07/22/1996 JLB : Objects added to draw process.                                           *
  *=============================================================================================*/
-void CellClass::Draw_It(int x, int y, bool objects) const
+void CellClass::Draw_It(int x, int y, bool objects)
 {
 	assert((unsigned)Cell_Number() <= MAP_CELL_TOTAL);
 
@@ -1093,7 +1134,12 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 			*/
 			if (ttype->Get_Image_Data()) {
 // jmarshall - hd image should always be valid even if loading legacy assets
-				LogicPage->Draw_Stamp(ttype->Get_HDImage_Data(), icon, x, y, NULL, WINDOW_TACTICAL);
+				int xx = x;
+				int yy = y;
+				ConvertCoordsToIsometric(xx, yy);
+				lastRenderX = xx;
+				lastRenderY = yy;
+				LogicPage->Draw_Stamp(ttype->Get_HDImage_Data(), icon, xx, yy, NULL, WINDOW_TACTICAL);
 // jmarshall end
 				if (remap) {
 					LogicPage->Remap(x+Map.TacPixelX, y+Map.TacPixelY, ICON_PIXEL_W, ICON_PIXEL_H, remap);
@@ -1217,7 +1263,12 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 									(Cell_Y(cell) - Cell_Y(Map.ZoneCell + Map.ZoneOffset)) *
 									tptr->Width;
 // jmarshall - hd image should always be valid even if loading legacy assets
-								LogicPage->Draw_Stamp(tptr->Get_HDImage_Data(), icon, x, y, NULL, WINDOW_TACTICAL);
+								int xx = x;
+								int yy = y;
+								ConvertCoordsToIsometric(xx, yy);
+								lastRenderX = xx;
+								lastRenderY = yy;
+								LogicPage->Draw_Stamp(tptr->Get_HDImage_Data(), icon, xx, yy, NULL, WINDOW_TACTICAL);
 // jmarshall end
 							}
 							break;
@@ -1338,6 +1389,7 @@ void CellClass::Draw_It(int x, int y, bool objects) const
 			renderedFrameObjects.push_back(object);
 			int xx,yy;
 			if (object->IsToDisplay && (!object->Is_Techno() || ((TechnoClass *)object)->Visual_Character() == VISUAL_NORMAL) && Map.Coord_To_Pixel(object->Render_Coord(), xx, yy)) {
+				ConvertCoordsToIsometric(xx, yy);
 				if (_Calc_Partial_Window(x, y, xx, yy)) {
 					object->Draw_It(xx, yy, WINDOW_PARTIAL);
 					if (Debug_Map) {

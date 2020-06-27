@@ -276,10 +276,14 @@ class CellClass
 		void Code_Pointers(void);
 		void Decode_Pointers(void);
 
+		static void ConvertCoordsToIsometric(int& x, int& y);
+		static bool ScreenCoordsToIsoTile(int x, int y, int& tileX, int& tileY);
+		static bool ScreenCoordsToIsoCoords(COORDINATE screenCoord, COORDINATE& isoCoord);
+
 		/*
 		**	Display and rendering controls.
 		*/
-		void Draw_It(int x, int y, bool objects=false) const;
+		void Draw_It(int x, int y, bool objects=false);
 		void Redraw_Objects(bool forced=false);
 		void Shimmer(void);
 
@@ -319,8 +323,15 @@ class CellClass
 		*/
 		void Override_Land_Type(LandType type);
 
+
+		int GetLastRenderX(void) { return lastRenderX; }
+		int GetLastRenderY(void) { return lastRenderY; }
+
 	private:
 		CellClass (CellClass const &) ;
+
+		int lastRenderX;
+		int lastRenderY;
 
 		LandType Land;			// The land type of this cell.
 

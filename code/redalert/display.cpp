@@ -1145,11 +1145,19 @@ void DisplayClass::Remove(ObjectClass const * object, LayerType layer)
  *=============================================================================================*/
 CELL DisplayClass::Click_Cell_Calc(int x, int y) const
 {
+	int tileX, tileY;
+	if (!CellClass::ScreenCoordsToIsoTile(x, y, tileX, tileY)) {
+		return -1;
+	}
+
+	x = tileX * CELL_PIXEL_W;
+	y = tileY * CELL_PIXEL_H;
+
 	x -= TacPixelX;
 	x = Pixel_To_Lepton(x);
 	y -= TacPixelY;
 	y = Pixel_To_Lepton(y);
-
+	
 	// Possibly ignore the view constraints if we aren't using the internal renderer. ST - 8/5/2019 11:56AM
 	if (IgnoreViewConstraints || (unsigned)x < TacLeptonWidth && (unsigned)y < TacLeptonHeight) {
 		COORDINATE tcoord = XY_Coord(Pixel_To_Lepton(Lepton_To_Pixel(Coord_X(TacticalCoord))), Pixel_To_Lepton(Lepton_To_Pixel(Coord_Y(TacticalCoord))));
@@ -2304,27 +2312,15 @@ ObjectClass * DisplayClass::Cell_Object(CELL cell, int x, int y) const
 		**	cell coordinates.
 		*/
 		if (Debug_Map && PendingObjectPtr) {
-			PendingObjectPtr->Coord = PendingObjectPtr->Class_Of().Coord_Fixup(Cell_Coord(ZoneCell + ZoneOffset));
+			COORDINATE coord = Cell_Coord(ZoneCell + ZoneOffset);
+			PendingObjectPtr->Coord = PendingObjectPtr->Class_Of().Coord_Fixup(coord);
 			PendingObjectPtr->Render(true);
+			
 		}
 #endif
 		BEnd(BENCH_TACTICAL);
 	}
 }
-
-// jmarshall - isometric
-void DisplayClass::ConvertCoordsToIsometric(int& x, int& y) {	
-	int tileWidth = CELL_PIXEL_W;
-	int tileHeight = CELL_PIXEL_H;
-	int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
-	int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
-
-	x = sx + (CELL_PIXEL_W / 2);
-	y = sy + (CELL_PIXEL_W / 2);
-
-	x = x + (ScreenWidth / 2);	
-}
-// jmarshall end
 
 /***********************************************************************************************
  * DisplayClass::Redraw_Icons -- Draws all terrain icons necessary.                            *
@@ -2362,8 +2358,6 @@ void DisplayClass::Redraw_Icons(void)
 				int ypixel;
 
 				if (Coord_To_Pixel(coord, xpixel, ypixel)) {
-					ConvertCoordsToIsometric(xpixel, ypixel);
-
 					CellClass * cellptr = &(*this)[coord];
 
 					/*
@@ -2408,8 +2402,6 @@ void DisplayClass::Redraw_OIcons(void)
 
 				if (Coord_To_Pixel(coord, xpixel, ypixel)) {
 					CellClass * cellptr = &(*this)[coord];
-
-			//		ConvertCoordsToIsometric(xpixel, ypixel);
 
 					/*
 					**	If there is a portion of the underlying icon that could be visible,
