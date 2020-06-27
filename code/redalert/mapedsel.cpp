@@ -81,8 +81,8 @@ int MapEditClass::Select_Object(void)
 	/*
 	**	Convert x,y to offset from cell upper-left
 	*/
-	x = (x-TacPixelX) % ICON_PIXEL_W;
-	y = (y-TacPixelY) % ICON_PIXEL_H;
+	x = (x - TacPixelX) % ICON_PIXEL_W;
+	y = (y - TacPixelY) % ICON_PIXEL_H;
 
 	/*
 	**	Get object at that x,y

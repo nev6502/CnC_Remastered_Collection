@@ -1839,6 +1839,10 @@ bool DisplayClass::Push_Onto_TacMap(COORDINATE & source, COORDINATE & dest)
  *=============================================================================================*/
 ObjectClass * DisplayClass::Cell_Object(CELL cell, int x, int y) const
 {
+	int tileX, tileY;
+	CellClass::ScreenCoordsToIsoTile(x, y, tileX, tileY);
+	x = tileX * CELL_PIXEL_W;
+	y = tileY * CELL_PIXEL_H;
 	return(*this)[cell].Cell_Object(x, y);
 }
 
