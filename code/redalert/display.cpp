@@ -3111,6 +3111,19 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 	x = Get_Mouse_X();
 	y = Get_Mouse_Y();
 
+// jmarshall
+	int tileX, tileY;
+	int screenX, screenY;
+
+	screenX = x;
+	screenY = y;
+	if (!CellClass::ScreenCoordsToIsoTile(x, y, tileX, tileY)) {
+		return 0;
+	}
+	x = tileX * CELL_PIXEL_W;
+	y = tileY * CELL_PIXEL_H;
+// jmarshall end
+
 	bool edge = (y == 0 || x == 0 || x == SeenBuff.Get_Width()-1 || y == SeenBuff.Get_Height()-1);
 	COORDINATE coord = Map.Pixel_To_Coord(x, y);
 	CELL cell = Coord_Cell(coord);
@@ -3291,7 +3304,7 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 		*/
 		if (!edge && (flags & LEFTPRESS)) {
 			Map.Mouse_Left_Up(cell, shadow, object, action);
-			Map.Mouse_Left_Press(x, y);
+			Map.Mouse_Left_Press(screenX, screenY);
 		}
 
 		/*
@@ -3300,7 +3313,7 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 		**	and flag the map to redraw it.
 		*/
 		if (flags & LEFTHELD) {
-			Map.Mouse_Left_Held(x, y);
+			Map.Mouse_Left_Held(screenX, screenY);
 		}
 	}
 
