@@ -941,7 +941,6 @@ static bool _Calc_Partial_Window(int cellx, int celly, int & drawx, int & drawy)
 		ph -= (py + ph) - (ty + th);
 	}
 	if (ph < 1) return(false);
-
 	drawx = drawx - (px-tx);
 	drawy = drawy - (py-ty);
 	return(true);
@@ -1397,10 +1396,10 @@ void CellClass::Draw_It(int x, int y, bool objects)
 			}
 			renderedFrameObjects.push_back(object);
 			int xx,yy;
-			if (object->IsToDisplay && (!object->Is_Techno() || ((TechnoClass *)object)->Visual_Character() == VISUAL_NORMAL) && Map.Coord_To_Pixel(object->Render_Coord(), xx, yy)) {
-				ConvertCoordsToIsometric(xx, yy);
-				if (_Calc_Partial_Window(x, y, xx, yy)) {
-					object->Draw_It(xx, yy, WINDOW_PARTIAL);
+			if (object->IsToDisplay && (!object->Is_Techno() || ((TechnoClass *)object)->Visual_Character() == VISUAL_NORMAL) && Map.Coord_To_Pixel(object->Render_Coord(), xx, yy)) {				
+				{
+					ConvertCoordsToIsometric(xx, yy);
+					object->Draw_It(xx, yy, WINDOW_TACTICAL);
 					if (Debug_Map) {
 						object->IsToDisplay = true;
 					} else {
