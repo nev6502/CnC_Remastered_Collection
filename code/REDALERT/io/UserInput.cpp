@@ -49,6 +49,8 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 
 	const Uint32 MouseState = SDL_GetMouseState(&Mouse.X, &Mouse.Y);
 
+	flags = 0;
+
 	Keyboard->MouseQX = Mouse.X;
 	Keyboard->MouseQY = Mouse.Y;
 
@@ -87,8 +89,9 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 			case SDL_MOUSEMOTION:
 				if ( !( MouseState & SDL_BUTTON(SDL_BUTTON_LEFT) ) )
 				{
-					flags = GadgetClass::LEFTUP;
+					flags |= GadgetClass::LEFTUP;
 				}
+
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
@@ -96,9 +99,9 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 					Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_DOWN;
 
 					key = KN_LMOUSE;
-					flags = GadgetClass::LEFTPRESS;
+					flags |= GadgetClass::LEFTPRESS;
 					
-					EventQueue.Put( new MouseEventMessage(Mouse.X, Mouse.Y, KN_LMOUSE) );
+					EventQueue.Put( EventMessage( Mouse.X, Mouse.Y, KN_LMOUSE ) );
 
 					Keyboard->Put_Element(KN_LMOUSE);
 
@@ -112,12 +115,12 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					Mouse.Button_Right == MouseButtonState::MOUSE_BUTTON_DOWN;
 
-					EventQueue.Put( new MouseEventMessage(Mouse.X, Mouse.Y, KN_RMOUSE) );
+					EventQueue.Put( EventMessage( Mouse.X, Mouse.Y, KN_RMOUSE ) );
 
 					Keyboard->Put_Element(KN_RMOUSE);
 
 					key = KN_RMOUSE;
-					flags = GadgetClass::RIGHTPRESS;
+					flags |= GadgetClass::RIGHTPRESS;
 
 					numFramesLMouse = 0;
 				}
@@ -127,17 +130,17 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 				if (event.button.button == SDL_BUTTON_LEFT) {
 					Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_RELEASE;
 
-					EventQueue.Put(new MouseEventMessage(Mouse.X, Mouse.Y, KN_LMOUSE, UserInputClass::MouseButtonState::MOUSE_BUTTON_RELEASE));
+					EventQueue.Put( EventMessage(Mouse.X, Mouse.Y, KN_LMOUSE, MouseButtonState::MOUSE_BUTTON_RELEASE) );
 
-					flags = GadgetClass::LEFTRELEASE;
+					flags |= GadgetClass::LEFTRELEASE;
 					numFramesLMouse = 0;
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
 					Mouse.Button_Right == MouseButtonState::MOUSE_BUTTON_RELEASE;
 
-					EventQueue.Put( new MouseEventMessage(Mouse.X, Mouse.Y, KN_RMOUSE, UserInputClass::MouseButtonState::MOUSE_BUTTON_RELEASE) );
+					EventQueue.Put( EventMessage(Mouse.X, Mouse.Y, KN_RMOUSE, MouseButtonState::MOUSE_BUTTON_RELEASE) );
 
-					flags = GadgetClass::RIGHTRELEASE;
+					flags |= GadgetClass::RIGHTRELEASE;
 					numFramesLMouse = 0;
 				}
 				break;
@@ -159,6 +162,11 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 				}
 
 				int keyFlags = 0x00;
+				KeyB.Shift = false;
+				KeyB.Alt = false;
+				KeyB.Control = false;
+				KeyB.CapsLock = false;
+
 				if (state[SDL_SCANCODE_RSHIFT] || state[SDL_SCANCODE_LSHIFT]) {
 					KeyB.Shift = true;
 					keyFlags |= KN_SHIFT_BIT;
@@ -176,16 +184,20 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 					KeyB.CapsLock = true;
 				}
 
-				// handle match between SDL and internals (non-text keys)
+				// handle match between SDL and internals ( non-text keys )
 				auto element = sdl_keyMapping.find((SDL_KeyCode)event.key.keysym.sym);
 				if (element != sdl_keyMapping.end())
 				{
 					//EventQueue.Put( element->second | keyFlags );
-					EventQueue.Put( new KeyboardEventMessage( (KeyNumType)element->second, KeyB.Shift, KeyB.Alt, KeyB.Control, KeyB.CapsLock ) );
+					EventQueue.Put( EventMessage( (KeyNumType)element->second, element->second, KeyB.Shift, KeyB.Alt, KeyB.Control, KeyB.CapsLock ) );
 
 					Keyboard->Put_Element( element->second | keyFlags);
 
-					KeyB.ASCII = element->second;
+					KeyB.LastKey = element->first;
+					if (event.text.text[0] == (event.text.text[0] & 0xFF))
+					{
+						KeyB.ASCII = element->second;
+					}
 				}
 
 				break;
@@ -207,8 +219,8 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 	if (!leftMouseProcessed && numFramesLMouse != 0)
 	{
 		Mouse.Button_Left == MouseButtonState::MOUSE_BUTTON_HOLD;
-		flags = GadgetClass::LEFTHELD;
+		flags |= GadgetClass::LEFTHELD;
 
-		EventQueue.Put(new MouseEventMessage(Mouse.X, Mouse.Y, KN_LMOUSE, UserInputClass::MouseButtonState::MOUSE_BUTTON_HOLD));
+		EventQueue.Put( EventMessage(Mouse.X, Mouse.Y, KN_LMOUSE, MouseButtonState::MOUSE_BUTTON_HOLD) );
 	}
 }

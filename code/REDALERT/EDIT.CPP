@@ -253,39 +253,8 @@ int EditClass::Action(unsigned flags, KeyNumType & key)
 		} else {
 #ifdef WIN32
 
-			KeyASCIIType ascii = (KeyASCIIType)(Keyboard->To_ASCII(key) & 0xff);
-
-			/*
-			** Allow numeric keypad presses to map to ascii numbers
-			*/
-			if ((key & WWKEY_VK_BIT) && ascii >='0' && ascii <= '9') {
-
-				key = (KeyNumType)(key & ~WWKEY_VK_BIT);
-				if ( (!(flags & LEFTRELEASE)) && (!(flags & RIGHTRELEASE))) {
-					if (Handle_Key (ascii) ) {
-						flags &= ~KEYBOARD;
-						key = KN_NONE;
-					}
-				}
-			} else {
-				/*
-				** Filter out all special keys except return and backspace
-				*/  	if ((!(key & WWKEY_VK_BIT) && ascii >= ' ' && ascii <= 255)
-					|| key == KN_RETURN || key == KN_BACKSPACE) {
-
-
-
-					if ((!(flags & LEFTRELEASE)) && (!(flags & RIGHTRELEASE))) {
-						if (Handle_Key(Keyboard->To_ASCII(key))) {
-							flags &= ~KEYBOARD;
-							key = KN_NONE;
-						}
-					}
-				} else {
-					flags &= ~KEYBOARD;
-					key = KN_NONE;
-				}
-			}
+			//KeyASCIIType ascii = (KeyASCIIType)(Keyboard->To_ASCII(key) & 0xff);
+			Handle_Key(key, flags);
 		}
 
 #else	//WIN32
@@ -374,11 +343,12 @@ void EditClass::Draw_Text(char const * text)
  * HISTORY:                                                                                    *
  *   01/21/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-bool EditClass::Handle_Key(KeyASCIIType ascii)
+bool EditClass::Handle_Key(KeyNumType key, unsigned flags)
 {
-	unsigned char testAscii = (unsigned char)ascii;
+	unsigned char testAscii = UserInput.KeyB.ASCII;
+	//if (key & KN_SHIFT_BIT || key & KN_CAPSLOCK_BIT) testAscii = toupper(testAscii);
 
-	switch (ascii) {
+	switch (key & 0xff) {
 		/*
 		**	Handle the special case of a non-keyboard event. It is possible that this
 		**	key code might be passed to this routine if this routine has been overridden
@@ -394,14 +364,14 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 		**	so that the controlling program will know that the text can be
 		**	processed.
 		*/
-		case KA_RETURN:
+		case KN_RETURN:
 			Clear_Focus();
 			return(false);
 
 		/*
 		**	When the BACKSPACE key is pressed, remove the last character in the edit string.
 		*/
-		case KA_BACKSPACE:
+		case KN_BACKSPACE:
 			if (Length) {
 				Length--;
 				String[Length] = '\0';
@@ -457,6 +427,7 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 			*/
 			String[Length++] = testAscii;
 			String[Length] = '\0';
+
 			Flag_To_Redraw();
 			break;
 	}

@@ -93,22 +93,22 @@ const int USERINPUT_SHIFT_BIT = 0x100;
 const int USERINPUT_CTRL_BIT = 0x200;
 const int USERINPUT_ALT_BIT = 0x400;
 
+typedef enum {
+	MOUSE_BUTTON_UP,
+	MOUSE_BUTTON_DOWN,
+	MOUSE_BUTTON_HOLD,
+	MOUSE_BUTTON_RELEASE,
+} MouseButtonState;
+
+typedef enum {
+	INPUT_ACTION_NONE,
+	INPUT_ACTION_KEYBOARD,
+	INPUT_ACTION_MOUSE,
+} InputAction;
+
 class UserInputClass
 {
 	public:
-		typedef enum {
-			MOUSE_BUTTON_UP,
-			MOUSE_BUTTON_DOWN,
-			MOUSE_BUTTON_HOLD,
-			MOUSE_BUTTON_RELEASE,
-		} MouseButtonState;
-
-		typedef enum {
-			INPUT_ACTION_NONE,
-			INPUT_ACTION_KEYBOARD,
-			INPUT_ACTION_MOUSE,
-		} InputAction;
-
 		UserInputClass();
 		void UserInputClass::Process_Input( KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags );
 

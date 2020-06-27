@@ -471,7 +471,7 @@ void GadgetClass::Draw_All(bool forced)
  *=========================================================================*/
 KeyNumType GadgetClass::Input(void)
 {	
-	EventMessage* eventMessage = NULL;
+	EventMessage eventMessage;
 	KeyNumType key = KN_NONE;
 	int flags = 0;
 	int forced = false;
@@ -490,11 +490,11 @@ KeyNumType GadgetClass::Input(void)
 	/*
 	**	Fetch any pending keyboard input.
 	*/
-	UserInput.Process_Input(); // key, flags);
+	UserInput.Process_Input(key, flags);
 
 	if ( EventQueue.Check() ) {
 		eventMessage = EventQueue.Get();
-		eventMessage->Key_Flags( key, flags );
+		eventMessage.Key_Flags( key, flags );
 	}
 
 	/*
@@ -518,7 +518,7 @@ KeyNumType GadgetClass::Input(void)
 		**	If there is a gadget that has the keyboard focus, then route all keyboard
 		**	events to it.
 		*/
-		if ( Focused && eventMessage != NULL && eventMessage->EventType == EventMessageType::EVENT_KEYBOARD ) {
+		if ( Focused && eventMessage.EventType == EventMessageType::EVENT_KEYBOARD ) {
 			Focused->Draw_Me(false);
 			Focused->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 			if (Focused) {
