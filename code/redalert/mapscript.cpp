@@ -5711,7 +5711,7 @@
 *=============================================================================================*/
 
 /***********************************************************************************************
- * Script_MoveObjectTo - Assigns a movement order to an object                                 *
+ * Script_OrderMove - Assigns a movement order to an object                                    *
  *                                                                                             *
  *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *                                                                   
  *                                                                                             *
@@ -5728,7 +5728,7 @@
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-    static int Script_MoveObjectTo(lua_State* L) {
+    static int Script_OrderMove(lua_State* L) {
 
         int objectID = lua_tointeger(L, 1);
         int in_x = lua_tointeger(L, 2);
@@ -5737,48 +5737,108 @@
         ObjectClass* this_object = Script_GetCacheObject(objectID);
 
         if (this_object != NULL) {
-            switch (this_object->RTTI) {
-                case RTTI_UNIT: {
 
-                    UnitClass* thisUnit = (UnitClass*)this_object;
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, As_Target(XY_Cell(in_x, in_y)));
 
-                    Queue_Mission(TargetClass(thisUnit), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
+            lua_pushnumber(L, 1);
+            return 1;
 
-                    lua_pushnumber(L, 1);
-                    return 1;
+        }
 
-                }break;
-                case RTTI_INFANTRY: {
+        lua_pushnumber(L, -1);
+        return 1;
 
-                    InfantryClass* thisInfantry = (InfantryClass*)this_object;
+    }
 
-                    Queue_Mission(TargetClass(thisInfantry), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
+    /***********************************************************************************************
+     * Script_OrderAttackCell - Assigns an attack order to an object for a specific cell           *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x       (int) - X location to attack                                    *
+     *                                                                                             *
+     *                  in_y       (int) - Y location to attack                                    *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderAttackCell(lua_State* L) {
 
-                    lua_pushnumber(L, 1);
-                    return 1;
+        int objectID = lua_tointeger(L, 1);
 
-                }break;
-                case RTTI_AIRCRAFT: {
+        int in_x = lua_tointeger(L, 2);
+        int in_y = lua_tointeger(L, 3);
 
-                    AircraftClass* thisAircraft = (AircraftClass*)this_object;
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
 
-                    Queue_Mission(TargetClass(thisAircraft), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
+        if (this_object != NULL) {
 
-                    lua_pushnumber(L, 1);
-                    return 1;
-
-                }break;
-                case RTTI_VESSEL: {
-
-                    VesselClass* thisVessel = (VesselClass*)this_object;
-
-                    Queue_Mission(TargetClass(thisVessel), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
-
-                    lua_pushnumber(L, 1);
-                    return 1;
-
-                }break;
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
             }
+
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, this_target, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
+        }
+
+        lua_pushnumber(L, -1);
+        return 1;
+
+    }
+  
+    /***********************************************************************************************
+     * Script_OrderAttack - Assigns an attack order to an object                                   *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x       (int) - X location to attack                                    *
+     *                                                                                             *
+     *                  in_y       (int) - Y location to attack                                    *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderAttack(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+
+        int in_x = -1;
+        int in_y = -1;
+        if (lua_gettop(L) == 3) {
+            in_x = lua_tointeger(L, 2);
+            in_y = lua_tointeger(L, 3);
+        }
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        if (this_object != NULL) {
+
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
+            }
+
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
         }
 
         lua_pushnumber(L, -1);
@@ -5786,6 +5846,255 @@
 
     }
     
+    /***********************************************************************************************
+     * Script_OrderHunt - Assigns a hunt order to an object                                        *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x  (opt)(int) - X location to attack                                    *
+     *                                                                                             *
+     *                  in_y  (opt)(int) - Y location to attack                                    *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderHunt(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+
+        int in_x = -1;
+        int in_y = -1;
+        if (lua_gettop(L) == 3) {
+            in_x = lua_tointeger(L, 2);
+            in_y = lua_tointeger(L, 3);
+        }
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        if (this_object != NULL) {
+
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
+            }
+
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
+        }
+
+        lua_pushnumber(L, -1);
+        return 1;
+
+    }
+    
+    /***********************************************************************************************
+     * Script_OrderGuard - Assigns a guard order to an object                                      *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x  (opt)(int) - X location to attack                                    *
+     *                                                                                             *
+     *                  in_y  (opt)(int) - Y location to attack                                    *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderGuard(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+
+        int in_x = -1;
+        int in_y = -1;
+        if (lua_gettop(L) == 3) {
+            in_x = lua_tointeger(L, 2);
+            in_y = lua_tointeger(L, 3);
+        }
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        if (this_object != NULL) {
+
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
+            }
+
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
+        }
+
+        lua_pushnumber(L, -1);
+        return 1;
+
+    }
+    
+    /***********************************************************************************************
+     * Script_OrderRetreat - Assigns a retreat order to an object                                  *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x  (opt)(int) - X location to attack                                    *
+     *                                                                                             *
+     *                  in_y  (opt)(int) - Y location to attack                                    *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderRetreat(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+
+        int in_x = -1;
+        int in_y = -1;
+        if (lua_gettop(L) == 3) {
+            in_x = lua_tointeger(L, 2);
+            in_y = lua_tointeger(L, 3);
+        }
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        if (this_object != NULL) {
+
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
+            }
+
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
+        }
+
+        lua_pushnumber(L, -1);
+        return 1;
+
+    }
+    
+    /***********************************************************************************************
+     * Script_OrderEnter - Assigns an enter order to an object                                     *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x  (opt)(int) - X location to enter (building / unit)                   *
+     *                                                                                             *
+     *                  in_y  (opt)(int) - Y location to enter (building / unit)                   *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderEnter(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+
+        int in_x = -1;
+        int in_y = -1;
+        if (lua_gettop(L) == 3) {
+            in_x = lua_tointeger(L, 2);
+            in_y = lua_tointeger(L, 3);
+        }
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        if (this_object != NULL) {
+
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
+            }
+
+            Queue_Mission(TargetClass(this_object), MISSION_ENTER, this_target, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
+        }
+
+        lua_pushnumber(L, -1);
+        return 1;
+
+    }
+
+    /***********************************************************************************************
+     * Script_OrderCapture - Assigns a capture order to an object                                  *
+     *                                                                                             *
+     *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+     *                                                                                             *
+     *                  in_x  (opt)(int) - X location to capture (building)                        *
+     *                                                                                             *
+     *                  in_y  (opt)(int) - Y location to capture (building)                        *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * INPUT:  lua_State - The current Lua state                                                   *
+     *                                                                                             *
+     * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    static int Script_OrderCapture(lua_State* L) {
+
+        int objectID = lua_tointeger(L, 1);
+
+        int in_x = -1;
+        int in_y = -1;
+        if (lua_gettop(L) == 3) {
+            in_x = lua_tointeger(L, 2);
+            in_y = lua_tointeger(L, 3);
+        }
+
+        ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+        if (this_object != NULL) {
+
+            TARGET this_target = 0;
+            if (in_x >= 0 && in_y >= 0) {
+                this_target = As_Target(XY_Cell(in_x, in_y));
+            }
+
+            Queue_Mission(TargetClass(this_object), MISSION_CAPTURE, this_target, this_target);
+
+            lua_pushnumber(L, 1);
+            return 1;
+
+        }
+
+        lua_pushnumber(L, -1);
+        return 1;
+
+    }
 
 /**********************************************************************************************
 * Mission Utility Functions                                                                   *
@@ -7201,16 +7510,21 @@
             lua_register(L, "GetHouseAttribute", Script_GetHouseAttribute);	                // Gets a house's attributes
 
             lua_register(L, "BuildUnit", Script_BuildUnit);	                                // Builds a unit in a given factory / barracks / naval yard / etc
-            lua_register(L, "CreateVehicle", Script_CreateVehicle);                               // Creates a unit out of thin air
-            lua_register(L, "CreateInfantry", Script_CreateInfantry);                               // Creates a unit out of thin air
-            lua_register(L, "CreateAircraft", Script_CreateAircraft);                               // Creates a unit out of thin air
-            lua_register(L, "CreateVessel", Script_CreateVessel);                               // Creates a unit out of thin air
+            lua_register(L, "CreateVehicle", Script_CreateVehicle);                         // Creates a unit out of thin air
+            lua_register(L, "CreateInfantry", Script_CreateInfantry);                       // Creates a unit out of thin air
+            lua_register(L, "CreateAircraft", Script_CreateAircraft);                       // Creates a unit out of thin air
+            lua_register(L, "CreateVessel", Script_CreateVessel);                           // Creates a unit out of thin air
 
         /**********************************************************************************************
         * Object Orders Functions                                                                     *
         *=============================================================================================*/
 
-            lua_register(L, "MoveObjectTo", Script_MoveObjectTo);                               // Assigns a movement order to the object
+            lua_register(L, "OrderMove", Script_OrderMove);                                 // Assigns a movement order to the object
+            lua_register(L, "OrderAttack", Script_OrderAttack);                             // Assigns an attack order to the object
+            lua_register(L, "OrderHunt", Script_OrderHunt);                                 // Assigns a hunt order to the object
+            lua_register(L, "OrderGuard", Script_OrderGuard);                               // Assigns a guard order to the object
+            lua_register(L, "OrderEnter", Script_OrderEnter);                               // Assigns a enter order to the object
+            lua_register(L, "OrderCapture", Script_OrderCapture);                           // Assigns a capture order to the object
 
         /**********************************************************************************************
         * Mission Utility Functions                                                                   *
