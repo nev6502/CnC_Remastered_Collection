@@ -4,115 +4,148 @@
 -- *                                                       *
 -- *=======================================================*
 
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Houses (players)                                     *
+    -- *                                                       *
+    -- *********************************************************
+    Houses={
+        SPAIN=0,      --  YELLOW/GOLD
+        GREECE=1,     --  BLUE-GREY
+        USSR=2,       --  RED
+        ENGLAND=3,    --  GREEN
+        UKRAINE=4,    --  ORANGE
+        GERMANY=5,    --  KHAKI/LIGHT BROWN
+        FRANCE=6,     --  AQUA
+        TURKEY=7,     --  RED-OCHRE
+        GOODGUY=8,    --  BLUE-GREY
+        BADGUY=9,     --  RED
+        NEUTRAL=10,   --  YELLOW/GOLD
+        SPECIAL=11,   --  YELLOW/GOLD
+        MULTI1=12,    --  YELLOW/GOLD
+        MULTI2=13,    --  BLUE-GREY
+        MULTI3=14,    --  RED
+        MULTI4=15,    --  GREEN
+        MULTI5=16,    --  ORANGE
+        MULTI6=17,    --  KHAKI/LIGHT BROWN
+        MULTI7=18,    --  AQUA
+        MULTI8=19     --  RED-OCHRE
+    }
 
     -- *********************************************************
     -- *                                                       *
     -- *  Buildings                                            *
     -- *                                                       *
     -- *********************************************************
-
-        BUILDING_ATEK=0   -- Allied Technology Centre
-        BUILDING_IRON=1   -- Iron Curtain
-        BUILDING_WEAP=2   -- Weapons Factory
-        BUILDING_PDOX=3   -- Chronosphere
-        BUILDING_PBOX=4   -- Pillbox
-        BUILDING_HBOX=5   -- Camouflaged Pillbox
-        BUILDING_DOME=6   -- Radar Dome
-        BUILDING_GAP =7   -- Gap Generator
-        BUILDING_GUN =8   -- Gun Turret
-        BUILDING_AGUN=9   -- Anti-Aircraft Gun
-        BUILDING_FTUR=10  -- Flame Turret
-        BUILDING_FACT=11  -- Construction Yard
-        BUILDING_PROC=12  -- Ore Refinery
-        BUILDING_SILO=13  -- Ore Silo
-        BUILDING_HPAD=14  -- Helicopter Pad
-        BUILDING_SAM =15  -- SAM Site
-        BUILDING_AFLD=16  -- Airfield
-        BUILDING_POWR=17  -- Power Plant
-        BUILDING_APWR=18  -- Advanced Power Plant
-        BUILDING_STEK=19  -- Soviet Technology Centre
-        BUILDING_HOSP=20  -- Hospital
-        BUILDING_BARR=21  -- Barracks (Allied)
-        BUILDING_TENT=22  -- Barracks (Soviet)
-        BUILDING_KENN=23  -- Dog Kennel
-        BUILDING_FIX =24  -- Service Depot
-        BUILDING_BIO =25  -- Bio-Research Laboratory
-        BUILDING_MISS=26  -- Technology Centre/Prison
-        BUILDING_SYRD=27  -- Ship Yard
-        BUILDING_SPEN=28  -- Sub Pen
-        BUILDING_MSLO=29  -- Missile Silo
-        BUILDING_FCOM=30  -- Forward Command Post
-        BUILDING_TSLA=31  -- Tesla Coil
-        BUILDING_WEAF=32  -- Fake Weapons Factory
-        BUILDING_FACF=33  -- Fake Construction Yard
-        BUILDING_SYRF=34  -- Fake Ship Yard
-        BUILDING_SPEF=35  -- Fake Sub Pen
-        BUILDING_DOMF=36  -- Fake Radar Dome
-        BUILDING_MINV=43  -- Anti-vehicle mine
-        BUILDING_MINP=44  -- Anti-personnel mine
+    
+    BuildingTypes={
+        ATEK=0,   -- Allied Technology Centre
+        IRON=1,   -- Iron Curtain
+        WEAP=2,   -- Weapons Factory
+        PDOX=3,   -- Chronosphere
+        PBOX=4,   -- Pillbox
+        HBOX=5,   -- Camouflaged Pillbox
+        DOME=6,   -- Radar Dome
+        GAP =7,   -- Gap Generator
+        GUN =8,   -- Gun Turret
+        AGUN=9,   -- Anti-Aircraft Gun
+        FTUR=10,  -- Flame Turret
+        FACT=11,  -- Construction Yard
+        PROC=12,  -- Ore Refinery
+        SILO=13,  -- Ore Silo
+        HPAD=14,  -- Helicopter Pad
+        SAM =15,  -- SAM Site
+        AFLD=16,  -- Airfield
+        POWR=17,  -- Power Plant
+        APWR=18,  -- Advanced Power Plant
+        STEK=19,  -- Soviet Technology Centre
+        HOSP=20,  -- Hospital
+        BARR=21,  -- Barracks (Allied)
+        TENT=22,  -- Barracks (Soviet)
+        KENN=23,  -- Dog Kennel
+        FIX =24,  -- Service Depot
+        BIO =25,  -- Bio-Research Laboratory
+        MISS=26,  -- Technology Centre/Prison
+        SYRD=27,  -- Ship Yard
+        SPEN=28,  -- Sub Pen
+        MSLO=29,  -- Missile Silo
+        FCOM=30,  -- Forward Command Post
+        TSLA=31,  -- Tesla Coil
+        WEAF=32,  -- Fake Weapons Factory
+        FACF=33,  -- Fake Construction Yard
+        SYRF=34,  -- Fake Ship Yard
+        SPEF=35,  -- Fake Sub Pen
+        DOMF=36,  -- Fake Radar Dome
+        MINV=43,  -- Anti-vehicle mine
+        MINP=44,  -- Anti-personnel mine
 
         -- Counterstrike
 
-        BUILDING_QUEE=84  -- Queen ant structure
-        BUILDING_LAR1=85  -- Ant - single ant larva
-        BUILDING_LAR2=86  -- Ant - two ant larvae
-
+        QUEE=84,  -- Queen ant structure
+        LAR1=85,  -- Ant - single ant larva
+        LAR2=86   -- Ant - two ant larvae
+    }
+    
     -- *********************************************************
     -- *                                                       *
     -- *  Infantry                                             *
     -- *                                                       *
     -- *********************************************************
 
-        INFANTRY_E1=0         -- Rifle Infantry
-        INFANTRY_E2=1         -- Grenadier
-        INFANTRY_E3=2         -- Rocket Soldier
-        INFANTRY_E4=3         -- Flamethrower
-        INFANTRY_E6=4         -- Engineer
-        INFANTRY_E7=5         -- Tanya
-        INFANTRY_SPY=6        -- Spy
-        INFANTRY_THF=7        -- Thief
-        INFANTRY_MEDI=8       -- Field Medic
-        INFANTRY_GNRL=9       -- General
-        INFANTRY_DOG=10       -- Attack Dog
-        INFANTRY_C1=11        -- Joe
-        INFANTRY_C2=12        -- Barry
-        INFANTRY_C3=13        -- Shelly
-        INFANTRY_C4=14        -- Maria
-        INFANTRY_C5=15        -- Karen
-        INFANTRY_C6=16        -- Steve
-        INFANTRY_C7=17        -- Phil
-        INFANTRY_C8=18        -- Dwight
-        INFANTRY_C9=19        -- Erik
-        INFANTRY_C10=20       -- Scientist
-        INFANTRY_EINSTEIN=21  -- Prof. Einstein
-        INFANTRY_DELPHI=22    -- Special 1
-        INFANTRY_CHAN=23      -- Special 2
-
+    InfantryTypes={
+        E1=0,         -- Rifle Infantry
+        E2=1,         -- Grenadier
+        E3=2,         -- Rocket Soldier
+        E4=3,         -- Flamethrower
+        E6=4,         -- Engineer
+        E7=5,         -- Tanya
+        SPY=6,        -- Spy
+        THF=7,        -- Thief
+        MEDI=8,       -- Field Medic
+        GNRL=9,       -- General
+        DOG=10,       -- Attack Dog
+        C1=11,        -- Joe
+        C2=12,        -- Barry
+        C3=13,        -- Shelly
+        C4=14,        -- Maria
+        C5=15,        -- Karen
+        C6=16,        -- Steve
+        C7=17,        -- Phil
+        C8=18,        -- Dwight
+        C9=19,        -- Erik
+        C10=20,       -- Scientist
+        EINSTEIN=21,  -- Prof. Einstein
+        DELPHI=22,    -- Special 1
+        CHAN=23       -- Special 2
+    }
+    
     -- *********************************************************
     -- *                                                       *
     -- *  Vehicle                                              *
     -- *                                                       *
     -- *********************************************************
 
-        VEHICLE_4TNK=0     -- Mammoth Tank
-        VEHICLE_3TNK=1     -- Heavy Tank
-        VEHICLE_2TNK=2     -- Medium Tank
-        VEHICLE_1TNK=3     -- Light Tank
-        VEHICLE_APC=4      -- Armoured Personnel Carrier
-        VEHICLE_MNLY=5     -- Mine Layer
-        VEHICLE_JEEP=6     -- Ranger
-        VEHICLE_HARV=7     -- Ore Truck
-        VEHICLE_ARTY=8     -- Artillery
-        VEHICLE_MRJ=9      -- Mobile Radar Jammer
-        VEHICLE_MGG=10     -- Mobile Gap Generator
-        VEHICLE_MCV=11     -- Mobile Construction Vehicle
-        VEHICLE_2VRL=12    -- V2 Rocket Launcher
-        VEHICLE_TRUK=13    -- Convoy Truck
+    VehicleTypes={
+        _4TNK=0,    -- Mammoth Tank
+        _3TNK=1,    -- Heavy Tank
+        _2TNK=2,    -- Medium Tank
+        _1TNK=3,    -- Light Tank
+        APC=4,      -- Armoured Personnel Carrier
+        MNLY=5,     -- Mine Layer
+        JEEP=6,     -- Ranger
+        HARV=7,     -- Ore Truck
+        ARTY=8,     -- Artillery
+        MRJ=9,      -- Mobile Radar Jammer
+        MGG=10,     -- Mobile Gap Generator
+        MCV=11,     -- Mobile Construction Vehicle
+        _2VRL=12,   -- V2 Rocket Launcher
+        TRUK=13,    -- Convoy Truck
 
         -- Counterstrike only:
-        VEHICLE_ANT1=14    -- First ant type
-        VEHICLE_ANT2=15    -- Second ant type
-        VEHICLE_ANT3=16    -- Third ant type
+        ANT1=14,    -- First ant type
+        ANT2=15,    -- Second ant type
+        ANT3=16     -- Third ant type
+    }
 
     -- *********************************************************
     -- *                                                       *
@@ -120,159 +153,183 @@
     -- *                                                       *
     -- *********************************************************
 
-        AIRCRAFT_TRAN=0   -- Chinook Helicopter
-        AIRCRAFT_BADR=1   -- Badger Bomber
-        AIRCRAFT_U2=2     -- Spy Plane
-        AIRCRAFT_MIG=3    -- MIG Attack Plane
-        AIRCRAFT_YAK=4    -- Yak Attack Plane
-        AIRCRAFT_HELI=5   -- Longbow Helicopter
-        AIRCRAFT_HIND=6   -- Hind Helicopter
-
-    -- *********************************************************
-    -- *                                                       *
-    -- *  Houses (players)                                     *
-    -- *                                                       *
-    -- *********************************************************
-
-        HOUSE_SPAIN= 0     --  YELLOW/GOLD
-        HOUSE_GREECE=1     --  BLUE-GREY
-        HOUSE_USSR=2       --  RED
-        HOUSE_ENGLAND=3    --  GREEN
-        HOUSE_UKRAINE=4    --  ORANGE
-        HOUSE_GERMANY=5    --  KHAKI/LIGHT BROWN
-        HOUSE_FRANCE=6     --  AQUA
-        HOUSE_TURKEY=7     --  RED-OCHRE
-        HOUSE_GOODGUY=8    --  BLUE-GREY
-        HOUSE_BADGUY=9     --  RED
-        HOUSE_NEUTRAL=10   --  YELLOW/GOLD
-        HOUSE_SPECIAL=11   --  YELLOW/GOLD
-        HOUSE_MULTI1=12    --  YELLOW/GOLD
-        HOUSE_MULTI2=13    --  BLUE-GREY
-        HOUSE_MULTI3=14    --  RED
-        HOUSE_MULTI4=15    --  GREEN
-        HOUSE_MULTI5=16    --  ORANGE
-        HOUSE_MULTI6=17    --  KHAKI/LIGHT BROWN
-        HOUSE_MULTI7=18    --  AQUA
-        HOUSE_MULTI8=19    --  RED-OCHRE
-
-    -- *********************************************************
-    -- *                                                       *
-    -- *  Special weapons                                      *
-    -- *                                                       *
-    -- *********************************************************
-        SPECIAL_WEAPON_SONAR=0
-        SPECIAL_WEAPON_NUKE=1
-        SPECIAL_WEAPON_CHRONO=2
-        SPECIAL_WEAPON_PARABOMB=3
-        SPECIAL_WEAPON_PARATROOPS=4
-        SPECIAL_WEAPON_SPY_PLANE=5
-        SPECIAL_WEAPON_IRON_CURTAIN=6
-        SPECIAL_WEAPON_GPS=7
-
-    -- *********************************************************
-    -- *                                                       *
-    -- *  Target types (for use with DesignatePreferredTarget) *
-    -- *                                                       *
-    -- *********************************************************
-        TARGET_TYPE_ANYTHING=1
-        TARGET_TYPE_BUILDINGS=2
-        TARGET_TYPE_HARVESTERS=3
-        TARGET_TYPE_INFANTRY=4
-        TARGET_TYPE_VEHICLES=5
-        TARGET_TYPE_SHIPS=6
-        TARGET_TYPE_FACTORIES=7
-        TARGET_TYPE_BASE_DEFENCES=8
-        TARGET_TYPE_BASE_THREATS=9
-        TARGET_TYPE_POWER=10
-        TARGET_TYPE_FAKE_BUILDINGS=11
-
-    -- *********************************************************
-    -- *                                                       *
-    -- *  Trigger persistance                                  *
-    -- *                                                       *
-    -- *********************************************************
-        TRIGGER_VOLATILE=0
-        TRIGGER_SEMI_PERSISTENT=1
-        TRIGGER_PERSISTENT=2
-
-    -- *********************************************************
-    -- *                                                       *
-    -- *  Attribite Types                                      *
-    -- *                                                       *
-    -- *********************************************************
-        ATTRIBUTE_NONE=0
-        ATTRIBUTE_STRENGTH=1            -- Object attribute
-        ATTRIBUTE_MAX_STRENGTH=2        -- Definition attribute
-        ATTRIBUTE_COST=3                -- Definition attribute
-        ATTRIBUTE_SIGHT_RANGE=4         -- Definition attribute
-        ATTRIBUTE_TECH_LEVEL=5          -- Definition attribute
-        ATTRIBUTE_ARMOR=6
-        ATTRIBUTE_PRIMARY_WEAPON=7
-        ATTRIBUTE_SECONDARY_WEAPON=8
-        ATTRIBUTE_SPEED=9
-        ATTRIBUTE_MAX_SPEED=10
-        ATTRIBUTE_MAX_AMMO=11
-        ATTRIBUTE_ROTATION_SPEED=12
-        ATTRIBUTE_IS_CRUSHABLE=13
-        ATTRIBUTE_IS_STEALTHY=14
-        ATTRIBUTE_IS_SELECTABLE=15
-        ATTRIBUTE_IS_LEGAL_TARGET=16
-        ATTRIBUTE_IS_REPAIRABLE=17
-        ATTRIBUTE_IS_SELF_HEALING=18
-        ATTRIBUTE_IS_EXPLODING=19
-        ATTRIBUTE_HAS_CREW=20
-        ATTRIBUTE_MAX_PASSENGERS=21
-        
+    AircraftTypes={
+        TRAN=0,   -- Chinook Helicopter
+        BADR=1,   -- Badger Bomber
+        U2=2,     -- Spy Plane
+        MIG=3,    -- MIG Attack Plane
+        YAK=4,    -- Yak Attack Plane
+        HELI=5,   -- Longbow Helicopter
+        HIND=6,   -- Hind Helicopter
+    }
+    
     -- *********************************************************
     -- *                                                       *
     -- *  Armor Types                                          *
     -- *                                                       *
     -- *********************************************************
-        ARMOR_NONE=0
-        ARMOR_WOOD=1
-        ARMOR_ALUMINUM=2
-        ARMOR_STEEL=3
-        ARMOR_CONCRETE=4
-        
+    ArmorTypes={
+        NONE=0,
+        WOOD=1,
+        ALUMINUM=2,
+        STEEL=3,
+        CONCRETE=4
+    } 
+    
     -- *********************************************************
     -- *                                                       *
     -- *  Weapon Types                                         *
     -- *                                                       *
     -- *********************************************************
-        WEAPON_COLT45=0
-        WEAPON_ACK_ACK=1
-        WEAPON_VULCAN=2
-        WEAPON_MAVERICK=3
-        WEAPON_CAMERA=4
-        WEAPON_FIREBALL=5
-        WEAPON_RIFLE=6
-        WEAPON_CHAIN_GUN=7
-        WEAPON_PISTOL=8
-        WEAPON_M16=9
-        WEAPON_DRAGON=10
-        WEAPON_HELLFIRE=11
-        WEAPON_GRENADE=12
-        WEAPON_75MM=13
-        WEAPON_90MM=14
-        WEAPON_105MM=15
-        WEAPON_120MM=16
-        WEAPON_TURRET_GUN=17
-        WEAPON_MAMMOTH_TUSK=18
-        WEAPON_155MM=19
-        WEAPON_M60MG=20
-        WEAPON_NAPALM=21
-        WEAPON_TESLA_ZAP=22
-        WEAPON_NIKE=23
-        WEAPON_8INCH=24
-        WEAPON_STINGER=25
-        WEAPON_TORPEDO=26
-        WEAPON_2INCH=27
-        WEAPON_DEPTH_CHARGE=28
-        WEAPON_PARA_BOMB=29
-        WEAPON_DOGJAW=30
-        WEAPON_HEAL=31
-        WEAPON_SCUD=32
-        WEAPON_FLAMER=33
-        WEAPON_REDEYE=34
-
+    WeaponTypes={
+        NONE=-1,
+        COLT45=0,
+        ACK_ACK=1,
+        VULCAN=2,
+        MAVERICK=3,
+        CAMERA=4,
+        FIREBALL=5,
+        RIFLE=6,
+        CHAIN_GUN=7,
+        PISTOL=8,
+        M16=9,
+        DRAGON=10,
+        HELLFIRE=11,
+        GRENADE=12,
+        _75MM=13,
+        _90MM=14,
+        _105MM=15,
+        _120MM=16,
+        TURRET_GUN=17,
+        MAMMOTH_TUSK=18,
+        _155MM=19,
+        M60MG=20,
+        NAPALM=21,
+        TESLA_ZAP=22,
+        NIKE=23,
+        _8INCH=24,
+        STINGER=25,
+        TORPEDO=26,
+        _2INCH=27,
+        DEPTH_CHARGE=28,
+        PARA_BOMB=29,
+        DOGJAW=30,
+        HEAL=31,
+        SCUD=32,
+        FLAMER=33,
+        REDEYE=34
+    }
     
+    
+    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Special weapons                                      *
+    -- *                                                       *
+    -- *********************************************************
+    SpecialWeapons={
+        Sonar=0,
+        Nuke=1,
+        Chrono=2,
+        Parabomb=3,
+        Paratroops=4,
+        SpyPlane=5,
+        IronCurtain=6,
+        GPS=7
+    }
+    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Target types (for use with DesignatePreferredTarget) *
+    -- *                                                       *
+    -- *********************************************************
+    TargetTypes={
+        Anything=1,
+        Buildings=2,
+        Harvesters=3,
+        Infantry=4,
+        Vehicles=5,
+        Ships=6,
+        Factories=7,
+        BaseDefences=8,
+        BaseThreats=9,
+        Power=10,
+        FakeBuildings=11
+    }
+    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Trigger persistance                                  *
+    -- *                                                       *
+    -- *********************************************************
+    PersistenceTypes={
+        Volatile=0,
+        SemiPersistent=1,
+        Persistent=2
+    }
+    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Attribite Types                                      *
+    -- *                                                       *
+    -- *********************************************************
+    Attributes = {
+        Type=0,
+        Strength=1,           -- Object attribute
+        MaxStrength=2,        -- Definition attribute
+        Cost=3,               -- Definition attribute
+        SightRange=4,         -- Definition attribute
+        TechLevel=5,          -- Definition attribute
+        Armor=6,
+        PrimaryWeapon=7,
+        SecondaryWeapon=8,
+        Speed=9,
+        MaxSpeed=10,
+        MaxAmmo=11,
+        RotationSpeed=12,
+        IsCrushable=13,
+        IsStealthy=14,
+        IsSelectable=15,
+        IsLegalTarget=16,
+        IsRepairable=17,
+        IsSelfHealing=18,
+        Explodes=19,
+        HasCrew=20,
+        MaxPassengers=21,
+        IsRepairing=22,
+        
+        -- Building Specific
+        Capacity=23,
+        Power=24,
+        Sellable=25,
+
+        -- Unit Specific
+        IsCrateGoodie=26,
+        IsCrusher=27,
+        IsHarvest=28,
+        IsRadarEquipped=29,
+        IsJammer=30,
+        IsGapper=31,
+
+        -- Infantry Specific
+        IsFemale=32,
+        Capture=33,
+        IsFraidyCat=34,
+        IsCivilian=35,
+        IsBomber=36,
+        IsDog=37
+        
+    }
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Fear Type Attribute Values                           *
+    -- *                                                       *
+    -- *********************************************************
+    FearTypes={
+        None=0,       -- No fear at all (default state).
+        Anxious=10,   -- Something makes them scared.
+        Scared=100,   -- Scared enough to take cover.
+        Panic=200,    -- Run away! Run away!
+        Maximum=255   -- Scared to death.
+    }

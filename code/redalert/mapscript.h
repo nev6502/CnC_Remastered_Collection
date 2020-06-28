@@ -1,4 +1,4 @@
-// MapScript.h
+// mapscript.h
 //
 
 #ifndef MAPSCRIPT_H
@@ -20,6 +20,15 @@ struct MapScriptObject {
 	RTTIType RTTI; // The type of object
 };
 
+// Stores defaults of rules from before
+// variables were changed within
+struct MapScriptDefaultAttribute {
+    RTTIType RTTI; // The type of object
+    int ID=-1; // The index of the object in its heap
+    int attribute;
+    int value;
+};
+
 
 //
 // MapScript Class
@@ -38,6 +47,7 @@ public:
 	void SetLuaPath(const char* input_path);
 
 	std::vector<MapScriptObject*> ObjectCache;
+	std::vector<MapScriptDefaultAttribute*> DefaultTypeAttributeCache;
 
 private:
 	lua_State* L;
@@ -47,7 +57,9 @@ private:
 
 // Enums
 typedef enum MapScriptAttributeType : char {
-    ATTRIBUTE_NONE=0,
+
+    // Techno types
+    ATTRIBUTE_TYPE=0,
     ATTRIBUTE_STRENGTH,
     ATTRIBUTE_MAX_STRENGTH,
     ATTRIBUTE_COST,
@@ -60,15 +72,39 @@ typedef enum MapScriptAttributeType : char {
     ATTRIBUTE_MAX_SPEED,
     ATTRIBUTE_MAX_AMMO,
     ATTRIBUTE_ROTATION_SPEED,
-    ATTRIBUTE_IS_CRUSHABLE,
-    ATTRIBUTE_IS_STEALTHY,
-    ATTRIBUTE_IS_SELECTABLE,
-    ATTRIBUTE_IS_LEGAL_TARGET,
-    ATTRIBUTE_IS_REPAIRABLE,
-    ATTRIBUTE_IS_SELF_HEALING,
-    ATTRIBUTE_IS_EXPLODING,
+    ATTRIBUTE_CRUSHABLE,
+    ATTRIBUTE_STEALTHY,
+    ATTRIBUTE_SELECTABLE,
+    ATTRIBUTE_LEGAL_TARGET,
+    ATTRIBUTE_REPAIRABLE,
+    ATTRIBUTE_SELF_HEALING,
+    ATTRIBUTE_EXPLODES,
     ATTRIBUTE_HAS_CREW,
-    ATTRIBUTE_MAX_PASSENGERS
+    ATTRIBUTE_MAX_PASSENGERS,
+    ATTRIBUTE_IS_REPAIRING,
+
+    // Building Specific
+    ATTRIBUTE_CAPACITY,
+    ATTRIBUTE_POWER,
+    ATTRIBUTE_SELLABLE,
+
+    // Unit Specific
+    ATTRIBUTE_CRATE_GOODIE,
+    ATTRIBUTE_CRUSHER,
+    ATTRIBUTE_HARVEST,
+    ATTRIBUTE_RADAR_EQUIPPED,
+    ATTRIBUTE_JAMMER,
+    ATTRIBUTE_GAPPER,
+
+    // Infantry Specific
+    ATTRIBUTE_FEMALE,
+    ATTRIBUTE_CAPTURE,
+    ATTRIBUTE_FRAIDY_CAT,
+    ATTRIBUTE_CIVILIAN,
+    ATTRIBUTE_BOMBER,
+    ATTRIBUTE_DOG
+
+
 } MapScriptAttributeType;
 
 // Non-Class-Functions
@@ -83,5 +119,6 @@ int Script_VesselIndexFromID(int input_object_id);
 
 static int Script_SetObjectTypeAttribute(lua_State* L, TechnoTypeClass* this_type_class, MapScriptAttributeType attribute_type);
 
+void Script_CacheDefaultAttribute(RTTIType input_rtti, int input_id, MapScriptAttributeType input_attribute, int input_value);
 
 #endif

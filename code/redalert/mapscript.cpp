@@ -1,5 +1,5 @@
-#include "FUNCTION.H"
-#include "MapScript.h"
+#include "function.H"
+#include "mapscript.h"
 
 /**********************************************************************************************
 * Red Alert Vanilla Actions                                                                   *
@@ -3306,14 +3306,39 @@
 
             
 
-
+            // Global attributes / Multi object attributes
             switch ((MapScriptAttributeType)attribute_type) {
+                case ATTRIBUTE_TYPE: {
+
+                }break;
                 case ATTRIBUTE_STRENGTH: {
 
                     int attribute_value = lua_tointeger(L, 3);
                     this_object->Strength = attribute_value;
 
                 }break;
+
+                case ATTRIBUTE_IS_REPAIRING: {
+
+                    int attribute_value = lua_tointeger(L, 3);
+
+                    switch (this_object->RTTI) {
+                        case RTTI_BUILDING: {
+
+                            BuildingClass* this_building = (BuildingClass*)this_object;
+                            this_building->IsRepairing = attribute_value;
+
+                        }break;
+                        case RTTI_VESSEL: {
+
+                                        VesselClass* this_vessel = (VesselClass*)this_object;
+                                        this_vessel->IsSelfRepairing = attribute_value;
+
+                        }break;
+                    }
+                }break;
+
+                // Object Class specific
                 default: {
 
                     TechnoTypeClass* this_type_class;
@@ -3344,7 +3369,7 @@
                             this_type_class = AircraftTypes.Ptr(this_object->Class_Of().ID);
 
                         break;
-                        }
+                    }
                     
 
                     if (this_type_class != NULL) {
@@ -3531,6 +3556,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->MaxStrength);
+
+                // Set the attribute
                 this_type_class->MaxStrength = attribute_value;
 
             }break;
@@ -3539,6 +3568,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->Cost);
+
+                // Set the attribute
                 this_type_class->Cost = attribute_value;
 
             }break;
@@ -3546,6 +3579,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->SightRange);
+
+                // Set the attribute
                 this_type_class->SightRange = attribute_value;
 
             }break;
@@ -3553,6 +3590,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->Level);
+
+                // Set the attribute
                 this_type_class->Level = attribute_value;
 
             }break;
@@ -3560,6 +3601,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->Armor);
+
+                // Set the attribute
                 this_type_class->Armor = (ArmorType)attribute_value;
 
             }break;
@@ -3567,9 +3612,24 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
-                WeaponTypeClass* this_weapon = Weapons.Ptr(attribute_value);
-                if (this_weapon != NULL) {
-                    this_type_class->PrimaryWeapon = this_weapon;
+                if (this_type_class->PrimaryWeapon != NULL) {
+                    // Cache default value if first time changing this attribute
+                    Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->PrimaryWeapon->ID);
+                }else {
+                    // Cache default value if first time changing this attribute
+                    Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, -1);
+                }
+
+                // Set the attribute
+                if (attribute_value < 0) {
+                    this_type_class->PrimaryWeapon = NULL;
+                }else {
+                    WeaponTypeClass* this_weapon = Weapons.Ptr(attribute_value);
+                    if (this_weapon != NULL) {
+                        this_type_class->PrimaryWeapon = this_weapon;
+                    }else {
+                        this_type_class->PrimaryWeapon = NULL;
+                    }
                 }
 
             }break;
@@ -3577,9 +3637,24 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
-                WeaponTypeClass* this_weapon = Weapons.Ptr(attribute_value);
-                if (this_weapon != NULL) {
-                    this_type_class->SecondaryWeapon = this_weapon;
+                if (this_type_class->PrimaryWeapon != NULL) {
+                    // Cache default value if first time changing this attribute
+                    Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->SecondaryWeapon->ID);
+                }else {
+                    // Cache default value if first time changing this attribute
+                    Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, -1);
+                }
+
+                // Set the attribute
+                if (attribute_value < 0) {
+                    this_type_class->SecondaryWeapon = NULL;
+                }else{
+                    WeaponTypeClass* this_weapon = Weapons.Ptr(attribute_value);
+                    if (this_weapon != NULL) {
+                        this_type_class->SecondaryWeapon = this_weapon;
+                    }else {
+                        this_type_class->SecondaryWeapon = NULL;
+                    }
                 }
 
             }break;
@@ -3587,6 +3662,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->Speed);
+
+                // Set the attribute
                 this_type_class->Speed = (SpeedType)attribute_value;
 
             }break;
@@ -3594,6 +3673,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->MaxSpeed);
+
+                // Set the attribute
                 this_type_class->MaxSpeed = (MPHType)attribute_value;
 
             }break;
@@ -3601,6 +3684,10 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->MaxAmmo);
+
+                // Set the attribute
                 this_type_class->MaxAmmo = attribute_value;
 
             }break;
@@ -3608,55 +3695,87 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->ROT);
+
+                // Set the attribute
                 this_type_class->ROT = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_CRUSHABLE: {
+            case ATTRIBUTE_CRUSHABLE: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsCrushable);
+
+                // Set the attribute
                 this_type_class->IsCrushable = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_STEALTHY: {
+            case ATTRIBUTE_STEALTHY: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsStealthy);
+
+                // Set the attribute
                 this_type_class->IsStealthy = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_SELECTABLE: {
+            case ATTRIBUTE_SELECTABLE: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsSelectable);
+
+                // Set the attribute
                 this_type_class->IsSelectable = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_LEGAL_TARGET: {
+            case ATTRIBUTE_LEGAL_TARGET: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsLegalTarget);
+
+                // Set the attribute
                 this_type_class->IsLegalTarget = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_REPAIRABLE: {
+            case ATTRIBUTE_REPAIRABLE: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsRepairable);
+
+                // Set the attribute
                 this_type_class->IsRepairable = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_SELF_HEALING: {
+            case ATTRIBUTE_SELF_HEALING: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsSelfHealing);
+
+                // Set the attribute
                 this_type_class->IsSelfHealing = attribute_value;
 
             }break;
-            case ATTRIBUTE_IS_EXPLODING: {
+            case ATTRIBUTE_EXPLODES: {
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsExploding);
+
+                // Set the attribute
                 this_type_class->IsExploding = attribute_value;
 
             }break;
@@ -3664,6 +3783,10 @@
 
                 unsigned int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->IsCrew);
+
+                // Set the attribute
                 this_type_class->IsCrew = attribute_value;
 
             }break;
@@ -3671,14 +3794,312 @@
 
                 int attribute_value = lua_tointeger(L, 3);
 
+                // Cache default value if first time changing this attribute
+                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_type_class->MaxPassengers);
+
+                // Set the attribute
                 this_type_class->MaxPassengers = attribute_value;
 
             }break;
+            default:{
+
+                // Object class specific attributes
+                // Welcome to the web of switches]
+                
+                // Type of object
+                switch (this_type_class->RTTI) {
+
+                    // Building Specific
+                    case RTTI_BUILDINGTYPE:{
+
+                        // What type of attribute?
+                        switch (attribute_type) {
+                            case ATTRIBUTE_CAPACITY: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                BuildingTypeClass* this_building_class = (BuildingTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_building_class->Capacity);
+
+                                // Set the attribute
+                                this_building_class->Capacity = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_POWER: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                // Both power and drain are different variables
+                                // And so we do some trickery here to fill
+                                // the right values based on postivie/negative input
+
+                                BuildingTypeClass* this_building_class = (BuildingTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_building_class->Power + this_building_class->Drain);
+
+                                // Set the attribute
+                                if (attribute_value > 0) {
+                                    this_building_class->Power = attribute_value;
+                                    this_building_class->Drain = 0;
+                                }else {
+                                    this_building_class->Power = 0;
+                                    this_building_class->Drain = attribute_value * -1; // Flip negative power input
+                                }
+
+                            }break;
+                            case ATTRIBUTE_SELLABLE: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                BuildingTypeClass* this_building_class = (BuildingTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_building_class->IsUnsellable *-1);
+
+                                // Set the attribute
+                                // Personal opinion; sellable makes more sense than unsellable
+                                // This replacement could be seen as IsUnNonSellable, or... IsSellable
+                                if (attribute_value == 1) {
+                                    this_building_class->IsUnsellable = 0;
+                                }
+                                else {
+                                    this_building_class->IsUnsellable = 1;
+                                }
+
+                            }break;
+                        }
+
+                    }break;
+
+
+                    // Unit Specific
+                    case RTTI_UNITTYPE:{
+
+                        // What type of attribute?
+                        switch (attribute_type) {
+                            case ATTRIBUTE_CRATE_GOODIE: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                UnitTypeClass* this_unit_class = (UnitTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_unit_class->IsCrateGoodie);
+
+                                // Set the attribute
+                                this_unit_class->IsCrateGoodie = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_CRUSHER: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                UnitTypeClass* this_unit_class = (UnitTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_unit_class->IsCrusher);
+
+                                // Set the attribute
+                                this_unit_class->IsCrusher = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_HARVEST: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                UnitTypeClass* this_unit_class = (UnitTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_unit_class->IsToHarvest);
+
+                                // Set the attribute
+                                this_unit_class->IsToHarvest = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_RADAR_EQUIPPED: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                UnitTypeClass* this_unit_class = (UnitTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_unit_class->IsRadarEquipped);
+
+                                // Set the attribute
+                                this_unit_class->IsRadarEquipped = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_JAMMER: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                UnitTypeClass* this_unit_class = (UnitTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_unit_class->IsJammer);
+
+                                // Set the attribute
+                                this_unit_class->IsJammer = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_GAPPER: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                UnitTypeClass* this_unit_class = (UnitTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_unit_class->IsGapper);
+
+                                // Set the attribute
+                                this_unit_class->IsGapper = attribute_value;
+
+                            }break;
+                        }
+
+                    }break;
+
+
+                    // Infantry Specific
+                    case RTTI_INFANTRYTYPE:{
+
+                        // What type of attribute?
+                        switch (attribute_type) {
+                            case ATTRIBUTE_FEMALE: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                InfantryTypeClass* this_infantry_class = (InfantryTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_infantry_class->IsFemale);
+
+                                // Set the attribute
+                                this_infantry_class->IsFemale = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_CAPTURE: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                InfantryTypeClass* this_infantry_class = (InfantryTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_infantry_class->IsCapture);
+
+                                // Set the attribute
+                                this_infantry_class->IsCapture = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_FRAIDY_CAT: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                InfantryTypeClass* this_infantry_class = (InfantryTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_infantry_class->IsFraidyCat);
+
+                                // Set the attribute
+                                this_infantry_class->IsFraidyCat = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_CIVILIAN: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                InfantryTypeClass* this_infantry_class = (InfantryTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_infantry_class->IsCivilian);
+
+                                // Set the attribute
+                                this_infantry_class->IsCivilian = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_BOMBER: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                InfantryTypeClass* this_infantry_class = (InfantryTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_infantry_class->IsBomber);
+
+                                // Set the attribute
+                                this_infantry_class->IsBomber = attribute_value;
+
+                            }break;
+                            case ATTRIBUTE_DOG: {
+
+                                int attribute_value = lua_tointeger(L, 3);
+
+                                InfantryTypeClass* this_infantry_class = (InfantryTypeClass*)this_type_class;
+
+                                // Cache default value if first time changing this attribute
+                                Script_CacheDefaultAttribute(this_type_class->RTTI, this_type_class->ID, attribute_type, this_infantry_class->IsDog);
+
+                                // Set the attribute
+                                this_infantry_class->IsDog = attribute_value;
+
+                            }break;
+
+                        }
+
+                    }break;
+
+                } // End of object specific switch
+
+            }break; 
+
+        } // End of attribute switch 
+
+        return -1;
+    }
+
+
+    /***********************************************************************************************
+     * Script_CacheDefaultAttribute - Caches an attribute value upon first usage for restoration   *
+     *                                                                                             *
+     *   SCRIPT INPUT:	input_rtti (RTTIType) - The RTTI type for the attrtibute                   *
+     *                	input_id   (int)      - The ID of the typeclass                            *
+     *                	input_attribute (int) - The attribute to cache                             *
+     *                	input_value (int)     - The value if the cache item doesn't exist          *
+     *                                                                                             *
+     *   SCRIPT OUTPUT:  void                                                                      *
+     *                                                                                             *
+     * WARNINGS:  ?                                                                                *
+     *                                                                                             *
+     *=============================================================================================*/
+    void Script_CacheDefaultAttribute(RTTIType input_rtti, int input_id, MapScriptAttributeType input_attribute, int input_value) {
+
+        bool cache_item_found = false;
+        for (std::vector<MapScriptDefaultAttribute*>::iterator it = Scen.mapScript->DefaultTypeAttributeCache.begin(); it != Scen.mapScript->DefaultTypeAttributeCache.end(); ++it) {//Error 2-4
+
+            MapScriptDefaultAttribute* cachedAttribute = (MapScriptDefaultAttribute*)(*it);
+
+            if (input_rtti == cachedAttribute->RTTI && input_id == cachedAttribute->ID && input_attribute == cachedAttribute->attribute) {
+                cache_item_found = true;
+                break;
+            }
 
         }
 
+        // Cached attribute does not exist; let's cache!
+        if (!cache_item_found) {
 
-        return -1;
+            MapScriptDefaultAttribute* cachedAttribute = new MapScriptDefaultAttribute;
+            cachedAttribute->RTTI = input_rtti;
+            cachedAttribute->ID = input_id;
+            cachedAttribute->attribute = input_attribute;
+            cachedAttribute->value = input_value;
+            Scen.mapScript->DefaultTypeAttributeCache.push_back(cachedAttribute);
+
+        }
+
     }
 
 /**********************************************************************************************
@@ -4744,12 +5165,99 @@
      *=============================================================================================*/
     void MapScript::Deinit() {
 
+        // Remove any cached objects
         for (int i = 0; i < ObjectCache.size(); ++i)
         {
             delete ObjectCache[i];
         }
 
         ObjectCache.clear();
+
+        // Welcome back to the web of switches where we will restore any default
+        // attributes that were changed in the script
+        for (std::vector<MapScriptDefaultAttribute*>::iterator it = Scen.mapScript->DefaultTypeAttributeCache.begin(); it != Scen.mapScript->DefaultTypeAttributeCache.end(); ++it) {//Error 2-4
+
+            MapScriptDefaultAttribute* cachedAttribute = (MapScriptDefaultAttribute*)(*it);
+
+
+
+
+
+            switch (cachedAttribute->RTTI) {
+
+            case RTTI_BUILDINGTYPE: {
+                lua_getglobal(L, "SetBuildingTypeAttribute");
+                lua_pushnumber(L, cachedAttribute->ID);
+                lua_pushnumber(L, cachedAttribute->attribute);
+                lua_pushnumber(L, cachedAttribute->value);
+                lua_pcall(L, 3, 1, 0);
+            }break;
+            case RTTI_UNITTYPE: {
+                lua_getglobal(L, "SetUnitTypeAttribute");
+                lua_pushnumber(L, cachedAttribute->ID);
+                lua_pushnumber(L, cachedAttribute->attribute);
+                lua_pushnumber(L, cachedAttribute->value);
+                lua_pcall(L, 3, 1, 0);
+            }break;
+            case RTTI_INFANTRYTYPE: {
+                lua_getglobal(L, "SetInfantryTypeAttribute");
+                lua_pushnumber(L, cachedAttribute->ID);
+                lua_pushnumber(L, cachedAttribute->attribute);
+                lua_pushnumber(L, cachedAttribute->value);
+                lua_pcall(L, 3, 1, 0);
+            }break;
+            case RTTI_AIRCRAFTTYPE: {
+                lua_getglobal(L, "SetAircraftTypeAttribute");
+                lua_pushnumber(L, cachedAttribute->ID);
+                lua_pushnumber(L, cachedAttribute->attribute);
+                lua_pushnumber(L, cachedAttribute->value);
+                lua_pcall(L, 3, 1, 0);
+            }break;
+            case RTTI_VESSELTYPE: {
+                lua_getglobal(L, "SetVesselTypeAttribute");
+                lua_pushnumber(L, cachedAttribute->ID);
+                lua_pushnumber(L, cachedAttribute->attribute);
+                lua_pushnumber(L, cachedAttribute->value);
+                lua_pcall(L, 3, 1, 0);
+            }break;
+
+            }
+
+
+        }
+
+
+        for (int index = 0; index < Warheads.Count(); index++) {
+            Warheads.Ptr(index)->Read_INI(RuleINI);
+        }
+
+        for (int proj = 0; proj < BulletTypes.Count(); proj++) {
+            BulletTypes.Ptr(proj)->Read_INI(RuleINI);
+        }
+
+        for (int windex = 0; windex < Weapons.Count(); windex++) {
+            Weapons.Ptr(windex)->Read_INI(RuleINI);
+        }
+
+        for (int uindex = 0; uindex < UnitTypes.Count(); uindex++) {
+            UnitTypes.Ptr(uindex)->Read_INI(RuleINI);
+        }
+
+        for (int iindex = 0; iindex < InfantryTypes.Count(); iindex++) {
+            InfantryTypes.Ptr(iindex)->Read_INI(RuleINI);
+        }
+
+        for (int vindex = 0; vindex < VesselTypes.Count(); vindex++) {
+            VesselTypes.Ptr(vindex)->Read_INI(RuleINI);
+        }
+
+        for (int aindex = 0; aindex < AircraftTypes.Count(); aindex++) {
+            AircraftTypes.Ptr(aindex)->Read_INI(RuleINI);
+        }
+
+        for (int bindex = 0; bindex < BuildingTypes.Count(); bindex++) {
+            BuildingTypes.Ptr(bindex)->Read_INI(RuleINI);
+        }
 
     }
 
@@ -4776,6 +5284,7 @@
 
         // Load file
         if (luaL_loadfile(L, scriptName)){
+            Console_Printf(lua_tostring(L, -1));
             L = NULL;
             return false;
         }
@@ -4789,12 +5298,16 @@
         SetLuaPath(";scripts/?.script;");
 
         if (lua_pcall(L, 0, 0, 0)) {
+            Console_Printf(lua_tostring(L, -1));
             L = NULL;
             return false;
         }
 
         // Reserve object cache memory
         ObjectCache.reserve(2000);
+
+        // Reserve type attribute cache memory (to restore rules after script)
+        DefaultTypeAttributeCache.reserve(1000);
 
         /**********************************************************************************************
         * Red Alert Vanilla Actions                                                                   *
@@ -4894,6 +5407,9 @@
             lua_register(L, "SetInfantryTypeAttribute", Script_SetInfantryTypeAttribute);	// Sets the attribute of an Infantry type
             lua_register(L, "SetVesselTypeAttribute", Script_SetVesselTypeAttribute);	    // Sets the attribute of a Vessel type
             lua_register(L, "SetAircraftTypeAttribute", Script_SetAircraftTypeAttribute);	// Sets the attribute of an Aircraft type
+            
+            
+            //lua_register(L, "GetObjectAttribute", Script_SetAircraftTypeAttribute);	// Gets the attribute of an object
 
         /**********************************************************************************************
         * Mission Utility Functions                                                                   *

@@ -58,6 +58,12 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 					Keyboard->Put_Element(KN_LMOUSE);
 
 					leftMouseProcessed = true;
+					
+					// Seems to fix "missed mouse click" bug
+					if (numFramesLMouse == 0) {
+						numFramesLMouse++;
+						return;
+					}
 					numFramesLMouse++;
 				}
 				else if (event.button.button == SDL_BUTTON_RIGHT) {
