@@ -160,7 +160,21 @@
         MIG=3,    -- MIG Attack Plane
         YAK=4,    -- Yak Attack Plane
         HELI=5,   -- Longbow Helicopter
-        HIND=6,   -- Hind Helicopter
+        HIND=6    -- Hind Helicopter
+    }
+    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Vessels                                              *
+    -- *                                                       *
+    -- *********************************************************
+
+    VesselTypes={
+        SS=0,   -- Submarine         
+        DD=1,   -- Destroyer       
+        CA=2,   -- Cruiser   
+        LST=3,  -- Land Sea Tank (transport)
+        PT=4    -- Gun Boat         
     }
     
     -- *********************************************************
@@ -270,10 +284,10 @@
     
     -- *********************************************************
     -- *                                                       *
-    -- *  Attribite Types                                      *
+    -- *  Obejct Attributes                                    *
     -- *                                                       *
     -- *********************************************************
-    Attributes = {
+    ObjectAttributes = {
         Type=0,
         Strength=1,           -- Object attribute
         MaxStrength=2,        -- Definition attribute
@@ -319,6 +333,50 @@
         IsBomber=36,
         IsDog=37
         
+    }
+    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  House Attributes                                     *
+    -- *                                                       *
+    -- *********************************************************
+    HouseAttributes = {
+        IQ = 0,
+        TechLevel =1,
+        IsHuman=2,
+        FirepowerBias=3,
+        GroundspeedBias=4,
+        ArmorBias=5,
+        ROFBias=6,
+        CostBias=7,
+        RepairDelay=8,
+        BuildDelay=9,
+        Started=10,
+        Alerted=11,
+        BaseBuilding=12,
+        Discovered=13,
+        Capacity=14,
+        Tiberium=15,
+        Credits=16,
+        AlertTimer=17,
+        RepairTimer=18,
+        Points=19,
+        DestroyedBuildings=20,
+        DestroyedVehicles=21,
+        DestroyedInfantry=22,
+        DestroyedAircraft=23,
+        DestroyedVessels=24,
+        CapturedBuildings=25,
+        Crates=26,
+        BuildingFactories=27,
+        VehicleFactories=28,
+        InfantryFactories=29,
+        AircraftFactories=30,
+        VesselFactories=31,
+        
+        Power=32,
+        Drain=33,
+        LastAttacker=34
     }
 
     -- *********************************************************

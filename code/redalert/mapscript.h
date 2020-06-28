@@ -15,20 +15,22 @@ extern "C" {
 // Object Cache Item
 // Stores an id lookup table
 struct MapScriptObject {
+
+    int UID; // The UID of the object (to prevent ID collisions)
+
 	int ID=-1; // The object's "Global ID"
 	int classIndex=-1; // The object's "Global ID"
 	RTTIType RTTI; // The type of object
+
 };
 
-// Stores defaults of rules from before
-// variables were changed within
-struct MapScriptDefaultAttribute {
+// Stores defaults of object attributes whenever they are changed for the first time (for later restoration)
+struct MapScriptDefaultObjectAttribute {
     RTTIType RTTI; // The type of object
     int ID=-1; // The index of the object in its heap
     int attribute;
     int value;
 };
-
 
 //
 // MapScript Class
@@ -36,6 +38,7 @@ struct MapScriptDefaultAttribute {
 class MapScript {
 public:
 
+    int cUID = 0;
 
 	~MapScript() { Deinit(); };
 
@@ -43,11 +46,13 @@ public:
 	bool Init(const char* mapName);
 	void Deinit();
 
+    MapScriptObject* CreateCacheObject();
+
 	void CallFunction(const char* functionName);
 	void SetLuaPath(const char* input_path);
 
 	std::vector<MapScriptObject*> ObjectCache;
-	std::vector<MapScriptDefaultAttribute*> DefaultTypeAttributeCache;
+	std::vector<MapScriptDefaultObjectAttribute*> DefaultObjectTypeAttributeCache;
 
 private:
 	lua_State* L;
@@ -56,7 +61,7 @@ private:
 
 
 // Enums
-typedef enum MapScriptAttributeType : char {
+typedef enum MapScriptObjectAttributeType : char {
 
     // Techno types
     ATTRIBUTE_TYPE=0,
@@ -105,7 +110,49 @@ typedef enum MapScriptAttributeType : char {
     ATTRIBUTE_DOG
 
 
-} MapScriptAttributeType;
+} MapScriptObjectAttributeType;
+
+// Enums
+typedef enum MapScriptHouseAttributeType : char {
+
+    // Techno types
+    HOUSE_ATTRIBUTE_IQ = 0,
+    HOUSE_ATTRIBUTE_TECH_LEVEL,
+    HOUSE_ATTRIBUTE_IS_HUMAN,
+    HOUSE_ATTRIBUTE_FIREPOWER_BIAS,
+    HOUSE_ATTRIBUTE_GROUNDSPEED_BIAS,
+    HOUSE_ATTRIBUTE_ARMOR_BIAS,
+    HOUSE_ATTRIBUTE_ROF_BIAS,
+    HOUSE_ATTRIBUTE_COST_BIAS,
+    HOUSE_ATTRIBUTE_REPAIR_DELAY,
+    HOUSE_ATTRIBUTE_BUILD_DELAY,
+    HOUSE_ATTRIBUTE_STARTED,
+    HOUSE_ATTRIBUTE_ALERTED,
+    HOUSE_ATTRIBUTE_BASE_BUILDING,
+    HOUSE_ATTRIBUTE_DISCOVERED,
+    HOUSE_ATTRIBUTE_CAPACITY,
+    HOUSE_ATTRIBUTE_TIBERIUM,
+    HOUSE_ATTRIBUTE_CREDITS,
+    HOUSE_ATTRIBUTE_ALERT_TIMER,
+    HOUSE_ATTRIBUTE_REPAIR_TIMER,
+    HOUSE_ATTRIBUTE_POINTS,
+    HOUSE_ATTRIBUTE_DESTROYED_BUILDINGS,
+    HOUSE_ATTRIBUTE_DESTROYED_VEHICLES, 
+    HOUSE_ATTRIBUTE_DESTROYED_INFANTRY,
+    HOUSE_ATTRIBUTE_DESTROYED_AIRCRAFT,
+    HOUSE_ATTRIBUTE_DESTROYED_VESSELS,
+    HOUSE_ATTRIBUTE_CAPTURED_BUILDINGS,
+    HOUSE_ATTRIBUTE_CRATES,
+    HOUSE_ATTRIBUTE_BUILDING_FACTORIES,
+    HOUSE_ATTRIBUTE_UNIT_FACTORIES, 
+    HOUSE_ATTRIBUTE_INFANTRY_FACTORIES,
+    HOUSE_ATTRIBUTE_AIRCRAFT_FACTORIES,
+    HOUSE_ATTRIBUTE_VESSEL_FACTORIES,
+    HOUSE_ATTRIBUTE_POWER,
+    HOUSE_ATTRIBUTE_DRAIN,
+    HOUSE_ATTRIBUTE_LAST_ATTACKER
+
+} MapScriptHouseAttributeType;
 
 // Non-Class-Functions
 bool Script_SetObjectTrigger(int input_object_id, TriggerClass* input_trigger);
@@ -117,8 +164,9 @@ int Script_AircraftIndexFromID(int input_object_id);
 int Script_InfantryIndexFromID(int input_object_id);
 int Script_VesselIndexFromID(int input_object_id);
 
-static int Script_SetObjectTypeAttribute(lua_State* L, TechnoTypeClass* this_type_class, MapScriptAttributeType attribute_type);
+static int Script_SetObjectTypeAttribute(lua_State* L, TechnoTypeClass* this_type_class, MapScriptObjectAttributeType attribute_type);
+static int Script_GetObjectTypeAttribute(lua_State* L, TechnoTypeClass* this_type_class, MapScriptObjectAttributeType attribute_type);
 
-void Script_CacheDefaultAttribute(RTTIType input_rtti, int input_id, MapScriptAttributeType input_attribute, int input_value);
+void Script_CacheDefaultObjectTypeAttribute(RTTIType input_rtti, int input_id, MapScriptObjectAttributeType input_attribute, int input_value);
 
 #endif
