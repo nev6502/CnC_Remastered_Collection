@@ -5745,7 +5745,11 @@ static int Script_OrderMove(lua_State* L) {
 
     if (this_object != NULL) {
 
-        Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, As_Target(XY_Cell(in_x, in_y)));
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
+        }
+
+        Queue_Mission(TargetClass(this_object), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
 
         lua_pushnumber(L, 1);
         return 1;
@@ -5789,6 +5793,10 @@ static int Script_OrderAttackCell(lua_State* L) {
         TARGET this_target = 0;
         if (in_x >= 0 && in_y >= 0) {
             this_target = As_Target(XY_Cell(in_x, in_y));
+        }
+
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, this_target, this_target);
         }
 
         Queue_Mission(TargetClass(this_object), MISSION_ATTACK, this_target, this_target);
@@ -5841,6 +5849,10 @@ static int Script_OrderAttack(lua_State* L) {
             this_target = As_Target(XY_Cell(in_x, in_y));
         }
 
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+        }
+
         Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
 
         lua_pushnumber(L, 1);
@@ -5891,7 +5903,11 @@ static int Script_OrderHunt(lua_State* L) {
             this_target = As_Target(XY_Cell(in_x, in_y));
         }
 
-        Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_HUNT, 0, this_target);
+        }
+
+        Queue_Mission(TargetClass(this_object), MISSION_HUNT, 0, this_target);
 
         lua_pushnumber(L, 1);
         return 1;
@@ -5941,7 +5957,11 @@ static int Script_OrderGuard(lua_State* L) {
             this_target = As_Target(XY_Cell(in_x, in_y));
         }
 
-        Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_GUARD, 0, this_target);
+        }
+
+        Queue_Mission(TargetClass(this_object), MISSION_GUARD, 0, this_target);
 
         lua_pushnumber(L, 1);
         return 1;
@@ -5991,7 +6011,11 @@ static int Script_OrderRetreat(lua_State* L) {
             this_target = As_Target(XY_Cell(in_x, in_y));
         }
 
-        Queue_Mission(TargetClass(this_object), MISSION_ATTACK, 0, this_target);
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_RETREAT, 0, this_target);
+        }
+
+        Queue_Mission(TargetClass(this_object), MISSION_RETREAT, 0, this_target);
 
         lua_pushnumber(L, 1);
         return 1;
@@ -6039,6 +6063,10 @@ static int Script_OrderEnter(lua_State* L) {
         TARGET this_target = 0;
         if (in_x >= 0 && in_y >= 0) {
             this_target = As_Target(XY_Cell(in_x, in_y));
+        }
+
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_ENTER, this_target, this_target);
         }
 
         Queue_Mission(TargetClass(this_object), MISSION_ENTER, this_target, this_target);
@@ -6089,6 +6117,10 @@ static int Script_OrderCapture(lua_State* L) {
         TARGET this_target = 0;
         if (in_x >= 0 && in_y >= 0) {
             this_target = As_Target(XY_Cell(in_x, in_y));
+        }
+
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_CAPTURE, this_target, this_target);
         }
 
         Queue_Mission(TargetClass(this_object), MISSION_CAPTURE, this_target, this_target);
