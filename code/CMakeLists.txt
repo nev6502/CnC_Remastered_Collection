@@ -160,6 +160,8 @@ set(src_redalert
 	./redalert/carry.cpp
 	./redalert/carry.h
 	./redalert/cbn_.h
+	./redalert/crc32.cpp
+	./redalert/crc32.h
 	./redalert/ccdde.cpp
 	./redalert/ccdde.h
 	./redalert/ccfile.cpp

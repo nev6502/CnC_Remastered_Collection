@@ -51,13 +51,13 @@
 static TemplateTypeClass const Empty(
 	TEMPLATE_CLEAR1,
 	THEATERF_TEMPERATE|THEATERF_SNOW|THEATERF_INTERIOR,
-	"CLEAR1",
+	"CLEAR01",
 	TXT_CLEAR
 );
 static TemplateTypeClass const Clear(
 	TEMPLATE_CLEAR1,
 	THEATERF_TEMPERATE|THEATERF_SNOW|THEATERF_INTERIOR,
-	"CLEAR1",
+	"CLEAR01",
 	TXT_CLEAR
 );
 static TemplateTypeClass const Road01(
@@ -3129,7 +3129,6 @@ void TemplateTypeClass::Init(TheaterType theater)
 			_makepath(fullname, NULL, NULL, tplate.IniName, Theaters[theater].Suffix);
 			ptr = MFCD::Retrieve(fullname);
 			((void const *&)tplate.ImageData) = ptr;
-
 #ifdef WIN32
 			Register_Icon_Set((void*)ptr, TRUE);		//Register icon set for video memory caching
 #endif

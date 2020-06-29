@@ -196,9 +196,11 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	}
 
 	ILuint Width, Height, Bpp;
+	ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
 	Width = ilGetInteger(IL_IMAGE_WIDTH);
 	Height = ilGetInteger(IL_IMAGE_HEIGHT);
-	Bpp = ilGetInteger(IL_IMAGE_BPP);
+	Bpp = ilGetInteger(IL_IMAGE_BPP);	
 	ILubyte* Data = ilGetData();
 
 	if (Bpp == 4 && houseid != -1) {
@@ -216,6 +218,10 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 			byte b = Data[(i * 4) + 2];
 			Data[(i * 4) + 2] = Data[(i * 4) + 0];
 			Data[(i * 4) + 0] = b;
+
+			if (Data[(i * 4) + 2] == 0 && Data[(i * 4) + 1] == 0 && Data[(i * 4) + 0] == 117) {
+				Data[(i * 4) + 3] = 0;
+			}
 		}
 	}
 

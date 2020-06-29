@@ -3002,6 +3002,14 @@ static void Init_Bootstrap_Mixfiles(void)
 	int temp = RequiredCD;
 	RequiredCD = -2;
 
+// Isometric Files 
+	new MFCD("isosnow.mix", &FastKey, MIX_FILE_TS);
+	{
+		bool ok = MFCD::Cache("isosnow.mix");
+		assert(ok);
+	}
+// jmarshall end
+
 #ifdef WOLAPI_INTEGRATION
 	CCFileClass fileWolapiMix( "WOLAPI.MIX" );
 	if( fileWolapiMix.Is_Available() )
