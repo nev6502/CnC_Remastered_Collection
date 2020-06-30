@@ -23,12 +23,12 @@ struct Image_t {
 	int renderheight[MAX_IMAGE_SHAPES];
 	bool perFrameRenderDimen;
 	int numFrames;
-	void* IconMapPtr;
 	uint8_t* ScratchBuffer;
+	struct IsoTile* isoTileInfo;
 };
 
 __forceinline Image_t::Image_t() {
-	IconMapPtr = NULL;
+	isoTileInfo = NULL;
 	numAnimFrames = 0;
 	ScratchBuffer = NULL;
 	perFrameRenderDimen = false;
@@ -43,9 +43,9 @@ __forceinline Image_t::~Image_t() {
 }
 
 Image_t* Image_LoadImage(const char* name, bool loadAnims = false, bool loadHouseColor = false);
-Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char* data, unsigned char *remap = NULL);
+Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char* data, unsigned char *remap = NULL, unsigned char *palette = NULL);
 Image_t* Find_Image(const char* name);
-void Image_Add8BitImage(Image_t* image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap);
+void Image_Add8BitImage(Image_t* image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap, unsigned char* palette = NULL);
 bool Image_Add32BitImage(const char* name, Image_t* image, int HouseId, int ShapeID, int frameId);
 
 Image_t* Image_CreateBlankImage(const char* name, int width, int height);

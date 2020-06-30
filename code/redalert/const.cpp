@@ -647,9 +647,9 @@ GroundType Ground[LAND_COUNT];
 **	These are the names of the theaters.
 */
 TheaterDataType const Theaters[THEATER_COUNT] = {
-	{"TEMPERATE","TEMPERAT","TEM"},
-	{"SNOW","SNOW","SNO"},
-	{"INTERIOR","INTERIOR","INT"},
+	{"TEMPERATE","TEMPERAT","TEM", "ISOSNO.PAL"},
+	{"SNOW","SNOW","SNO", "ISOSNO.PAL"},
+	{"INTERIOR","INTERIOR","INT", "ISOSNO.PAL"},
 };
 
 

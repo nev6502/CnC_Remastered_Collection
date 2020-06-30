@@ -63,1425 +63,833 @@ static TemplateTypeClass const Clear(
 static TemplateTypeClass const Road01(
 	TEMPLATE_ROAD01,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D01",
+	"CLEAR01",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road02(
 	TEMPLATE_ROAD02,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D02",
+	"DROADC02",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road03(
 	TEMPLATE_ROAD03,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D03",
+	"DROADC03",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road04(
 	TEMPLATE_ROAD04,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D04",
+	"DROADC04",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road05(
 	TEMPLATE_ROAD05,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D05",
+	"DROADC05",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road06(
 	TEMPLATE_ROAD06,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D06",
+	"DROADC06",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road07(
 	TEMPLATE_ROAD07,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D07",
+	"DROADC07",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road08(
 	TEMPLATE_ROAD08,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D08",
+	"DROADC08",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road09(
 	TEMPLATE_ROAD09,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D09",
+	"DROADC09",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road10(
 	TEMPLATE_ROAD10,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D10",
+	"DROADC10",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road11(
 	TEMPLATE_ROAD11,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D11",
+	"DROADC11",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road12(
 	TEMPLATE_ROAD12,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D12",
+	"DROADC12",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road13(
 	TEMPLATE_ROAD13,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D13",
+	"DROADC13",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road14(
 	TEMPLATE_ROAD14,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D14",
+	"DROADC14",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road15(
 	TEMPLATE_ROAD15,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D15",
+	"DROADC15",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road16(
 	TEMPLATE_ROAD16,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D16",
+	"DROADC16",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road17(
 	TEMPLATE_ROAD17,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D17",
+	"DROADC17",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road18(
 	TEMPLATE_ROAD18,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D18",
+	"DROADC18",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road19(
 	TEMPLATE_ROAD19,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D19",
+	"DROADC19",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road20(
 	TEMPLATE_ROAD20,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D20",
+	"DROADC20",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road21(
 	TEMPLATE_ROAD21,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D21",
+	"DROADC21",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road22(
 	TEMPLATE_ROAD22,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D22",
+	"DROADC22",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road23(
 	TEMPLATE_ROAD23,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D23",
+	"DROADC23",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road24(
 	TEMPLATE_ROAD24,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D24",
+	"DROADC24",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road25(
 	TEMPLATE_ROAD25,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D25",
+	"DROADC01",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road26(
 	TEMPLATE_ROAD26,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D26",
+	"DROADC02",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road27(
 	TEMPLATE_ROAD27,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D27",
+	"DROADC02",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road28(
 	TEMPLATE_ROAD28,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D28",
+	"DROADC03",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road29(
 	TEMPLATE_ROAD29,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D29",
+	"DROADC04",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road30(
 	TEMPLATE_ROAD30,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D30",
+	"DROADC05",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road31(
 	TEMPLATE_ROAD31,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D31",
+	"DROADC06",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road32(
 	TEMPLATE_ROAD32,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D32",
+	"DROADC07",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road33(
 	TEMPLATE_ROAD33,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D33",
+	"DROADC08",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road34(
 	TEMPLATE_ROAD34,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D34",
+	"DROADC09",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road35(
 	TEMPLATE_ROAD35,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D35",
+	"DROADC10",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road36(
 	TEMPLATE_ROAD36,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D36",
+	"DROADC11",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road37(
 	TEMPLATE_ROAD37,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D37",
+	"DROADC12",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road38(
 	TEMPLATE_ROAD38,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D38",
+	"DROADC13",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road39(
 	TEMPLATE_ROAD39,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D39",
+	"DROADC14",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road40(
 	TEMPLATE_ROAD40,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D40",
+	"DROADC15",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road41(
 	TEMPLATE_ROAD41,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D41",
+	"DROADC16",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road42(
 	TEMPLATE_ROAD42,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D42",
+	"DROADC17",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road43(
 	TEMPLATE_ROAD43,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D43",
+	"DROADC18",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road44(
 	TEMPLATE_ROAD44,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D44",
+	"DROADC19",
 	TXT_ROAD
 );
 static TemplateTypeClass const Road45(
 	TEMPLATE_ROAD45,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"D45",
+	"DROADC20",
 	TXT_ROAD
 );
 static TemplateTypeClass const Water(
 	TEMPLATE_WATER,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"W1",
+	"WATER01",
 	TXT_WATER
 );
 static TemplateTypeClass const Water2(
 	TEMPLATE_WATER2,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"W2",
+	"WATER02",
 	TXT_WATER
 );
 static TemplateTypeClass const Shore01(
 	TEMPLATE_SHORE01,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH01",
+	"SHORE01",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore02(
 	TEMPLATE_SHORE02,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH02",
+	"SHORE02",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore03(
 	TEMPLATE_SHORE03,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH03",
+	"SHORE03",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore04(
 	TEMPLATE_SHORE04,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH04",
+	"SHORE04",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore05(
 	TEMPLATE_SHORE05,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH05",
+	"SHORE05",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore06(
 	TEMPLATE_SHORE06,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH06",
+	"SHORE06",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore07(
 	TEMPLATE_SHORE07,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH07",
+	"SHORE07",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore08(
 	TEMPLATE_SHORE08,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH08",
+	"SHORE08",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore09(
 	TEMPLATE_SHORE09,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH09",
+	"SHORE09",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore10(
 	TEMPLATE_SHORE10,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH10",
+	"SHORE10",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore11(
 	TEMPLATE_SHORE11,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH11",
+	"SHORE11",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore12(
 	TEMPLATE_SHORE12,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH12",
+	"SHORE12",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore13(
 	TEMPLATE_SHORE13,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH13",
+	"SHORE13",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore14(
 	TEMPLATE_SHORE14,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH14",
+	"SHORE14",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore15(
 	TEMPLATE_SHORE15,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH15",
+	"SHORE15",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore16(
 	TEMPLATE_SHORE16,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH16",
+	"SHORE16",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore17(
 	TEMPLATE_SHORE17,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH17",
+	"SHORE17",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore18(
 	TEMPLATE_SHORE18,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH18",
+	"SHORE18",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore19(
 	TEMPLATE_SHORE19,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH19",
+	"SHORE19",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore20(
 	TEMPLATE_SHORE20,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH20",
+	"SHORE20",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore21(
 	TEMPLATE_SHORE21,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH21",
+	"SHORE21",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore22(
 	TEMPLATE_SHORE22,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH22",
+	"SHORE22",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore23(
 	TEMPLATE_SHORE23,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH23",
+	"SHORE23",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore24(
 	TEMPLATE_SHORE24,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH24",
+	"SHORE24",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore25(
 	TEMPLATE_SHORE25,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH25",
+	"SHORE25",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore26(
 	TEMPLATE_SHORE26,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH26",
+	"SHORE26",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore27(
 	TEMPLATE_SHORE27,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH27",
+	"SHORE27",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore28(
 	TEMPLATE_SHORE28,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH28",
+	"SHORE28",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore29(
 	TEMPLATE_SHORE29,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH29",
+	"SHORE29",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore30(
 	TEMPLATE_SHORE30,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH30",
+	"SHORE30",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore31(
 	TEMPLATE_SHORE31,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH31",
+	"SHORE31",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore32(
 	TEMPLATE_SHORE32,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH32",
+	"SHORE32",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore33(
 	TEMPLATE_SHORE33,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH33",
+	"SHORE33",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore34(
 	TEMPLATE_SHORE34,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH34",
+	"SHORE4",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore35(
 	TEMPLATE_SHORE35,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH35",
+	"SHORE35",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore36(
 	TEMPLATE_SHORE36,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH36",
+	"SHORE36",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore37(
 	TEMPLATE_SHORE37,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH37",
+	"SHORE37",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore38(
 	TEMPLATE_SHORE38,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH38",
+	"SHORE38",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore39(
 	TEMPLATE_SHORE39,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH39",
+	"SHORE39",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore40(
 	TEMPLATE_SHORE40,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH40",
+	"SHORE40",
 	TXT_SHORE
 );
 static TemplateTypeClass const Shore41(
 	TEMPLATE_SHORE41,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH41",
+	"SHORE41",
 	TXT_SHORE
 );
-static TemplateTypeClass const Shore42(
-	TEMPLATE_SHORE42,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH42",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore43(
-	TEMPLATE_SHORE43,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH43",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore44(
-	TEMPLATE_SHORE44,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH44",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore45(
-	TEMPLATE_SHORE45,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH45",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore46(
-	TEMPLATE_SHORE46,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH46",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore47(
-	TEMPLATE_SHORE47,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH47",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore48(
-	TEMPLATE_SHORE48,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH48",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore49(
-	TEMPLATE_SHORE49,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH49",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore50(
-	TEMPLATE_SHORE50,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH50",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore51(
-	TEMPLATE_SHORE51,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH51",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore52(
-	TEMPLATE_SHORE52,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH52",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore53(
-	TEMPLATE_SHORE53,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH53",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore54(
-	TEMPLATE_SHORE54,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH54",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore55(
-	TEMPLATE_SHORE55,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH55",
-	TXT_SHORE
-);
-static TemplateTypeClass const Shore56(
-	TEMPLATE_SHORE56,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"SH56",
-	TXT_SHORE
-);
-static TemplateTypeClass const Boulder1(
-	TEMPLATE_BOULDER1,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"B1",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Boulder2(
-	TEMPLATE_BOULDER2,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"B2",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Boulder3(
-	TEMPLATE_BOULDER3,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"B3",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Boulder4(
-	TEMPLATE_BOULDER4,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"B4",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Boulder5(
-	TEMPLATE_BOULDER5,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"B5",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Boulder6(
-	TEMPLATE_BOULDER6,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"B6",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope01(
-	TEMPLATE_SLOPE01,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S01",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope02(
-	TEMPLATE_SLOPE02,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S02",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope03(
-	TEMPLATE_SLOPE03,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S03",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope04(
-	TEMPLATE_SLOPE04,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S04",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope05(
-	TEMPLATE_SLOPE05,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S05",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope06(
-	TEMPLATE_SLOPE06,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S06",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope07(
-	TEMPLATE_SLOPE07,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S07",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope08(
-	TEMPLATE_SLOPE08,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S08",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope09(
-	TEMPLATE_SLOPE09,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S09",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope10(
-	TEMPLATE_SLOPE10,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S10",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope11(
-	TEMPLATE_SLOPE11,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S11",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope12(
-	TEMPLATE_SLOPE12,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S12",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope13(
-	TEMPLATE_SLOPE13,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S13",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope14(
-	TEMPLATE_SLOPE14,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S14",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope15(
-	TEMPLATE_SLOPE15,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S15",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope16(
-	TEMPLATE_SLOPE16,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S16",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope17(
-	TEMPLATE_SLOPE17,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S17",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope18(
-	TEMPLATE_SLOPE18,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S18",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope19(
-	TEMPLATE_SLOPE19,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S19",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope20(
-	TEMPLATE_SLOPE20,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S20",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope21(
-	TEMPLATE_SLOPE21,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S21",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope22(
-	TEMPLATE_SLOPE22,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S22",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope23(
-	TEMPLATE_SLOPE23,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S23",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope24(
-	TEMPLATE_SLOPE24,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S24",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope25(
-	TEMPLATE_SLOPE25,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S25",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope26(
-	TEMPLATE_SLOPE26,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S26",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope27(
-	TEMPLATE_SLOPE27,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S27",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope28(
-	TEMPLATE_SLOPE28,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S28",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope29(
-	TEMPLATE_SLOPE29,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S29",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope30(
-	TEMPLATE_SLOPE30,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S30",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope31(
-	TEMPLATE_SLOPE31,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S31",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope32(
-	TEMPLATE_SLOPE32,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S32",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope33(
-	TEMPLATE_SLOPE33,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S33",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope34(
-	TEMPLATE_SLOPE34,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S34",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope35(
-	TEMPLATE_SLOPE35,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S35",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope36(
-	TEMPLATE_SLOPE36,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S36",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope37(
-	TEMPLATE_SLOPE37,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S37",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Slope38(
-	TEMPLATE_SLOPE38,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"S38",
-	TXT_SLOPE
-);
-static TemplateTypeClass const Patch01(
-	TEMPLATE_PATCH01,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P01",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch02(
-	TEMPLATE_PATCH02,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P02",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch03(
-	TEMPLATE_PATCH03,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P03",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch04(
-	TEMPLATE_PATCH04,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P04",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch07(
-	TEMPLATE_PATCH07,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P07",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch08(
-	TEMPLATE_PATCH08,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P08",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch13(
-	TEMPLATE_PATCH13,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P13",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch14(
-	TEMPLATE_PATCH14,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P14",
-	TXT_PATCH
-);
-static TemplateTypeClass const Patch15(
-	TEMPLATE_PATCH15,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"P15",
-	TXT_PATCH
-);
-static TemplateTypeClass const River01(
-	TEMPLATE_RIVER01,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV01",
-	TXT_RIVER
-);
-static TemplateTypeClass const River02(
-	TEMPLATE_RIVER02,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV02",
-	TXT_RIVER
-);
-static TemplateTypeClass const River03(
-	TEMPLATE_RIVER03,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV03",
-	TXT_RIVER
-);
-static TemplateTypeClass const River04(
-	TEMPLATE_RIVER04,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV04",
-	TXT_RIVER
-);
-static TemplateTypeClass const River05(
-	TEMPLATE_RIVER05,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV05",
-	TXT_RIVER
-);
-static TemplateTypeClass const River06(
-	TEMPLATE_RIVER06,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV06",
-	TXT_RIVER
-);
-static TemplateTypeClass const River07(
-	TEMPLATE_RIVER07,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV07",
-	TXT_RIVER
-);
-static TemplateTypeClass const River08(
-	TEMPLATE_RIVER08,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV08",
-	TXT_RIVER
-);
-static TemplateTypeClass const River09(
-	TEMPLATE_RIVER09,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV09",
-	TXT_RIVER
-);
-static TemplateTypeClass const River10(
-	TEMPLATE_RIVER10,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV10",
-	TXT_RIVER
-);
-static TemplateTypeClass const River11(
-	TEMPLATE_RIVER11,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV11",
-	TXT_RIVER
-);
-static TemplateTypeClass const River12(
-	TEMPLATE_RIVER12,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV12",
-	TXT_RIVER
-);
-static TemplateTypeClass const River13(
-	TEMPLATE_RIVER13,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV13",
-	TXT_RIVER
-);
-static TemplateTypeClass const River14(
-	TEMPLATE_RIVER14,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV14",
-	TXT_RIVER
-);
-static TemplateTypeClass const River15(
-	TEMPLATE_RIVER15,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RV15",
-	TXT_RIVER
-);
-static TemplateTypeClass const Ford1(
-	TEMPLATE_FORD1,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"FORD1",
-	TXT_RIVER
-);
-static TemplateTypeClass const Ford2(
-	TEMPLATE_FORD2,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"FORD2",
-	TXT_RIVER
-);
-static TemplateTypeClass const Falls1(
-	TEMPLATE_FALLS1,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"FALLS1",
-	TXT_RIVER
-);
-static TemplateTypeClass const Falls1a(
-	TEMPLATE_FALLS1A,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"FALLS1A",
-	TXT_RIVER
-);
-static TemplateTypeClass const Falls2(
-	TEMPLATE_FALLS2,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"FALLS2",
-	TXT_RIVER
-);
-static TemplateTypeClass const Falls2a(
-	TEMPLATE_FALLS2A,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"FALLS2A",
-	TXT_RIVER
-);
+// jmarshall
 static TemplateTypeClass const Bridge1x(
 	TEMPLATE_BRIDGE1X,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE1X",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1(
 	TEMPLATE_BRIDGE1,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE1",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1h(
 	TEMPLATE_BRIDGE1H,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE1H",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1d(
 	TEMPLATE_BRIDGE1D,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE1D",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2x(
 	TEMPLATE_BRIDGE2X,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE2X",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2(
 	TEMPLATE_BRIDGE2,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE2",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2h(
 	TEMPLATE_BRIDGE2H,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE2H",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2d(
 	TEMPLATE_BRIDGE2D,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BRIDGE2D",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1ax(
 	TEMPLATE_BRIDGE_1AX,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR1X",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1a(
 	TEMPLATE_BRIDGE_1A,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR1A",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1b(
 	TEMPLATE_BRIDGE_1B,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR1B",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge1c(
 	TEMPLATE_BRIDGE_1C,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR1C",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2ax(
 	TEMPLATE_BRIDGE_2AX,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR2X",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2a(
 	TEMPLATE_BRIDGE_2A,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR2A",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2b(
 	TEMPLATE_BRIDGE_2B,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR2B",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge2c(
 	TEMPLATE_BRIDGE_2C,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR2C",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge3a(
 	TEMPLATE_BRIDGE_3A,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR3A",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge3b(
 	TEMPLATE_BRIDGE_3B,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR3B",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge3c(
 	TEMPLATE_BRIDGE_3C,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR3C",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge3d(
 	TEMPLATE_BRIDGE_3D,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR3D",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge3e(
 	TEMPLATE_BRIDGE_3E,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR3E",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const Bridge3f(
 	TEMPLATE_BRIDGE_3F,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"BR3F",
+	"WCLIFF01",
 	TXT_BRIDGE
 );
 static TemplateTypeClass const ShoreCliff01(
 	TEMPLATE_SHORECLIFF01,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC01",
+	"WCLIFF01",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff02(
 	TEMPLATE_SHORECLIFF02,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC02",
+	"WCLIFF02",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff03(
 	TEMPLATE_SHORECLIFF03,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC03",
+	"WCLIFF03",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff04(
 	TEMPLATE_SHORECLIFF04,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC04",
+	"WCLIFF04",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff05(
 	TEMPLATE_SHORECLIFF05,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC05",
+	"WCLIFF05",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff06(
 	TEMPLATE_SHORECLIFF06,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC06",
+	"WCLIFF06",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff07(
 	TEMPLATE_SHORECLIFF07,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC07",
+	"WCLIFF07",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff08(
 	TEMPLATE_SHORECLIFF08,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC08",
+	"WCLIFF08",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff09(
 	TEMPLATE_SHORECLIFF09,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC09",
+	"WCLIFF09",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff10(
 	TEMPLATE_SHORECLIFF10,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC10",
+	"WCLIFF10",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff11(
 	TEMPLATE_SHORECLIFF11,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC11",
+	"WCLIFF11",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff12(
 	TEMPLATE_SHORECLIFF12,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC12",
+	"WCLIFF12",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff13(
 	TEMPLATE_SHORECLIFF13,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC13",
+	"WCLIFF13",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff14(
 	TEMPLATE_SHORECLIFF14,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC14",
+	"WCLIFF14",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff15(
 	TEMPLATE_SHORECLIFF15,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC15",
+	"WCLIFF15",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff16(
 	TEMPLATE_SHORECLIFF16,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC16",
+	"WCLIFF16",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff17(
 	TEMPLATE_SHORECLIFF17,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC17",
+	"WCLIFF17",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff18(
 	TEMPLATE_SHORECLIFF18,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC18",
+	"WCLIFF18",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff19(
 	TEMPLATE_SHORECLIFF19,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC19",
+	"WCLIFF19",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff20(
 	TEMPLATE_SHORECLIFF20,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC20",
+	"WCLIFF20",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff21(
 	TEMPLATE_SHORECLIFF21,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC21",
+	"WCLIFF21",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff22(
 	TEMPLATE_SHORECLIFF22,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC22",
+	"WCLIFF22",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff23(
 	TEMPLATE_SHORECLIFF23,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC23",
+	"WCLIFF23",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff24(
 	TEMPLATE_SHORECLIFF24,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC24",
+	"WCLIFF24",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff25(
 	TEMPLATE_SHORECLIFF25,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC25",
+	"WCLIFF25",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff26(
 	TEMPLATE_SHORECLIFF26,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC26",
+	"WCLIFF26",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff27(
 	TEMPLATE_SHORECLIFF27,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC27",
+	"WCLIFF27",
 	TXT_SHORE
 );
 static TemplateTypeClass const ShoreCliff28(
 	TEMPLATE_SHORECLIFF28,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC28",
+	"WCLIFF28",
 	TXT_SHORE
 );
-static TemplateTypeClass const ShoreCliff29(
-	TEMPLATE_SHORECLIFF29,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC29",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff30(
-	TEMPLATE_SHORECLIFF30,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC30",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff31(
-	TEMPLATE_SHORECLIFF31,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC31",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff32(
-	TEMPLATE_SHORECLIFF32,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC32",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff33(
-	TEMPLATE_SHORECLIFF33,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC33",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff34(
-	TEMPLATE_SHORECLIFF34,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC34",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff35(
-	TEMPLATE_SHORECLIFF35,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC35",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff36(
-	TEMPLATE_SHORECLIFF36,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC36",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff37(
-	TEMPLATE_SHORECLIFF37,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC37",
-	TXT_SHORE
-);
-static TemplateTypeClass const ShoreCliff38(
-	TEMPLATE_SHORECLIFF38,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"WC38",
-	TXT_SHORE
-);
+
 static TemplateTypeClass const Rough01(
 	TEMPLATE_ROUGH01,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
@@ -2570,8 +1978,8 @@ static void _Watcom_Ugh_Hack(void)
 	(void)new TemplateTypeClass(Rough11);			// TEMPLATE_ROUGH11
 	(void)new TemplateTypeClass(Road44);			//	TEMPLATE_ROAD44
 	(void)new TemplateTypeClass(Road45);			//	TEMPLATE_ROAD45
-	(void)new TemplateTypeClass(River14);			//	TEMPLATE_RIVER14
-	(void)new TemplateTypeClass(River15);			//	TEMPLATE_RIVER15
+//	(void)new TemplateTypeClass(River14);			//	TEMPLATE_RIVER14
+//	(void)new TemplateTypeClass(River15);			//	TEMPLATE_RIVER15
 	(void)new TemplateTypeClass(RiverCliff01);	//	TEMPLATE_RIVERCLIFF01
 	(void)new TemplateTypeClass(RiverCliff02);	//	TEMPLATE_RIVERCLIFF02
 	(void)new TemplateTypeClass(RiverCliff03);	//	TEMPLATE_RIVERCLIFF03
@@ -2802,21 +2210,6 @@ void TemplateTypeClass::Init_Heap(void)
 	(void)new TemplateTypeClass(Shore39);			//	TEMPLATE_SHORE39
 	(void)new TemplateTypeClass(Shore40);			//	TEMPLATE_SHORE40
 	(void)new TemplateTypeClass(Shore41);			//	TEMPLATE_SHORE41
-	(void)new TemplateTypeClass(Shore42);			//	TEMPLATE_SHORE42
-	(void)new TemplateTypeClass(Shore43);			//	TEMPLATE_SHORE43
-	(void)new TemplateTypeClass(Shore44);			//	TEMPLATE_SHORE44
-	(void)new TemplateTypeClass(Shore45);			//	TEMPLATE_SHORE45
-	(void)new TemplateTypeClass(Shore46);			//	TEMPLATE_SHORE46
-	(void)new TemplateTypeClass(Shore47);			//	TEMPLATE_SHORE47
-	(void)new TemplateTypeClass(Shore48);			//	TEMPLATE_SHORE48
-	(void)new TemplateTypeClass(Shore49);			//	TEMPLATE_SHORE49
-	(void)new TemplateTypeClass(Shore50);			//	TEMPLATE_SHORE50
-	(void)new TemplateTypeClass(Shore51);			//	TEMPLATE_SHORE51
-	(void)new TemplateTypeClass(Shore52);			//	TEMPLATE_SHORE52
-	(void)new TemplateTypeClass(Shore53);			//	TEMPLATE_SHORE53
-	(void)new TemplateTypeClass(Shore54);			//	TEMPLATE_SHORE54
-	(void)new TemplateTypeClass(Shore55);			//	TEMPLATE_SHORE55
-	(void)new TemplateTypeClass(Shore56);			//	TEMPLATE_SHORE56
 	(void)new TemplateTypeClass(ShoreCliff01);	//	TEMPLATE_SHORECLIFF01
 	(void)new TemplateTypeClass(ShoreCliff02);	//	TEMPLATE_SHORECLIFF02
 	(void)new TemplateTypeClass(ShoreCliff03);	//	TEMPLATE_SHORECLIFF03
@@ -2845,92 +2238,10 @@ void TemplateTypeClass::Init_Heap(void)
 	(void)new TemplateTypeClass(ShoreCliff26);	//	TEMPLATE_SHORECLIFF26
 	(void)new TemplateTypeClass(ShoreCliff27);	//	TEMPLATE_SHORECLIFF27
 	(void)new TemplateTypeClass(ShoreCliff28);	//	TEMPLATE_SHORECLIFF28
-	(void)new TemplateTypeClass(ShoreCliff29);	//	TEMPLATE_SHORECLIFF29
-	(void)new TemplateTypeClass(ShoreCliff30);	//	TEMPLATE_SHORECLIFF30
-	(void)new TemplateTypeClass(ShoreCliff31);	//	TEMPLATE_SHORECLIFF31
-	(void)new TemplateTypeClass(ShoreCliff32);	//	TEMPLATE_SHORECLIFF32
-	(void)new TemplateTypeClass(ShoreCliff33);	//	TEMPLATE_SHORECLIFF33
-	(void)new TemplateTypeClass(ShoreCliff34);	//	TEMPLATE_SHORECLIFF34
-	(void)new TemplateTypeClass(ShoreCliff35);	//	TEMPLATE_SHORECLIFF35
-	(void)new TemplateTypeClass(ShoreCliff36);	//	TEMPLATE_SHORECLIFF36
-	(void)new TemplateTypeClass(ShoreCliff37);	//	TEMPLATE_SHORECLIFF37
-	(void)new TemplateTypeClass(ShoreCliff38);	//	TEMPLATE_SHORECLIFF38
-	(void)new TemplateTypeClass(Boulder1);			//	TEMPLATE_BOULDER1
-	(void)new TemplateTypeClass(Boulder2);			//	TEMPLATE_BOULDER2
-	(void)new TemplateTypeClass(Boulder3);			//	TEMPLATE_BOULDER3
-	(void)new TemplateTypeClass(Boulder4);			// TEMPLATE_BOULDER4
-	(void)new TemplateTypeClass(Boulder5);			//	TEMPLATE_BOULDER5
-	(void)new TemplateTypeClass(Boulder6);			//	TEMPLATE_BOULDER6
-	(void)new TemplateTypeClass(Patch01);			//	TEMPLATE_PATCH1
-	(void)new TemplateTypeClass(Patch02);			//	TEMPLATE_PATCH2
-	(void)new TemplateTypeClass(Patch03);			//	TEMPLATE_PATCH3
-	(void)new TemplateTypeClass(Patch04);			//	TEMPLATE_PATCH4
-	(void)new TemplateTypeClass(Patch07);			//	TEMPLATE_PATCH7
-	(void)new TemplateTypeClass(Patch08);			//	TEMPLATE_PATCH8
-	(void)new TemplateTypeClass(Patch13);			//	TEMPLATE_PATCH13
-	(void)new TemplateTypeClass(Patch14);			//	TEMPLATE_PATCH14
-	(void)new TemplateTypeClass(Patch15);			//	TEMPLATE_PATCH15
-	(void)new TemplateTypeClass(River01);			//	TEMPLATE_RIVER1
-	(void)new TemplateTypeClass(River02);			//	TEMPLATE_RIVER2
-	(void)new TemplateTypeClass(River03);			//	TEMPLATE_RIVER3
-	(void)new TemplateTypeClass(River04);			//	TEMPLATE_RIVER4
-	(void)new TemplateTypeClass(River05);			//	TEMPLATE_RIVER5
-	(void)new TemplateTypeClass(River06);			//	TEMPLATE_RIVER6
-	(void)new TemplateTypeClass(River07);			//	TEMPLATE_RIVER7
-	(void)new TemplateTypeClass(River08);			//	TEMPLATE_RIVER8
-	(void)new TemplateTypeClass(River09);			//	TEMPLATE_RIVER9
-	(void)new TemplateTypeClass(River10);			//	TEMPLATE_RIVER10
-	(void)new TemplateTypeClass(River11);			//	TEMPLATE_RIVER11
-	(void)new TemplateTypeClass(River12);			//	TEMPLATE_RIVER12
-	(void)new TemplateTypeClass(River13);			//	TEMPLATE_RIVER13
-	(void)new TemplateTypeClass(Falls1);			//	TEMPLATE_FALLS1
-	(void)new TemplateTypeClass(Falls1a);			//	TEMPLATE_FALLS1A
-	(void)new TemplateTypeClass(Falls2);			//	TEMPLATE_FALLS2
-	(void)new TemplateTypeClass(Falls2a);			//	TEMPLATE_FALLS2A
-	(void)new TemplateTypeClass(Ford1);				//	TEMPLATE_FORD1
-	(void)new TemplateTypeClass(Ford2);				//	TEMPLATE_FORD2
 	(void)new TemplateTypeClass(Bridge1);			//	TEMPLATE_BRIDGE1
 	(void)new TemplateTypeClass(Bridge1d);			//	TEMPLATE_BRIDGE1D
 	(void)new TemplateTypeClass(Bridge2);			//	TEMPLATE_BRIDGE2
 	(void)new TemplateTypeClass(Bridge2d);			//	TEMPLATE_BRIDGE2D
-	(void)new TemplateTypeClass(Slope01);			//	TEMPLATE_SLOPE1
-	(void)new TemplateTypeClass(Slope02);			//	TEMPLATE_SLOPE2
-	(void)new TemplateTypeClass(Slope03);			//	TEMPLATE_SLOPE3
-	(void)new TemplateTypeClass(Slope04);			//	TEMPLATE_SLOPE4
-	(void)new TemplateTypeClass(Slope05);			//	TEMPLATE_SLOPE5
-	(void)new TemplateTypeClass(Slope06);			//	TEMPLATE_SLOPE6
-	(void)new TemplateTypeClass(Slope07);			//	TEMPLATE_SLOPE7
-	(void)new TemplateTypeClass(Slope08);			//	TEMPLATE_SLOPE8
-	(void)new TemplateTypeClass(Slope09);			//	TEMPLATE_SLOPE9
-	(void)new TemplateTypeClass(Slope10);			//	TEMPLATE_SLOPE10
-	(void)new TemplateTypeClass(Slope11);			//	TEMPLATE_SLOPE11
-	(void)new TemplateTypeClass(Slope12);			//	TEMPLATE_SLOPE12
-	(void)new TemplateTypeClass(Slope13);			//	TEMPLATE_SLOPE13
-	(void)new TemplateTypeClass(Slope14);			//	TEMPLATE_SLOPE14
-	(void)new TemplateTypeClass(Slope15);			//	TEMPLATE_SLOPE15
-	(void)new TemplateTypeClass(Slope16);			//	TEMPLATE_SLOPE16
-	(void)new TemplateTypeClass(Slope17);			//	TEMPLATE_SLOPE17
-	(void)new TemplateTypeClass(Slope18);			//	TEMPLATE_SLOPE18
-	(void)new TemplateTypeClass(Slope19);			//	TEMPLATE_SLOPE19
-	(void)new TemplateTypeClass(Slope20);			//	TEMPLATE_SLOPE20
-	(void)new TemplateTypeClass(Slope21);			//	TEMPLATE_SLOPE21
-	(void)new TemplateTypeClass(Slope22);			//	TEMPLATE_SLOPE22
-	(void)new TemplateTypeClass(Slope23);			//	TEMPLATE_SLOPE23
-	(void)new TemplateTypeClass(Slope24);			//	TEMPLATE_SLOPE24
-	(void)new TemplateTypeClass(Slope25);			//	TEMPLATE_SLOPE25
-	(void)new TemplateTypeClass(Slope26);			//	TEMPLATE_SLOPE26
-	(void)new TemplateTypeClass(Slope27);			//	TEMPLATE_SLOPE27
-	(void)new TemplateTypeClass(Slope28);			//	TEMPLATE_SLOPE28
-	(void)new TemplateTypeClass(Slope29);			//	TEMPLATE_SLOPE29
-	(void)new TemplateTypeClass(Slope30);			//	TEMPLATE_SLOPE30
-	(void)new TemplateTypeClass(Slope31);			//	TEMPLATE_SLOPE31
-	(void)new TemplateTypeClass(Slope32);			//	TEMPLATE_SLOPE32
-	(void)new TemplateTypeClass(Slope33);			//	TEMPLATE_SLOPE33
-	(void)new TemplateTypeClass(Slope34);			//	TEMPLATE_SLOPE34
-	(void)new TemplateTypeClass(Slope35);			//	TEMPLATE_SLOPE35
-	(void)new TemplateTypeClass(Slope36);			//	TEMPLATE_SLOPE36
-	(void)new TemplateTypeClass(Slope37);			//	TEMPLATE_SLOPE37
-	(void)new TemplateTypeClass(Slope38);			//	TEMPLATE_SLOPE38
 	(void)new TemplateTypeClass(Road01);			//	TEMPLATE_ROAD1
 	(void)new TemplateTypeClass(Road02);			//	TEMPLATE_ROAD2
 	(void)new TemplateTypeClass(Road03);			//	TEMPLATE_ROAD3
@@ -3121,9 +2432,14 @@ void TemplateTypeClass::Init(TheaterType theater)
 	char fullname[_MAX_FNAME+_MAX_EXT];	// Fully constructed iconset name.
 	void const * ptr;		// Working loaded iconset pointer.
 
+	void *terrainPalette = (void *)MFCD::Retrieve(Theaters[theater].IsoPalette);
+
 	for (TemplateType index = TEMPLATE_FIRST; index < TEMPLATE_COUNT; index++) {
 		TemplateTypeClass	const & tplate = As_Reference(index);
-
+// jmarshall - temp hack
+		if (index > TEMPLATE_SHORE41)
+			break;
+// jmarshall end
 		((void const *&)tplate.ImageData) = NULL;
 		if (tplate.Theater & (1<<theater)) {
 			_makepath(fullname, NULL, NULL, tplate.IniName, Theaters[theater].Suffix);
@@ -3148,7 +2464,7 @@ void TemplateTypeClass::Init(TheaterType theater)
 				// If no HD assets, load the legacy assets into a texture.
 				char tmp[512];
 				sprintf(tmp, "icon_%s", fullname);
-				((void const*&)tplate.HDImageData) = Load_Stamp(fullname, tplate.ImageData);
+				((void const*&)tplate.HDImageData) = Load_Stamp(fullname, tplate.ImageData, terrainPalette);
 			}
 		}
 	}

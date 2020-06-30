@@ -231,9 +231,11 @@ void DisplayClass::One_Time(void)
 	/*
 	**	Load the generic transparent icon set.
 	*/
-	TransIconset = MFCD::Retrieve("TRANS.ICN");
 // jmarshall
-	TransIconsetHD = Load_Stamp("TRANS_ICON", TransIconset);
+//	TransIconset = MFCD::Retrieve("TRANS.ICN");
+//// jmarshall
+//	TransIconsetHD = Load_Stamp("TRANS_ICON", TransIconset);
+//// jmarshall end
 // jmarshall end
 
 	#ifndef NDEBUG

@@ -389,7 +389,7 @@ Image_t *Find_Image(const char* name) {
 	return NULL;
 }
 
-Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap) {
+Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsigned char *data, unsigned char* remap, unsigned char* ccpalete) {
 	int64_t hash = generateHashValue(name, strlen(name));
 
 	int image_table_size = loaded_images.size();
@@ -405,7 +405,9 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 		}
 	}
 
-	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+	if (ccpalete == NULL)
+		ccpalete = (unsigned char*)CCPalette.Get_Data();
+
 
 	Image_t* image = new Image_t();
 	unsigned char *buffer = new unsigned char[Width * Height * 4];
@@ -426,6 +428,9 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 			g = 0;
 			b = 0;			
 			a = 128;
+		}
+		else if (r == 0 && g == 0 && b == 0) {
+			r = g = b = a = 0;
 		}
 		else if (c != 0) {
 			a = 255;
@@ -459,9 +464,12 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 	return image;
 }
 
-void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap) {	
+void Image_Add8BitImage(Image_t *image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap, unsigned char *palette) {	
 	unsigned char* buffer = new unsigned char[Width * Height * 4];
 	unsigned char* ccpalete = (unsigned char*)CCPalette.Get_Data();
+	if (palette) {
+		ccpalete = palette;
+	}
 
 	if (image->width != Width || image->height != Height) {
 		assert(!"Image_Add8BitImage: Invalid new dimensions!");

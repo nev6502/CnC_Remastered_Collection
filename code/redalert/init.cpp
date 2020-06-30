@@ -3072,6 +3072,15 @@ static void Init_Bootstrap_Mixfiles(void)
 	assert(ok);
 #endif	//WIN32
 
+
+// Isometric Files 
+	new MFCD("cache.mix", &FastKey, MIX_FILE_TS);
+	{
+		bool ok = MFCD::Cache("cache.mix");
+		assert(ok);
+	}
+// jmarshall end
+
 	RequiredCD = temp;
 }
 
