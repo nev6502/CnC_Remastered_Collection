@@ -1769,102 +1769,102 @@ static TemplateTypeClass const WALL0049(
 	TXT_INTERIOR
 );
 
-static TemplateTypeClass const Xtra0001(
-	TEMPLATE_XTRA0001,
-	THEATERF_INTERIOR,
-	"XTRA0001",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0002(
-	TEMPLATE_XTRA0002,
-	THEATERF_INTERIOR,
-	"XTRA0002",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0003(
-	TEMPLATE_XTRA0003,
-	THEATERF_INTERIOR,
-	"XTRA0003",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0004(
-	TEMPLATE_XTRA0004,
-	THEATERF_INTERIOR,
-	"XTRA0004",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0005(
-	TEMPLATE_XTRA0005,
-	THEATERF_INTERIOR,
-	"XTRA0005",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0006(
-	TEMPLATE_XTRA0006,
-	THEATERF_INTERIOR,
-	"XTRA0006",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0007(
-	TEMPLATE_XTRA0007,
-	THEATERF_INTERIOR,
-	"XTRA0007",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0008(
-	TEMPLATE_XTRA0008,
-	THEATERF_INTERIOR,
-	"XTRA0008",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0009(
-	TEMPLATE_XTRA0009,
-	THEATERF_INTERIOR,
-	"XTRA0009",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0010(
-	TEMPLATE_XTRA0010,
-	THEATERF_INTERIOR,
-	"XTRA0010",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0011(
-	TEMPLATE_XTRA0011,
-	THEATERF_INTERIOR,
-	"XTRA0011",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0012(
-	TEMPLATE_XTRA0012,
-	THEATERF_INTERIOR,
-	"XTRA0012",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0013(
-	TEMPLATE_XTRA0013,
-	THEATERF_INTERIOR,
-	"XTRA0013",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0014(
-	TEMPLATE_XTRA0014,
-	THEATERF_INTERIOR,
-	"XTRA0014",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0015(
-	TEMPLATE_XTRA0015,
-	THEATERF_INTERIOR,
-	"XTRA0015",
-	TXT_INTERIOR
-);
-static TemplateTypeClass const Xtra0016(
-	TEMPLATE_XTRA0016,
-	THEATERF_INTERIOR,
-	"XTRA0016",
-	TXT_INTERIOR
-);
+//static TemplateTypeClass const Xtra0001(
+//	TEMPLATE_XTRA0001,
+//	THEATERF_INTERIOR,
+//	"XTRA0001",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0002(
+//	TEMPLATE_XTRA0002,
+//	THEATERF_INTERIOR,
+//	"XTRA0002",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0003(
+//	TEMPLATE_XTRA0003,
+//	THEATERF_INTERIOR,
+//	"XTRA0003",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0004(
+//	TEMPLATE_XTRA0004,
+//	THEATERF_INTERIOR,
+//	"XTRA0004",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0005(
+//	TEMPLATE_XTRA0005,
+//	THEATERF_INTERIOR,
+//	"XTRA0005",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0006(
+//	TEMPLATE_XTRA0006,
+//	THEATERF_INTERIOR,
+//	"XTRA0006",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0007(
+//	TEMPLATE_XTRA0007,
+//	THEATERF_INTERIOR,
+//	"XTRA0007",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0008(
+//	TEMPLATE_XTRA0008,
+//	THEATERF_INTERIOR,
+//	"XTRA0008",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0009(
+//	TEMPLATE_XTRA0009,
+//	THEATERF_INTERIOR,
+//	"XTRA0009",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0010(
+//	TEMPLATE_XTRA0010,
+//	THEATERF_INTERIOR,
+//	"XTRA0010",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0011(
+//	TEMPLATE_XTRA0011,
+//	THEATERF_INTERIOR,
+//	"XTRA0011",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0012(
+//	TEMPLATE_XTRA0012,
+//	THEATERF_INTERIOR,
+//	"XTRA0012",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0013(
+//	TEMPLATE_XTRA0013,
+//	THEATERF_INTERIOR,
+//	"XTRA0013",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0014(
+//	TEMPLATE_XTRA0014,
+//	THEATERF_INTERIOR,
+//	"XTRA0014",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0015(
+//	TEMPLATE_XTRA0015,
+//	THEATERF_INTERIOR,
+//	"XTRA0015",
+//	TXT_INTERIOR
+//);
+//static TemplateTypeClass const Xtra0016(
+//	TEMPLATE_XTRA0016,
+//	THEATERF_INTERIOR,
+//	"XTRA0016",
+//	TXT_INTERIOR
+//);
 
 #ifdef FIXIT_ANTS
 static TemplateTypeClass const AntHill(
@@ -2135,22 +2135,22 @@ static void _Watcom_Ugh_Hack(void)
 	(void)new TemplateTypeClass(Bridge1x);			//	TEMPLATE_BRIDGE1X
 	(void)new TemplateTypeClass(Bridge2x);			//	TEMPLATE_BRIDGE2X
 
-	(void)new TemplateTypeClass(Xtra0001);			//	TEMPLATE_XTRA0001
-	(void)new TemplateTypeClass(Xtra0002);			//	TEMPLATE_XTRA0002
-	(void)new TemplateTypeClass(Xtra0003);			//	TEMPLATE_XTRA0003
-	(void)new TemplateTypeClass(Xtra0004);			//	TEMPLATE_XTRA0004
-	(void)new TemplateTypeClass(Xtra0005);			//	TEMPLATE_XTRA0005
-	(void)new TemplateTypeClass(Xtra0006);			//	TEMPLATE_XTRA0006
-	(void)new TemplateTypeClass(Xtra0007);			//	TEMPLATE_XTRA0007
-	(void)new TemplateTypeClass(Xtra0008);			//	TEMPLATE_XTRA0008
-	(void)new TemplateTypeClass(Xtra0009);			//	TEMPLATE_XTRA0009
-	(void)new TemplateTypeClass(Xtra0010);			//	TEMPLATE_XTRA0010
-	(void)new TemplateTypeClass(Xtra0011);			//	TEMPLATE_XTRA0011
-	(void)new TemplateTypeClass(Xtra0012);			//	TEMPLATE_XTRA0012
-	(void)new TemplateTypeClass(Xtra0013);			//	TEMPLATE_XTRA0013
-	(void)new TemplateTypeClass(Xtra0014);			//	TEMPLATE_XTRA0014
-	(void)new TemplateTypeClass(Xtra0015);			//	TEMPLATE_XTRA0015
-	(void)new TemplateTypeClass(Xtra0016);			//	TEMPLATE_XTRA0016
+	//(void)new TemplateTypeClass(Xtra0001);			//	TEMPLATE_XTRA0001
+	//(void)new TemplateTypeClass(Xtra0002);			//	TEMPLATE_XTRA0002
+	//(void)new TemplateTypeClass(Xtra0003);			//	TEMPLATE_XTRA0003
+	//(void)new TemplateTypeClass(Xtra0004);			//	TEMPLATE_XTRA0004
+	//(void)new TemplateTypeClass(Xtra0005);			//	TEMPLATE_XTRA0005
+	//(void)new TemplateTypeClass(Xtra0006);			//	TEMPLATE_XTRA0006
+	//(void)new TemplateTypeClass(Xtra0007);			//	TEMPLATE_XTRA0007
+	//(void)new TemplateTypeClass(Xtra0008);			//	TEMPLATE_XTRA0008
+	//(void)new TemplateTypeClass(Xtra0009);			//	TEMPLATE_XTRA0009
+	//(void)new TemplateTypeClass(Xtra0010);			//	TEMPLATE_XTRA0010
+	//(void)new TemplateTypeClass(Xtra0011);			//	TEMPLATE_XTRA0011
+	//(void)new TemplateTypeClass(Xtra0012);			//	TEMPLATE_XTRA0012
+	//(void)new TemplateTypeClass(Xtra0013);			//	TEMPLATE_XTRA0013
+	//(void)new TemplateTypeClass(Xtra0014);			//	TEMPLATE_XTRA0014
+	//(void)new TemplateTypeClass(Xtra0015);			//	TEMPLATE_XTRA0015
+	//(void)new TemplateTypeClass(Xtra0016);			//	TEMPLATE_XTRA0016
 
 #ifdef FIXIT_ANTS
 	(void)new TemplateTypeClass(AntHill);			//	TEMPLATE_ROAD36
@@ -2495,29 +2495,30 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 	int	index;
 	bool	scale;		// Should the template be half sized?
 
-	w = Bound(Width, 1, 13);
-	h = Bound(Height, 1, 8);
-	scale = (w > 3 || h > 3);
-	if (scale) {
-		x -= (w * ICON_PIXEL_W) / 4;
-		y -= (h * ICON_PIXEL_H) / 4;
-	} else {
-		x -= (w * ICON_PIXEL_W) / 2;
-		y -= (h * ICON_PIXEL_H) / 2;
-	}
-	x += WindowList[window][WINDOWX];
-	y += WindowList[window][WINDOWY];
+	Image_t* img = Get_HDImage_Data();
 
-	IconsetClass const * iconset = (IconsetClass const *)Get_Image_Data();
-	unsigned char const * map = iconset->Map_Data();
+	w = Bound(img->width, 1, 13);
+	h = Bound(img->height, 1, 8);
+	//scale = (w > 3 || h > 3);
+	//if (scale) {
+	//	x -= (w * ICON_PIXEL_W) / 4;
+	//	y -= (h * ICON_PIXEL_H) / 4;
+	//} else {
+	//	x -= (w * ICON_PIXEL_W) / 2;
+	//	y -= (h * ICON_PIXEL_H) / 2;
+	//}
+	//x += WindowList[window][WINDOWX];
+	//y += WindowList[window][WINDOWY];
 
-	for (index = 0; index < w*h; index++) {
-		if (map[index] != 0xFF) {
-			Image_t* image = Get_HDImage_Data();
-			int stamp_index = Stamp_GetIconIndex(image, index);
+	//IconsetClass const * iconset = (IconsetClass const *)Get_Image_Data();
+	//unsigned char const * map = iconset->Map_Data();
 
-			GL_RenderForeGroundImage(image, x + ((index % w) * (ICON_PIXEL_W / 2)), y + ((index / w) * (ICON_PIXEL_H / 2)), ICON_PIXEL_W / 2, ICON_PIXEL_H / 2, 0, stamp_index);
-		}
+	for (index = 0; index < img->isoTileInfo->NumTiles(); index++) {
+		IsoTileImageHeader* isoImage = img->isoTileInfo->GetTileInfo(index);
+		if (isoImage == NULL)
+			continue;
+
+		GL_RenderForeGroundImage(img, x + isoImage->TileX, y + isoImage->TileY, ICON_PIXEL_W, ICON_PIXEL_H, 0, index);	
 	}
 }
 
@@ -2544,6 +2545,10 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 void TemplateTypeClass::Prep_For_Add(void)
 {
 	for (TemplateType index = TEMPLATE_CLEAR1; index < TEMPLATE_COUNT; index++) {
+// jmarshall
+		if (index > TEMPLATE_SHORE41)
+			return;
+// jmarshall end
 		if (As_Reference(index).Get_Image_Data()) {
 			Map.Add_To_List(&As_Reference(index));
 		}
