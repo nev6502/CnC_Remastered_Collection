@@ -116,7 +116,8 @@ typedef enum {
 class UserInputClass
 {
 	public:
-		UserInputClass();
+		UserInputClass(void);
+
 		void UserInputClass::Process_Input( KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags );
 
 		InputAction LastAction;

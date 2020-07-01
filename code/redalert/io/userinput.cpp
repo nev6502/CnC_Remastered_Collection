@@ -1,5 +1,5 @@
-#include "../FUNCTION.H"
-#include "UserInput.h"
+#include "../function.h"
+#include "userinput.h"
 
 extern KeyboardClass * Keyboard;
 

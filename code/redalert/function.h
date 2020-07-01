@@ -200,7 +200,8 @@ struct NoInitClass {
 #endif
 
 #include	"key.h"
-#include    "io/UserInput.h"
+#include    "io/userinput.h"
+#include    "io/eventqueue.h"
 
 #include    <wwlib32.h>
 #include	"mpu.h"
