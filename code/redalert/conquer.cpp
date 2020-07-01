@@ -743,7 +743,7 @@ void Keyboard_Process(KeyNumType & input)
 	**	Center the map about the construction yard or construction vehicle
 	**	if one is present.
 	*/
-	if (key != 0 && key == VK_H) {
+	if (key != 0 && key == Options.KeyBase) {
 		Unselect_All();
 		if (PlayerPtr->CurBuildings) {
 			for (index = 0; index < Buildings.Count(); index++) {
@@ -875,19 +875,19 @@ void Keyboard_Process(KeyNumType & input)
 	**	Scrolls the tactical map in the direction specified.
 	*/
 	int distance = CELL_LEPTON_W;
-	if (key != 0 && key == VK_LEFT) {
+	if (key != 0 && key == KN_LEFT) {
 		Map.Scroll_Map(DIR_W, distance, true);
 		input = KN_NONE;
 	}
-	if (key != 0 && key == VK_RIGHT) {
+	if (key != 0 && key == KN_RIGHT) {
 		Map.Scroll_Map(DIR_E, distance, true);
 		input = KN_NONE;
 	}
-	if (key != 0 && key == VK_UP) {
+	if (key != 0 && key == KN_UP) {
 		Map.Scroll_Map(DIR_N, distance, true);
 		input = KN_NONE;
 	}
-	if (key != 0 && key == VK_DOWN) {
+	if (key != 0 && key == KN_DOWN) {
 		Map.Scroll_Map(DIR_S, distance, true);
 		input = KN_NONE;
 	}

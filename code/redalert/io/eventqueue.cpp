@@ -1,5 +1,5 @@
-#include "../FUNCTION.H"
-#include "EventQueue.h"
+#include "../function.h"
+#include "eventqueue.h"
 
 /*
 	Clears the event queue and frees memory

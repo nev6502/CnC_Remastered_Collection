@@ -115,53 +115,52 @@ typedef enum {
 
 class UserInputClass
 {
+public:
+	UserInputClass();
+	void UserInputClass::Process_Input(KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags);
+
+	InputAction LastAction;
+
+	class KeyboardState {
 	public:
-		UserInputClass(void);
+		SDL_KeyCode LastKey;
+		char ASCII;
 
-		void UserInputClass::Process_Input( KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags );
+		bool Shift;
+		bool Control;
+		bool Alt;
+		bool CapsLock;
 
-		InputAction LastAction;
+		bool Key_Down(KeyNumType key)  const;
 
-		class KeyboardState {
-			public:
-				SDL_KeyCode LastKey;
-				char ASCII;
+		void ResetState() {
+			this->Shift = false;
+			this->Control = false;
+			this->Alt = false;
+		}
+	};
 
-				bool Shift;
-				bool Control;
-				bool Alt;
-				bool CapsLock;
+	KeyboardState KeyB;
 
-				bool Key_Down(KeyNumType key)  const;
+	class MouseState {
+	public:
+		int X;
+		int Y;
 
-				void ResetState() {
-					this->Shift = false;
-					this->Control = false;
-					this->Alt = false;
-				}
-		};
+		MouseButtonState Button_Left;
+		MouseButtonState Button_Middle;
+		MouseButtonState Button_Right;
 
-		KeyboardState KeyB;
+		bool UserInputClass::MouseState::Mouse_Down(KeyNumType key) const;
 
-		class MouseState {
-			public:
-				int X;
-				int Y;
+		void ResetState() {
+			this->Button_Left = MouseButtonState::MOUSE_BUTTON_UP;
+			this->Button_Middle = MouseButtonState::MOUSE_BUTTON_UP;
+			this->Button_Right = MouseButtonState::MOUSE_BUTTON_UP;
+		}
+	};
 
-				MouseButtonState Button_Left;
-				MouseButtonState Button_Middle;
-				MouseButtonState Button_Right;
-
-				bool UserInputClass::MouseState::Mouse_Down(KeyNumType key) const;
-
-				void ResetState() {
-					this->Button_Left = MouseButtonState::MOUSE_BUTTON_UP;
-					this->Button_Middle = MouseButtonState::MOUSE_BUTTON_UP;
-					this->Button_Right = MouseButtonState::MOUSE_BUTTON_UP;
-				}
-		};
-
-		MouseState Mouse;
-	private:
-		int numFramesLMouse = 0;
+	MouseState Mouse;
+private:
+	int numFramesLMouse = 0;
 };
