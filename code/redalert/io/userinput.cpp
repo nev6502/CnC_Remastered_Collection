@@ -204,10 +204,7 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 				Keyboard->Put_Element(element->second | keyFlags);
 
 				KeyB.LastKey = element->first;
-				if (event.text.text[0] == (event.text.text[0] & 0xFF))
-				{
-					KeyB.ASCII = element->second;
-				}
+				KeyB.ASCII = 0x0;
 			}
 
 			break;
