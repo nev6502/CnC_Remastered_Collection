@@ -86,6 +86,13 @@ std::map<SDL_KeyCode, KeyNumType> const sdl_keyMapping = {
 	{ SDLK_DOWN, KN_DOWN },
 	{ SDLK_LEFT, KN_LEFT },
 	{ SDLK_RIGHT, KN_RIGHT },
+
+	{ SDLK_LALT, KN_LALT },
+	{ SDLK_RALT, KN_RALT },
+	{ SDLK_LCTRL, KN_LCTRL },
+	{ SDLK_RCTRL, KN_RCTRL },
+	{ SDLK_LSHIFT, KN_LSHIFT },
+	{ SDLK_RSHIFT, KN_RSHIFT },
 };
 extern std::map<KeyNumType, SDL_KeyCode> sdl_keyMapping_reverse;
 

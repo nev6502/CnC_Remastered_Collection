@@ -53,6 +53,7 @@
 
 //#include "key.h"
 #include "FUNCTION.H"
+#include "SDL.h"
 
 #include	"monoc.h"
 
@@ -359,7 +360,8 @@ char WWKeyboardClass::To_ASCII(unsigned short key)
  *=============================================================================================*/
 bool WWKeyboardClass::Down(unsigned short key)
 {
-	return(GetAsyncKeyState(key & 0xFF) == 0 ? false : true);
+	//return(GetAsyncKeyState(key & 0xFF) == 0 ? false : true);
+	return UserInput.KeyB.Key_Down( (KeyNumType)key );
 }
 
 

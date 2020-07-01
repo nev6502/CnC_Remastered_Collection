@@ -530,7 +530,7 @@ KeyNumType GadgetClass::Input(void)
 			**	Sweep through all the buttons in the chain and pass the current button state
 			**	and keyboard input data to them. These routines will detect whether they should
 			**	perform some action and return a flag to this effect. They also have the option
-			**	of changing the key value so that an appropriate return value is use for this
+			**	of changing the key value so that an appropriate return value is used for this
 			**	processing routine.
 			*/
 			GadgetClass * next_button = this;

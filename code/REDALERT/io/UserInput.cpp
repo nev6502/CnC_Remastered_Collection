@@ -21,8 +21,9 @@ bool UserInputClass::KeyboardState::Key_Down(KeyNumType key) const
 	auto sdl_Key = sdl_keyMapping_reverse.find( key );
 	if ( sdl_Key != sdl_keyMapping_reverse.end() )
 	{
+		const SDL_Scancode scanCode = SDL_GetScancodeFromKey(sdl_Key->second);
 		const Uint8* keyState = SDL_GetKeyboardState(NULL);
-		return keyState[ sdl_Key->second ];
+		return ( keyState[scanCode] );
 	}
 	return false;
 }
@@ -145,6 +146,13 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 				}
 				break;
 
+			// Keyboard key lifted up
+			case SDL_KEYUP:
+				flags |= GadgetClass::KEYBOARD;
+
+				break;
+
+			// Keyboard key pressed down
 			case SDL_KEYDOWN:
 			{
 				if (event.key.keysym.scancode == SDL_SCANCODE_GRAVE) {
@@ -160,6 +168,8 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 					}
 					break;
 				}
+
+				flags |= GadgetClass::KEYBOARD;
 
 				int keyFlags = 0x00;
 				KeyB.Shift = false;
