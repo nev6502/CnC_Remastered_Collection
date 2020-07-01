@@ -66,11 +66,12 @@ struct IsoTileHeader_t {
 
 struct IsoTileImageHeader
 {
-	int TileX;
-	int TileY;
-	uint8_t* GetExtraData(IsoTile* tile)
+	uint8_t* GetExtraData(void)
 	{
-		return reinterpret_cast<uint8_t*>(tile) + ExtraOffset;
+		if(ExtraOffset == 0) {
+			return NULL;
+		}
+		return reinterpret_cast<uint8_t*>(this) + ExtraOffset + sizeof(IsoTileImageHeader);
 	}
 
 	uint8_t* GetZData(IsoTile* tile)
@@ -111,10 +112,32 @@ struct IsoTileImageHeader
 			tileData += cx;
 			w_line += global_cx;
 		}
+		w_line = TempTSStampData;
 
+		//uint8_t *extraData = GetExtraData();
+		//if (extraData != NULL)
+		//{
+		//	tileData += 576;
+		//	int cx = ExtraX;
+		//	int cy = ExtraY;
+		//	for (y = 0; y < cy; y++)
+		//	{
+		//		byte* w = w_line;
+		//		for (int i = 0; i < cx; i++)
+		//		{
+		//			int v = *tileData++;
+		//			if (v)
+		//				*w = v;
+		//			w++;
+		//		}
+		//		w_line += global_cx;
+		//	}
+		//}
 		return TempTSStampData;
 	}
 
+	int TileX;
+	int TileY;
 	int32_t ExtraOffset;
 	int32_t ZDataoffset;
 	int32_t ExtraZOffset;
@@ -135,6 +158,7 @@ struct IsoTileImageHeader
 		//unsigned int Bit128 : 1; //128
 
 	};
+	Flags flags;
 	unsigned char Height;
 	unsigned char TileType;
 	unsigned char RampType;
