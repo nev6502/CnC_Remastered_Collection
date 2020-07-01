@@ -164,6 +164,7 @@ int ShapeButtonClass::Draw_Me(int forced)
 
 		}
 		CC_Draw_Shape(ShapeData, shapenum, X, Y, WINDOW_MAIN, SHAPE_NORMAL);
+
 		/*
 		**	Display the mouse.
 		*/

@@ -759,6 +759,9 @@ bool SidebarClass::Scroll(bool up, int column)
  *=============================================================================================*/
 void SidebarClass::Draw_It(bool complete)
 {
+	/* Draw black background */
+	GL_FillRect(TBLACK, SIDE_X * RESFACTOR, 8 * RESFACTOR, SIDE_WIDTH * RESFACTOR, ScreenHeight - (8 * RESFACTOR));
+
 	PowerClass::Draw_It(complete);
 
 	BStart(BENCH_SIDEBAR);
@@ -772,19 +775,16 @@ void SidebarClass::Draw_It(bool complete)
 			*/
 			int shape = complete ? 0 : 1;
 
-			/*
-			** The sidebar shape is too big in 640x400 so it needs to be drawn in three chunks.
-			*/
 			CC_Draw_Shape(SidebarShape, 0, SIDE_X * RESFACTOR, 8*RESFACTOR, WINDOW_MAIN, SHAPE_WIN_REL);
 
-			// @@ this one repeats 
 			CC_Draw_Shape(SidebarMiddleShape, shape, SIDE_X * RESFACTOR, (8+80)*RESFACTOR, WINDOW_MAIN, SHAPE_WIN_REL);
-		
-			CC_Draw_Shape(SidebarBottomShape, shape, SIDE_X * RESFACTOR, ScreenHeight - ( 80*RESFACTOR ), WINDOW_MAIN, SHAPE_WIN_REL);
+
+			CC_Draw_Shape(SidebarBottomShape, shape, SIDE_X * RESFACTOR, ScreenHeight - (80 * RESFACTOR) + 3, WINDOW_MAIN, SHAPE_WIN_REL);
 
 			Repair.Draw_Me(true);
 			Upgrade.Draw_Me(true);
 			Zoom.Draw_Me(true);
+
 			LogicPage->Unlock();
 		}
 	}
@@ -802,7 +802,6 @@ void SidebarClass::Draw_It(bool complete)
 			Zoom.Draw_Me(true);
 		}
 	}
-	//IsToRedraw = false;
 
 	BEnd(BENCH_SIDEBAR);
 }
@@ -1226,29 +1225,16 @@ void SidebarClass::StripClass::Init_IO(int id)
 	UpButton[ID].ID = BUTTON_UP+id;
 	UpButton[ID].X = X + (UP_X_OFFSET * RESFACTOR);
 	UpButton[ID].Y = HEIGHT - ( ( OBJECT_HEIGHT + 7 ) * RESFACTOR );
-
-#if (FRENCH)
-#ifdef WIN32
 	UpButton[ID].Set_Shape(MFCD::Retrieve("STRIPUP.SHP"));
-#else
-	UpButton[ID].Set_Shape(MFCD::Retrieve("STUP_FIX.SHP"));
-#endif
-#else	//FRENCH
-	UpButton[ID].Set_Shape(MFCD::Retrieve("STRIPUP.SHP"));
-#endif	//FRENCH
 
 	DownButton[ID].IsSticky = true;
 	DownButton[ID].ID = BUTTON_DOWN+id;
 	DownButton[ID].X = X + (DOWN_X_OFFSET * RESFACTOR);
 	DownButton[ID].Y = HEIGHT - ( (OBJECT_HEIGHT + 7 ) * RESFACTOR );
-
-	/*
-	** Buttons are in a slightly different position in the new sidebar
-	*/
-	UpButton[ID].Y--;
-	DownButton[ID].Y--;
-
 	DownButton[ID].Set_Shape(MFCD::Retrieve("STRIPDN.SHP"));
+
+	UpButton[ID].Y += 3;
+	DownButton[ID].Y += 3;
 
 	for (int index = 0; index < MaxButtonsVisible; index++) {
 		SelectClass & g = SelectButton[ID][index];
@@ -1828,6 +1814,7 @@ void SidebarClass::StripClass::Draw_It(bool complete)
 			}
 
 			remapper = 0;
+
 			/*
 			**	Now that the shape of the object at the current working slot has been found,
 			**	draw it and any graphic overlays as necessary.
