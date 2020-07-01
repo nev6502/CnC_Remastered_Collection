@@ -999,13 +999,14 @@ bool CellClass::Get_Template_Info(char *template_name, int &icon, void *&image_d
 }
 
 void CellClass::ConvertCoordsToIsometric(int& x, int& y) {
+	y = y * 2;
 	int tileWidth = CELL_PIXEL_W;
 	int tileHeight = CELL_PIXEL_H;
 	int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
 	int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
 
-	x = sx + (CELL_PIXEL_W / 2);
-	y = sy + (CELL_PIXEL_W / 2);
+	x = sx;// + (CELL_PIXEL_W / 2);
+	y = sy;// + (CELL_PIXEL_W / 2);
 
 	x = x + (ScreenWidth / 2);
 }
@@ -1306,6 +1307,14 @@ void CellClass::Draw_It(int x, int y, bool objects)
 	#ifdef CHEAT_KEYS
 		}
 	#endif
+		//{
+		//		int isox = x, isoy = y;
+		//		ConvertCoordsToIsometric(isox, isoy);
+		//		char tmp[12];
+		//		sprintf(tmp, "%d", cell);
+		//		GL_DrawText(6, isox, isoy, tmp);
+		//}
+
 		BEnd(BENCH_CELL);
 	}
 

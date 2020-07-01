@@ -10,3 +10,4 @@ void GL_DrawLine(int color, int x, int y, int dx, int dy);
 void GL_ResetClipRect(void);
 void GL_SetClipRect(int x, int y, int width, int height);
 void GL_ForceForegroundRender(bool force);
+void GL_DrawForegroundText(int color, int x, int y, char* text);

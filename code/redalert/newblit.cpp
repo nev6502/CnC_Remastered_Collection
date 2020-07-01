@@ -81,6 +81,17 @@ void GL_DrawText(int color, int x, int y, char* text) {
 	ImGui::GetBackgroundDrawList()->AddText(pos, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)), text);
 }
 
+void GL_DrawForegroundText(int color, int x, int y, char* text) {
+	ImVec2 pos(x, y);
+	if (color == 0 || color == 160) { // This is a hack!
+		color = g_ColorXlat[color % 15];
+	}
+	float r = backbuffer_palette[(color * 3) + 0] / 255.0f;
+	float g = backbuffer_palette[(color * 3) + 1] / 255.0f;
+	float b = backbuffer_palette[(color * 3) + 2] / 255.0f;
+	ImGui::GetForegroundDrawList()->AddText(pos, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)), text);
+}
+
 void GL_DrawLine(int color, int x, int y, int dx, int dy) {
 	ImVec2 pos(x, y);
 	ImVec2 pos2(dx, dy);

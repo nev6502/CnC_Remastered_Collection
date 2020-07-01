@@ -267,8 +267,9 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
                 //    src += IconWidth;
                 //}
 
-                if (iconImage->HouseImages[0].image[icon_index] == 0)
-                    return;
+                if (iconImage->HouseImages[0].image[icon_index][0] == 0) {
+                    icon_index = 0;
+                }
 
                GL_SetClipRect(xstart, ystart, blit_width, blit_height);
                 GL_RenderImage(iconImage, xstart, ystart, blit_width, blit_height, 0, icon_index);
