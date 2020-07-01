@@ -1081,25 +1081,25 @@ void RadarClass::Plot_Radar_Pixel(CELL cell)
 					ptr = &TemplateTypeClass::As_Reference(TEMPLATE_CLEAR1);
 					icon = cellptr->Clear_Icon();
 				}
-
-				IconsetClass const * iconset = (IconsetClass const *)ptr->Get_Image_Data();
-				unsigned char const * icondata = iconset->Icon_Data();
-
-
-				/*
-				**	Convert the logical icon number into the actual icon number.
-				*/
-				icon &= 0x00FF;
-				icon = *(iconset->Map_Data() + icon);
-// jmarshall
-				unsigned char * data = (unsigned char *)icondata + icon*(24*24);
-				Image_t* image;
-				{
-					char tmp[512];
-					sprintf(tmp, "radar_%d_%d", ptr->Type, icon);
-					image = Image_CreateImageFrom8Bit(tmp, 24, 24, (unsigned char*)data);
-				}
-				GL_RenderImage(image, x, y, ZoomFactor, ZoomFactor);
+// jmarshall - fix radar
+//				IconsetClass const * iconset = (IconsetClass const *)ptr->Get_Image_Data();
+//				unsigned char const * icondata = iconset->Icon_Data();
+//
+//
+//				/*
+//				**	Convert the logical icon number into the actual icon number.
+//				*/
+//				icon &= 0x00FF;
+//				icon = *(iconset->Map_Data() + icon);
+//// jmarshall
+//				unsigned char * data = (unsigned char *)icondata + icon*(24*24);
+//				Image_t* image;
+//				{
+//					char tmp[512];
+//					sprintf(tmp, "radar_%d_%d", ptr->Type, icon);
+//					image = Image_CreateImageFrom8Bit(tmp, 24, 24, (unsigned char*)data);
+//				}
+//				GL_RenderImage(image, x, y, ZoomFactor, ZoomFactor);
 // jmarshall end
 				//Buffer_To_Page(0, 0, 24, 24, data, _TileStage);
 				//_TileStage.Scale(*LogicPage, 0, 0, x, y, 24, 24, ZoomFactor, ZoomFactor, TRUE);

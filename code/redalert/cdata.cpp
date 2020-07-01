@@ -2309,31 +2309,29 @@ void TemplateTypeClass::Init_Heap(void)
  *=============================================================================================*/
 LandType TemplateTypeClass::Land_Type(int icon) const
 {
-	IconsetClass const * icontrol = (IconsetClass const *)Get_Image_Data();
+	IsoTile* icontrol = (IsoTile *)Get_Image_Data();
 
 	if (icontrol != NULL) {
-		unsigned char const * map = icontrol->Control_Map();
-		if (map != NULL) {
+		IsoTileImageHeader* image = icontrol->GetTileInfo(icon);
+		if (image != NULL) {
 			static LandType _land[16] = {
 				LAND_CLEAR,
-				LAND_CLEAR,
-				LAND_CLEAR,
-				LAND_CLEAR,			// Clear
-				LAND_CLEAR,
-				LAND_CLEAR,
-				LAND_BEACH,			// Beach
-				LAND_CLEAR,
-				LAND_ROCK,			// Rock
-				LAND_ROAD,			// Road
-				LAND_WATER,			// Water
-				LAND_RIVER,			//	River
-				LAND_CLEAR,
-				LAND_CLEAR,
-				LAND_ROUGH,			// Rough
-				LAND_CLEAR,
+				LAND_ROAD ,
+				LAND_WATER,
+				LAND_ROCK,
+				LAND_WALL,
+				LAND_TIBERIUM,
+				LAND_BEACH,
+				LAND_ROUGH,
+				LAND_ICE,
+				LAND_RAILROAD,
+				LAND_TUNNEL,
+				LAND_WEEDS,
+				LAND_COUNT,
 			};
 
-			return(_land[map[icon % (icontrol->Map_Width() * icontrol->Map_Height())]]);
+			//return(_land[map[icon % (icontrol->Map_Width() * icontrol->Map_Height())]]);
+			return _land[image->TileType % LAND_COUNT];
 		}
 	}
 	return(LAND_CLEAR);
@@ -2394,14 +2392,19 @@ short const * TemplateTypeClass::Occupy_List(bool) const
 	static short _occupy[13*8+5];
 	short	* ptr;
 
-	IconsetClass const * iconset = (IconsetClass const *)Get_Image_Data();
-	unsigned char const * map = iconset->Map_Data();
+	IsoTile * iconset = (IsoTile *)Get_Image_Data();
+	//unsigned char const * map = iconset->Map_Data();
 
 	ptr = &_occupy[0];
-	for (int index = 0; index < Width * Height; index++) {
-		if (*map++ != 0xFF) {
-			*ptr++ = (index % Width) + ((index / Width)*MAP_CELL_W);
-		}
+	for (int index = 0; index < iconset->NumTiles(); index++) {
+		//if (*map++ != 0xFF) {
+		//	*ptr++ = (index % Width) + ((index / Width)*MAP_CELL_W);
+		//}
+		IsoTileImageHeader* tileimg = iconset->GetTileInfo(index);
+		if (tileimg == NULL)
+			continue;
+
+		*ptr++ = (index % Width) + ((index / Width) * MAP_CELL_W);
 	}
 	*ptr = REFRESH_EOL;
 
@@ -2435,9 +2438,9 @@ void TemplateTypeClass::Init(TheaterType theater)
 	void *terrainPalette = (void *)MFCD::Retrieve(Theaters[theater].IsoPalette);
 
 	for (TemplateType index = TEMPLATE_FIRST; index < TEMPLATE_COUNT; index++) {
-		TemplateTypeClass	const & tplate = As_Reference(index);
+		TemplateTypeClass& tplate = As_Reference(index);
 // jmarshall - temp hack
-		if (index > TEMPLATE_SHORE41)
+		if (index > TEMPLATE_ROAD43)
 			break;
 // jmarshall end
 		((void const *&)tplate.ImageData) = NULL;
@@ -2466,8 +2469,11 @@ void TemplateTypeClass::Init(TheaterType theater)
 				sprintf(tmp, "icon_%s", fullname);
 				((void const*&)tplate.HDImageData) = Load_Stamp(fullname, tplate.ImageData, terrainPalette);
 			}
-		}
+
+		}		
 	}
+
+
 }
 
 
@@ -2496,6 +2502,8 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 	bool	scale;		// Should the template be half sized?
 
 	Image_t* img = Get_HDImage_Data();
+	if (img == NULL)
+		return;
 
 	w = Bound(img->width, 1, 13);
 	h = Bound(img->height, 1, 8);
@@ -2546,7 +2554,7 @@ void TemplateTypeClass::Prep_For_Add(void)
 {
 	for (TemplateType index = TEMPLATE_CLEAR1; index < TEMPLATE_COUNT; index++) {
 // jmarshall
-		if (index > TEMPLATE_SHORE41)
+		if (index > TEMPLATE_ROAD43)
 			return;
 // jmarshall end
 		if (As_Reference(index).Get_Image_Data()) {

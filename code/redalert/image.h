@@ -156,6 +156,8 @@ public:
 		return tileImageHeaders;
 	}
 	int NumTiles(void) { return header.TileWidth * header.TileHeight; }
+	int NumTilesX(void) { return header.TileWidth; }
+	int NumTilesY(void) { return header.TileHeight; }
 private:
 	IsoTileHeader_t header;
 };

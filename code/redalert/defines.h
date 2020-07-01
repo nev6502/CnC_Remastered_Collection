@@ -2928,6 +2928,10 @@ typedef enum LandType : char {
 	LAND_BEACH,		//	Beach terrain.
 	LAND_ROUGH,		// Rocky terrain.
 	LAND_RIVER,		// Rocky riverbed.
+	LAND_ICE,
+	LAND_RAILROAD,
+	LAND_TUNNEL,
+	LAND_WEEDS,
 
 	LAND_COUNT,
 	LAND_NONE=-1,

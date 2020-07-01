@@ -1299,15 +1299,16 @@ if (BlubCell->Overlapper[1]) {
 		**	icon.  If the icon value is out of range or points to an invalid spot,
 		**	return an error.
 		*/
-		if (ttype != TEMPLATE_NONE) {
-			tclass = &TemplateTypeClass::As_Reference(ttype);
-			ticon = (*this)[cell].TIcon;
-			Mem_Copy(Get_Icon_Set_Map(tclass->Get_Image_Data()), map, tclass->Width * tclass->Height);
-			if (ticon < 0 || ticon >= (tclass->Width * tclass->Height) || map[ticon]==0xff) {
-				return (false);
-			}
-		}
-
+// jmarshall - readd this check?
+		//if (ttype != TEMPLATE_NONE) {
+		//	tclass = &TemplateTypeClass::As_Reference(ttype);
+		//	ticon = (*this)[cell].TIcon;
+		//	Mem_Copy(Get_Icon_Set_Map(tclass->Get_Image_Data()), map, tclass->Width * tclass->Height);
+		//	if (ticon < 0 || ticon >= (tclass->Width * tclass->Height) || map[ticon]==0xff) {
+		//		return (false);
+		//	}
+		//}
+// jmarshall end
 		/*
 		**	Validate Overlay
 		*/

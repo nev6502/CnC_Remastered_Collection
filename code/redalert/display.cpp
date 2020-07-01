@@ -1003,7 +1003,7 @@ void DisplayClass::Cursor_Mark(CELL pos, bool on)
 		CELL cell = pos + *ptr++;
 		if (In_Radar(cell)) {
 			cellptr = &(*this)[cell];
-			cellptr->Redraw_Objects();
+			cellptr->Redraw_Objects(true); // jmarshall: Force redraw all cursor tiles.
 			if (on) {
 				cellptr->IsCursorHere = true;
 			} else {
@@ -1022,7 +1022,7 @@ void DisplayClass::Cursor_Mark(CELL pos, bool on)
 			CELL cell = pos + *ptr++;
 			if (In_Radar(cell)) {
 				cellptr = &(*this)[cell];
-				cellptr->Redraw_Objects();
+				cellptr->Redraw_Objects(true);  // jmarshall: Force redraw all cursor tiles.
 			}
 		}
 	}

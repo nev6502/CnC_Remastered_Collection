@@ -31,6 +31,28 @@ using std::memcpy;
 class GraphicViewPortClass;
 byte TempTSStampData[48 * 24 * 4];
 
+
+int Get_IconSet_MapWidth(void const* data)
+{
+	// jmarshall
+	if (data) {
+		return ((IsoTile*)data)->NumTilesX();
+	}
+	// jmarshall end
+	return(0);
+}
+
+int Get_IconSet_MapHeight(void const* data)
+{
+	// jmarshall
+	if (data) {
+        return ((IsoTile*)data)->NumTilesY();
+	}
+	// jmarshall end
+	return(0);
+}
+
+
 Image_t* Load_StampHD(int theater, const char* iconName, const void* icondata) {
     char filename[2048];
     Image_t* image = NULL;
@@ -124,7 +146,12 @@ Image_t * Load_Stamp(const char *name, const void* icondata, void* terrainPalett
         }
     }
 
-    uint8_t* src = isoTile->GetTileInfo(0)->GetRasterizedData();
+    IsoTileImageHeader* initialTile = isoTile->GetTileInfo(0);
+    if(initialTile == NULL) {
+        return NULL;
+    }
+
+    uint8_t* src = initialTile->GetRasterizedData();
 	Image_t *image = Image_CreateImageFrom8Bit(name, isoTile->TileImageWidth(), isoTile->TileImageHeight(), (unsigned char*)src, NULL, (unsigned char *)terrainPalette);
     if (image == NULL) {
         return NULL;
@@ -133,7 +160,12 @@ Image_t * Load_Stamp(const char *name, const void* icondata, void* terrainPalett
     image->isoTileInfo = isoTile;
 
     for (int i = 1; i < isoTile->NumTiles(); i++) {  
-        src = isoTile->GetTileInfo(i)->GetRasterizedData();
+        IsoTileImageHeader* tile = isoTile->GetTileInfo(i);
+        if(tile == NULL) {
+            continue;
+        }
+
+        src = tile->GetRasterizedData();
         Image_Add8BitImage(image, 0, i, isoTile->TileImageWidth(), isoTile->TileImageHeight(), src, NULL, (unsigned char*)terrainPalette);
     }
 
