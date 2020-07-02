@@ -11,8 +11,6 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(src_io
 	./redalert/io/userinput.cpp
 	./redalert/io/userinput.h
-	./redalert/io/eventqueue.h
-	./redalert/io/eventqueue.cpp
 )
 
 set(src_win32lib
@@ -742,4 +740,4 @@ if (UNIX)
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert"  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.." )
 endif(UNIX)
 
-target_include_directories(RedAlert PRIVATE ./external/xml/;./external/devil/;./external/;./redalert/win32lib;./redalert/io;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)
+target_include_directories(RedAlert PRIVATE ./external/xml/;./external/devil/;./external/;./redalert/win32lib;./external/lua/;./external/imgui;./external/dxsdk/Include;./external/ffmpeg-win32/include;./external/sdl2/include;./win32lib;./external/openal/include)

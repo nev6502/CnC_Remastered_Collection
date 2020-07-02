@@ -591,7 +591,6 @@ void OptionsClass::Load_Settings(void)
 	SlowPalette = ini.Get_Bool(OPTIONS, "SlowPalette", SlowPalette);
 	IsPaletteScroll = ini.Get_Bool(OPTIONS, "PaletteScroll", IsPaletteScroll);
 
-	/*
 	KeyForceMove1 = (KeyNumType)ini.Get_Int(HotkeyName, "KeyForceMove1", KeyForceMove1);
 	KeyForceMove2 = (KeyNumType)ini.Get_Int(HotkeyName, "KeyForceMove2", KeyForceMove2);
 	KeyForceAttack1 = (KeyNumType)ini.Get_Int(HotkeyName, "KeyForceAttack1", KeyForceAttack1);
@@ -641,6 +640,7 @@ void OptionsClass::Load_Settings(void)
 	KeyTeam8 =  (KeyNumType)ini.Get_Int(HotkeyName, "KeyTeam8", KeyTeam8);
 	KeyTeam9 =  (KeyNumType)ini.Get_Int(HotkeyName, "KeyTeam9", KeyTeam9);
 	KeyTeam10 =  (KeyNumType)ini.Get_Int(HotkeyName, "KeyTeam10", KeyTeam10);
+
 
 #ifdef WIN32
 	KeyForceMove1 = (KeyNumType)(KeyForceMove1 & ~WWKEY_VK_BIT);
@@ -693,7 +693,6 @@ void OptionsClass::Load_Settings(void)
 	KeyTeam9 = (KeyNumType)(KeyTeam9 & ~WWKEY_VK_BIT);
 	KeyTeam10 = (KeyNumType)(KeyTeam10 & ~WWKEY_VK_BIT);
 #endif
-	*/
 }
 
 

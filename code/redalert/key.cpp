@@ -372,7 +372,7 @@ bool WWKeyboardClass::Down(unsigned short key)
 		return g_globalKeyFlags & GadgetClass::RIGHTPRESS;
 	}
 
-	return UserInput.KeyB.Key_Down((KeyNumType)key);
+	return(GetAsyncKeyState(key & 0xFF) == 0 ? false : true);
 }
 
 

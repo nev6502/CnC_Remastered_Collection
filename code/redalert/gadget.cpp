@@ -58,31 +58,31 @@
 #include <SDL.h>
 
 
- /*
- **	This records the current gadget the the gadget system is "stuck on". Such a
- **	gadget will be processed to the exclusion of all others until the mouse button
- **	is no longer pressed.
- */
-GadgetClass* GadgetClass::StuckOn = 0;
+/*
+**	This records the current gadget the the gadget system is "stuck on". Such a
+**	gadget will be processed to the exclusion of all others until the mouse button
+**	is no longer pressed.
+*/
+GadgetClass * GadgetClass::StuckOn = 0;
 
 /*
 **	This is a copy of a pointer to the last list used by the gadget input system.
 **	If a change of list is detected, then all gadgets are forced to be redrawn.
 */
-GadgetClass* GadgetClass::LastList = 0;
+GadgetClass * GadgetClass::LastList = 0;
 
 
 /*
 **	This points to the gadget that is intercepting all keyboard events.
 */
-GadgetClass* GadgetClass::Focused = 0;
+GadgetClass * GadgetClass::Focused = 0;
 
 
 /*
 ** This points to the current color scheme for drawing all gadgets.
 */
-static RemapControlType _GreyScheme = { 15 };
-RemapControlType* GadgetClass::ColorScheme = &_GreyScheme;
+static RemapControlType _GreyScheme = {15};
+RemapControlType * GadgetClass::ColorScheme = &_GreyScheme;
 
 /***********************************************************************************************
  * GadgetClass::GadgetClass -- Constructor for gadget object.                                  *
@@ -110,7 +110,7 @@ GadgetClass::GadgetClass(int x, int y, int w, int h, unsigned flags, int sticky)
 	X(x), Y(y), Width(w), Height(h), IsToRepaint(false), IsSticky(sticky), IsDisabled(false), Flags(flags)
 {
 	if (IsSticky) {
-		Flags |= LEFTPRESS | LEFTRELEASE;
+		Flags |= LEFTPRESS|LEFTRELEASE;
 	}
 }
 
@@ -130,7 +130,7 @@ GadgetClass::GadgetClass(int x, int y, int w, int h, unsigned flags, int sticky)
  * HISTORY:                                                                                    *
  *   08/01/1996 JLB : Created.                                                                 *
  *=============================================================================================*/
-GadgetClass::GadgetClass(GadgetClass const& gadget) :
+GadgetClass::GadgetClass(GadgetClass const & gadget) :
 	X(gadget.X),
 	Y(gadget.Y),
 	Width(gadget.Width),
@@ -190,7 +190,7 @@ GadgetClass::~GadgetClass(void)
  *                                                                         *
  * HISTORY:    01/03/1995 MML : Created.                                   *
  *=========================================================================*/
-int GadgetClass::Clicked_On(KeyNumType& key, unsigned flags, int mousex, int mousey)
+int GadgetClass::Clicked_On(KeyNumType & key, unsigned flags, int mousex, int mousey)
 {
 	/*
 	**	Set flags to match only those events that occur AND are being looked for. If
@@ -212,7 +212,7 @@ int GadgetClass::Clicked_On(KeyNumType& key, unsigned flags, int mousex, int mou
 	*/
 	if (this == StuckOn ||
 		(flags & KEYBOARD) ||
-		(flags && (mousex - X) < Width && (mousey - Y) < Height)) {
+		(flags && (mousex - X) < Width  && (mousey - Y) < Height)) {
 
 		return(Action(flags, key));
 	}
@@ -281,10 +281,10 @@ void GadgetClass::Disable(void)
  * HISTORY:                                                                                    *
  *   01/15/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-GadgetClass* GadgetClass::Remove(void)
+GadgetClass * GadgetClass::Remove(void)
 {
 	Clear_Focus();
-	return(GadgetClass*)LinkClass::Remove();
+	return(GadgetClass *)LinkClass::Remove();
 }
 
 
@@ -303,7 +303,7 @@ GadgetClass* GadgetClass::Remove(void)
  * HISTORY:                                                                                    *
  *   01/15/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-GadgetClass* GadgetClass::Get_Next(void) const
+GadgetClass * GadgetClass::Get_Next(void) const
 {
 	return(GadgetClass*)LinkClass::Get_Next();
 }
@@ -324,7 +324,7 @@ GadgetClass* GadgetClass::Get_Next(void) const
  * HISTORY:                                                                                    *
  *   01/15/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-GadgetClass* GadgetClass::Get_Prev(void) const
+GadgetClass * GadgetClass::Get_Prev(void) const
 {
 	return(GadgetClass*)LinkClass::Get_Prev();
 }
@@ -347,7 +347,7 @@ GadgetClass* GadgetClass::Get_Prev(void) const
  *=============================================================================================*/
 void GadgetClass::Delete_List(void)
 {
-	GadgetClass* g = this;
+	GadgetClass * g = this;
 
 	/*
 	**	Move to head of the list.
@@ -365,7 +365,7 @@ void GadgetClass::Delete_List(void)
 	while (g) {
 		g->Clear_Focus();
 
-		GadgetClass* temp = g;
+		GadgetClass * temp = g;
 		g = g->Get_Next();
 		delete temp;
 	}
@@ -391,7 +391,7 @@ void GadgetClass::Delete_List(void)
  * HISTORY:                                                                                    *
  *   01/15/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-int GadgetClass::Action(unsigned flags, KeyNumType&)
+int GadgetClass::Action(unsigned flags, KeyNumType &)
 {
 	/*
 	**	If any of the event flags are active, then this indicates that something probably
@@ -450,7 +450,7 @@ int GadgetClass::Draw_Me(int forced)
  *=============================================================================================*/
 void GadgetClass::Draw_All(bool forced)
 {
-	GadgetClass* gadget = this;
+	GadgetClass * gadget = this;
 
 	while (gadget != NULL) {
 		gadget->Draw_Me(forced);
@@ -470,10 +470,8 @@ void GadgetClass::Draw_All(bool forced)
  * HISTORY:    01/03/1995 MML : Created.                                   *
  *=========================================================================*/
 KeyNumType GadgetClass::Input(void)
-{
-	EventMessage eventMessage;
-	KeyNumType key = KN_NONE;
-	int flags = 0;
+{	
+	KeyNumType key;
 	int forced = false;
 
 	/*
@@ -490,52 +488,111 @@ KeyNumType GadgetClass::Input(void)
 	/*
 	**	Fetch any pending keyboard input.
 	*/
-	UserInput.Process_Input(key, flags);
-
-	if (EventQueue.Check()) {
-		eventMessage = EventQueue.Get();
-		eventMessage.Key_Flags(key, flags);
+	key = Keyboard->Check();
+	if (key != 0) {
+		key = Keyboard->Get();
 	}
+
+	/*
+	**	For mouse button clicks, the mouse position is actually held in the MouseQ...
+	**	globals rather than their normal Mouse... globals. This is because we need to
+	**	know the position of the mouse at the exact instant when the click occurred
+	**	rather the the mouse position at the time we get around to this function.
+	*/
+// jmarshall	
+	UserInput.Process_Input( g_globalKeyNumType, g_globalKeyFlags);
+	int flags = g_globalKeyFlags;
+// jmarshall end
+
+	/*
+	**	Set the mouse button state flags. These will be passed to the individual
+	**	buttons so that they can determine what action to perform (if any).
+	*/	
+	//if (key) {
+	//	if (key == KN_LMOUSE) {
+	//		flags |= LEFTPRESS;
+	//	}
+	//	if (key == KN_RMOUSE) {
+	//		flags |= RIGHTPRESS;
+	//	}
+	//	if (key == (KN_LMOUSE | KN_RLSE_BIT)) {
+	//		flags |= LEFTRELEASE;
+	//	}
+	//	if (key == (KN_RMOUSE | KN_RLSE_BIT)) {
+	//		flags |= RIGHTRELEASE;
+	//	}
+	//}
+
+	/*
+	**	If the mouse wasn't responsible for this key code, then it must be from
+	**	the keyboard. Flag this fact.
+	*/
+	if (key && !flags) {
+		flags |= KEYBOARD;
+	}
+
+	/*
+	**	Mouse button up or down action is ignored if there is a keyboard event. This
+	**	allows keyboard events to fall through normally even if the mouse is over a
+	**	gadget that is flagged for LEFTUP or RIGHTUP.
+	*/
+// jmarshall
+	//if (!key) {
+	//
+	//	/*
+	//	**	Check for the mouse being held down. We can't use the normal input system
+	//	**	for this, so we must examine the actual current state of the mouse
+	//	**	buttons. As a side note, if we determine that the mouse button isn't being
+	//	**	held down, then we automatically know that it must be up -- set the flag
+	//	**	accordingly.
+	//	*/
+	//	if (Keyboard->Down(KN_LMOUSE)) {
+	//		flags |= LEFTHELD;
+	//	} else {
+	//		flags |= LEFTUP;
+	//	}
+	//	if (Keyboard->Down(KN_RMOUSE)) {
+	//		flags |= RIGHTHELD;
+	//	} else {
+	//		flags |= RIGHTUP;
+	//	}
+	//}
+// jmarshall end
 
 	/*
 	**	If "sticky" processing is active, then only process the stuck gadget.
 	*/
 	if (StuckOn) {
 		StuckOn->Draw_Me(false);
-		GadgetClass* oldstuck = StuckOn;
+		GadgetClass * oldstuck = StuckOn;
 		StuckOn->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
-
-		if (StuckOn)
-		{
+		if (StuckOn) {
 			StuckOn->Draw_Me(false);
-		}
-		else {
+		} else {
 			oldstuck->Draw_Me(false);
 		}
-	}
-	else
-	{
+	} else {
+
 		/*
 		**	If there is a gadget that has the keyboard focus, then route all keyboard
 		**	events to it.
 		*/
-		if (Focused && eventMessage.EventType == EventMessageType::EVENT_KEYBOARD) {
+		if (Focused && (flags & KEYBOARD)) {
 			Focused->Draw_Me(false);
 			Focused->Clicked_On(key, flags, UserInput.Mouse.X, UserInput.Mouse.Y);
 			if (Focused) {
 				Focused->Draw_Me(false);
 			}
-		}
-		else {
+		} else {
 
 			/*
 			**	Sweep through all the buttons in the chain and pass the current button state
 			**	and keyboard input data to them. These routines will detect whether they should
 			**	perform some action and return a flag to this effect. They also have the option
-			**	of changing the key value so that an appropriate return value is used for this
+			**	of changing the key value so that an appropriate return value is use for this
 			**	processing routine.
 			*/
-			GadgetClass* next_button = this;
+			GadgetClass * next_button = this;
 			while (next_button != NULL) {
 
 				/*
@@ -564,7 +621,6 @@ KeyNumType GadgetClass::Input(void)
 			}
 		}
 	}
-
 	return(key);
 }
 
@@ -589,14 +645,14 @@ KeyNumType GadgetClass::Input(void)
  * HISTORY:                                                                                    *
  *   01/16/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-ControlClass* GadgetClass::Extract_Gadget(unsigned id)
+ControlClass * GadgetClass::Extract_Gadget(unsigned id)
 {
-	GadgetClass* g = this;
+	GadgetClass * g = this;
 
 	if (id != 0) {
 		while (g != NULL) {
 			if (g->Get_ID() == id) {
-				return((ControlClass*)g);
+				return((ControlClass *)g);
 			}
 			g = g->Get_Next();
 		}
@@ -745,7 +801,7 @@ bool GadgetClass::Has_Focus(void)
  *=============================================================================================*/
 int GadgetClass::Is_List_To_Redraw(void)
 {
-	GadgetClass* gadget = this;
+	GadgetClass * gadget = this;
 
 	while (gadget != NULL) {
 		if (gadget->IsToRepaint) {
