@@ -1,9 +1,9 @@
-#ifndef USERINPUT_H
-#define USERINPUT_H
+#pragma once
 
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <map>
+#include <queue>
 
 #include "examples/imgui_impl_sdl.h"
 
@@ -86,65 +86,81 @@ std::map<SDL_KeyCode, KeyNumType> const sdl_keyMapping = {
 	{ SDLK_DOWN, KN_DOWN },
 	{ SDLK_LEFT, KN_LEFT },
 	{ SDLK_RIGHT, KN_RIGHT },
+
+	{ SDLK_LALT, KN_LALT },
+	{ SDLK_RALT, KN_RALT },
+	{ SDLK_LCTRL, KN_LCTRL },
+	{ SDLK_RCTRL, KN_RCTRL },
+	{ SDLK_LSHIFT, KN_LSHIFT },
+	{ SDLK_RSHIFT, KN_RSHIFT },
 };
+extern std::map<KeyNumType, SDL_KeyCode> sdl_keyMapping_reverse;
+
+const int USERINPUT_SHIFT_BIT = 0x100;
+const int USERINPUT_CTRL_BIT = 0x200;
+const int USERINPUT_ALT_BIT = 0x400;
+
+typedef enum {
+	MOUSE_BUTTON_UP,
+	MOUSE_BUTTON_DOWN,
+	MOUSE_BUTTON_HOLD,
+	MOUSE_BUTTON_RELEASE,
+} MouseButtonState;
+
+typedef enum {
+	INPUT_ACTION_NONE,
+	INPUT_ACTION_KEYBOARD,
+	INPUT_ACTION_MOUSE,
+} InputAction;
 
 class UserInputClass
 {
+public:
+	UserInputClass();
+	void UserInputClass::Process_Input(KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags);
+
+	InputAction LastAction;
+
+	class KeyboardState {
 	public:
-		typedef enum {
-			MOUSE_BUTTON_UP,
-			MOUSE_BUTTON_DOWN,
-			MOUSE_BUTTON_HOLD,
-			MOUSE_BUTTON_RELEASE,
-		} MouseButtonState;
+		SDL_KeyCode LastKey;
+		char ASCII;
 
-		typedef enum {
-			INPUT_ACTION_NONE,
-			INPUT_ACTION_KEYBOARD,
-			INPUT_ACTION_MOUSE,
-		} InputAction;
+		bool Shift;
+		bool Control;
+		bool Alt;
+		bool CapsLock;
 
-		void UserInputClass::Process_Input(KeyNumType& key = g_globalKeyNumType, int& flags = g_globalKeyFlags);
+		bool Key_Down(KeyNumType key)  const;
 
-		InputAction LastAction;
+		void ResetState() {
+			this->Shift = false;
+			this->Control = false;
+			this->Alt = false;
+		}
+	};
 
-		class KeyboardState {
-		public:
-			SDL_KeyCode LastKey;
-			char ASCII;
+	KeyboardState KeyB;
 
-			bool Shift;
-			bool Control;
-			bool Alt;
+	class MouseState {
+	public:
+		int X;
+		int Y;
 
-			void ResetState() {
-				this->Shift = false;
-				this->Control = false;
-				this->Alt = false;
-			}
-		};
+		MouseButtonState Button_Left;
+		MouseButtonState Button_Middle;
+		MouseButtonState Button_Right;
 
-		KeyboardState KeyB;
+		bool UserInputClass::MouseState::Mouse_Down(KeyNumType key) const;
 
-		class MouseState {
-			public:
-				int X;
-				int Y;
+		void ResetState() {
+			this->Button_Left = MouseButtonState::MOUSE_BUTTON_UP;
+			this->Button_Middle = MouseButtonState::MOUSE_BUTTON_UP;
+			this->Button_Right = MouseButtonState::MOUSE_BUTTON_UP;
+		}
+	};
 
-				MouseButtonState Button_Left;
-				MouseButtonState Button_Middle;
-				MouseButtonState Button_Right;
-
-				void ResetState() {
-					this->Button_Left = MouseButtonState::MOUSE_BUTTON_UP;
-					this->Button_Middle = MouseButtonState::MOUSE_BUTTON_UP;
-					this->Button_Right = MouseButtonState::MOUSE_BUTTON_UP;
-				}
-		};
-
-		MouseState Mouse;
-	private:
-		int numFramesLMouse = 0;
+	MouseState Mouse;
+private:
+	int numFramesLMouse = 0;
 };
-
-#endif
