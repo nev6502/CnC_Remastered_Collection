@@ -893,91 +893,91 @@ static TemplateTypeClass const ShoreCliff28(
 static TemplateTypeClass const Rough01(
 	TEMPLATE_ROUGH01,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF01",
+	"ROUGH01",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough02(
 	TEMPLATE_ROUGH02,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF02",
+	"ROUGH02",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough03(
 	TEMPLATE_ROUGH03,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF03",
+	"ROUGH03",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough04(
 	TEMPLATE_ROUGH04,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF04",
+	"ROUGH04",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough05(
 	TEMPLATE_ROUGH05,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF05",
+	"ROUGH05",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough06(
 	TEMPLATE_ROUGH06,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF06",
+	"ROUGH06",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough07(
 	TEMPLATE_ROUGH07,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF07",
+	"ROUGH07",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough08(
 	TEMPLATE_ROUGH08,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF08",
+	"ROUGH08",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough09(
 	TEMPLATE_ROUGH09,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF09",
+	"ROUGH10",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough10(
-	TEMPLATE_ROUGH10,
+	TEMPLATE_ROADS1,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF10",
+	"DROADS01",
 	TXT_ROCK
 );
 static TemplateTypeClass const Rough11(
-	TEMPLATE_ROUGH11,
+	TEMPLATE_ROADS2,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RF11",
+	"DROADS02",
 	TXT_ROCK
 );
 static TemplateTypeClass const RiverCliff01(
-	TEMPLATE_RIVERCLIFF01,
+	TEMPLATE_ROADS3,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RC01",
+	"DROADS03",
 	TXT_RIVER
 );
 static TemplateTypeClass const RiverCliff02(
-	TEMPLATE_RIVERCLIFF02,
+	TEMPLATE_ROADS4,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RC02",
+	"DROADS04",
 	TXT_RIVER
 );
 static TemplateTypeClass const RiverCliff03(
-	TEMPLATE_RIVERCLIFF03,
+	TEMPLATE_ROADS5,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RC03",
+	"DROADS05",
 	TXT_RIVER
 );
 static TemplateTypeClass const RiverCliff04(
-	TEMPLATE_RIVERCLIFF04,
+	TEMPLATE_ROADS6,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"RC04",
+	"DROADS06",
 	TXT_RIVER
 );
 
@@ -2438,10 +2438,10 @@ void TemplateTypeClass::Init(TheaterType theater)
 
 	for (TemplateType index = TEMPLATE_FIRST; index < TEMPLATE_COUNT; index++) {
 		TemplateTypeClass& tplate = As_Reference(index);
-// jmarshall - temp hack
-		if (index > TEMPLATE_ROAD43)
+// jmarshall - stupid hack
+		if (index >= TEMPLATE_BRIDGE_1A)
 			break;
-// jmarshall end
+// jmarshall - stupid hack
 		((void const *&)tplate.ImageData) = NULL;
 		if (tplate.Theater & (1<<theater)) {
 			_makepath(fullname, NULL, NULL, tplate.IniName, Theaters[theater].Suffix);
@@ -2552,10 +2552,10 @@ void TemplateTypeClass::Display(int x, int y, WindowNumberType window, HousesTyp
 void TemplateTypeClass::Prep_For_Add(void)
 {
 	for (TemplateType index = TEMPLATE_CLEAR1; index < TEMPLATE_COUNT; index++) {
-// jmarshall
-		if (index > TEMPLATE_ROAD43)
-			return;
-// jmarshall end
+// jmarshall - stupid hack
+		if (index >= TEMPLATE_BRIDGE_1A)
+			break;
+// jmarshall - stupid hack
 		if (As_Reference(index).Get_Image_Data()) {
 			Map.Add_To_List(&As_Reference(index));
 		}
