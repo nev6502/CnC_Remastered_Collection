@@ -207,6 +207,11 @@ class fixed
 		char const * As_ASCII(void) const;
 
 		/*
+		**	Helper function to convert fixed point number to float (JJ)
+		*/
+		float To_Float() const;
+
+		/*
 		**	Helper constants that provide some convenient fixed point values.
 		*/
 		static const fixed _1_2;

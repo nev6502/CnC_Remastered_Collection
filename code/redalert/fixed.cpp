@@ -32,6 +32,7 @@
  * Functions:                                                                                  *
  *   fixed::As_ASCII -- Returns a pointer (static) of this number as an ASCII string.          *
  *   fixed::To_ASCII -- Convert a fixed point number into an ASCII string.                     *
+ *   fixed::To_Float -- Convert a fixed point number into a float value                        *
  *   fixed::fixed -- Constructor for fixed integral from ASCII initializer.                    *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
@@ -40,6 +41,7 @@
 #include	<stdlib.h>
 #include	<stdio.h>
 #include	<ctype.h>
+#include	<math.h>
 
 
 /*
@@ -147,6 +149,33 @@ fixed::fixed(char const * ascii)
 	}
 }
 
+
+/***********************************************************************************************
+ * fixed::To_Float -- Convert a fixed point number into a float                                *
+ *                                                                                             *
+ *    Use this routine to convert this fixed point number into a float. This can be lossy for  *
+ *    fine values.                                                                             *
+ *                                                                                             *
+ * INPUT:   none																			   *
+ *                                                                                             *
+ * OUTPUT:  Returns with the float value of this fixed point number                            *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/27/2020 JJ : Created.                                                                  *
+ *=============================================================================================*/
+float fixed::To_Float() const
+{
+
+	unsigned int whole = Data.Composite.Whole;
+	unsigned int frac = ((unsigned int)Data.Composite.Fraction * 1000U) / PRECISION;
+	
+	float this_raw_value = (whole + (frac * .001));
+	
+	return floor(this_raw_value * 100.0 + 0.5) / 100.0;
+
+}
 
 /***********************************************************************************************
  * fixed::To_ASCII -- Convert a fixed point number into an ASCII string.                       *
