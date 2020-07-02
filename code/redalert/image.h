@@ -178,6 +178,10 @@ public:
 		uint8_t* ptr = reinterpret_cast<uint8_t*>(this);
 		ptr += sizeof(IsoTileHeader_t);
 		uint32_t* offsets = (uint32_t*)ptr;
+		if (offsets[idx] == 0 || offsets[idx] == WESTWOOD_ISO_NOTSET_FLAG) {
+			return NULL;
+		}
+
 		IsoTileImageHeader* tileImageHeaders = (IsoTileImageHeader*)(((uint8_t*)this) + offsets[idx]);
 		return tileImageHeaders;
 	}
