@@ -999,7 +999,6 @@ bool CellClass::Get_Template_Info(char *template_name, int &icon, void *&image_d
 }
 
 void CellClass::ConvertCoordsToIsometric(int& x, int& y) {
-	y = y * 2;
 	int tileWidth = CELL_PIXEL_W;
 	int tileHeight = CELL_PIXEL_H;
 	int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);

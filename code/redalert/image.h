@@ -64,11 +64,13 @@ struct IsoTileHeader_t {
 	int TileImageHeight;
 };
 
+#define WESTWOOD_ISO_NOTSET_FLAG -842150451 // Westwood didn't zero everything out in there tile exporter, so this is required.
+
 struct IsoTileImageHeader
 {
 	uint8_t* GetExtraData(void)
-	{
-		if(ExtraOffset == 0) {
+	{		
+		if(ExtraOffset == 0 || ExtraOffset == WESTWOOD_ISO_NOTSET_FLAG) {
 			return NULL;
 		}
 		return reinterpret_cast<uint8_t*>(this) + ExtraOffset + sizeof(IsoTileImageHeader);

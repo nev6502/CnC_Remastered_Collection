@@ -2367,7 +2367,6 @@ TemplateType TemplateTypeClass::From_Name(char const * name)
 	return(TEMPLATE_NONE);
 }
 
-
 /***********************************************************************************************
  * TemplateTypeClass::Occupy_List -- Determines occupation list.                               *
  *                                                                                             *
