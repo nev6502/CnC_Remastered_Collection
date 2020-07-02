@@ -491,11 +491,11 @@ void TerrainClass::AI(void)
 	assert(IsActive);
 
 	ObjectClass::AI();
-// jmarshall - add back terrain mine
-	//if ((*this == TERRAIN_MINE) && (Frame % (Rule.GrowthRate * TICKS_PER_MINUTE)) == 0) {
-	//	Map[::As_Cell(As_Target())].Spread_Tiberium(true);
-	//}
-// jmarshall end
+
+	if ((*this == TERRAIN_MINE) && (Frame % (Rule.GrowthRate * TICKS_PER_MINUTE)) == 0) {
+		Map[::As_Cell(As_Target())].Spread_Tiberium(true);
+	}
+
 	if (StageClass::Graphic_Logic()) {
 		Mark();
 
