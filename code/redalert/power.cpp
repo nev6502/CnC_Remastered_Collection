@@ -44,11 +44,11 @@
 #include	"function.h"
 
 
- /*
- **	Points to the shape to use for the "desired" power level indicator.
- */
-void const* PowerClass::PowerShape;
-void const* PowerClass::PowerBarShape;
+/*
+**	Points to the shape to use for the "desired" power level indicator.
+*/
+void const * PowerClass::PowerShape;
+void const * PowerClass::PowerBarShape;
 
 PowerClass::PowerButtonClass PowerClass::PowerButton;
 
@@ -137,8 +137,8 @@ void PowerClass::One_Time(void)
 	RadarClass::One_Time();
 	PowerButton.X = ScreenWidth - (640 - (POWER_X * RESFACTOR));
 	PowerButton.Y = POWER_Y * RESFACTOR;
-	PowerButton.Width = (POWER_WIDTH * RESFACTOR) - 1;
-	PowerButton.Height = ScreenHeight - (POWER_Y * RESFACTOR);// POWER_HEIGHT* RESFACTOR;
+	PowerButton.Width = (POWER_WIDTH * RESFACTOR)-1;
+	PowerButton.Height = ScreenHeight - ( POWER_Y * RESFACTOR ) ;// POWER_HEIGHT* RESFACTOR;
 	PowerShape = MFCD::Retrieve("POWER.SHP");
 	PowerBarShape = MFCD::Retrieve("POWERBAR.SHP");
 }
@@ -162,14 +162,13 @@ void PowerClass::One_Time(void)
  *=============================================================================================*/
 void PowerClass::Draw_It(bool complete)
 {
-	static int _modtable[] = {
+	static int _modtable[]={
 		0, -1, 0, 1, 0, -1, -2, -1, 0, 1, 2, 1 ,0
 	};
 
-	// jmarshall - render the world before the power bar.
+// jmarshall - render the world before the power bar.
 	RadarClass::Draw_It(complete);
-	// jmarshall end
-
+// jmarshall end
 	{
 		BStart(BENCH_POWER);
 
@@ -177,7 +176,7 @@ void PowerClass::Draw_It(bool complete)
 			if (Map.IsSidebarActive) {
 				IsToRedraw = false;
 				ShapeFlags_Type flags = SHAPE_NORMAL;
-				void const* remap = NULL;
+				void const * remap = NULL;
 
 				if (FlashTimer > 1 && ((FlashTimer % 3) & 0x01) != 0) {
 					flags = flags | SHAPE_FADING;
@@ -191,22 +190,24 @@ void PowerClass::Draw_It(bool complete)
 
 				int bottomOfBar = (88 * RESFACTOR) + 56;
 
-				while (bottomOfBar < PowerButton.Height + 42)
+				while(bottomOfBar < PowerButton.Height + 34 )
 				{
 					CC_Draw_Shape(PowerBarShape, 1, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 					bottomOfBar += 8 * RESFACTOR;
 				}
 
-				int bottom = bottomOfBar + (28 * RESFACTOR);
+				int bottom = ( PowerButton.Y * RESFACTOR ) + PowerButton.Height;
 
 				/*
 				**	Determine how much the power production exceeds or falls short
 				**	of power demands.
 				*/
-				int power_height = (PowerHeight == DesiredPowerHeight) ? PowerHeight + (_modtable[PowerBounce] * PowerDir) : PowerHeight;
-				int drain_height = (DrainHeight == DesiredDrainHeight) ? DrainHeight + (_modtable[DrainBounce] * DrainDir) : DrainHeight;
+				int power_height  = (PowerHeight == DesiredPowerHeight) ? PowerHeight + (_modtable[PowerBounce] * PowerDir) : PowerHeight;
+				int drain_height  = (DrainHeight == DesiredDrainHeight) ? DrainHeight + (_modtable[DrainBounce] * DrainDir) : DrainHeight;
 				power_height = Bound(power_height, 0, PowerButton.Height - 2);
 				drain_height = Bound(drain_height, 0, PowerButton.Height - 2);
+
+				bottom -= (15 * RESFACTOR);
 
 				/*
 				**	Draw the power output graphic on top of the power bar framework.
@@ -232,26 +233,23 @@ void PowerClass::Draw_It(bool complete)
 					** ST - 5/2/96 11:23AM
 					*/
 
-					power_height = (power_height * (76 * RESFACTOR + 1)) / (53 * RESFACTOR + 1);
-					drain_height = (drain_height * (76 * RESFACTOR + 1)) / (53 * RESFACTOR + 1);
+					power_height = (power_height*(76*RESFACTOR+1)) / (53*RESFACTOR+1);
+					drain_height = (drain_height*(76*RESFACTOR+1)) / (53*RESFACTOR+1);
 
 					//bottom = (175*RESFACTOR)+1;
-					LogicPage->Fill_Rect(ScreenWidth - (640 - (245 * RESFACTOR)), bottom - power_height, ScreenWidth - (640 - (245 * RESFACTOR + 1)), bottom, color2);
-					LogicPage->Fill_Rect(ScreenWidth - (640 - (246 * RESFACTOR)), bottom - power_height, ScreenWidth - (640 - (246 * RESFACTOR + 1)), bottom, color1);
+					LogicPage->Fill_Rect(ScreenWidth - (640 - (245*RESFACTOR)), bottom - power_height, ScreenWidth - (640 - (245*RESFACTOR+1)), bottom, color2 );
+					LogicPage->Fill_Rect(ScreenWidth - (640 - (246*RESFACTOR)), bottom - power_height, ScreenWidth - (640 - (246*RESFACTOR+1)), bottom, color1 );
 				}
 
 				/*
 				**	Draw the power drain threshold marker.
 				*/
-				if (PlayerPtr->Drain > 0)
-				{
-					CC_Draw_Shape(PowerShape, 0, ScreenWidth - (640 - (((POWER_X * RESFACTOR)) + RESFACTOR)), bottom - (drain_height + (2 * RESFACTOR)), WINDOW_MAIN, flags | SHAPE_NORMAL, remap);
-				}
+				CC_Draw_Shape(PowerShape, 0, ScreenWidth - (640 - (((POWER_X * RESFACTOR)) +RESFACTOR)), bottom - (drain_height + (2 * RESFACTOR)), WINDOW_MAIN, flags | SHAPE_NORMAL, remap);
 			}
 			LogicPage->Unlock();
 		}
 		BEnd(BENCH_POWER);
-	}
+	}	
 }
 
 
@@ -272,11 +270,11 @@ void PowerClass::Draw_It(bool complete)
  *   12/20/1994 JLB : Created.                                                                 *
  *   12/31/1994 JLB : Uses mouse coordinate parameters.                                        *
  *=============================================================================================*/
-void PowerClass::AI(KeyNumType& input, int x, int y)
+void PowerClass::AI(KeyNumType &input, int x, int y)
 {
 	if (Map.IsSidebarActive /*IsActive*/) {
 		int olddrain = DrainHeight;
-		int oldpower = PowerHeight;
+		int oldpower  = PowerHeight;
 
 
 		/*
@@ -285,15 +283,13 @@ void PowerClass::AI(KeyNumType& input, int x, int y)
 		*/
 		if (PlayerPtr->Power != RecordedPower) {
 			DesiredPowerHeight = Power_Height(PlayerPtr->Power);
-			RecordedPower = PlayerPtr->Power;
-			PowerBounce = 12;
+			RecordedPower		 = PlayerPtr->Power;
+			PowerBounce			 = 12;
 			if (PowerHeight > DesiredPowerHeight) {
 				PowerDir = -1;
-			}
-			else if (PowerHeight < DesiredPowerHeight) {
+			} else if (PowerHeight < DesiredPowerHeight) {
 				PowerDir = 1;
-			}
-			else {
+			} else {
 				PowerBounce = 0;
 			}
 		}
@@ -304,15 +300,13 @@ void PowerClass::AI(KeyNumType& input, int x, int y)
 		*/
 		if (PlayerPtr->Drain != RecordedDrain) {
 			DesiredDrainHeight = Power_Height(PlayerPtr->Drain);
-			RecordedDrain = PlayerPtr->Drain;
-			DrainBounce = 12;
+			RecordedDrain		 = PlayerPtr->Drain;
+			DrainBounce			 = 12;
 			if (DrainHeight > DesiredDrainHeight) {
 				DrainDir = -1;
-			}
-			else if (DrainHeight < DesiredDrainHeight) {
+			} else if (DrainHeight < DesiredDrainHeight) {
 				DrainDir = 1;
-			}
-			else {
+			} else {
 				DrainBounce = 0;
 			}
 		}
@@ -321,8 +315,7 @@ void PowerClass::AI(KeyNumType& input, int x, int y)
 			IsToRedraw = true;
 			Flag_To_Redraw(false);
 			DrainBounce--;
-		}
-		else {
+		} else {
 			/*
 			** If we need to move the drain height then do so.
 			*/
@@ -335,8 +328,7 @@ void PowerClass::AI(KeyNumType& input, int x, int y)
 			IsToRedraw = true;
 			Flag_To_Redraw(false);
 			PowerBounce--;
-		}
-		else {
+		} else {
 			/*
 			** If we need to move the power height then do so.
 			*/
@@ -353,7 +345,7 @@ void PowerClass::AI(KeyNumType& input, int x, int y)
 		/*
 		**	Flag to redraw if the power bar flash effect has expired.
 		*/
-		//		if (FlashTimer == 1) {
+//		if (FlashTimer == 1) {
 		if (FlashTimer > 0) {
 			IsToRedraw = true;
 			Flag_To_Redraw(false);
@@ -382,7 +374,7 @@ void PowerClass::AI(KeyNumType& input, int x, int y)
  * HISTORY:                                                                                    *
  *   06/01/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-void PowerClass::Refresh_Cells(CELL cell, short const* list)
+void PowerClass::Refresh_Cells(CELL cell, short const * list)
 {
 	if (*list == REFRESH_SIDEBAR) {
 		IsToRedraw = true;
@@ -406,16 +398,16 @@ void PowerClass::Refresh_Cells(CELL cell, short const* list)
  *=========================================================================*/
 int PowerClass::Power_Height(int value)
 {
-	int num = value / POWER_STEP_LEVEL;		// figure out the initial num of DRAIN_VALUE's
-	int retval = 0;									// currently there is no power
+	int num		= value/ POWER_STEP_LEVEL;		// figure out the initial num of DRAIN_VALUE's
+	int retval	= 0;									// currently there is no power
 
 	/*
 	** Loop through the different hundreds figuring out the fractional piece
 	** of each.
 	*/
-	for (int lp = 0; lp < num; lp++) {
-		retval = retval + (((POWER_HEIGHT - 2) - retval) / POWER_STEP_FACTOR);
-		value -= POWER_STEP_LEVEL;
+	for (int lp = 0; lp < num; lp ++)  {
+		retval  = retval + (((POWER_HEIGHT - 2) - retval) / POWER_STEP_FACTOR);
+		value  -= POWER_STEP_LEVEL;
 	}
 
 	/*
@@ -425,7 +417,7 @@ int PowerClass::Power_Height(int value)
 		retval = retval + (((((POWER_HEIGHT - 2) - retval) / POWER_STEP_FACTOR) * value) / POWER_STEP_LEVEL);
 	}
 
-	retval = Bound(retval, 0, POWER_HEIGHT - 2);
+	retval = Bound(retval, 0, POWER_HEIGHT-2);
 	return(retval);
 }
 
@@ -447,7 +439,7 @@ int PowerClass::Power_Height(int value)
  * HISTORY:                                                                                    *
  *   08/07/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-int PowerClass::PowerButtonClass::Action(unsigned flags, KeyNumType& key)
+int PowerClass::PowerButtonClass::Action(unsigned flags, KeyNumType & key)
 {
 	if (!Map.IsSidebarActive) {
 		return(false);
@@ -460,8 +452,7 @@ int PowerClass::PowerButtonClass::Action(unsigned flags, KeyNumType& key)
 	Map.Override_Mouse_Shape(MOUSE_NORMAL);
 	if (PlayerPtr->Power_Fraction() < 1 && PlayerPtr->Power > 0) {
 		Map.Help_Text(TXT_POWER_OUTPUT_LOW, -1, -1, GadgetClass::Get_Color_Scheme()->Color);
-	}
-	else {
+	} else {
 		Map.Help_Text(TXT_POWER_OUTPUT, -1, -1, GadgetClass::Get_Color_Scheme()->Color);
 	}
 	GadgetClass::Action(flags, key);

@@ -91,7 +91,7 @@ class EditClass : public ControlClass
 		virtual int Action (unsigned flags, KeyNumType &key);
 		virtual void Draw_Background(void);
 		virtual void Draw_Text(char const * text);
-		virtual bool Handle_Key(KeyNumType ascii, unsigned flags);
+		virtual bool Handle_Key(KeyASCIIType ascii);
 
 	private:
 		int IsReadOnly;
