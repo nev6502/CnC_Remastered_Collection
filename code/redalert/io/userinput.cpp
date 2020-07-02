@@ -61,6 +61,16 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 	while (SDL_PollEvent(&event)) {
 		const Uint8* state = SDL_GetKeyboardState(NULL);
 
+		if (Debug_Map || renderConsole)
+		{
+			// If Imgui has processed a KEYDOWN or MOUSEDOWN event, then we are going to ignore it. 
+			if(ImGui_ImplSDL2_ProcessEvent(&event)) {
+				if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_KEYDOWN) {
+					continue;
+				}
+			}
+		}
+
 		switch (event.type)
 		{
 		case SDL_SYSWMEVENT:
@@ -215,11 +225,6 @@ void UserInputClass::Process_Input(KeyNumType& key, int& flags)
 			{
 				KeyB.ASCII = (char)event.text.text[0];
 			}
-		}
-
-		if (Debug_Map || renderConsole)
-		{
-			ImGui_ImplSDL2_ProcessEvent(&event);
 		}
 	}
 
