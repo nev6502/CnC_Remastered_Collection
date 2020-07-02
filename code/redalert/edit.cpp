@@ -253,39 +253,8 @@ int EditClass::Action(unsigned flags, KeyNumType & key)
 		} else {
 #ifdef WIN32
 
-			KeyASCIIType ascii = (KeyASCIIType)(Keyboard->To_ASCII(key) & 0xff);
-
-			/*
-			** Allow numeric keypad presses to map to ascii numbers
-			*/
-			if ((key & WWKEY_VK_BIT) && ascii >='0' && ascii <= '9') {
-
-				key = (KeyNumType)(key & ~WWKEY_VK_BIT);
-				if ( (!(flags & LEFTRELEASE)) && (!(flags & RIGHTRELEASE))) {
-					if (Handle_Key (ascii) ) {
-						flags &= ~KEYBOARD;
-						key = KN_NONE;
-					}
-				}
-			} else {
-				/*
-				** Filter out all special keys except return and backspace
-				*/  	if ((!(key & WWKEY_VK_BIT) && ascii >= ' ' && ascii <= 255)
-					|| key == KN_RETURN || key == KN_BACKSPACE) {
-
-
-
-					if ((!(flags & LEFTRELEASE)) && (!(flags & RIGHTRELEASE))) {
-						if (Handle_Key(Keyboard->To_ASCII(key))) {
-							flags &= ~KEYBOARD;
-							key = KN_NONE;
-						}
-					}
-				} else {
-					flags &= ~KEYBOARD;
-					key = KN_NONE;
-				}
-			}
+			//KeyASCIIType ascii = (KeyASCIIType)(Keyboard->To_ASCII(key) & 0xff);
+			Handle_Key(key, flags);
 		}
 
 #else	//WIN32
@@ -374,11 +343,11 @@ void EditClass::Draw_Text(char const * text)
  * HISTORY:                                                                                    *
  *   01/21/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-bool EditClass::Handle_Key(KeyASCIIType ascii)
+bool EditClass::Handle_Key(KeyNumType key, unsigned flags)
 {
-	unsigned char testAscii = (unsigned char)ascii;
+	unsigned rawKey = key & 0xff;
 
-	switch (ascii) {
+	switch (rawKey) {
 		/*
 		**	Handle the special case of a non-keyboard event. It is possible that this
 		**	key code might be passed to this routine if this routine has been overridden
@@ -387,6 +356,7 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 		case 0:
 			break;
 
+
 		/*
 		**	If the return key is pressed, then remove the focus from this edit
 		**	gadget but otherwise let the normal gadget processing proceed. This
@@ -394,14 +364,14 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 		**	so that the controlling program will know that the text can be
 		**	processed.
 		*/
-		case KA_RETURN:
+		case KN_RETURN:
 			Clear_Focus();
 			return(false);
 
 		/*
 		**	When the BACKSPACE key is pressed, remove the last character in the edit string.
 		*/
-		case KA_BACKSPACE:
+		case KN_BACKSPACE:
 			if (Length) {
 				Length--;
 				String[Length] = '\0';
@@ -414,11 +384,13 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 		**	if it can legally be added to the edit string and do so if possible.
 		*/
 		default:
+			unsigned char keyAscii = UserInput.KeyB.ASCII;
+			if (key & KN_SHIFT_BIT || key & KN_CAPSLOCK_BIT) keyAscii = toupper(keyAscii);
 
 			/*
 			**	Don't add a character if the length is greater than edit width.
 			*/
-			if (((int)String_Pixel_Width(String) + (int)Char_Pixel_Width(testAscii) ) >= (Width-2)) {
+			if (((int)String_Pixel_Width(String) + (int)Char_Pixel_Width(keyAscii) ) >= (Width-2)) {
 				break;
 			}
 
@@ -431,21 +403,21 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 			**	Invisible characters are never added to the string. This is
 			**	especially true for spaces at the beginning of the string.
 			*/
-			if (!isgraph(testAscii) && testAscii != ' ') break;
-			if (testAscii == ' ' && Length == 0) break;
+			if (!isgraph(keyAscii) && keyAscii != ' ') break;
+			if (keyAscii == ' ' && Length == 0) break;
 
 			/*
 			**	If this is an upper case only edit gadget, then force the alphabetic
 			**	character to upper case.
 			*/
-			if ((EditFlags & UPPERCASE) && isalpha(testAscii)) {
-				testAscii = (KeyASCIIType)toupper(testAscii);
+			if ((EditFlags & UPPERCASE) && isalpha(keyAscii)) {
+				rawKey = (KeyASCIIType)toupper(keyAscii);
 			}
 
-			if ((!(EditFlags & NUMERIC) || !isdigit(testAscii)) &&
-				(!(EditFlags & ALPHA) || !isalpha(testAscii)) &&
-				(!(EditFlags & MISC) || isalnum(testAscii)) &&
-				testAscii != ' ') {
+			if ((!(EditFlags & NUMERIC) || !isdigit(keyAscii)) &&
+				(!(EditFlags & ALPHA) || !isalpha(keyAscii)) &&
+				(!(EditFlags & MISC) || isalnum(keyAscii)) &&
+				rawKey != ' ') {
 					break;
 			}
 
@@ -455,8 +427,9 @@ bool EditClass::Handle_Key(KeyASCIIType ascii)
 			**	because the event flag has been cleared. This prevents the gadget's ID
 			**	number from being returned just because the gadget has been edited.
 			*/
-			String[Length++] = testAscii;
+			String[Length++] = keyAscii;
 			String[Length] = '\0';
+
 			Flag_To_Redraw();
 			break;
 	}

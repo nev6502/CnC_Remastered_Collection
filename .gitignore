@@ -8,11 +8,12 @@
 /fonts
 /sound
 /ui
-/*.mix
-/*.pal
-/*.ini
 /*.exe
 /*.ilk
-/*.dat
-/savegame*
+/*.MIX
+/*.PAL
+/*.INI
+/*.DAT
+/SAVEGAME*
 
+/cache

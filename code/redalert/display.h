@@ -275,7 +275,7 @@ class DisplayClass: public MapClass
 		*/
 		class TacticalClass : public GadgetClass {
 			public:
-				TacticalClass(void) : GadgetClass(0,0,0,0,LEFTPRESS|LEFTRELEASE|LEFTHELD|LEFTUP|RIGHTPRESS,true) {};
+				TacticalClass(void) : GadgetClass(0,0,0,0,KEYBOARD|LEFTPRESS|LEFTRELEASE|LEFTHELD|LEFTUP|RIGHTPRESS,true) {};
 
 				int Selection_At_Mouse(unsigned flags, KeyNumType & key);
 				int Command_Object(unsigned flags, KeyNumType & key);
