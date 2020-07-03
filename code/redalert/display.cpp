@@ -571,10 +571,10 @@ short const * DisplayClass::Text_Overlap_List(char const * text, int x, int y) c
 void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 {
 	if (width == -1) width = SeenBuff.Get_Width();
-	TacLeptonWidth = Pixel_To_Lepton( width - x) * 2;
+	TacLeptonWidth = Pixel_To_Lepton( width - x) * 2.5;
 
 	if (height == -1) height = SeenBuff.Get_Height();
-	TacLeptonHeight = Pixel_To_Lepton(height - y) * 2;
+	TacLeptonHeight = Pixel_To_Lepton(height - y) * 4;
 
 	/*
 	**	Adjust the tactical cell if it is now in an invalid position

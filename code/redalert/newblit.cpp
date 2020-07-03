@@ -25,6 +25,14 @@ void GL_ResetClipRect(void) {
 }
 
 void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int colorRemap, int shapeId) {
+	if(x < 0 || y < 0) {
+		return;
+	}
+
+	if(x >= ScreenWidth || y >= ScreenHeight) {
+		return;
+	}
+
 	ImVec2 mi(x, y);
 	ImVec2 ma(x + width, y + height);
 

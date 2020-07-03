@@ -1008,10 +1008,12 @@ void CellClass::ConvertCoordsToIsometric(int& x, int& y) {
 	y = sy;// + (CELL_PIXEL_W / 2);
 
 	x = x + (ScreenWidth / 2);
+	y = y - (ScreenWidth / 4);
 }
 
 bool CellClass::ScreenCoordsToIsoTile(int x, int y, int &tileX, int &tileY) {	
 	x = x - (ScreenWidth / 2);
+	y = y + (ScreenWidth / 4);
 
 	float tempPt_x = (2 * y + x) / 2;
 	float tempPt_y = (2 * y - x) / 2;
