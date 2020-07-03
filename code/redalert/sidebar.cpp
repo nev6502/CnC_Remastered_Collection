@@ -83,6 +83,9 @@ void* SidebarClass::SidebarShape = NULL;
 void* SidebarClass::SidebarMiddleShape = NULL;
 void* SidebarClass::SidebarBottomShape = NULL;
 
+void* SidebarClass::SidebarShapeHD = NULL;
+void* SidebarClass::SidebarFillerHD = NULL;
+
 
 /***************************************************************************
 **	This holds the translucent table for use with the construction clock
@@ -122,6 +125,8 @@ SidebarClass::StripClass::SelectButton[COLUMNS][MAX_VISIBLE];
 ** Shape data pointers
 */
 void* SidebarClass::StripClass::LogoShapes = NULL;
+void* SidebarClass::StripClass::LogoShapesHD = NULL;
+
 void const* SidebarClass::StripClass::ClockShapes;
 void const* SidebarClass::StripClass::SpecialShapes[SPC_COUNT];
 
@@ -251,6 +256,16 @@ void SidebarClass::One_Time(void)
 	*/
 	if (SidebarShape == NULL) {
 		SidebarShape = (void*)MFCD::Retrieve("SIDEBAR.SHP");
+	}
+
+	if (SidebarShapeHD == NULL) {
+		RawFileClass sideBarFile("SIDEHD.SHP");
+		if (sideBarFile.Is_Available() ) SidebarShapeHD = Load_Alloc_Data(sideBarFile);
+	}
+
+	if (SidebarFillerHD == NULL) {
+		RawFileClass sideBarFillerFile("SIDEFILLER.SHP");
+		if (sideBarFillerFile.Is_Available()) SidebarFillerHD = Load_Alloc_Data(sideBarFillerFile);
 	}
 }
 
@@ -774,17 +789,27 @@ void SidebarClass::Draw_It(bool complete)
 			/*
 			**	Draw the outline box around the sidebar buttons.
 			*/
-			int shape = complete ? 0 : 1;
-
 			CC_Draw_Shape(SidebarShape, 0, SIDE_X * RESFACTOR, 8 * RESFACTOR, WINDOW_MAIN, SHAPE_WIN_REL);
 
-			CC_Draw_Shape(SidebarMiddleShape, shape, SIDE_X * RESFACTOR, (8 + 80) * RESFACTOR, WINDOW_MAIN, SHAPE_WIN_REL);
+			int topY = 90 * RESFACTOR;
+			int frameNr = 0;
 
-			CC_Draw_Shape(SidebarBottomShape, shape, SIDE_X * RESFACTOR, ScreenHeight - (80 * RESFACTOR) + 3, WINDOW_MAIN, SHAPE_WIN_REL);
+			for (int i = 0; i < Column[0].MaxButtonsVisible; i++)
+			{
+				CC_Draw_Shape(SidebarShapeHD, frameNr, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
+				topY += 24 * RESFACTOR;
+
+				if (topY > ScreenHeight) break;
+				if (frameNr < 6) frameNr++;
+			}
+
+			topY += 10 * RESFACTOR;
+			CC_Draw_Shape(SidebarFillerHD, 0, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
 
 			Repair.Draw_Me(true);
 			Upgrade.Draw_Me(true);
 			Zoom.Draw_Me(true);
+
 			LogicPage->Unlock();
 		}
 	}
@@ -1312,6 +1337,7 @@ void SidebarClass::StripClass::Reload_LogoShapes(void)
 		"stripna.shp",		//HOUSE_GOOD
 		"stripus.shp",		//HOUSE_BAD
 	};
+
 	int houseloaded = 0;
 
 	/*
@@ -1697,9 +1723,6 @@ void SidebarClass::StripClass::Draw_It(bool complete)
 		/*
 		** New sidebar needs to be drawn not filled
 		*/
-		if (BuildableCount < MaxButtonsVisible) {
-			CC_Draw_Shape(LogoShapes, ID, X + (2 * RESFACTOR), Y, WINDOW_MAIN, SHAPE_WIN_REL | SHAPE_NORMAL, 0);
-		}
 
 		/*
 		**	Redraw the scroll buttons.

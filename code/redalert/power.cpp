@@ -50,6 +50,8 @@
 void const* PowerClass::PowerShape;
 void const* PowerClass::PowerBarShape;
 
+void const* PowerClass::PowerBarShapeHD;
+
 PowerClass::PowerButtonClass PowerClass::PowerButton;
 
 
@@ -139,8 +141,12 @@ void PowerClass::One_Time(void)
 	PowerButton.Y = POWER_Y * RESFACTOR;
 	PowerButton.Width = (POWER_WIDTH * RESFACTOR) - 1;
 	PowerButton.Height = ScreenHeight - (POWER_Y * RESFACTOR);// POWER_HEIGHT* RESFACTOR;
+
 	PowerShape = MFCD::Retrieve("POWER.SHP");
 	PowerBarShape = MFCD::Retrieve("POWERBAR.SHP");
+
+	RawFileClass powerShapeFile("POWERHD.SHP");
+	if (powerShapeFile.Is_Available()) PowerBarShapeHD = Load_Alloc_Data(powerShapeFile);
 }
 
 
@@ -187,17 +193,20 @@ void PowerClass::Draw_It(bool complete)
 				/*
 				** Hires power strip is too big to fit into a shape so it is in two parts
 				*/
-				CC_Draw_Shape(PowerBarShape, 0, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+				CC_Draw_Shape(PowerBarShapeHD, 0, ScreenWidth - (640 - (240 * RESFACTOR)), (84 * RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 
-				int bottomOfBar = (88 * RESFACTOR) + 56;
+				int bottomOfBar = (84 * RESFACTOR) + 56;
 
-				while (bottomOfBar < PowerButton.Height + 42)
+				while (bottomOfBar < PowerButton.Height + 32)
 				{
-					CC_Draw_Shape(PowerBarShape, 1, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+					CC_Draw_Shape(PowerBarShapeHD, 1, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 					bottomOfBar += 8 * RESFACTOR;
 				}
 
-				int bottom = bottomOfBar + (28 * RESFACTOR);
+				// bottom
+				CC_Draw_Shape(PowerBarShapeHD, 2, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+
+				int bottom = bottomOfBar + (36 * RESFACTOR);
 
 				/*
 				**	Determine how much the power production exceeds or falls short
