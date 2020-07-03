@@ -429,9 +429,6 @@ Image_t* Image_CreateImageFrom8Bit(const char* name, int Width, int Height, unsi
 			b = 0;			
 			a = 128;
 		}
-		else if (r == 0 && g == 0 && b == 0) {
-			r = g = b = a = 0;
-		}
 		else if (c != 0) {
 			a = 255;
 		}
