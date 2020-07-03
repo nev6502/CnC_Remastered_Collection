@@ -1001,11 +1001,14 @@ bool CellClass::Get_Template_Info(char *template_name, int &icon, void *&image_d
 void CellClass::ConvertCoordsToIsometric(int& x, int& y) {
 	int tileWidth = CELL_PIXEL_W;
 	int tileHeight = CELL_PIXEL_H;
-	int sx = (x / CELL_PIXEL_W) * (tileWidth / 2) - (y / CELL_PIXEL_W) * (tileWidth / 2);
-	int sy = (x / CELL_PIXEL_W) * (tileHeight / 2) + (y / CELL_PIXEL_W) * (tileHeight / 2);
+	float x_div = ((float)x / CELL_PIXEL_W);
+	float y_div = ((float)y / CELL_PIXEL_W);
 
-	x = sx;// + (CELL_PIXEL_W / 2);
-	y = sy;// + (CELL_PIXEL_W / 2);
+	int sx = x_div * (tileWidth / 2) - y_div * (tileWidth / 2);
+	int sy = x_div * (tileHeight / 2) + y_div * (tileHeight / 2);
+
+	x = sx;// + (CELL_PIXEL_W * 0.5f);
+	y = sy;// + (CELL_PIXEL_H * 0.5f);
 
 	x = x + (ScreenWidth / 2);
 	y = y - (ScreenWidth / 4);
