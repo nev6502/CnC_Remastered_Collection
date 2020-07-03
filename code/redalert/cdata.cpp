@@ -2478,14 +2478,13 @@ LandType TemplateTypeClass::Land_Type(int icon) const
 				LAND_BEACH,
 				LAND_ROUGH,
 				LAND_ICE,
-				LAND_RAILROAD,
-				LAND_TUNNEL,
-				LAND_WEEDS,
+				LAND_CLEAR,
+				LAND_CLEAR,
+				LAND_CLEAR,
 				LAND_COUNT,
 			};
 
-			//return(_land[map[icon % (icontrol->Map_Width() * icontrol->Map_Height())]]);
-			return _land[image->TileType % LAND_COUNT];
+			return(_land[image->TileType % LAND_COUNT]);
 		}
 	}
 	return(LAND_CLEAR);
