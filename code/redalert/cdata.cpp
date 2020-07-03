@@ -48,6 +48,181 @@
 #include	"function.h"
 #include	"image.h"
 
+static TemplateTypeClass const PRoad01(
+	TEMPLATE_PROAD01,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD01",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad01a(
+	TEMPLATE_PROAD01a,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD01A",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad01b(
+	TEMPLATE_PROAD01b,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD01B",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad02(
+	TEMPLATE_PROAD02,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD02",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad02a(
+	TEMPLATE_PROAD02a,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD02A",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad02b(
+	TEMPLATE_PROAD02b,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD02B",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad03(
+	TEMPLATE_PROAD03,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD03",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad04(
+	TEMPLATE_PROAD04,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD04",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad05(
+	TEMPLATE_PROAD05,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD05",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad06(
+	TEMPLATE_PROAD06,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD06",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad07(
+	TEMPLATE_PROAD07,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD07",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad08(
+	TEMPLATE_PROAD08,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD08",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad09(
+	TEMPLATE_PROAD09,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD09",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad10(
+	TEMPLATE_PROAD10,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD10",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad11(
+	TEMPLATE_PROAD11,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD11",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad12(
+	TEMPLATE_PROAD12,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD12",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad13(
+	TEMPLATE_PROAD13,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD13",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad14(
+	TEMPLATE_PROAD14,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD14",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad15(
+	TEMPLATE_PROAD15,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD15",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad16(
+	TEMPLATE_PROAD16,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD16",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad17(
+	TEMPLATE_PROAD17,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD17",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad18(
+	TEMPLATE_PROAD18,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD18",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad19(
+	TEMPLATE_PROAD19,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD19",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad20(
+	TEMPLATE_PROAD20,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD20",
+	TXT_CLEAR
+);
+
+static TemplateTypeClass const PRoad21(
+	TEMPLATE_PROAD21,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"PROAD21",
+	TXT_CLEAR
+);
+
 static TemplateTypeClass const Empty(
 	TEMPLATE_CLEAR1,
 	THEATERF_TEMPERATE|THEATERF_SNOW|THEATERF_INTERIOR,
@@ -1953,6 +2128,31 @@ void TemplateTypeClass::Init_Heap(void)
 	(void)new TemplateTypeClass(Clear);				// TEMPLATE_CLEAR1
 	(void)new TemplateTypeClass(Water);				// TEMPLATE_WATER
 	(void)new TemplateTypeClass(Water2);			// TEMPLATE_WATER2
+	(void)new TemplateTypeClass(PRoad01);
+	(void)new TemplateTypeClass(PRoad01a);
+	(void)new TemplateTypeClass(PRoad01b);;
+	(void)new TemplateTypeClass(PRoad02);
+	(void)new TemplateTypeClass(PRoad02a);
+	(void)new TemplateTypeClass(PRoad02b);
+	(void)new TemplateTypeClass(PRoad03);
+	(void)new TemplateTypeClass(PRoad04);
+	(void)new TemplateTypeClass(PRoad05);
+	(void)new TemplateTypeClass(PRoad06);
+	(void)new TemplateTypeClass(PRoad07);
+	(void)new TemplateTypeClass(PRoad08);
+	(void)new TemplateTypeClass(PRoad09);
+	(void)new TemplateTypeClass(PRoad10);
+	(void)new TemplateTypeClass(PRoad11);
+	(void)new TemplateTypeClass(PRoad12);
+	(void)new TemplateTypeClass(PRoad13);
+	(void)new TemplateTypeClass(PRoad14);
+	(void)new TemplateTypeClass(PRoad15);
+	(void)new TemplateTypeClass(PRoad16);
+	(void)new TemplateTypeClass(PRoad17);
+	(void)new TemplateTypeClass(PRoad18);
+	(void)new TemplateTypeClass(PRoad19);
+	(void)new TemplateTypeClass(PRoad20);
+	(void)new TemplateTypeClass(PRoad21);
 	(void)new TemplateTypeClass(Shore01);			// TEMPLATE_SHORE1
 	(void)new TemplateTypeClass(Shore02);			// TEMPLATE_SHORE2
 	(void)new TemplateTypeClass(Shore03);			// TEMPLATE_SHORE3
