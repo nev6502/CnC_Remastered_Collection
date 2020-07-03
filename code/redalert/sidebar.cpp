@@ -760,6 +760,9 @@ bool SidebarClass::Scroll(bool up, int column)
  *=============================================================================================*/
 void SidebarClass::Draw_It(bool complete)
 {
+	// hack: black background for the sidebar
+	GL_FillRect(TBLACK, SIDE_X * RESFACTOR, 8 * RESFACTOR, SIDE_WIDTH * RESFACTOR, ScreenHeight);
+
 	PowerClass::Draw_It(complete);
 
 	BStart(BENCH_SIDEBAR);
