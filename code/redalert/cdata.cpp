@@ -318,18 +318,6 @@ static TemplateTypeClass const Road43(
 	"DROADC18",
 	TXT_ROAD
 );
-static TemplateTypeClass const Road44(
-	TEMPLATE_ROAD44,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"DROADC19",
-	TXT_ROAD
-);
-static TemplateTypeClass const Road45(
-	TEMPLATE_ROAD45,
-	THEATERF_TEMPERATE|THEATERF_SNOW,
-	"DROADC20",
-	TXT_ROAD
-);
 static TemplateTypeClass const Water(
 	TEMPLATE_WATER,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
@@ -1955,9 +1943,125 @@ void TemplateTypeClass::operator delete(void * ptr)
 	TemplateTypes.Free((TemplateTypeClass *)ptr);
 }
 
-
-static void _Watcom_Ugh_Hack(void)
+void TemplateTypeClass::Init_Heap(void)
 {
+	/*
+	**	These template type class objects must be allocated in the exact order that they
+	**	are specified in the TemplateType enumeration. This is necessary because the heap
+	**	allocation block index serves double duty as the type number index.
+	*/
+	(void)new TemplateTypeClass(Clear);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(Water);				// TEMPLATE_WATER
+	(void)new TemplateTypeClass(Water2);			// TEMPLATE_WATER2
+	(void)new TemplateTypeClass(Shore01);			// TEMPLATE_SHORE1
+	(void)new TemplateTypeClass(Shore02);			// TEMPLATE_SHORE2
+	(void)new TemplateTypeClass(Shore03);			// TEMPLATE_SHORE3
+	(void)new TemplateTypeClass(Shore04);			// TEMPLATE_SHORE4
+	(void)new TemplateTypeClass(Shore05);			// TEMPLATE_SHORE5
+	(void)new TemplateTypeClass(Shore06);			// TEMPLATE_SHORE6
+	(void)new TemplateTypeClass(Shore07);			// TEMPLATE_SHORE7
+	(void)new TemplateTypeClass(Shore08);			// TEMPLATE_SHORE8
+	(void)new TemplateTypeClass(Shore09);			// TEMPLATE_SHORE9
+	(void)new TemplateTypeClass(Shore10);			// TEMPLATE_SHORE10
+	(void)new TemplateTypeClass(Shore11);			//	TEMPLATE_SHORE11
+	(void)new TemplateTypeClass(Shore12);			// TEMPLATE_SHORE12
+	(void)new TemplateTypeClass(Shore13);			// TEMPLATE_SHORE13
+	(void)new TemplateTypeClass(Shore14);			// TEMPLATE_SHORE14
+	(void)new TemplateTypeClass(Shore15);			// TEMPLATE_SHORE15
+	(void)new TemplateTypeClass(Shore16);			//	TEMPLATE_SHORE16
+	(void)new TemplateTypeClass(Shore17);			//	TEMPLATE_SHORE17
+	(void)new TemplateTypeClass(Shore18);			//	TEMPLATE_SHORE18
+	(void)new TemplateTypeClass(Shore19);			// TEMPLATE_SHORE19
+	(void)new TemplateTypeClass(Shore20);			// TEMPLATE_SHORE20
+	(void)new TemplateTypeClass(Shore21);			// TEMPLATE_SHORE21
+	(void)new TemplateTypeClass(Shore22);			//	TEMPLATE_SHORE22
+	(void)new TemplateTypeClass(Shore23);			// TEMPLATE_SHORE23
+	(void)new TemplateTypeClass(Shore24);			//	TEMPLATE_SHORE24
+	(void)new TemplateTypeClass(Shore25);			//	TEMPLATE_SHORE25
+	(void)new TemplateTypeClass(Shore26);			//	TEMPLATE_SHORE26
+	(void)new TemplateTypeClass(Shore27);			//	TEMPLATE_SHORE27
+	(void)new TemplateTypeClass(Shore28);			//	TEMPLATE_SHORE28
+	(void)new TemplateTypeClass(Shore29);			//	TEMPLATE_SHORE29
+	(void)new TemplateTypeClass(Shore30);			//	TEMPLATE_SHORE30
+	(void)new TemplateTypeClass(Shore31);			//	TEMPLATE_SHORE31
+	(void)new TemplateTypeClass(Shore32);			// TEMPLATE_SHORE32
+	(void)new TemplateTypeClass(Shore33);			// TEMPLATE_SHORE33
+	(void)new TemplateTypeClass(Shore34);			//	TEMPLATE_SHORE34
+	(void)new TemplateTypeClass(Shore35);			//	TEMPLATE_SHORE35
+	(void)new TemplateTypeClass(Shore36);			//	TEMPLATE_SHORE36
+	(void)new TemplateTypeClass(Shore37);			//	TEMPLATE_SHORE37
+	(void)new TemplateTypeClass(Shore38);			//	TEMPLATE_SHORE38
+	(void)new TemplateTypeClass(Shore39);			//	TEMPLATE_SHORE39
+	(void)new TemplateTypeClass(Shore40);			//	TEMPLATE_SHORE40
+	(void)new TemplateTypeClass(Shore41);			//	TEMPLATE_SHORE41
+	(void)new TemplateTypeClass(ShoreCliff01);	//	TEMPLATE_SHORECLIFF01
+	(void)new TemplateTypeClass(ShoreCliff02);	//	TEMPLATE_SHORECLIFF02
+	(void)new TemplateTypeClass(ShoreCliff03);	//	TEMPLATE_SHORECLIFF03
+	(void)new TemplateTypeClass(ShoreCliff04);	//	TEMPLATE_SHORECLIFF04
+	(void)new TemplateTypeClass(ShoreCliff05);	//	TEMPLATE_SHORECLIFF05
+	(void)new TemplateTypeClass(ShoreCliff06);	//	TEMPLATE_SHORECLIFF06
+	(void)new TemplateTypeClass(ShoreCliff07);	//	TEMPLATE_SHORECLIFF07
+	(void)new TemplateTypeClass(ShoreCliff08);	//	TEMPLATE_SHORECLIFF08
+	(void)new TemplateTypeClass(ShoreCliff09);	//	TEMPLATE_SHORECLIFF09
+	(void)new TemplateTypeClass(ShoreCliff10);	//	TEMPLATE_SHORECLIFF10
+	(void)new TemplateTypeClass(ShoreCliff11);	//	TEMPLATE_SHORECLIFF11
+	(void)new TemplateTypeClass(ShoreCliff12);	//	TEMPLATE_SHORECLIFF12
+	(void)new TemplateTypeClass(ShoreCliff13);	//	TEMPLATE_SHORECLIFF13
+	(void)new TemplateTypeClass(ShoreCliff14);	//	TEMPLATE_SHORECLIFF14
+	(void)new TemplateTypeClass(ShoreCliff15);	//	TEMPLATE_SHORECLIFF15
+	(void)new TemplateTypeClass(ShoreCliff16);	//	TEMPLATE_SHORECLIFF16
+	(void)new TemplateTypeClass(ShoreCliff17);	//	TEMPLATE_SHORECLIFF17
+	(void)new TemplateTypeClass(ShoreCliff18);	//	TEMPLATE_SHORECLIFF18
+	(void)new TemplateTypeClass(ShoreCliff19);	//	TEMPLATE_SHORECLIFF19
+	(void)new TemplateTypeClass(ShoreCliff20);	//	TEMPLATE_SHORECLIFF20
+	(void)new TemplateTypeClass(ShoreCliff21);	//	TEMPLATE_SHORECLIFF21
+	(void)new TemplateTypeClass(ShoreCliff22);	//	TEMPLATE_SHORECLIFF22
+	(void)new TemplateTypeClass(ShoreCliff23);	//	TEMPLATE_SHORECLIFF23
+	(void)new TemplateTypeClass(ShoreCliff24);	//	TEMPLATE_SHORECLIFF24
+	(void)new TemplateTypeClass(ShoreCliff25);	//	TEMPLATE_SHORECLIFF25
+	(void)new TemplateTypeClass(ShoreCliff26);	//	TEMPLATE_SHORECLIFF26
+	(void)new TemplateTypeClass(ShoreCliff27);	//	TEMPLATE_SHORECLIFF27
+	(void)new TemplateTypeClass(ShoreCliff28);	//	TEMPLATE_SHORECLIFF28
+	(void)new TemplateTypeClass(Bridge1);			//	TEMPLATE_BRIDGE1
+	(void)new TemplateTypeClass(Bridge1d);			//	TEMPLATE_BRIDGE1D
+	(void)new TemplateTypeClass(Bridge2);			//	TEMPLATE_BRIDGE2
+	(void)new TemplateTypeClass(Bridge2d);			//	TEMPLATE_BRIDGE2D
+	(void)new TemplateTypeClass(Road01);			//	TEMPLATE_ROAD1
+	(void)new TemplateTypeClass(Road02);			//	TEMPLATE_ROAD2
+	(void)new TemplateTypeClass(Road03);			//	TEMPLATE_ROAD3
+	(void)new TemplateTypeClass(Road04);			//	TEMPLATE_ROAD4
+	(void)new TemplateTypeClass(Road05);			//	TEMPLATE_ROAD5
+	(void)new TemplateTypeClass(Road06);			//	TEMPLATE_ROAD6
+	(void)new TemplateTypeClass(Road07);			//	TEMPLATE_ROAD7
+	(void)new TemplateTypeClass(Road08);			//	TEMPLATE_ROAD8
+	(void)new TemplateTypeClass(Road09);			//	TEMPLATE_ROAD9
+	(void)new TemplateTypeClass(Road10);			//	TEMPLATE_ROAD10
+	(void)new TemplateTypeClass(Road11);			//	TEMPLATE_ROAD11
+	(void)new TemplateTypeClass(Road12);			//	TEMPLATE_ROAD12
+	(void)new TemplateTypeClass(Road13);			//	TEMPLATE_ROAD13
+	(void)new TemplateTypeClass(Road14);			//	TEMPLATE_ROAD14
+	(void)new TemplateTypeClass(Road15);			//	TEMPLATE_ROAD15
+	(void)new TemplateTypeClass(Road16);			//	TEMPLATE_ROAD16
+	(void)new TemplateTypeClass(Road17);			//	TEMPLATE_ROAD17
+	(void)new TemplateTypeClass(Road18);			//	TEMPLATE_ROAD18
+	(void)new TemplateTypeClass(Road19);			//	TEMPLATE_ROAD19
+	(void)new TemplateTypeClass(Road20);			//	TEMPLATE_ROAD20
+	(void)new TemplateTypeClass(Road21);			//	TEMPLATE_ROAD21
+	(void)new TemplateTypeClass(Road22);			//	TEMPLATE_ROAD22
+	(void)new TemplateTypeClass(Road23);			//	TEMPLATE_ROAD23
+	(void)new TemplateTypeClass(Road24);			//	TEMPLATE_ROAD24
+	(void)new TemplateTypeClass(Road25);			//	TEMPLATE_ROAD25
+	(void)new TemplateTypeClass(Road26);			//	TEMPLATE_ROAD26
+	(void)new TemplateTypeClass(Road27);			//	TEMPLATE_ROAD27
+	(void)new TemplateTypeClass(Road28);			//	TEMPLATE_ROAD28
+	(void)new TemplateTypeClass(Road29);			//	TEMPLATE_ROAD29
+	(void)new TemplateTypeClass(Road30);			//	TEMPLATE_ROAD30
+	(void)new TemplateTypeClass(Road31);			//	TEMPLATE_ROAD31
+	(void)new TemplateTypeClass(Road32);			//	TEMPLATE_ROAD32
+	(void)new TemplateTypeClass(Road33);			//	TEMPLATE_ROAD33
+	(void)new TemplateTypeClass(Road34);			//	TEMPLATE_ROAD34
+	(void)new TemplateTypeClass(Road35);			//	TEMPLATE_ROAD35
+	(void)new TemplateTypeClass(Road36);			//	TEMPLATE_ROAD36
 	(void)new TemplateTypeClass(Road37);			//	TEMPLATE_ROAD37
 	(void)new TemplateTypeClass(Road38);			//	TEMPLATE_ROAD38
 	(void)new TemplateTypeClass(Road39);			//	TEMPLATE_ROAD39
@@ -1976,8 +2080,6 @@ static void _Watcom_Ugh_Hack(void)
 	(void)new TemplateTypeClass(Rough09);			// TEMPLATE_ROUGH09
 	(void)new TemplateTypeClass(Rough10);			// TEMPLATE_ROUGH10
 	(void)new TemplateTypeClass(Rough11);			// TEMPLATE_ROUGH11
-	(void)new TemplateTypeClass(Road44);			//	TEMPLATE_ROAD44
-	(void)new TemplateTypeClass(Road45);			//	TEMPLATE_ROAD45
 //	(void)new TemplateTypeClass(River14);			//	TEMPLATE_RIVER14
 //	(void)new TemplateTypeClass(River15);			//	TEMPLATE_RIVER15
 	(void)new TemplateTypeClass(RiverCliff01);	//	TEMPLATE_RIVERCLIFF01
@@ -2135,155 +2237,7 @@ static void _Watcom_Ugh_Hack(void)
 	(void)new TemplateTypeClass(Bridge1x);			//	TEMPLATE_BRIDGE1X
 	(void)new TemplateTypeClass(Bridge2x);			//	TEMPLATE_BRIDGE2X
 
-	//(void)new TemplateTypeClass(Xtra0001);			//	TEMPLATE_XTRA0001
-	//(void)new TemplateTypeClass(Xtra0002);			//	TEMPLATE_XTRA0002
-	//(void)new TemplateTypeClass(Xtra0003);			//	TEMPLATE_XTRA0003
-	//(void)new TemplateTypeClass(Xtra0004);			//	TEMPLATE_XTRA0004
-	//(void)new TemplateTypeClass(Xtra0005);			//	TEMPLATE_XTRA0005
-	//(void)new TemplateTypeClass(Xtra0006);			//	TEMPLATE_XTRA0006
-	//(void)new TemplateTypeClass(Xtra0007);			//	TEMPLATE_XTRA0007
-	//(void)new TemplateTypeClass(Xtra0008);			//	TEMPLATE_XTRA0008
-	//(void)new TemplateTypeClass(Xtra0009);			//	TEMPLATE_XTRA0009
-	//(void)new TemplateTypeClass(Xtra0010);			//	TEMPLATE_XTRA0010
-	//(void)new TemplateTypeClass(Xtra0011);			//	TEMPLATE_XTRA0011
-	//(void)new TemplateTypeClass(Xtra0012);			//	TEMPLATE_XTRA0012
-	//(void)new TemplateTypeClass(Xtra0013);			//	TEMPLATE_XTRA0013
-	//(void)new TemplateTypeClass(Xtra0014);			//	TEMPLATE_XTRA0014
-	//(void)new TemplateTypeClass(Xtra0015);			//	TEMPLATE_XTRA0015
-	//(void)new TemplateTypeClass(Xtra0016);			//	TEMPLATE_XTRA0016
-
-#ifdef FIXIT_ANTS
 	(void)new TemplateTypeClass(AntHill);			//	TEMPLATE_ROAD36
-#endif
-}
-
-
-
-void TemplateTypeClass::Init_Heap(void)
-{
-	/*
-	**	These template type class objects must be allocated in the exact order that they
-	**	are specified in the TemplateType enumeration. This is necessary because the heap
-	**	allocation block index serves double duty as the type number index.
-	*/
-	(void)new TemplateTypeClass(Clear);				// TEMPLATE_CLEAR1
-	(void)new TemplateTypeClass(Water);				// TEMPLATE_WATER
-	(void)new TemplateTypeClass(Water2);			// TEMPLATE_WATER2
-	(void)new TemplateTypeClass(Shore01);			// TEMPLATE_SHORE1
-	(void)new TemplateTypeClass(Shore02);			// TEMPLATE_SHORE2
-	(void)new TemplateTypeClass(Shore03);			// TEMPLATE_SHORE3
-	(void)new TemplateTypeClass(Shore04);			// TEMPLATE_SHORE4
-	(void)new TemplateTypeClass(Shore05);			// TEMPLATE_SHORE5
-	(void)new TemplateTypeClass(Shore06);			// TEMPLATE_SHORE6
-	(void)new TemplateTypeClass(Shore07);			// TEMPLATE_SHORE7
-	(void)new TemplateTypeClass(Shore08);			// TEMPLATE_SHORE8
-	(void)new TemplateTypeClass(Shore09);			// TEMPLATE_SHORE9
-	(void)new TemplateTypeClass(Shore10);			// TEMPLATE_SHORE10
-	(void)new TemplateTypeClass(Shore11);			//	TEMPLATE_SHORE11
-	(void)new TemplateTypeClass(Shore12);			// TEMPLATE_SHORE12
-	(void)new TemplateTypeClass(Shore13);			// TEMPLATE_SHORE13
-	(void)new TemplateTypeClass(Shore14);			// TEMPLATE_SHORE14
-	(void)new TemplateTypeClass(Shore15);			// TEMPLATE_SHORE15
-	(void)new TemplateTypeClass(Shore16);			//	TEMPLATE_SHORE16
-	(void)new TemplateTypeClass(Shore17);			//	TEMPLATE_SHORE17
-	(void)new TemplateTypeClass(Shore18);			//	TEMPLATE_SHORE18
-	(void)new TemplateTypeClass(Shore19);			// TEMPLATE_SHORE19
-	(void)new TemplateTypeClass(Shore20);			// TEMPLATE_SHORE20
-	(void)new TemplateTypeClass(Shore21);			// TEMPLATE_SHORE21
-	(void)new TemplateTypeClass(Shore22);			//	TEMPLATE_SHORE22
-	(void)new TemplateTypeClass(Shore23);			// TEMPLATE_SHORE23
-	(void)new TemplateTypeClass(Shore24);			//	TEMPLATE_SHORE24
-	(void)new TemplateTypeClass(Shore25);			//	TEMPLATE_SHORE25
-	(void)new TemplateTypeClass(Shore26);			//	TEMPLATE_SHORE26
-	(void)new TemplateTypeClass(Shore27);			//	TEMPLATE_SHORE27
-	(void)new TemplateTypeClass(Shore28);			//	TEMPLATE_SHORE28
-	(void)new TemplateTypeClass(Shore29);			//	TEMPLATE_SHORE29
-	(void)new TemplateTypeClass(Shore30);			//	TEMPLATE_SHORE30
-	(void)new TemplateTypeClass(Shore31);			//	TEMPLATE_SHORE31
-	(void)new TemplateTypeClass(Shore32);			// TEMPLATE_SHORE32
-	(void)new TemplateTypeClass(Shore33);			// TEMPLATE_SHORE33
-	(void)new TemplateTypeClass(Shore34);			//	TEMPLATE_SHORE34
-	(void)new TemplateTypeClass(Shore35);			//	TEMPLATE_SHORE35
-	(void)new TemplateTypeClass(Shore36);			//	TEMPLATE_SHORE36
-	(void)new TemplateTypeClass(Shore37);			//	TEMPLATE_SHORE37
-	(void)new TemplateTypeClass(Shore38);			//	TEMPLATE_SHORE38
-	(void)new TemplateTypeClass(Shore39);			//	TEMPLATE_SHORE39
-	(void)new TemplateTypeClass(Shore40);			//	TEMPLATE_SHORE40
-	(void)new TemplateTypeClass(Shore41);			//	TEMPLATE_SHORE41
-	(void)new TemplateTypeClass(ShoreCliff01);	//	TEMPLATE_SHORECLIFF01
-	(void)new TemplateTypeClass(ShoreCliff02);	//	TEMPLATE_SHORECLIFF02
-	(void)new TemplateTypeClass(ShoreCliff03);	//	TEMPLATE_SHORECLIFF03
-	(void)new TemplateTypeClass(ShoreCliff04);	//	TEMPLATE_SHORECLIFF04
-	(void)new TemplateTypeClass(ShoreCliff05);	//	TEMPLATE_SHORECLIFF05
-	(void)new TemplateTypeClass(ShoreCliff06);	//	TEMPLATE_SHORECLIFF06
-	(void)new TemplateTypeClass(ShoreCliff07);	//	TEMPLATE_SHORECLIFF07
-	(void)new TemplateTypeClass(ShoreCliff08);	//	TEMPLATE_SHORECLIFF08
-	(void)new TemplateTypeClass(ShoreCliff09);	//	TEMPLATE_SHORECLIFF09
-	(void)new TemplateTypeClass(ShoreCliff10);	//	TEMPLATE_SHORECLIFF10
-	(void)new TemplateTypeClass(ShoreCliff11);	//	TEMPLATE_SHORECLIFF11
-	(void)new TemplateTypeClass(ShoreCliff12);	//	TEMPLATE_SHORECLIFF12
-	(void)new TemplateTypeClass(ShoreCliff13);	//	TEMPLATE_SHORECLIFF13
-	(void)new TemplateTypeClass(ShoreCliff14);	//	TEMPLATE_SHORECLIFF14
-	(void)new TemplateTypeClass(ShoreCliff15);	//	TEMPLATE_SHORECLIFF15
-	(void)new TemplateTypeClass(ShoreCliff16);	//	TEMPLATE_SHORECLIFF16
-	(void)new TemplateTypeClass(ShoreCliff17);	//	TEMPLATE_SHORECLIFF17
-	(void)new TemplateTypeClass(ShoreCliff18);	//	TEMPLATE_SHORECLIFF18
-	(void)new TemplateTypeClass(ShoreCliff19);	//	TEMPLATE_SHORECLIFF19
-	(void)new TemplateTypeClass(ShoreCliff20);	//	TEMPLATE_SHORECLIFF20
-	(void)new TemplateTypeClass(ShoreCliff21);	//	TEMPLATE_SHORECLIFF21
-	(void)new TemplateTypeClass(ShoreCliff22);	//	TEMPLATE_SHORECLIFF22
-	(void)new TemplateTypeClass(ShoreCliff23);	//	TEMPLATE_SHORECLIFF23
-	(void)new TemplateTypeClass(ShoreCliff24);	//	TEMPLATE_SHORECLIFF24
-	(void)new TemplateTypeClass(ShoreCliff25);	//	TEMPLATE_SHORECLIFF25
-	(void)new TemplateTypeClass(ShoreCliff26);	//	TEMPLATE_SHORECLIFF26
-	(void)new TemplateTypeClass(ShoreCliff27);	//	TEMPLATE_SHORECLIFF27
-	(void)new TemplateTypeClass(ShoreCliff28);	//	TEMPLATE_SHORECLIFF28
-	(void)new TemplateTypeClass(Bridge1);			//	TEMPLATE_BRIDGE1
-	(void)new TemplateTypeClass(Bridge1d);			//	TEMPLATE_BRIDGE1D
-	(void)new TemplateTypeClass(Bridge2);			//	TEMPLATE_BRIDGE2
-	(void)new TemplateTypeClass(Bridge2d);			//	TEMPLATE_BRIDGE2D
-	(void)new TemplateTypeClass(Road01);			//	TEMPLATE_ROAD1
-	(void)new TemplateTypeClass(Road02);			//	TEMPLATE_ROAD2
-	(void)new TemplateTypeClass(Road03);			//	TEMPLATE_ROAD3
-	(void)new TemplateTypeClass(Road04);			//	TEMPLATE_ROAD4
-	(void)new TemplateTypeClass(Road05);			//	TEMPLATE_ROAD5
-	(void)new TemplateTypeClass(Road06);			//	TEMPLATE_ROAD6
-	(void)new TemplateTypeClass(Road07);			//	TEMPLATE_ROAD7
-	(void)new TemplateTypeClass(Road08);			//	TEMPLATE_ROAD8
-	(void)new TemplateTypeClass(Road09);			//	TEMPLATE_ROAD9
-	(void)new TemplateTypeClass(Road10);			//	TEMPLATE_ROAD10
-	(void)new TemplateTypeClass(Road11);			//	TEMPLATE_ROAD11
-	(void)new TemplateTypeClass(Road12);			//	TEMPLATE_ROAD12
-	(void)new TemplateTypeClass(Road13);			//	TEMPLATE_ROAD13
-	(void)new TemplateTypeClass(Road14);			//	TEMPLATE_ROAD14
-	(void)new TemplateTypeClass(Road15);			//	TEMPLATE_ROAD15
-	(void)new TemplateTypeClass(Road16);			//	TEMPLATE_ROAD16
-	(void)new TemplateTypeClass(Road17);			//	TEMPLATE_ROAD17
-	(void)new TemplateTypeClass(Road18);			//	TEMPLATE_ROAD18
-	(void)new TemplateTypeClass(Road19);			//	TEMPLATE_ROAD19
-	(void)new TemplateTypeClass(Road20);			//	TEMPLATE_ROAD20
-	(void)new TemplateTypeClass(Road21);			//	TEMPLATE_ROAD21
-	(void)new TemplateTypeClass(Road22);			//	TEMPLATE_ROAD22
-	(void)new TemplateTypeClass(Road23);			//	TEMPLATE_ROAD23
-	(void)new TemplateTypeClass(Road24);			//	TEMPLATE_ROAD24
-	(void)new TemplateTypeClass(Road25);			//	TEMPLATE_ROAD25
-	(void)new TemplateTypeClass(Road26);			//	TEMPLATE_ROAD26
-	(void)new TemplateTypeClass(Road27);			//	TEMPLATE_ROAD27
-	(void)new TemplateTypeClass(Road28);			//	TEMPLATE_ROAD28
-	(void)new TemplateTypeClass(Road29);			//	TEMPLATE_ROAD29
-	(void)new TemplateTypeClass(Road30);			//	TEMPLATE_ROAD30
-	(void)new TemplateTypeClass(Road31);			//	TEMPLATE_ROAD31
-	(void)new TemplateTypeClass(Road32);			//	TEMPLATE_ROAD32
-	(void)new TemplateTypeClass(Road33);			//	TEMPLATE_ROAD33
-	(void)new TemplateTypeClass(Road34);			//	TEMPLATE_ROAD34
-	(void)new TemplateTypeClass(Road35);			//	TEMPLATE_ROAD35
-	(void)new TemplateTypeClass(Road36);			//	TEMPLATE_ROAD36
-
-	/*
-	**	Separate out the list of new operator calls. Watcom bombs
-	**	if they are kept together.
-	*/
-	_Watcom_Ugh_Hack();
 }
 
 
