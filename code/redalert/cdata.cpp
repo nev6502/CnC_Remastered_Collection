@@ -2710,7 +2710,9 @@ void TemplateTypeClass::Prep_For_Add(void)
 		if (index >= TEMPLATE_BRIDGE_1A)
 			break;
 // jmarshall - stupid hack
-		if (As_Reference(index).Get_Image_Data()) {
+
+		// jmarshall: get hdimage data. 
+		if (As_Reference(index).Get_HDImage_Data()) {
 			Map.Add_To_List(&As_Reference(index));
 		}
 	}
