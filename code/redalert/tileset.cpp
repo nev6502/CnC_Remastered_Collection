@@ -181,6 +181,9 @@ void __cdecl Buffer_Draw_Stamp_Clip2(GraphicViewPortClass& viewport, const void 
     Image_t* iconImage = (Image_t*)icondata;
     IsoTile* isoTile = iconImage->isoTileInfo;
 
+    if (isoTile == NULL)
+        return;
+
     if (icon > isoTile->NumTiles())
         icon = isoTile->NumTiles() - 1;
     IsoTileImageHeader* isoStampImage = isoTile->GetTileInfo(icon);

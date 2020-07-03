@@ -1084,6 +1084,15 @@ void CellClass::Draw_It(int x, int y, bool objects)
 		int i;
 		char waypt[3];
 	#endif
+		int cellx = Cell_X(cell);
+		int celly = Cell_Y(cell);
+		if (cellx < Map.MapCellX || celly < Map.MapCellY) {
+			GL_SetColor(0.35, 0.35, 0.35);
+		}
+
+		if (cellx >= Map.MapCellX + Map.MapCellWidth || celly >= Map.MapCellY + Map.MapCellHeight) {
+			GL_SetColor(0.35, 0.35, 0.35);
+		}
 
 		CellCount++;
 
@@ -1425,7 +1434,7 @@ void CellClass::Draw_It(int x, int y, bool objects)
 		BEnd(BENCH_OBJECTS);
 	}
 #endif
-
+	GL_SetColor(1, 1, 1);
 }
 
 

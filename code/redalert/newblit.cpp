@@ -9,9 +9,14 @@ extern byte backbuffer_palette[768];
 extern uint8_t g_ColorXlat[16];
 
 bool forceForgegroundRender = false;
+int32_t g_currentColor;
 
 void GL_ForceForegroundRender(bool force) {
 	forceForgegroundRender = force;
+}
+
+void GL_SetColor(float r, float g, float b) {
+	g_currentColor = ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1));
 }
 
 void GL_SetClipRect(int x, int y, int width, int height) {
@@ -43,12 +48,12 @@ void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int col
 
 	if (image->numFrames > 0) {
 		if(image->HouseImages[colorRemap].image[shapeId][((int)animFrameNum) % image->numFrames] == 0)
-			ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][0], mi, ma);
+			ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][0], mi, ma, ImVec2(0, 0), ImVec2(1, 1), g_currentColor);
 		else
-			ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][((int)animFrameNum) % image->numFrames], mi, ma);
+			ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][((int)animFrameNum) % image->numFrames], mi, ma, ImVec2(0, 0), ImVec2(1, 1), g_currentColor);
 	}
 	else {
-		ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][0], mi, ma);
+		ImGui::GetBackgroundDrawList()->AddImage((ImTextureID)image->HouseImages[colorRemap].image[shapeId][0], mi, ma, ImVec2(0, 0), ImVec2(1, 1), g_currentColor);
 	}
 
 }

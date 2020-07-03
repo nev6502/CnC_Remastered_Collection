@@ -785,6 +785,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 	ilInit();
 
+	GL_SetColor(1, 1, 1);
+
 	texCache.Init();
 
 	SDL_Init(SDL_INIT_VIDEO);

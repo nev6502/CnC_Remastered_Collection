@@ -11,3 +11,4 @@ void GL_ResetClipRect(void);
 void GL_SetClipRect(int x, int y, int width, int height);
 void GL_ForceForegroundRender(bool force);
 void GL_DrawForegroundText(int color, int x, int y, char* text);
+void GL_SetColor(float r, float g, float b);
