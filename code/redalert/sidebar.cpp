@@ -75,6 +75,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
+#include	"image.h"
 
  //#undef RESFACTOR
  //#define RESFACTOR 1
@@ -83,8 +84,8 @@ void* SidebarClass::SidebarShape = NULL;
 void* SidebarClass::SidebarMiddleShape = NULL;
 void* SidebarClass::SidebarBottomShape = NULL;
 
-void* SidebarClass::SidebarShapeHD = NULL;
-void* SidebarClass::SidebarFillerHD = NULL;
+Image_t* SidebarClass::SidebarShapeHD[SIDEBAR_NUMSIDEHDFRAMES] = { 0 };
+Image_t* SidebarClass::SidebarFillerHD = NULL;
 
 
 /***************************************************************************
@@ -258,14 +259,20 @@ void SidebarClass::One_Time(void)
 		SidebarShape = (void*)MFCD::Retrieve("SIDEBAR.SHP");
 	}
 
-	if (SidebarShapeHD == NULL) {
-		RawFileClass sideBarFile("SIDEHD.SHP");
-		if (sideBarFile.Is_Available() ) SidebarShapeHD = Load_Alloc_Data(sideBarFile);
+	if (SidebarShapeHD[0] == NULL) {
+		for (int i = 0; i < SIDEBAR_NUMSIDEHDFRAMES; i++) {
+			char tmp[512];
+			sprintf(tmp, "ui/sidebar/SIDEHD_000%d.png", i);
+			SidebarShapeHD[i] = Image_LoadImage(tmp);
+		}
+		//RawFileClass sideBarFile("SIDEHD.SHP");
+		//if (sideBarFile.Is_Available() ) SidebarShapeHD = Load_Alloc_Data(sideBarFile);
 	}
 
 	if (SidebarFillerHD == NULL) {
-		RawFileClass sideBarFillerFile("SIDEFILLER.SHP");
-		if (sideBarFillerFile.Is_Available()) SidebarFillerHD = Load_Alloc_Data(sideBarFillerFile);
+		//RawFileClass sideBarFillerFile("SIDEFILLER.SHP");
+		//if (sideBarFillerFile.Is_Available()) SidebarFillerHD = Load_Alloc_Data(sideBarFillerFile);
+		SidebarFillerHD = Image_LoadImage("ui/sidebar/SIDEFILLER_0000.png");
 	}
 }
 
@@ -797,7 +804,7 @@ void SidebarClass::Draw_It(bool complete)
 
 			for (int i = 0; i < Column[0].MaxButtonsVisible; i++)
 			{
-				CC_Draw_Shape(SidebarShapeHD, frameNr, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
+				CC_DrawHD_Shape(SidebarShapeHD[frameNr], 0, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
 				topY += 24 * RESFACTOR;
 
 				if (topY > ScreenHeight) break;
@@ -805,7 +812,7 @@ void SidebarClass::Draw_It(bool complete)
 			}
 
 			topY += 11 * RESFACTOR;
-			CC_Draw_Shape(SidebarFillerHD, 0, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
+			CC_DrawHD_Shape(SidebarFillerHD, 0, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
 
 			Repair.Draw_Me(true);
 			Upgrade.Draw_Me(true);

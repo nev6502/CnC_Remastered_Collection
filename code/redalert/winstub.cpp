@@ -227,7 +227,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_BGRA, GL_UNSIGNED_BYTE, Data);
 	}
 	else if (Bpp == 3) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Width, Height, 0, GL_RGB, GL_UNSIGNED_BYTE, Data);
 	}
 	else if (Bpp == 1) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_R, GL_UNSIGNED_BYTE, Data);

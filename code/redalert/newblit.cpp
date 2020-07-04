@@ -67,7 +67,12 @@ void GL_FillRect(int color, int x, int y, int width, int height) {
 	float r = backbuffer_palette[(color * 3) + 0] / 255.0f;
 	float g = backbuffer_palette[(color * 3) + 1] / 255.0f;
 	float b = backbuffer_palette[(color * 3) + 2] / 255.0f;
-	ImGui::GetBackgroundDrawList()->AddRectFilled(mi, ma, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)));
+	if (forceForgegroundRender) {
+		ImGui::GetForegroundDrawList()->AddRectFilled(mi, ma, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)));
+	}
+	else {
+		ImGui::GetBackgroundDrawList()->AddRectFilled(mi, ma, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)));
+	}
 }
 
 void GL_DrawText(int color, int x, int y, char* text) {

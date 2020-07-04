@@ -3493,7 +3493,7 @@ void CC_Draw_Pip(const ObjectClass *object, void const * shapefile, int shapenum
 }
 
 // jmarshall - this is for hd textures
-void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const* fadingdata, void const* ghostdata, DirType rotation) {
+void CC_DrawHD_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const* fadingdata, void const* ghostdata, DirType rotation) {
 	int predoffset;
 
 	/*
@@ -3537,7 +3537,7 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 #endif
 
 
-	
+
 		{
 			//GraphicViewPortClass draw_window(LogicPage->Get_Graphic_Buffer(),
 			//	WindowList[window][WINDOWX] + LogicPage->Get_XPos(),
@@ -3549,42 +3549,42 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 			/*
 			**	Rotation handler.
 			*/
-// jmarshall: todo HD rotation code!
-//			if (rotation != DIR_N) {
-//
-//				/*
-//				** Get the raw shape data without the new header and flag to use the old shape drawing
-//				*/
-//				UseOldShapeDraw = true;
-//
-//				if (Debug_Rotate) {
-//#if (0)//PG
-//					GraphicBufferClass src(width, height, buffer);
-//					width *= 2;
-//					height *= 2;
-//					memset(_xbuffer, '\0', SHAPE_BUFFER_SIZE);
-//					GraphicBufferClass dst(width, height, _xbuffer);
-//					Rotate_Bitmap(&src, &dst, rotation);
-//					buffer = _xbuffer;
-//#endif
-//				}
-//				else {
-//
-//					BitmapClass bm(width, height, buffer);
-//					width *= 2;
-//					height *= 2;
-//					memset(_xbuffer, '\0', SHAPE_BUFFER_SIZE);
-//					GraphicBufferClass gb(width, height, _xbuffer);
-//					TPoint2D pt(width / 2, height / 2);
-//
-//					gb.Scale_Rotate(bm, pt, 0x0100, (256 - (rotation - 64)));
-//					buffer = _xbuffer;
-//				}
-//			}
-// jmarshall end
-			/*
-			**	Special shadow drawing code (used for aircraft and bullets).
-			*/
+			// jmarshall: todo HD rotation code!
+			//			if (rotation != DIR_N) {
+			//
+			//				/*
+			//				** Get the raw shape data without the new header and flag to use the old shape drawing
+			//				*/
+			//				UseOldShapeDraw = true;
+			//
+			//				if (Debug_Rotate) {
+			//#if (0)//PG
+			//					GraphicBufferClass src(width, height, buffer);
+			//					width *= 2;
+			//					height *= 2;
+			//					memset(_xbuffer, '\0', SHAPE_BUFFER_SIZE);
+			//					GraphicBufferClass dst(width, height, _xbuffer);
+			//					Rotate_Bitmap(&src, &dst, rotation);
+			//					buffer = _xbuffer;
+			//#endif
+			//				}
+			//				else {
+			//
+			//					BitmapClass bm(width, height, buffer);
+			//					width *= 2;
+			//					height *= 2;
+			//					memset(_xbuffer, '\0', SHAPE_BUFFER_SIZE);
+			//					GraphicBufferClass gb(width, height, _xbuffer);
+			//					TPoint2D pt(width / 2, height / 2);
+			//
+			//					gb.Scale_Rotate(bm, pt, 0x0100, (256 - (rotation - 64)));
+			//					buffer = _xbuffer;
+			//				}
+			//			}
+			// jmarshall end
+						/*
+						**	Special shadow drawing code (used for aircraft and bullets).
+						*/
 			if ((flags & (SHAPE_FADING | SHAPE_PREDATOR)) == (SHAPE_FADING | SHAPE_PREDATOR)) {
 				flags = flags & ~(SHAPE_FADING | SHAPE_PREDATOR);
 				flags = flags | SHAPE_GHOST;
@@ -3599,27 +3599,31 @@ void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType 
 
 			Buffer_Enable_HD_Texture(true);
 			//if (draw_window.Lock()) {
-				if ((flags & (SHAPE_GHOST | SHAPE_FADING)) == (SHAPE_GHOST | SHAPE_FADING)) {
-					Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+			if ((flags & (SHAPE_GHOST | SHAPE_FADING)) == (SHAPE_GHOST | SHAPE_FADING)) {
+				Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, fadingdata, 1, predoffset);
+			}
+			else {
+				if (flags & SHAPE_FADING) {
+					Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
 				}
 				else {
-					if (flags & SHAPE_FADING) {
-						Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, fadingdata, 1, predoffset);
+					if (flags & SHAPE_PREDATOR) {
+						Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, predoffset);
 					}
 					else {
-						if (flags & SHAPE_PREDATOR) {
-							Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, predoffset);
-						}
-						else {
-							Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
-						}
+						Buffer_Frame_To_Page(shapenum, x, y, width, height, image, window, flags | SHAPE_TRANS, ghostdata, predoffset);
 					}
 				}
+			}
 			//	draw_window.Unlock();
 			//}
 			Buffer_Enable_HD_Texture(false);
 		}
 	}
+}
+
+void CC_Draw_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const* fadingdata, void const* ghostdata, DirType rotation) {
+	CC_DrawHD_Shape(image, shapenum, x, y, window, flags, fadingdata, ghostdata, rotation);
 }
 // jmarshall end
 
