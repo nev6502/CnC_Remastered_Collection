@@ -37,6 +37,10 @@
 
 #include	"radar.h"
 
+struct Image_t;
+
+#define SIDEBAR_POWERHD_FRAMES 3
+
 class PowerClass : public RadarClass
 {
 	public:
@@ -113,7 +117,7 @@ class PowerClass : public RadarClass
 		*/
 		static void const * PowerShape;
 		static void const * PowerBarShape;
-		static void const * PowerBarShapeHD;
+		static Image_t *PowerBarShapeHD[SIDEBAR_POWERHD_FRAMES];
 };
 
 #endif

@@ -42,6 +42,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include	"function.h"
+#include    "image.h"
 
 
  /*
@@ -50,7 +51,7 @@
 void const* PowerClass::PowerShape;
 void const* PowerClass::PowerBarShape;
 
-void const* PowerClass::PowerBarShapeHD;
+Image_t *PowerClass::PowerBarShapeHD[SIDEBAR_POWERHD_FRAMES];
 
 PowerClass::PowerButtonClass PowerClass::PowerButton;
 
@@ -145,8 +146,14 @@ void PowerClass::One_Time(void)
 	PowerShape = MFCD::Retrieve("POWER.SHP");
 	PowerBarShape = MFCD::Retrieve("POWERBAR.SHP");
 
-	RawFileClass powerShapeFile("POWERHD.SHP");
-	if (powerShapeFile.Is_Available()) PowerBarShapeHD = Load_Alloc_Data(powerShapeFile);
+	//RawFileClass powerShapeFile("POWERHD.SHP");
+	//if (powerShapeFile.Is_Available()) PowerBarShapeHD = Load_Alloc_Data(powerShapeFile);
+
+	for(int i = 0; i < SIDEBAR_POWERHD_FRAMES; i++) {
+		char tmp[512];
+		sprintf(tmp, "ui/sidebar/POWERHD_000%d.tga", i);
+		PowerBarShapeHD[i] = Image_LoadImage(tmp);
+	}
 }
 
 
@@ -176,6 +183,8 @@ void PowerClass::Draw_It(bool complete)
 	RadarClass::Draw_It(complete);
 	// jmarshall end
 
+	GL_ForceForegroundRender(true);
+
 	{
 		BStart(BENCH_POWER);
 
@@ -193,19 +202,19 @@ void PowerClass::Draw_It(bool complete)
 				/*
 				** Hires power strip is too big to fit into a shape so it is in two parts
 				*/
-				CC_Draw_Shape(PowerBarShapeHD, 0, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+				CC_DrawHD_Shape(PowerBarShapeHD[0], 0, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 
 				
 				int bottomOfBar = (88 + 56) * RESFACTOR;
 
 				while ( bottomOfBar < ( PowerButton.Height - 56 ) )
 				{
-					CC_Draw_Shape(PowerBarShapeHD, 1, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+					CC_DrawHD_Shape(PowerBarShapeHD[1], 0, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 					bottomOfBar += 56 * RESFACTOR;
 				}
 
 				// bottom
-				CC_Draw_Shape(PowerBarShapeHD, 2, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+				CC_DrawHD_Shape(PowerBarShapeHD[2], 0, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 
 				int bottom = bottomOfBar + (36 * RESFACTOR);
 
@@ -262,6 +271,8 @@ void PowerClass::Draw_It(bool complete)
 		}
 		BEnd(BENCH_POWER);
 	}
+
+	GL_ForceForegroundRender(false);
 }
 
 
