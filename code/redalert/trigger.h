@@ -119,7 +119,7 @@ class TriggerClass {
 		/*
 		** Store MapScript callback function and optional action index (because there can be multiple outcomes) -- JJ 6/14/2020
 		*/
-		char MapScriptCallback[32];
+		char MapScriptCallback[MAPSCRIPT_MAX_CALLBACK_SIZE];
 		char MapScriptActionIndex;
 };
 

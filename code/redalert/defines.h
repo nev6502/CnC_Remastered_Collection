@@ -276,6 +276,12 @@
 
 
 /**********************************************************************
+**	Defines for MapScript Add On
+*/
+#define MAPSCRIPT_MAX_CALLBACK_SIZE 24   // Max length of a callback function name
+
+
+/**********************************************************************
 **	This is the complete list of VQs allowed to be played in the game.
 */
 typedef enum VQType {

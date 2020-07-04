@@ -233,8 +233,36 @@
         FLAMER=33,
         REDEYE=34
     }
+
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Object Types (RTTI)                                  *
+    -- *                                                       *
+    -- *********************************************************
+    ObjectTypes={
+        None=0,
+        Aircraft=1,
+        Building=5,
+        Infantry=13,
+        Vehicle=28,
+        Vessel=30
+    }
     
-    
+    -- *********************************************************
+    -- *                                                       *
+    -- *  Warhead Types                                        *
+    -- *                                                       *
+    -- *********************************************************
+    WarheadTypes={
+        SA=0,				-- Small arms - good against infantry.
+        HE=1,				-- High explosive - good against buildings & infantry.
+        AP=2,				-- Armor piercing - good against armor.
+        Fire=3,		    	-- Incendiary - Good against flammables.
+        HollowPoint=4,	    -- Sniper bullet type.
+        Tesla=5,			-- Electrocution warhead for infantrymen
+        Dog=6,	    		-- Slavering attack beast mauling infantryman
+        Nuke=7   			-- Nuclear missile
+    }
     
     -- *********************************************************
     -- *                                                       *

@@ -48,7 +48,7 @@ public:
 
     MapScriptObject* CreateCacheObject();
 
-	void CallFunction(const char* functionName);
+	void CallFunction(const char* functionName, int input_args=0, ...);
 	void SetLuaPath(const char* input_path);
 
 	std::vector<MapScriptObject*> ObjectCache;
@@ -157,6 +157,7 @@ typedef enum MapScriptHouseAttributeType : char {
 // Non-Class-Functions
 bool Script_SetObjectTrigger(int input_object_id, TriggerClass* input_trigger);
 ObjectClass* Script_GetCacheObject(int input_object_id);
+void Script_DeleteCacheObject(int input_object_id);
 
 int Script_BuildingIndexFromID(int input_object_id);
 int Script_UnitIndexFromID(int input_object_id);

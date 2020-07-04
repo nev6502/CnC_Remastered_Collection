@@ -45,7 +45,7 @@
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 #include "function.h"
-#include "MapScript.h"
+#include "mapscript.h"
 
 
 #if defined(CHEAT_KEYS) || defined(SCENARIO_EDITOR)
@@ -300,7 +300,7 @@ bool TriggerClass::Spring(TEventType event, ObjectClass * obj, CELL cell, bool f
         /*
         ** We need to execute this trigger, so is there an attached MapScript callback?
         */
-        if (Scen.mapScript != NULL && strlen(MapScriptCallback) > 0) {
+        if (Scen.mapScript != NULL && MapScriptCallback[0] != 0) {
             execute_mapScript = true;
         }
 

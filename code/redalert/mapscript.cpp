@@ -3060,6 +3060,41 @@ static int Script_GetCellObject(lua_State* L) {
     return 1;
 }
 
+/**********************************************************************************************
+* Script_SetDestructionCallback - Sets callback to be called upon destruction (with details)  *
+*                                                                                             *
+*   SCRIPT INPUT:	objectID        (int)  - The ID of the object                             *
+ *                  in_function  (string)  - The callback function to execute upon death      *
+*                                                                                             *
+*   SCRIPT OUTPUT:  void                                                                      *
+*                                                                                             *
+* INPUT:  lua_State - The current Lua state                                                   *
+*                                                                                             *
+* OUTPUT:  int; Did the function run successfully? Return 1                                   *
+*                                                                                             *
+* WARNINGS:  ?                                                                                *
+*                                                                                             *
+*=============================================================================================*/
+static int Script_SetDestructionCallback(lua_State* L) {
+
+    int objectID = lua_tointeger(L, 1);
+    const char *in_function = lua_tostring(L, 2);
+
+    TechnoClass* this_object = (TechnoClass*)Script_GetCacheObject(objectID);
+
+    // Get the appropriate technotype
+    if (this_object != NULL) {
+
+        // Copy the callback function into the trigger
+        strncpy(this_object->MapScript_DestructionCallback, in_function, sizeof(this_object->MapScript_DestructionCallback) - 1);
+
+    }
+
+
+    return -1;
+}
+
+
 /***********************************************************************************************
  * Script_Merge_Triggers - Adds the event from trigger 2 to trigger 1 and discards trigger 2   *
  *                                                                                             *
@@ -4164,7 +4199,7 @@ static int Script_GetObjectAttribute(lua_State* L) {
 
             // Type attribute retrieval
             if (this_type_class != NULL) {
-                return Script_SetObjectTypeAttribute(L, this_type_class, (MapScriptObjectAttributeType)attribute_type);
+                return Script_GetObjectTypeAttribute(L, this_type_class, (MapScriptObjectAttributeType)attribute_type);
             }
 
         }break;
@@ -5261,7 +5296,10 @@ static int Script_BuildUnit(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5292,7 +5330,10 @@ static int Script_BuildUnit(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5322,7 +5363,10 @@ static int Script_BuildUnit(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5353,7 +5397,10 @@ static int Script_BuildUnit(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5384,7 +5431,10 @@ static int Script_BuildUnit(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5471,7 +5521,10 @@ static int Script_CreateVehicle(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5548,7 +5601,10 @@ static int Script_CreateInfantry(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5624,7 +5680,10 @@ static int Script_CreateAircraft(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5700,7 +5759,10 @@ static int Script_CreateVessel(lua_State* L) {
                 CacheObject->ID = new_unit->ID;
                 CacheObject->RTTI = new_unit->RTTI;
                 CacheObject->classIndex = _objectIndex;
+
                 Scen.mapScript->ObjectCache.push_back(CacheObject);
+
+                new_unit->MapScript_Object_UID = CacheObject->UID;
 
                 lua_pushnumber(L, CacheObject->UID);
                 return 1;
@@ -5710,6 +5772,65 @@ static int Script_CreateVessel(lua_State* L) {
 
     lua_pushnumber(L, -1);
     return 1;
+}
+
+/***********************************************************************************************
+ * Script_ObjectInRect - Checks if object is in rectangular area                               *
+ *                                                                                             *
+ *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+ *                                                                                             *
+ *                  in_x1 (int)              - Rectangle top left corner Cell X                *
+ *                                                                                             *
+ *                  in_y1 (int)              - Rectangle top left corner Cell Y                *
+ *                                                                                             *
+ *                  in_x2 (int)              - Rectangle bottom right corner Cell X            *
+ *                                                                                             *
+ *                  in_y2 (int)              - Rectangle bottom right corner Cell Y            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT: boolean                                                                    *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_ObjectInRect(lua_State* L) {
+
+    int objectID = lua_tointeger(L, 1);
+    int in_x1 = lua_tointeger(L, 2);
+    int in_y1 = lua_tointeger(L, 3);
+    int in_x2 = lua_tointeger(L, 4);
+    int in_y2 = lua_tointeger(L, 5);
+
+    ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+    if (this_object != NULL) {
+
+        int this_x = Coord_XCell(this_object->Coord);
+        int this_y = Coord_YCell(this_object->Coord);
+
+        if (
+            this_x >= in_x1 &&
+            this_y >= in_y1 &&
+            this_x <= in_x2 &&
+            this_x <= in_y2
+        ) {
+
+            lua_pushboolean(L, true);
+            return 1;
+        }else {
+            lua_pushboolean(L, false);
+            return 1;
+        }
+            
+
+    }
+
+    lua_pushboolean(L, false);
+    return 1;
+
 }
 
 
@@ -5750,6 +5871,52 @@ static int Script_OrderMove(lua_State* L) {
         }
 
         Queue_Mission(TargetClass(this_object), MISSION_QMOVE, 0, As_Target(XY_Cell(in_x, in_y)));
+
+        lua_pushnumber(L, 1);
+        return 1;
+
+    }
+
+    lua_pushnumber(L, -1);
+    return 1;
+
+}
+
+/***********************************************************************************************
+ * Script_OrderMoveAttack - Allows movement to a specific point along with an attack, followed *
+ *                          up with allowing the unit to have another movement assigned        *
+ *                          afterward                                                          *
+ *                                                                                             *
+ *   SCRIPT INPUT:	objectID   (int) - The object ID (retrieved via MS functions)              *
+ *                                                                                             *
+ *                  in_x       (int) - X location to move object to                            *
+ *                                                                                             *
+ *                  in_y       (int) - Y location to move object to                            *
+ *                                                                                             *
+ *   SCRIPT OUTPUT:  void                                                                      *
+ *                                                                                             *
+ * INPUT:  lua_State - The current Lua state                                                   *
+ *                                                                                             *
+ * OUTPUT:  int; Did the function run successfully? Return 1                                   *
+ *                                                                                             *
+ * WARNINGS:  ?                                                                                *
+ *                                                                                             *
+ *=============================================================================================*/
+static int Script_OrderMoveAttack(lua_State* L) {
+
+    int objectID = lua_tointeger(L, 1);
+    int in_x = lua_tointeger(L, 2);
+    int in_y = lua_tointeger(L, 3);
+
+    ObjectClass* this_object = Script_GetCacheObject(objectID);
+
+    if (this_object != NULL) {
+
+        if (this_object->IsRecentlyCreated) {
+            Queue_Mission(TargetClass(this_object), MISSION_QMOVE, As_Target(XY_Cell(in_x, in_y)), As_Target(XY_Cell(in_x, in_y)));
+        }
+
+        Queue_Mission(TargetClass(this_object), MISSION_QMOVE, As_Target(XY_Cell(in_x, in_y)), As_Target(XY_Cell(in_x, in_y)));
 
         lua_pushnumber(L, 1);
         return 1;
@@ -6820,7 +6987,7 @@ static int Script_Console_Print(lua_State* L) {
 *=============================================================================================*/
 
 /***********************************************************************************************
- * MapScript::GetCacheObject -- Returns ObjectClass from cache with given ID                   *
+ * Script_GetCacheObject -- Returns ObjectClass from cache with given UID                      *
  *                                                                                             *
  * INPUT:  input_object_id (int)         - Input object ID                                     *
  *                                                                                             *
@@ -6837,8 +7004,9 @@ ObjectClass* Script_GetCacheObject(int input_object_id) {
 
     // Look through cache for object with ID, and return it
     for (std::vector<MapScriptObject*>::iterator it = Scen.mapScript->ObjectCache.begin(); it != Scen.mapScript->ObjectCache.end(); ++it) {//Error 2-4
-
+        
         MapScriptObject* thisCacheObject = (MapScriptObject*)(*it);
+
 
         // Here it is
         if (thisCacheObject->UID == input_object_id) {
@@ -6901,85 +7069,43 @@ ObjectClass* Script_GetCacheObject(int input_object_id) {
 
     }
 
-    // Not found in cache; let's find the object by ID the hard way... If scripting is done well, this doesn't get hit
-    int _objectIndex = -1;
-    MapScriptObject* CacheObject = Scen.mapScript->CreateCacheObject();
-    CacheObject->ID = -1;
-
-    _objectIndex = Script_BuildingIndexFromID(input_object_id);
-    BuildingClass* this_building = Buildings.Ptr(_objectIndex);
-    if (this_building != NULL) {
-
-        CacheObject->ID = this_building->ID;
-        CacheObject->RTTI = this_building->RTTI;
-        CacheObject->classIndex = _objectIndex;
-        Scen.mapScript->ObjectCache.push_back(CacheObject);
-
-        return this_building;
-
-    }
-    else {
-        _objectIndex = Script_UnitIndexFromID(input_object_id);
-        UnitClass* this_unit = Units.Ptr(_objectIndex);
-        if (this_unit != NULL) {
-
-            CacheObject->ID = this_unit->ID;
-            CacheObject->RTTI = this_unit->RTTI;
-            CacheObject->classIndex = _objectIndex;
-            Scen.mapScript->ObjectCache.push_back(CacheObject);
-
-            return this_unit;
-
-        }
-        else {
-            _objectIndex = Script_AircraftIndexFromID(input_object_id);
-            AircraftClass* this_aircraft = Aircraft.Ptr(_objectIndex);
-            if (this_aircraft != NULL) {
-
-                CacheObject->ID = this_aircraft->ID;
-                CacheObject->RTTI = this_aircraft->RTTI;
-                CacheObject->classIndex = _objectIndex;
-                Scen.mapScript->ObjectCache.push_back(CacheObject);
-
-                return this_aircraft;
-
-            }
-            else {
-                _objectIndex = Script_VesselIndexFromID(input_object_id);
-                VesselClass* this_vessel = Vessels.Ptr(_objectIndex);
-                if (this_vessel != NULL) {
-
-                    CacheObject->ID = this_vessel->ID;
-                    CacheObject->RTTI = this_vessel->RTTI;
-                    CacheObject->classIndex = _objectIndex;
-                    Scen.mapScript->ObjectCache.push_back(CacheObject);
-
-                    return this_vessel;
-
-                }
-                else {
-                    _objectIndex = Script_InfantryIndexFromID(input_object_id);
-                    InfantryClass* this_infantry = Infantry.Ptr(_objectIndex);
-                    if (this_infantry != NULL) {
-
-                        CacheObject->ID = this_infantry->ID;
-                        CacheObject->RTTI = this_infantry->RTTI;
-                        CacheObject->classIndex = _objectIndex;
-                        Scen.mapScript->ObjectCache.push_back(CacheObject);
-
-                        return this_infantry;
-
-                    }
-                }
-            }
-        }
-    }
-
-    // Looks like we didn't find anything. They probably shouldn't have gotten this far in the first place so it was worth a try.
-    delete CacheObject;
-
     return NULL;
 }
+
+/***********************************************************************************************
+ * Script_DeleteCacheObject -- Removes object from MapScript cache with given UID              *
+ *                                                                                             *
+ * INPUT:  input_object_id (int)         - Input object ID                                     *
+ *                                                                                             *
+ * OUTPUT:  this_object (ObjectClass*)   - The object with the ID or NULL                      *
+ *                                                                                             *
+ * WARNINGS:  none                                                                             *
+ *                                                                                             *
+ *=============================================================================================*/
+void Script_DeleteCacheObject(int input_object_id) {
+
+    if (input_object_id < 0) {
+        return;
+    }
+
+    // Look through cache for object with ID, and return it
+    for (std::vector<MapScriptObject*>::iterator it = Scen.mapScript->ObjectCache.begin(); it != Scen.mapScript->ObjectCache.end(); ++it) {//Error 2-4
+
+        MapScriptObject* thisCacheObject = (MapScriptObject*)(*it);
+
+        // Here it is
+        if (thisCacheObject->UID == input_object_id) {
+
+            it = Scen.mapScript->ObjectCache.erase(it); // Cache item exists but is invalidated; remove from cache
+            return;
+
+        }
+
+    }
+
+    return;
+}
+
 
 /***********************************************************************************************
  * Script_SetObjectTrigger -- Figures out what kind of object is given and sets up trigger     *
@@ -7209,17 +7335,44 @@ void Script_CacheDefaultObjectTypeAttribute(RTTIType input_rtti, int input_id, M
 /***********************************************************************************************
  * MapScript::CallFunction - Calls a given function within the current script                  *
  *                                                                                             *
- * INPUT:  functionName - The name of the function to call                                     *
+ * INPUT:  functionName (char*) - The name of the function to call                             *
+ *         arg_count (int)      - The amount of (integer) arguments                            *
+ *         ... (int)            - Variable number of arguments                                 *
  *                                                                                             *
  * OUTPUT:  void                                                                               *
  *                                                                                             *
  * WARNINGS:  ?                                                                                *
  *                                                                                             *
  *=============================================================================================*/
-void MapScript::CallFunction(const char* functionName) {
+void MapScript::CallFunction(const char* functionName, int arg_count, ...) {
+    
 
-    lua_getglobal(L, functionName);
-    lua_pcall(L, 0, 0, 0);
+    if (arg_count <= 0) {
+
+        lua_getglobal(L, functionName);
+        lua_pcall(L, 0, 0, 0);
+
+    }else {
+
+        lua_getglobal(L, functionName);
+
+        va_list ap;
+        int i;
+
+        va_start(ap, arg_count);         /* Initialize the argument list. */
+
+
+        for (i = 0; i < arg_count; i++) {
+            lua_pushinteger(L, va_arg(ap, int));    /* Get the next argument value. */
+        }
+
+
+        va_end(ap);                  /* Clean up. */
+
+        lua_pcall(L, arg_count, 0, 0);
+
+    }
+    
 
 }
 
@@ -7350,39 +7503,6 @@ void MapScript::Deinit() {
     }
 
     DefaultObjectTypeAttributeCache.clear();
-
-
-    for (int index = 0; index < Warheads.Count(); index++) {
-        Warheads.Ptr(index)->Read_INI(RuleINI);
-    }
-
-    for (int proj = 0; proj < BulletTypes.Count(); proj++) {
-        BulletTypes.Ptr(proj)->Read_INI(RuleINI);
-    }
-
-    for (int windex = 0; windex < Weapons.Count(); windex++) {
-        Weapons.Ptr(windex)->Read_INI(RuleINI);
-    }
-
-    for (int uindex = 0; uindex < UnitTypes.Count(); uindex++) {
-        UnitTypes.Ptr(uindex)->Read_INI(RuleINI);
-    }
-
-    for (int iindex = 0; iindex < InfantryTypes.Count(); iindex++) {
-        InfantryTypes.Ptr(iindex)->Read_INI(RuleINI);
-    }
-
-    for (int vindex = 0; vindex < VesselTypes.Count(); vindex++) {
-        VesselTypes.Ptr(vindex)->Read_INI(RuleINI);
-    }
-
-    for (int aindex = 0; aindex < AircraftTypes.Count(); aindex++) {
-        AircraftTypes.Ptr(aindex)->Read_INI(RuleINI);
-    }
-
-    for (int bindex = 0; bindex < BuildingTypes.Count(); bindex++) {
-        BuildingTypes.Ptr(bindex)->Read_INI(RuleINI);
-    }
 
 }
 
@@ -7531,6 +7651,8 @@ bool MapScript::Init(const char* mapName) {
 *=============================================================================================*/
     lua_register(L, "GetCellObject", Script_GetCellObject);	                        // Gets an object (ID - building/vehicle/aircraft/infantry/vessel), if any, at [Cell/X],[Cell/Y]
 
+    lua_register(L, "SetDestructionCallback", Script_SetDestructionCallback);	    // Sets object up with a callback to be called upon destruction (containing details)
+
     lua_register(L, "SetObjectAttribute", Script_SetObjectAttribute);	            // Sets an object's attributes (strength, etc.)
     lua_register(L, "SetBuildingTypeAttribute", Script_SetBuildingTypeAttribute);	// Sets the attribute of a Building type
     lua_register(L, "SetVehicleTypeAttribute", Script_SetVehicleTypeAttribute);	    // Sets the attribute of a Vehicle type
@@ -7554,11 +7676,14 @@ bool MapScript::Init(const char* mapName) {
     lua_register(L, "CreateAircraft", Script_CreateAircraft);                       // Creates a unit out of thin air
     lua_register(L, "CreateVessel", Script_CreateVessel);                           // Creates a unit out of thin air
 
+    lua_register(L, "ObjectInRect", Script_ObjectInRect);	                        // Checks if an object is within a rectangular area
+
 /**********************************************************************************************
 * Object Orders Functions                                                                     *
 *=============================================================================================*/
 
     lua_register(L, "OrderMove", Script_OrderMove);                                 // Assigns a movement order to the object
+    lua_register(L, "OrderMoveAttack", Script_OrderMoveAttack);                                 // Assigns a movement order to the object
     lua_register(L, "OrderAttack", Script_OrderAttack);                             // Assigns an attack order to the object
     lua_register(L, "OrderHunt", Script_OrderHunt);                                 // Assigns a hunt order to the object
     lua_register(L, "OrderGuard", Script_OrderGuard);                               // Assigns a guard order to the object

@@ -248,6 +248,12 @@ class TechnoClass :	public RadioClass,
 		*/
 		unsigned char SaveLoadPadding[16];
 
+		/*
+		** Store MapScript callback(s)
+		*/
+		char MapScript_DestructionCallback[MAPSCRIPT_MAX_CALLBACK_SIZE]; // Callback that is called upon object destruction
+		int MapScript_Object_UID = -1; // Pointer to cached object
+
 
 		/*---------------------------------------------------------------------
 		**	Constructors, Destructors, and overloaded operators.

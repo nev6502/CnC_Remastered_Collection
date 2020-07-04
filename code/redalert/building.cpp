@@ -1419,6 +1419,27 @@ ResultType BuildingClass::Take_Damage(int & damage, int distance, WarheadType wa
 					House->Check_Pertinent_Structures();
 				}
 
+				/*
+				**	Does this building have a MapScript callback that must be called upon destruction?
+				**  Then callback with: attacking class, attacking class type, attacking object ID, attacking House ID, warhead,
+				**  this class, this class type, this object ID, this House ID,
+				*/
+				if (MapScript_DestructionCallback[0] != 0) {
+					if (source) {
+						TechnoTypeClass* attacking_object = source->Techno_Type_Class();
+						Scen.mapScript->CallFunction(MapScript_DestructionCallback, 9, source->RTTI, attacking_object->ID, source->ID, source->House->ID, warhead, this->RTTI, this->Techno_Type_Class()->ID,this->ID,this->House);
+					}else {
+						Scen.mapScript->CallFunction(MapScript_DestructionCallback, 9, -1, -1, -1, -1, warhead, -1, -1, -1, -1);
+					}
+				}
+
+				/*
+				**	Remove object from MapScript Cache
+				*/
+				if (MapScript_Object_UID != -1) {
+					Script_DeleteCacheObject(MapScript_Object_UID);
+				}
+
 				break;
 
 			case RESULT_HALF:
