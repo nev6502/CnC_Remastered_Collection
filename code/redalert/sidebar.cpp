@@ -778,6 +778,9 @@ void SidebarClass::Draw_It(bool complete)
 	// hack: black background for the sidebar
 	GL_FillRect(TBLACK, SIDE_X * RESFACTOR, 8 * RESFACTOR, SIDE_WIDTH * RESFACTOR, ScreenHeight);
 
+	// Draw power on top
+	PowerClass::Draw_It(complete);
+
 	BStart(BENCH_SIDEBAR);
 
 	if (IsSidebarActive && (IsToRedraw || complete) && !Debug_Map) {
@@ -811,9 +814,6 @@ void SidebarClass::Draw_It(bool complete)
 			LogicPage->Unlock();
 		}
 	}
-
-	// Draw power on top
-	PowerClass::Draw_It(complete);
 
 	/*
 	**	Draw the side strip elements by calling their respective draw functions.
