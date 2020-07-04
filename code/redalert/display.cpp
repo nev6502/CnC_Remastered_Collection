@@ -2458,6 +2458,8 @@ void DisplayClass::Redraw_Shadow(void)
 					int ypixel;
 
 					if (Coord_To_Pixel(coord, xpixel, ypixel)) {
+						CellClass::ConvertCoordsToIsometric(xpixel, ypixel);
+
 						CellClass * cellptr = &(*this)[coord];
 						//if (cellptr->IsVisible) continue;
 						if (cellptr->Is_Visible(PlayerPtr)) continue;		// Use PlayerPtr since we won't be rendering in MP. ST - 8/6/2019 10:44AM
