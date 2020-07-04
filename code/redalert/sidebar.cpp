@@ -778,8 +778,6 @@ void SidebarClass::Draw_It(bool complete)
 	// hack: black background for the sidebar
 	GL_FillRect(TBLACK, SIDE_X * RESFACTOR, 8 * RESFACTOR, SIDE_WIDTH * RESFACTOR, ScreenHeight);
 
-	PowerClass::Draw_It(complete);
-
 	BStart(BENCH_SIDEBAR);
 
 	if (IsSidebarActive && (IsToRedraw || complete) && !Debug_Map) {
@@ -803,7 +801,7 @@ void SidebarClass::Draw_It(bool complete)
 				if (frameNr < 6) frameNr++;
 			}
 
-			topY += 10 * RESFACTOR;
+			topY += 11 * RESFACTOR;
 			CC_Draw_Shape(SidebarFillerHD, 0, SIDE_X * RESFACTOR, topY, WINDOW_MAIN, SHAPE_WIN_REL, 0);
 
 			Repair.Draw_Me(true);
@@ -813,6 +811,9 @@ void SidebarClass::Draw_It(bool complete)
 			LogicPage->Unlock();
 		}
 	}
+
+	// Draw power on top
+	PowerClass::Draw_It(complete);
 
 	/*
 	**	Draw the side strip elements by calling their respective draw functions.
