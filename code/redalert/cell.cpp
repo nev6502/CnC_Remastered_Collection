@@ -1183,8 +1183,11 @@ void CellClass::Draw_It(int x, int y, bool objects)
 			*/
 			if (Overlay != OVERLAY_NONE) {
 				OverlayTypeClass const & otype = OverlayTypeClass::As_Reference(Overlay);
+				int xx = x;
+				int yy = y;
+				ConvertCoordsToIsometric(xx, yy);
 				IsTheaterShape = (bool)otype.IsTheater;	//Tell Build_Frame if this overlay is theater specific
-				CC_Draw_Shape(otype.Get_Image_Data(), OverlayData, (x+(CELL_PIXEL_W>>1)), (y+(CELL_PIXEL_H>>1)), WINDOW_TACTICAL, SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_GHOST, NULL, DisplayClass::UnitShadow);
+				CC_Draw_Shape(otype.Get_Image_Data(), OverlayData, (xx+(CELL_PIXEL_W>>1)), (yy+(CELL_PIXEL_H>>1)), WINDOW_TACTICAL, SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_GHOST, NULL, DisplayClass::UnitShadow);
 				IsTheaterShape = false;
 			}
 
