@@ -113,6 +113,7 @@ class PowerClass : public RadarClass
 		*/
 		static void const * PowerShape;
 		static void const * PowerBarShape;
+		static void const * PowerBarShapeHD;
 };
 
 #endif

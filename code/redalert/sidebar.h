@@ -108,6 +108,8 @@ class SidebarClass: public PowerClass
 		};
 
 		static void * SidebarShape;
+		static void * SidebarShapeHD;
+		static void * SidebarFillerHD;
 		static void * SidebarMiddleShape;	//Only used in Win95 version
 		static void * SidebarBottomShape;	//Only used in Win95 version
 
@@ -319,6 +321,7 @@ class SidebarClass: public PowerClass
 				**	placeholder pieces on the side bar.
 				*/
 				static void * LogoShapes;
+				static void * LogoShapesHD;
 
 				/*
 				**	This points to the animation sequence of frames used to mark the passage of time
