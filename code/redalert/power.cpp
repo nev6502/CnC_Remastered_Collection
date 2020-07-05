@@ -202,19 +202,19 @@ void PowerClass::Draw_It(bool complete)
 				/*
 				** Hires power strip is too big to fit into a shape so it is in two parts
 				*/
-				CC_DrawHD_Shape(PowerBarShapeHD[0], 0, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR), WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+				CC_DrawHD_Shape(PowerBarShapeHD[0], 0, ScreenWidth - (640 - (240 * RESFACTOR)), (88 * RESFACTOR), WINDOW_MAIN, SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 
 				
 				int bottomOfBar = (88 + 56) * RESFACTOR;
 
 				while ( bottomOfBar < ( PowerButton.Height - 56 ) )
 				{
-					CC_DrawHD_Shape(PowerBarShapeHD[1], 0, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+					CC_DrawHD_Shape(PowerBarShapeHD[1], 0, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 					bottomOfBar += 56 * RESFACTOR;
 				}
 
 				// bottom
-				CC_DrawHD_Shape(PowerBarShapeHD[2], 0, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, flags | SHAPE_NORMAL | SHAPE_WIN_REL, remap);
+				CC_DrawHD_Shape(PowerBarShapeHD[2], 0, ScreenWidth - (640 - (240 * RESFACTOR)), bottomOfBar, WINDOW_MAIN, SHAPE_NORMAL | SHAPE_WIN_REL, remap);
 
 				int bottom = bottomOfBar + (36 * RESFACTOR);
 
