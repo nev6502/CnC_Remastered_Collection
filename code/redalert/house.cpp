@@ -7337,7 +7337,9 @@ void HouseClass::Read_INI(CCINIClass & ini)
 		p->Credits = p->Control.InitialCredits;
 
 		int iq = ini.Get_Int(hname, "IQ", 0);
-		if (iq > Rule.MaxIQ) iq = 1;
+// jmarshall - if IQ index is too high set to max IQ not to 1
+		if (iq > Rule.MaxIQ) iq = Rule.MaxIQ;
+// jmarshall end
 		p->IQ = p->Control.IQ = iq;
 
 		p->Control.Edge = ini.Get_SourceType(hname, "Edge", SOURCE_NORTH);
@@ -7385,7 +7387,7 @@ void HouseClass::Write_INI(CCINIClass & ini)
 		if (p != NULL) {
 			char const * name = p->Class->IniName;
 
-			ini.Clear(name);
+			//ini.Clear(name);
 			if (i >= HOUSE_MULTI1) continue;
 
 			if (p->Control.InitialCredits != control.InitialCredits) {
