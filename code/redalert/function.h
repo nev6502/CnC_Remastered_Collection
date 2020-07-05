@@ -545,6 +545,7 @@ FacingType KN_To_Facing(int input);
 void const *Get_Radar_Icon(void const * shapefile, int shapenum, int frames, int zoomfactor);
 //void CC_Draw_Shape(ObjectClass *object, void const * shapefile, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const * fadingdata=0, void const * ghostdata=0, DirType rotation=DIR_N, long scale=0x0100);
 void CC_Draw_Shape(void const * shapefile, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const * fadingdata = 0, void const * ghostdata = 0, DirType rotation = DIR_N);
+void CC_DrawHD_Shape(Image_t* image, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const* fadingdata = 0, void const* ghostdata = 0, DirType rotation = DIR_N);
 
 // Added for draw intercept. ST - 1/17/2019 12:31PM
 void CC_Draw_Shape(const ObjectClass *object, void const * shapefile, int shapenum, int x, int y, WindowNumberType window, ShapeFlags_Type flags, void const * fadingdata = 0, void const * ghostdata = 0, DirType rotation = DIR_N, long virtualscale = 0x0100);

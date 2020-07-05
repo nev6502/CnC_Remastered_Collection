@@ -63,6 +63,10 @@ extern int ScreenWidth;
 #define BUTTON_THREE_X  (int)(SIDE_X + 58)			// Right button X coordinate.
 #define BUTTON_THREE_Y  (int)(SIDE_Y + 2)			// Right button Y coordinate.
 
+struct Image_t;
+
+#define SIDEBAR_NUMSIDEHDFRAMES   7
+
 class SidebarClass: public PowerClass
 {
 	public:
@@ -108,6 +112,8 @@ class SidebarClass: public PowerClass
 		};
 
 		static void * SidebarShape;
+		static Image_t* SidebarShapeHD[SIDEBAR_NUMSIDEHDFRAMES];
+		static Image_t* SidebarFillerHD;
 		static void * SidebarMiddleShape;	//Only used in Win95 version
 		static void * SidebarBottomShape;	//Only used in Win95 version
 
@@ -319,6 +325,7 @@ class SidebarClass: public PowerClass
 				**	placeholder pieces on the side bar.
 				*/
 				static void * LogoShapes;
+				static void * LogoShapesHD;
 
 				/*
 				**	This points to the animation sequence of frames used to mark the passage of time
