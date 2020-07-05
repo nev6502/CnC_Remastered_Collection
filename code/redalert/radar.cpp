@@ -393,7 +393,7 @@ void RadarClass::Draw_It(bool forced)
 
 //		strcpy(name, "NATORADR.SHP" );
 //		if (Session.Type == GAME_NORMAL) {
-			strcpy(name, _hiresradarnames[PlayerPtr->ActLike]);
+			strcpy(name, _hiresradarnames[PlayerPtr->ActLike % HOUSE_BAD]);
 //		}
 		#ifndef NDEBUG
 			RawFileClass file(name);
@@ -409,12 +409,12 @@ void RadarClass::Draw_It(bool forced)
 			} else {
 				RadarPulse = MFCD::Retrieve(name);
 			}
-			strcpy(name, _frames[PlayerPtr->ActLike]);
+			strcpy(name, _frames[PlayerPtr->ActLike % HOUSE_BAD]);
 			RawFileClass file3(name);
 			if (file3.Is_Available()) {
 				RadarFrame = Load_Alloc_Data(file3);
 			} else {
-				RadarFrame = MFCD::Retrieve(_frames[PlayerPtr->ActLike]);
+				RadarFrame = MFCD::Retrieve(_frames[PlayerPtr->ActLike % HOUSE_BAD]);
 			}
 		#else
 			RadarAnim = MFCD::Retrieve(name);

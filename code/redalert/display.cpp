@@ -116,7 +116,7 @@ unsigned char DisplayClass::UnitShadow[(USHADOW_COL_COUNT+1)*256];
 unsigned char DisplayClass::UnitShadowAir[(USHADOW_COL_COUNT+1)*256];
 unsigned char DisplayClass::SpecialGhost[2*256];
 
-void const * DisplayClass::ShadowShapes;
+Image_t *DisplayClass::ShadowShapes;
 unsigned char DisplayClass::ShadowTrans[(SHADOW_COL_COUNT+1)*256];
 
 /*
@@ -236,18 +236,9 @@ void DisplayClass::One_Time(void)
 	TransIconsetHD[0] = Image_LoadImage("ui/trans/trans0.png");
 	TransIconsetHD[1] = Image_LoadImage("ui/trans/trans1.png");
 	TransIconsetHD[2] = Image_LoadImage("ui/trans/trans2.png");
-// jmarshall end
 
-	#ifndef NDEBUG
-		RawFileClass file("SHADOW.SHP");
-		if (file.Is_Available()) {
-			ShadowShapes = Load_Alloc_Data(file);
-		} else {
-			ShadowShapes = MFCD::Retrieve("SHADOW.SHP");
-		}
-	#else
-		ShadowShapes = MFCD::Retrieve("SHADOW.SHP");
-	#endif
+	ShadowShapes = Image_LoadImage("ui/shroud.png");
+// jmarshall end
 
 	Set_View_Dimensions(0, 0);
 }
@@ -2275,7 +2266,12 @@ ObjectClass * DisplayClass::Cell_Object(CELL cell, int x, int y) const
 //						continue;
 //					}
 					assert(ptr->IsActive);
-					ptr->Render(forced);
+// jmarshall - added a Is_Mapped check here so we don't see the trees through shrouded terrain.
+					CellClass* cellptr = &(*this)[ptr->Coord];
+					if (cellptr->Is_Mapped(PlayerPtr) || Debug_Unshroud) {
+						ptr->Render(forced);
+					}
+// jmarshall end
 				}
 			}
 			BEnd(BENCH_OBJECTS);
@@ -2356,6 +2352,9 @@ void DisplayClass::Redraw_Icons(void)
 			CELL cell = Coord_Cell(coord);
 			coord = Coord_Whole(Cell_Coord(cell));
 
+			if (Cell_Shadow(cell, PlayerPtr) >= 0 && !Debug_Unshroud)
+				continue;
+
 			/*
 			**	Only cells flagged to be redraw are examined.
 			*/
@@ -2398,6 +2397,9 @@ void DisplayClass::Redraw_OIcons(void)
 			COORDINATE coord = Coord_Add(TacticalCoord, XY_Coord(x, y));
 			CELL cell = Coord_Cell(coord);
 			coord = Coord_Whole(Cell_Coord(cell));
+
+			if (Cell_Shadow(cell, PlayerPtr) >= 0 && !Debug_Unshroud)
+				continue;			
 
 			/*
 			**	Only cells flagged to be redraw are examined.
@@ -2465,20 +2467,19 @@ void DisplayClass::Redraw_Shadow(void)
 						if (cellptr->Is_Visible(PlayerPtr)) continue;		// Use PlayerPtr since we won't be rendering in MP. ST - 8/6/2019 10:44AM
 						int shadow = -2;
 						//if (cellptr->IsMapped) {
-						if (cellptr->Is_Mapped(PlayerPtr)) {					// Use PlayerPtr since we won't be rendering in MP. ST - 8/6/2019 10:44AM
-							shadow = Cell_Shadow(cell, PlayerPtr);				// Use PlayerPtr since we won't be rendering in MP. ST - 8/6/2019 10:44AM
+						if (cellptr->Is_Mapped(PlayerPtr)) {			
+							shadow = Cell_Shadow(cell, PlayerPtr);		
 						}
-						if (shadow >= 0) {
-							CC_Draw_Shape(ShadowShapes, shadow, xpixel, ypixel, WINDOW_TACTICAL, SHAPE_GHOST, NULL, ShadowTrans);
-						} else {
-							if (shadow != -1) {
-								int ww = CELL_PIXEL_W;
-								int hh = CELL_PIXEL_H;
 
-								if (Clip_Rect(&xpixel, &ypixel, &ww, &hh, Lepton_To_Pixel(TacLeptonWidth), Lepton_To_Pixel(TacLeptonHeight)) >= 0) {
-									LogicPage->Fill_Rect(TacPixelX+xpixel, TacPixelY+ypixel, TacPixelX+xpixel+ww-1, TacPixelY+ypixel+hh-1, BLACK);
-								}
-							}
+						int ww = CELL_PIXEL_W;
+						int hh = CELL_PIXEL_H;
+
+						//if (Clip_Rect(&xpixel, &ypixel, &ww, &hh, Lepton_To_Pixel(TacLeptonWidth), Lepton_To_Pixel(TacLeptonHeight)) >= 0) {
+						//	LogicPage->Fill_Rect(TacPixelX + xpixel, TacPixelY + ypixel, TacPixelX + xpixel + ww - 1, TacPixelY + ypixel + hh - 1, BLACK);
+						//}
+
+						if (shadow >= 0) {
+							CC_DrawHD_Shape(ShadowShapes, 0, xpixel, ypixel, WINDOW_TACTICAL, SHAPE_GHOST, NULL, ShadowTrans);
 						}
 					}
 				}

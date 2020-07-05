@@ -311,7 +311,7 @@ public:		//ST - 1/21/2019 11:59AM
 		int BandX,BandY;
 		int NewX,NewY;
 
-		static void const *ShadowShapes;
+		static Image_t *ShadowShapes;
 		static unsigned char ShadowTrans[(SHADOW_COL_COUNT+1)*256];
 
 		void Redraw_Icons(void);

@@ -1421,6 +1421,7 @@ void CellClass::Draw_It(int x, int y, bool objects)
 			if (HasRenderedObject(object)) {
 				continue;
 			}
+
 			renderedFrameObjects.push_back(object);
 			int xx,yy;
 			if (object->IsToDisplay && (!object->Is_Techno() || ((TechnoClass *)object)->Visual_Character() == VISUAL_NORMAL) && Map.Coord_To_Pixel(object->Render_Coord(), xx, yy)) {				
