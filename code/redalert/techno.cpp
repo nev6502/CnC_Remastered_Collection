@@ -6718,7 +6718,7 @@ bool TechnoTypeClass::Read_INI(CCINIClass & ini)
 		SightRange = ini.Get_Int(Name(), "Sight", SightRange);
 		Level = ini.Get_Int(Name(), "TechLevel", Level);
 		MaxSpeed = MPHType(_Scale_To_256(ini.Get_Int(Name(), "Speed", fixed(MaxSpeed, 256) * 100)));
-		Cost = 50; // ini.Get_Int(Name(), "Cost", Cost);
+		Cost = ini.Get_Int(Name(), "Cost", Cost);
 		MaxAmmo = ini.Get_Int(Name(), "Ammo", MaxAmmo);
 		Risk = Reward = Points = ini.Get_Int(Name(), "Points", Points);
 		Ownable = ini.Get_Owners(Name(), "Owner", Ownable);
