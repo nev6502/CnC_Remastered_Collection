@@ -87,6 +87,7 @@
 
 #include	"function.h"
 #include	"vortex.h"
+#include    "image.h"
 
 /*
 **	These layer control elements are used to group the displayable objects
@@ -109,7 +110,7 @@ unsigned char DisplayClass::WhiteTranslucentTable[(1+1)*256];
 unsigned char DisplayClass::MouseTranslucentTable[(4+1)*256];
 void const * DisplayClass::TransIconset;
 // jmarshall 
-Image_t*	DisplayClass::TransIconsetHD;
+Image_t* DisplayClass::TransIconsetHD[3] = { 0 };
 // jmarshall end
 unsigned char DisplayClass::UnitShadow[(USHADOW_COL_COUNT+1)*256];
 unsigned char DisplayClass::UnitShadowAir[(USHADOW_COL_COUNT+1)*256];
@@ -190,7 +191,6 @@ DisplayClass::DisplayClass(void) :
 {
 	ShadowShapes = 0;
 	TransIconset = 0;
-	TransIconsetHD = 0;
 
 	Set_View_Dimensions(0, 8 * RESFACTOR, ScreenWidth, ScreenHeight);
 }
@@ -232,10 +232,10 @@ void DisplayClass::One_Time(void)
 	**	Load the generic transparent icon set.
 	*/
 // jmarshall
-//	TransIconset = MFCD::Retrieve("TRANS.ICN");
-//// jmarshall
-//	TransIconsetHD = Load_Stamp("TRANS_ICON", TransIconset);
-//// jmarshall end
+	TransIconset = MFCD::Retrieve("TRANS.ICN");
+	TransIconsetHD[0] = Image_LoadImage("ui/trans/trans0.png");
+	TransIconsetHD[1] = Image_LoadImage("ui/trans/trans1.png");
+	TransIconsetHD[2] = Image_LoadImage("ui/trans/trans2.png");
 // jmarshall end
 
 	#ifndef NDEBUG

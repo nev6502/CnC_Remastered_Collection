@@ -1262,10 +1262,12 @@ void CellClass::Draw_It(int x, int y, bool objects)
 					lastRenderY = yy;
 
 					if (Map.ProximityCheck && Is_Clear_To_Build(loco)) {
-						LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 0, xx, yy, NULL, WINDOW_TACTICAL);
+						//LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 0, xx, yy, NULL, WINDOW_TACTICAL);
+						CC_DrawHD_Shape(DisplayClass::TransIconsetHD[0], 0, xx, yy, WINDOW_TACTICAL, SHAPE_NORMAL);
 					}
 					else {
-						LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 2, xx, yy, NULL, WINDOW_TACTICAL);
+						//LogicPage->Draw_Stamp(DisplayClass::TransIconsetHD, 2, xx, yy, NULL, WINDOW_TACTICAL);
+						CC_DrawHD_Shape(DisplayClass::TransIconsetHD[2], 0, xx, yy, WINDOW_TACTICAL, SHAPE_NORMAL);
 					}
 				}
 

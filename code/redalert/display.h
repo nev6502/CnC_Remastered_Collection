@@ -118,7 +118,7 @@ class DisplayClass: public MapClass
 		static unsigned char MouseTranslucentTable[(4+1)*256];
 		static void const *TransIconset;
 // jmarshall
-		static Image_t* TransIconsetHD;
+		static Image_t* TransIconsetHD[3];
 // jmarshall end
 		static unsigned char UnitShadow[(USHADOW_COL_COUNT+1)*256];
 		static unsigned char UnitShadowAir[(USHADOW_COL_COUNT+1)*256];
