@@ -2470,17 +2470,17 @@ LandType TemplateTypeClass::Land_Type(int icon) const
 		if (image != NULL) {
 			static LandType _land[16] = {
 				LAND_CLEAR,
-				LAND_ROAD ,
+				LAND_ROUGH ,
+				LAND_ROAD,
 				LAND_WATER,
 				LAND_ROCK,
 				LAND_WALL,
 				LAND_TIBERIUM,
+				LAND_WEEDS,
 				LAND_BEACH,
-				LAND_ROUGH,
-				LAND_ICE,
+				LAND_WATER,
 				LAND_CLEAR,
-				LAND_CLEAR,
-				LAND_CLEAR,
+				LAND_ROAD,
 				LAND_COUNT,
 			};
 
