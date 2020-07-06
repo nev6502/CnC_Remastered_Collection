@@ -3298,7 +3298,7 @@ int DisplayClass::TacticalClass::Action(unsigned flags, KeyNumType & key)
 		**	intercepted and possible rubber-band mode is flagged.
 		*/
 		if (flags & LEFTRELEASE) {
-			Map.Mouse_Left_Release(cell, x, y, object, action);
+			Map.Mouse_Left_Release(cell, screenX, screenY, object, action);
 		}
 
 		/*
@@ -3886,7 +3886,14 @@ void DisplayClass::Mouse_Left_Release(CELL cell, int x, int y, ObjectClass * obj
 
 		if (IsRubberBand) {
 			Refresh_Band();
-			Select_These(XYP_Coord(BandX, BandY), XYP_Coord(x, y));
+			int _BandX = BandX;
+			int _BandY = BandY;
+			int _x = x;
+			int _y = y;
+
+			CellClass::ConvertIsoCoordsToScreen(_BandX, _BandY);
+			CellClass::ConvertIsoCoordsToScreen(_x, _y);
+			Select_These(XYP_Coord(_BandX, _BandY), XYP_Coord(_x, _y));
 
 			Set_Default_Mouse(MOUSE_NORMAL, wsmall);
 			IsRubberBand = false;

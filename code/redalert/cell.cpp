@@ -1032,11 +1032,18 @@ bool CellClass::ScreenCoordsToIsoTile(int x, int y, int &tileX, int &tileY) {
 
 void CellClass::ConvertIsoCoordsToScreen(int& x, int& y) {
 	int tileX, tileY;
-	if (!CellClass::ScreenCoordsToIsoTile(x, y, tileX, tileY)) {
-		return;
-	}
-	x = tileX * CELL_PIXEL_W;
-	y = tileY * CELL_PIXEL_H;
+	x = x - (ScreenWidth / 2);
+	y = y + (ScreenWidth / 4);
+
+	float tempPt_x = (2 * y + x);
+	float tempPt_y = (2 * y - x);
+
+	//x = floor(tempPt_x / (CELL_PIXEL_W)) * CELL_PIXEL_W;
+	//y = floor(tempPt_y / (CELL_PIXEL_H)) * CELL_PIXEL_H;
+	x = tempPt_x - CELL_PIXEL_W;
+	y = tempPt_y - CELL_PIXEL_H;
+
+	Console_Printf("%d %d\n", x, y);
 }
 
 bool CellClass::ScreenCoordsToIsoCoords(COORDINATE screenCoord, COORDINATE& isoCoord) {
