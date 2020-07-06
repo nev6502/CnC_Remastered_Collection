@@ -82,6 +82,14 @@ BOOL Set_Primary_Buffer_Format(void) { return 0; };
 BOOL Start_Primary_Sound_Buffer(BOOL forced) { return 0; };
 void Stop_Primary_Sound_Buffer(void) {};
 
+/***************************************************************************
+**	Priority of sound effects (to be used when there are too many sounds playing) JJ 7/5/2020
+*/
+typedef enum : unsigned char {
+	SOUND_PRIORITY_LOW,			// eg. war sounds in the distance
+	SOUND_PRIORITY_MEDIUM,			// eg. sounds in the distance
+	SOUND_PRIORITY_HIGH			// eg. voiceover
+} SoundPriority;
 
 /***************************************************************************
 **	Controls what special effects may occur on the sound effect.
@@ -292,7 +300,7 @@ const char* GetEffectFileName(int index) {
 //
 // External handlers. MBL 06.17.2019
 //
-extern void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house);
+extern void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house, float volume=1, float panning_x=0, float panning_y =0, unsigned char priority=2);
 // extern void On_Speech(int speech_index); MBL 02.06.2020
 extern void On_Speech(int speech_index, HouseClass *house);
 extern void On_Ping(const HouseClass* player_ptr, COORDINATE coord);
@@ -381,10 +389,46 @@ char const * Voc_Name(VocType voc)
  *=============================================================================================*/
 void Sound_Effect(VocType voc, COORDINATE coord, int variation, HousesType house)
 {
+
+	CELL cell_pos = 0;
+
+	SoundPriority sound_priority = SOUND_PRIORITY_HIGH;
+	float volume = 1.0;
+	float panning_x =0, panning_y =0;
+
+	if (coord) {
+		cell_pos = Coord_Cell(coord);
+
+		// Get center of screen's cell coordinated
+		int screen_cell_x = (Coord_XCell(Map.TacticalCoord) + (Lepton_To_Cell(Map.TacLeptonWidth) / 2));
+		int screen_cell_y = (Coord_YCell(Map.TacticalCoord) + (Lepton_To_Cell(Map.TacLeptonHeight) / 2));
+
+		// Get panning values
+		panning_x = (screen_cell_x - Cell_X(cell_pos)) * -.000009;
+		panning_y = (screen_cell_y - Cell_Y(cell_pos)) * .000009;
+
+		float distance = Distance(Cell_X(cell_pos), Cell_Y(cell_pos), screen_cell_x,screen_cell_y);
+
+		// Determine the priority of this sound (to eventually be used with determining whether or not to play it)
+		if (distance > 40) {
+			sound_priority = SOUND_PRIORITY_LOW;
+		}else if (distance > 30) {
+			sound_priority = SOUND_PRIORITY_MEDIUM;
+		}
+		
+		// Volume based on distance
+		volume = min(1,1.1-(distance *.012));
+
+	}
+
+	if (volume <= 0) {
+		return;
+	}
+
 	//
 	// Intercept sound effect calls. MBL 06.17.2019
 	//
-	On_Sound_Effect((int)voc, variation, coord, (int)house);
+	On_Sound_Effect((int)voc, variation, coord, (int)house,volume, panning_x, panning_y, SOUND_PRIORITY_MEDIUM);
 
 #if 0
 	CELL cell_pos = 0;
@@ -456,7 +500,7 @@ int Sound_Effect(VocType voc, fixed volume, int variation, signed short pan_valu
 	//
 	pan_value;
 	COORDINATE coord = 0;
-	On_Sound_Effect((int)voc, variation, coord, (int)house);
+	On_Sound_Effect((int)voc, variation, coord, (int)house,1,0,0,SOUND_PRIORITY_HIGH);
 
 #if 0
 	char name[_MAX_FNAME+_MAX_EXT];				// Working filename of sound effect.

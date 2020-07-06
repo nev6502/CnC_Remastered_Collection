@@ -8,7 +8,7 @@
  */
 
 #include	"function.h"
-#include    "AUDIOMIX.H"
+#include    "audiomix.H"
 
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -301,7 +301,11 @@ void AudMix_Init(void) {
 	alGenBuffers(MAX_STREAM_BUFFERS, streaming_buffers);
 }
 
-void PlayAudio(AudioBuffer_t& buffer, bool speech) {
+// volume: 0.0 - 1.0
+// panning: -1.0 - 1.0
+// priority 0 (lowest) - 2 (highest)
+void PlayAudio(AudioBuffer_t& buffer, bool speech, float volume = 1.0, float panning_x = 0, float panning_y = 0, unsigned char priority=2) {
+
 	// Only one speech sound can play at once.
 	if (speech) {
 		//if (AudMix_IsSourcePlaying(SPEECH_AUDIO_SOURCE))
@@ -313,10 +317,39 @@ void PlayAudio(AudioBuffer_t& buffer, bool speech) {
 		return;
 	}
 
-	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 3)
+	if (currentAudioTSource >= MAX_AUDIO_SOURCES - 3) {
 		currentAudioTSource = 0;
+	}
+
+	// Stop sound if it's already playing
+	ALint state = 0;
+	alGetSourcei(audio_sources[currentAudioTSource], AL_SOURCE_STATE, &state);
+
+
+	if (state == AL_PLAYING) {
+
+		alSourceStop(audio_sources[currentAudioTSource]);
+		//return;
+	}
 
 	alSourcei(audio_sources[currentAudioTSource], AL_BUFFER, buffer.buffer);
+	alSourcef(audio_sources[currentAudioTSource], AL_GAIN, volume);
+	alSourcef(audio_sources[currentAudioTSource], AL_LOOPING, false);
+
+	// 3D Positioning
+	ALfloat al_position[3] = { 0,0,0 };
+
+	if (panning_x != 0 || panning_y != 0) {
+
+		al_position[0] = panning_x;
+		al_position[1] = panning_y;
+		al_position[2] = .5;
+
+	} 
+
+	alSourcefv(audio_sources[currentAudioTSource], AL_POSITION, al_position);
+	
+	// Play the sound
 	alSourcePlay(audio_sources[currentAudioTSource]);
 
 	currentAudioTSource++;
@@ -331,7 +364,7 @@ void AudMix_SetMusicState(bool musicState) {
 	}
 }
 
-void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house)
+void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house, float volume=1, float panning_x=0, float panning_y=0, unsigned char priority=2)
 {
 	// MBL 06.17.2019
 	int voc = sound_index;
@@ -341,15 +374,15 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 	}
 
 	if (precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index].buffer != 0) {
-		PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index], false);
+		PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_NONE][sound_index], false,volume,panning_x,panning_y,priority);
 	}
 	else if(PlayerPtr != NULL) {
 		// We have to play a faction audio.
 		if (PlayerPtr->Class->House == HOUSE_USSR || PlayerPtr->Class->House == HOUSE_UKRAINE || PlayerPtr->Class->House == HOUSE_TURKEY) {
-			PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_SOVIET][sound_index], false);
+			PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_SOVIET][sound_index], false, 1, 0, 0, 2);
 		}
 		else {
-			PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_ALIED][sound_index], false);
+			PlayAudio(precacheAudioTable[AUDIO_BUFFER_HOUSE_ALIED][sound_index], false, 1, 0, 0, 2);
 		}
 	}
 }
@@ -359,7 +392,7 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 void On_Speech(int speech_index, HouseClass* house)
 {
 	if (house == NULL) {
-		PlayAudio(speechPrecacheAudioTable[speech_index], true);
+		PlayAudio(speechPrecacheAudioTable[speech_index], true,1,0,0,2);
 	}
 
 	// DLLExportClass::On_Speech(PlayerPtr, speech_index); // MBL 02.06.2020
