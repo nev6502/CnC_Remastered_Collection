@@ -1030,6 +1030,15 @@ bool CellClass::ScreenCoordsToIsoTile(int x, int y, int &tileX, int &tileY) {
 	return true;
 }
 
+void CellClass::ConvertIsoCoordsToScreen(int& x, int& y) {
+	int tileX, tileY;
+	if (!CellClass::ScreenCoordsToIsoTile(x, y, tileX, tileY)) {
+		return;
+	}
+	x = tileX * CELL_PIXEL_W;
+	y = tileY * CELL_PIXEL_H;
+}
+
 bool CellClass::ScreenCoordsToIsoCoords(COORDINATE screenCoord, COORDINATE& isoCoord) {
 	int x, y;
 	Map.Coord_To_Pixel(screenCoord, x, y);

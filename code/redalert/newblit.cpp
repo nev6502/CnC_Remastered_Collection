@@ -88,6 +88,20 @@ void GL_FillRect(int color, int x, int y, int width, int height) {
 	}
 }
 
+void GL_FillRect(int _r, int _g, int _b, int x, int y, int width, int height) {
+	ImVec2 mi(x, y);
+	ImVec2 ma(x + width, y + height);
+	float r = _r / 255.0f;
+	float g = _g / 255.0f;
+	float b = _b / 255.0f;
+	if (forceForgegroundRender) {
+		ImGui::GetForegroundDrawList()->AddRectFilled(mi, ma, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)));
+	}
+	else {
+		ImGui::GetBackgroundDrawList()->AddRectFilled(mi, ma, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)));
+	}
+}
+
 void GL_DrawText(int color, int x, int y, char* text) {
 	ImVec2 pos(x, y);
 	if (color == 0 || color == 160) { // This is a hack!

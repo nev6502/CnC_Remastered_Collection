@@ -277,6 +277,7 @@ class CellClass
 		void Decode_Pointers(void);
 
 		static void ConvertCoordsToIsometric(int& x, int& y);
+		static void ConvertIsoCoordsToScreen(int& x, int& y);
 		static bool ScreenCoordsToIsoTile(int x, int y, int& tileX, int& tileY);
 		static bool ScreenCoordsToIsoCoords(COORDINATE screenCoord, COORDINATE& isoCoord);
 
