@@ -1043,7 +1043,7 @@ void CellClass::ConvertIsoCoordsToScreen(int& x, int& y) {
 	x = tempPt_x - CELL_PIXEL_W;
 	y = tempPt_y - CELL_PIXEL_H;
 
-	Console_Printf("%d %d\n", x, y);
+	//Console_Printf("%d %d\n", x, y);
 }
 
 bool CellClass::ScreenCoordsToIsoCoords(COORDINATE screenCoord, COORDINATE& isoCoord) {
