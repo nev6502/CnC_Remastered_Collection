@@ -2489,6 +2489,68 @@ static BuildingTypeClass const ClassAban01(
 	(short const*)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
 );
 
+static BuildingTypeClass const ClassAban02(
+	STRUCT_ABAN02,
+	TXT_CIV37,						// NAME:			Short name of the structure.
+	"ABAN02",						// NAME:			Short name of the structure.
+	FACING_NONE,					// Foundation direction from center of building.
+	XYP_COORD(0, 0),				// Exit point for produced units.
+	REMAP_ALTERNATE,				// Sidebar remap logic.
+	0x0000,							//	Vertical offset.
+	0x0000,							// Primary weapon offset along turret centerline.
+	0x0000,							// Primary weapon lateral offset along turret centerline.
+	false,						// Is this building a fake (decoy?)
+	true,							// Animation rate is regulated for constant speed?
+	true,							// Always use the given name for the building?
+	false,						// Is this a wall type structure?
+	true,							// Simple (one frame) damage imagery?
+	false,						// Is it invisible to radar?
+	true,							// Can the player select this?
+	true,							// Is this a legal target for attack or move?
+	false,						// Is this an insignificant building?
+	false,							// Theater specific graphic image?
+	false,						// Does it have a rotating turret?
+	false,						// Can the building be color remapped to indicate owner?
+	RTTI_NONE,						// The object type produced at this factory.
+	DIR_N,							// Starting idle frame to match construction.
+	BSIZE_42, 						// SIZE:			Building size.
+	NULL,								// Preferred exit cell list.
+	(short const*)ListWestwood,	// OCCUPYLIST:	List of active foundation squares.
+	(short const*)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
+);
+
+
+static BuildingTypeClass const ClassAban03(
+	STRUCT_ABAN03,
+	TXT_CIV37,						// NAME:			Short name of the structure.
+	"ABAN03",						// NAME:			Short name of the structure.
+	FACING_NONE,					// Foundation direction from center of building.
+	XYP_COORD(0, 0),				// Exit point for produced units.
+	REMAP_ALTERNATE,				// Sidebar remap logic.
+	0x0000,							//	Vertical offset.
+	0x0000,							// Primary weapon offset along turret centerline.
+	0x0000,							// Primary weapon lateral offset along turret centerline.
+	false,						// Is this building a fake (decoy?)
+	true,							// Animation rate is regulated for constant speed?
+	true,							// Always use the given name for the building?
+	false,						// Is this a wall type structure?
+	true,							// Simple (one frame) damage imagery?
+	false,						// Is it invisible to radar?
+	true,							// Can the player select this?
+	true,							// Is this a legal target for attack or move?
+	false,						// Is this an insignificant building?
+	false,							// Theater specific graphic image?
+	false,						// Does it have a rotating turret?
+	false,						// Can the building be color remapped to indicate owner?
+	RTTI_NONE,						// The object type produced at this factory.
+	DIR_N,							// Starting idle frame to match construction.
+	BSIZE_42, 						// SIZE:			Building size.
+	NULL,								// Preferred exit cell list.
+	(short const*)ListWestwood,	// OCCUPYLIST:	List of active foundation squares.
+	(short const*)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
+);
+
+
 static BuildingTypeClass const ClassMission(
 	STRUCT_MISSION,
 	TXT_CIVMISS,					// NAME:			Short name of the structure.
@@ -3056,7 +3118,8 @@ void BuildingTypeClass::Init_Heap(void)
 	new BuildingTypeClass(ClassBarrel3);		// STRUCT_BARREL3
 
 	new BuildingTypeClass(ClassAban01);
-
+	new BuildingTypeClass(ClassAban02);
+	new BuildingTypeClass(ClassAban03);
 #ifdef FIXIT_ANTS
 	new BuildingTypeClass(ClassQueen);			// STRUCT_QUEEN
 	new BuildingTypeClass(ClassLarva1);			// STRUCT_LARVA1
