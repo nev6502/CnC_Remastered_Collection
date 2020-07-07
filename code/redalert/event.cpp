@@ -865,6 +865,13 @@ void EventClass::Execute(void)
 // jmarshall - hack for skirmish games, lets the game flow go back to the mainmenu.
 			Session.Type = GAME_NORMAL;
 // jmarshall end
+
+			// De-initialize MapScript
+			if (Scen.mapScript) {
+				delete Scen.mapScript;
+				Scen.mapScript = NULL;
+			}
+
 			break;
 
 		/*
