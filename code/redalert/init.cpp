@@ -3008,6 +3008,11 @@ static void Init_Bootstrap_Mixfiles(void)
 		bool ok = MFCD::Cache("isosnow.mix");
 		assert(ok);
 	}
+	new MFCD("isotemp.mix", &FastKey, MIX_FILE_TS);
+	{
+		bool ok = MFCD::Cache("isotemp.mix");
+		assert(ok);
+	}
 // jmarshall end
 
 #ifdef WOLAPI_INTEGRATION
