@@ -11,22 +11,11 @@
 				<Value>
 					<Frames>
 						<Frame>ABAN04/aban04_0000.png</Frame>
-						<Frame>ABAN04/aban04_0000.png</Frame>
+						<Frame>ABAN04/aban04_0001.png</Frame>
 					</Frames>
 				</Value>
 			</Tile>			
-			<Tile>
-				<Key>
-					<Name>ABAN01</Name>
-					<Shape>1</Shape>
-				</Key>
-				<Value>
-					<Frames>
-						<Frame>ABAN04/aban04_0000.png</Frame>
-						<Frame>ABAN04/aban04_0000.png</Frame>
-					</Frames>
-				</Value>
-			</Tile>	
+			
 		</Tiles>
 	</TilesetTypeClass>
 </Tilesets>
