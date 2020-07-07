@@ -718,6 +718,7 @@ long __cdecl Buffer_Frame_To_Page(int shapeNum, int x, int y, int w, int h, Imag
 */
 INT_PTR Build_Frame(void const *dataptr, unsigned short framenumber, void *buffptr);
 unsigned short Get_Build_Frame_Count(void const *dataptr);
+bool Get_Build_TiberianSun_Format(void const* dataptr);
 unsigned short Get_Build_Frame_X(void const *dataptr);
 unsigned short Get_Build_Frame_Y(void const *dataptr);
 unsigned short Get_Build_Frame_Width(void const *dataptr);

@@ -1465,6 +1465,7 @@ typedef enum StructType : char {
 	STRUCT_V37,
 	STRUCT_BARREL,
 	STRUCT_BARREL3,
+	STRUCT_ABAN01,
 
 #ifdef FIXIT_ANTS
 	STRUCT_QUEEN,
