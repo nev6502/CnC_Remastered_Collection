@@ -534,6 +534,13 @@ void MapEditClass::AI(KeyNumType & input, int x, int y)
 	/*
 	**	Check for mouse motion while left button is down.
 	*/
+
+	//Draw mouse cell position (CellX/CellY)
+	//CELL template_cell = (ZoneCell + ZoneOffset);
+	//char tmp[12];
+	//sprintf(tmp, "%d , %d", Cell_X(template_cell), Cell_Y(template_cell));
+	//GL_DrawText(6, 64, 64, tmp);
+
 	rc = Mouse_Moved();
 	if (Keyboard->Down(KN_LMOUSE) && rc) {
 
