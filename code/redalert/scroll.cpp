@@ -126,19 +126,17 @@ void ScrollClass::AI(KeyNumType &input, int x, int y)
 					**	Adjust the mouse coordinates to emphasize the
 					**	cardinal directions over the diagonals.
 					*/
-					int altx = y;
-					if (altx < (50)) altx -= (50) - altx;
-					altx = max(altx, 0);
-					if (altx > ((half_screen_width - 50))) altx += altx - ((half_screen_width - 50));
-					altx = min(altx, screen_width);
-
+					int altx = x;
 					int alty = y;
-					if (alty < (50)) alty -= (50) - alty;
-					alty = max(alty, 0);
-					if (alty > ((half_screen_height - 50))) alty += alty - ((half_screen_height - 50));
-					alty = min(alty, screen_height);
 
-					direction = (DirType)Desired_Facing256((half_screen_width), (half_screen_height), x, y);
+					if (alty == 0 || alty >= screen_height - 1){
+						if (altx != (half_screen_width)) { 
+							float offset_x = (half_screen_width - altx) * .7;
+							altx = altx + offset_x;
+						}
+					}
+
+					direction = (DirType)Desired_Facing256((half_screen_width), (half_screen_height), altx, alty);
 				}
 
 				int control = Dir_Facing(direction);
