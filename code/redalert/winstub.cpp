@@ -222,6 +222,21 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 			if (Data[(i * 4) + 2] == 0 && Data[(i * 4) + 1] == 0 && Data[(i * 4) + 0] == 117) {
 				Data[(i * 4) + 3] = 0;
 			}
+
+			if (Data[(i * 4) + 2] == 117 && Data[(i * 4) + 1] == 0 && Data[(i * 4) + 0]) {
+				Data[(i * 4) + 3] = 0;
+			}
+		}
+	}
+	else if (Bpp == 3) {
+		for (int i = 0; i < Width * Height; i++) {
+			byte b = Data[(i * 3) + 2];
+			Data[(i * 3) + 2] = Data[(i * 4) + 0];
+			Data[(i * 3) + 0] = b;
+
+			if (Data[(i * 3) + 2] == 0 && Data[(i * 3) + 1] == 0 && Data[(i * 3) + 0] == 117) {
+				Data[(i * 3) + 3] = 0;
+			}
 		}
 	}
 

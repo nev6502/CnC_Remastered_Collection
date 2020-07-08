@@ -2458,6 +2458,99 @@ static BuildingTypeClass const ClassV37(
 	(short const *)ListWestwood,	// OCCUPYLIST:	List of active foundation squares.
 	(short const *)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
 );
+
+static BuildingTypeClass const ClassAban01(
+	STRUCT_ABAN01,
+	TXT_CIV37,						// NAME:			Short name of the structure.
+	"ABAN01",						// NAME:			Short name of the structure.
+	FACING_NONE,					// Foundation direction from center of building.
+	XYP_COORD(0, 0),				// Exit point for produced units.
+	REMAP_ALTERNATE,				// Sidebar remap logic.
+	0x0000,							//	Vertical offset.
+	0x0000,							// Primary weapon offset along turret centerline.
+	0x0000,							// Primary weapon lateral offset along turret centerline.
+	false,						// Is this building a fake (decoy?)
+	true,							// Animation rate is regulated for constant speed?
+	true,							// Always use the given name for the building?
+	false,						// Is this a wall type structure?
+	true,							// Simple (one frame) damage imagery?
+	false,						// Is it invisible to radar?
+	true,							// Can the player select this?
+	true,							// Is this a legal target for attack or move?
+	false,						// Is this an insignificant building?
+	false,							// Theater specific graphic image?
+	false,						// Does it have a rotating turret?
+	false,						// Can the building be color remapped to indicate owner?
+	RTTI_NONE,						// The object type produced at this factory.
+	DIR_N,							// Starting idle frame to match construction.
+	BSIZE_42, 						// SIZE:			Building size.
+	NULL,								// Preferred exit cell list.
+	(short const*)ListWestwood,	// OCCUPYLIST:	List of active foundation squares.
+	(short const*)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
+);
+
+static BuildingTypeClass const ClassAban02(
+	STRUCT_ABAN02,
+	TXT_CIV37,						// NAME:			Short name of the structure.
+	"ABAN02",						// NAME:			Short name of the structure.
+	FACING_NONE,					// Foundation direction from center of building.
+	XYP_COORD(0, 0),				// Exit point for produced units.
+	REMAP_ALTERNATE,				// Sidebar remap logic.
+	0x0000,							//	Vertical offset.
+	0x0000,							// Primary weapon offset along turret centerline.
+	0x0000,							// Primary weapon lateral offset along turret centerline.
+	false,						// Is this building a fake (decoy?)
+	true,							// Animation rate is regulated for constant speed?
+	true,							// Always use the given name for the building?
+	false,						// Is this a wall type structure?
+	true,							// Simple (one frame) damage imagery?
+	false,						// Is it invisible to radar?
+	true,							// Can the player select this?
+	true,							// Is this a legal target for attack or move?
+	false,						// Is this an insignificant building?
+	false,							// Theater specific graphic image?
+	false,						// Does it have a rotating turret?
+	false,						// Can the building be color remapped to indicate owner?
+	RTTI_NONE,						// The object type produced at this factory.
+	DIR_N,							// Starting idle frame to match construction.
+	BSIZE_42, 						// SIZE:			Building size.
+	NULL,								// Preferred exit cell list.
+	(short const*)ListWestwood,	// OCCUPYLIST:	List of active foundation squares.
+	(short const*)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
+);
+
+
+static BuildingTypeClass const ClassAban03(
+	STRUCT_ABAN03,
+	TXT_CIV37,						// NAME:			Short name of the structure.
+	"ABAN03",						// NAME:			Short name of the structure.
+	FACING_NONE,					// Foundation direction from center of building.
+	XYP_COORD(0, 0),				// Exit point for produced units.
+	REMAP_ALTERNATE,				// Sidebar remap logic.
+	0x0000,							//	Vertical offset.
+	0x0000,							// Primary weapon offset along turret centerline.
+	0x0000,							// Primary weapon lateral offset along turret centerline.
+	false,						// Is this building a fake (decoy?)
+	true,							// Animation rate is regulated for constant speed?
+	true,							// Always use the given name for the building?
+	false,						// Is this a wall type structure?
+	true,							// Simple (one frame) damage imagery?
+	false,						// Is it invisible to radar?
+	true,							// Can the player select this?
+	true,							// Is this a legal target for attack or move?
+	false,						// Is this an insignificant building?
+	false,							// Theater specific graphic image?
+	false,						// Does it have a rotating turret?
+	false,						// Can the building be color remapped to indicate owner?
+	RTTI_NONE,						// The object type produced at this factory.
+	DIR_N,							// Starting idle frame to match construction.
+	BSIZE_42, 						// SIZE:			Building size.
+	NULL,								// Preferred exit cell list.
+	(short const*)ListWestwood,	// OCCUPYLIST:	List of active foundation squares.
+	(short const*)OListWestwood	// OVERLAPLIST:List of overlap cell offset.
+);
+
+
 static BuildingTypeClass const ClassMission(
 	STRUCT_MISSION,
 	TXT_CIVMISS,					// NAME:			Short name of the structure.
@@ -3024,6 +3117,9 @@ void BuildingTypeClass::Init_Heap(void)
 	new BuildingTypeClass(ClassBarrel);			// STRUCT_BARREL
 	new BuildingTypeClass(ClassBarrel3);		// STRUCT_BARREL3
 
+	new BuildingTypeClass(ClassAban01);
+	new BuildingTypeClass(ClassAban02);
+	new BuildingTypeClass(ClassAban03);
 #ifdef FIXIT_ANTS
 	new BuildingTypeClass(ClassQueen);			// STRUCT_QUEEN
 	new BuildingTypeClass(ClassLarva1);			// STRUCT_LARVA1
@@ -3035,18 +3131,19 @@ void BuildingTypeClass::Init_Heap(void)
 #endif
 }
 
-Image_t* BuildingTypeClass::LoadHDImage(const char* fullname, int& numHDShapes) {
+Image_t* BuildingTypeClass::LoadHDImage(const char* fullname, int& numHDShapes, bool remapHouse) {
 	const char* imageFileName = Buildings_FindHDTexture(fullname, 0, 0);
 	Image_t* image = NULL;
 	
 	numHDShapes = -1;
 
 	if (imageFileName) {
-		image = Image_LoadImage(imageFileName, true, true);
+		image = Image_LoadImage(imageFileName, remapHouse, remapHouse);
 		int numBuildingAnims = Buildings_GetNumFramesForTile(fullname, 0);
 		int shapeId = 1;
 
 		// Load the old school animation pipeline.
+		if(remapHouse)
 		{
 			while (true) {
 				imageFileName = Buildings_FindHDTexture(fullname, shapeId, 0);
@@ -3063,9 +3160,15 @@ Image_t* BuildingTypeClass::LoadHDImage(const char* fullname, int& numHDShapes) 
 		if (numBuildingAnims > 0)
 		{
 			for (int i = 1; i < numBuildingAnims; i++) {
-				imageFileName = Buildings_FindHDTexture(fullname, 0, i);
-				for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
-					Image_Add32BitImage(imageFileName, image, d, 0, i);
+				if(!remapHouse) {
+					imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+					Image_Add32BitImage(imageFileName, image, -1, i, 0);
+				}
+				else {
+					imageFileName = Buildings_FindHDTexture(fullname, 0, i);
+					for (int d = 0; d < MAX_MPLAYER_COLORS; d++) {
+						Image_Add32BitImage(imageFileName, image, d, i, 0);
+					}
 				}
 			}
 		}
@@ -3184,18 +3287,18 @@ void BuildingTypeClass::One_Time(void)
 		*/
 		_makepath(fullname, NULL, NULL, building.Graphic_Name(), ".SHP");
 		((void const *&)building.ImageData) = MFCD::Retrieve(fullname);
-		((void const*&)building.HDImageData) = LoadHDImage(fullname, numhdimages);
+		((void const*&)building.HDImageData) = LoadHDImage(fullname, numhdimages, building.IsRemappable);
 
-		if (building.ImageData != NULL && building.HDImageData != NULL) {
-			int width = Get_Build_Frame_Width(building.ImageData);
-			int height = Get_Build_Frame_Height(building.ImageData);
-
-			for (int d = 0; d < numhdimages; d++)
-			{
-				building.HDImageData->renderwidth[d] = width;
-				building.HDImageData->renderheight[d] = height;
-			}
-		}
+		//if (building.ImageData != NULL && building.HDImageData != NULL) {
+		//	int width = Get_Build_Frame_Width(building.ImageData);
+		//	int height = Get_Build_Frame_Height(building.ImageData);
+		//
+		//	for (int d = 0; d < numhdimages; d++)
+		//	{
+		//		building.HDImageData->renderwidth[d] = width;
+		//		building.HDImageData->renderheight[d] = height;
+		//	}
+		//}
 	}
 
 	int specialNumHDImages = 0;
@@ -3204,7 +3307,7 @@ void BuildingTypeClass::One_Time(void)
 	char fullname[_MAX_FNAME+_MAX_EXT];
 	_makepath(fullname, NULL, NULL, (char const *)"WEAP2",".SHP");
 	WarFactoryOverlay = MFCD::Retrieve(fullname);
-	WarFactoryHDOverlay = LoadHDImage(fullname, specialNumHDImages);
+	WarFactoryHDOverlay = LoadHDImage(fullname, specialNumHDImages, false);
 	if (WarFactoryOverlay != NULL && WarFactoryHDOverlay != NULL) {
 		int width = Get_Build_Frame_Width(WarFactoryOverlay);
 		int height = Get_Build_Frame_Height(WarFactoryOverlay);
