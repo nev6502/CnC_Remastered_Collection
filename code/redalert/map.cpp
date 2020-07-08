@@ -880,7 +880,8 @@ long MapClass::Overpass(void)
 	*/
 	for (int y = 0; y < MapCellHeight; y++) {
 		for (int x = 0; x < MapCellWidth; x++) {
-			CELL cell = (MapCellY+y) * MAP_CELL_W + (MapCellX+x);
+			//CELL cell = (MapCellY+y) * MAP_CELL_W + (MapCellX+x);
+			CELL cell = XY_Cell(x,y); // Replaced because a crash was being caused
 			value += (*this)[cell].Tiberium_Adjust(true);
 			(*this)[cell].Recalc_Attributes();
 		}

@@ -863,8 +863,10 @@ CELL DisplayClass::Set_Cursor_Pos(CELL pos)
 	int x = Cell_X(pos + ZoneOffset);
 	int y = Cell_Y(pos + ZoneOffset);
 
-	if (x < Coord_XCell(TacticalCoord)) x = Coord_XCell(TacticalCoord);
-	if (y < Coord_YCell(TacticalCoord)) y = Coord_YCell(TacticalCoord);
+
+	// JJ TODO: This code appears to prevent object placement in the scenario editor when scrolled to the top of a large map 
+	//if (x < Coord_XCell(TacticalCoord)) x = Coord_XCell(TacticalCoord);
+	//if (y < Coord_YCell(TacticalCoord)) y = Coord_YCell(TacticalCoord);
 	if (x+w >= Coord_XCell(TacticalCoord) + Lepton_To_Cell(TacLeptonWidth)) x = Coord_XCell(TacticalCoord)+Lepton_To_Cell(TacLeptonWidth)-w;
 	if (y+h >= Coord_YCell(TacticalCoord) + Lepton_To_Cell(TacLeptonHeight)) y = Coord_YCell(TacticalCoord)+Lepton_To_Cell(TacLeptonHeight)-h;
 	pos = XY_Cell(x, y) - ZoneOffset;
@@ -1190,6 +1192,8 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 	**	If the distance is invalid then no further checking is required. Bail
 	**	with a no-can-do flag.
 	*/
+
+
 	if (distance == 0) return(false);
 	FacingType crude = Dir_Facing(facing);
 
@@ -1201,11 +1205,11 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 		if (crude == FACING_NW) facing = DIR_W;
 		if (crude == FACING_NE) facing = DIR_E;
 	}
-	if (Coord_X(TacticalCoord) + TacLeptonWidth == Cell_To_Lepton(MapCellX+MapCellWidth) && crude != FACING_E) {
+	if (Coord_X(TacticalCoord) + TacLeptonWidth == Cell_To_Lepton(MapCellX+(MapCellWidth*1.25)) && crude != FACING_E) {
 		if (crude == FACING_NE) facing = DIR_N;
 		if (crude == FACING_SE) facing = DIR_S;
 	}
-	if (Coord_Y(TacticalCoord) + TacLeptonHeight == Cell_To_Lepton(MapCellY+MapCellHeight) && crude != FACING_S) {
+	if (Coord_Y(TacticalCoord) + TacLeptonHeight == Cell_To_Lepton(MapCellY+(MapCellHeight*1.25)) && crude != FACING_S) {
 		if (crude == FACING_SE) facing = DIR_E;
 		if (crude == FACING_SW) facing = DIR_W;
 	}
@@ -1220,7 +1224,7 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 	*/
 	int xx = (int)(short)Coord_X(coord) - (short)Cell_To_Lepton(MapCellX);
 	int yy = (int)(short)Coord_Y(coord) - (short)Cell_To_Lepton(MapCellY);
-	bool shifted = Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth), Cell_To_Lepton(MapCellHeight));
+	bool shifted = Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth)*1.25, Cell_To_Lepton(MapCellHeight)*1.25);
 	if (xx < 0) {
 		xx = 0;
 		shifted = true;
@@ -3500,7 +3504,7 @@ void DisplayClass::Mouse_Right_Press(void)
 		PendingObjectPtr = 0;
 		PendingObject = 0;
 		PendingHouse = HOUSE_NONE;
-		Set_Cursor_Shape(0);
+		//Set_Cursor_Shape(0);
 	} else {
 		if (IsRepairMode) {
 			IsRepairMode = false;
@@ -4255,7 +4259,7 @@ void DisplayClass::Set_Tactical_Position(COORDINATE coord)
 	int yy = (int)Coord_Y(coord) - (int)Cell_To_Lepton(MapCellY);
 
 //	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) + GlyphXClientSidebarWidthInLeptons, Cell_To_Lepton(MapCellHeight));		// Needed to accomodate Glyphx client sidebar. ST - 4/12/2019 5:29PM
-	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth), Cell_To_Lepton(MapCellHeight));
+	//Confine_Rect(&xx, &yy, 0, 0, Cell_To_Lepton(MapCellWidth*2), Cell_To_Lepton(MapCellHeight*2));
 	coord = XY_Coord(xx + Cell_To_Lepton(MapCellX), yy + Cell_To_Lepton(MapCellY));
 
 	if (ScenarioInit) {
