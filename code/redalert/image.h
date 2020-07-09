@@ -15,6 +15,10 @@ struct Image_t {
 	Image_t();
 	~Image_t();
 
+	unsigned int GetImageForHouse(int houseId, int shapeId, int frame = 0) {
+		return HouseImages[houseId].image[shapeId][frame];
+	}
+
 	char name[512];
 	int64_t namehash;
 	HouseImage_t HouseImages[MAX_HOUSE_COLORS];
