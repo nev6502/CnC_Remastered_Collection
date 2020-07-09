@@ -4,6 +4,8 @@
 #include "function.h"
 #include "image.h"
 
+bool Debug_LockScroll = false;
+
 void SidebarEditor::init() {
 	metalplt = LoadEditorImage("metalplt.shp");
 
@@ -36,10 +38,12 @@ void SidebarEditor::draw_it(void) {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
 
+	Debug_LockScroll = false;
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			Debug_LockScroll = true;
 			if (ImGui::MenuItem("New Scenario")) { mainmenu_selection = 0; }
 			if (ImGui::MenuItem("Load Scenario")) { mainmenu_selection = 1; }
 			if (ImGui::MenuItem("Save Scenario")) { mainmenu_selection = 2; }
@@ -48,6 +52,7 @@ void SidebarEditor::draw_it(void) {
 		}
 		if (ImGui::BeginMenu("Map"))
 		{
+			Debug_LockScroll = true;
 			if (ImGui::MenuItem("Size Map")) { mainmenu_selection = 3; }
 			if (ImGui::MenuItem("Scenario Options")) { mainmenu_selection = 5; }
 			if (ImGui::MenuItem("AI Options")) { mainmenu_selection = 6; }
@@ -55,12 +60,14 @@ void SidebarEditor::draw_it(void) {
 		}
 		if (ImGui::BeginMenu("Objects"))
 		{
+			Debug_LockScroll = true;
 			if (ImGui::MenuItem("Add Game Object")) { mainmenu_selection = 4; }
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Run"))
 		{
+			Debug_LockScroll = true;
 			if (ImGui::MenuItem("Play Scenario")) { mainmenu_selection = 7; }
 			ImGui::EndMenu();
 		}

@@ -109,7 +109,11 @@ void ScrollClass::AI(KeyNumType &input, int x, int y)
 			int screen_width = SeenBuff.Get_Width();
 			int screen_height = SeenBuff.Get_Height();
 
-			bool at_screen_edge = (y == 0 || x == 0 || x >= screen_width - 1 || y >= screen_height - 1);
+			bool at_screen_edge = false;
+			
+			if (!Debug_Map || !Debug_LockScroll) {
+				at_screen_edge = (y == 0 || x == 0 || x >= screen_width - 1 || y >= screen_height - 1);
+			}			
 
 			/*
 			**	Verify that the mouse is over a scroll region.
