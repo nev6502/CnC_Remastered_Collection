@@ -346,6 +346,8 @@ void Main_Game(int argc, char * argv[])
 				if (Map_Edit_Loop()) {
 					break;
 				}
+
+				Imgui_Dialog_Function = NULL;
 			}
 		}
 #else

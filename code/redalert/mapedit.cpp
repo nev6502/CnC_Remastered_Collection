@@ -137,6 +137,8 @@ void MapEditClass::One_Time(void)
 {
 	MouseClass::One_Time();
 
+	editorSidebar.init();
+
 	/*
 	**	The map: a single large "button"
 	*/
@@ -560,45 +562,43 @@ void MapEditClass::AI(KeyNumType & input, int x, int y)
 		}
 	}
 
+	if (editorSidebar.mainmenu_selection != -1) {
+		/*
+		**	Turn off placement mode
+		*/
+		if (PendingObject) {
+			if (BaseBuilding) {
+				Cancel_Base_Building();
+			}
+			else {
+				Cancel_Placement();
+			}
+		}
+
+		/*
+		**	Turn off trigger placement mode
+		*/
+		if (CurTrigger) {
+			Stop_Trigger_Placement();
+		}
+
+		/*
+		**	Unselect object & hide popup controls
+		*/
+		if (CurrentObject.Count()) {
+			CurrentObject[0]->Unselect();
+			Popup_Controls();
+		}
+		Main_Menu();
+		input = KN_NONE;
+		editorSidebar.mainmenu_selection = -1;
+	}
+
 	/*
 	**	Trap special editing keys; if one is detected, set 'input' to 0 to
 	**	prevent a conflict with parent's AI().
 	*/
 	switch (input) {
-		/*
-		** F2/RMOUSE = pop up main menu
-		*/
-		case KN_RMOUSE:
-
-			/*
-			**	Turn off placement mode
-			*/
-			if (PendingObject) {
-				if (BaseBuilding) {
-					Cancel_Base_Building();
-				} else {
-					Cancel_Placement();
-				}
-			}
-
-			/*
-			**	Turn off trigger placement mode
-			*/
-			if (CurTrigger) {
-				Stop_Trigger_Placement();
-			}
-
-			/*
-			**	Unselect object & hide popup controls
-			*/
-			if (CurrentObject.Count()) {
-				CurrentObject[0]->Unselect();
-				Popup_Controls();
-			}
-			Main_Menu();
-			input = KN_NONE;
-			break;
-
 		/*
 		**	F6 = toggle passable/impassable display
 		*/
@@ -1384,6 +1384,9 @@ void MapEditClass::Draw_It(bool forced)
 		return;
 	}
 
+	editorSidebar.draw_it();
+
+
 	/*
 	**	Display the total value of all Tiberium on the map.
 	*/
@@ -1501,46 +1504,6 @@ bool MapEditClass::Mouse_Moved(void)
 	return(retcode);
 }
 
-int mainmenu_selection = -1;
-int mainmenu_x = -1;
-int mainmenu_y = -1;
-
-void Imgui_MapEdit_MainMenu(void) {
-	bool toolActive = false;
-
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.FramePadding = ImVec2(0, 0);
-	ImGui::SetNextWindowSize(ImVec2(150, 200));
-	ImGui::SetNextWindowPos(ImVec2(mainmenu_x, mainmenu_y));
-	ImGui::Begin("MainMenu", &toolActive, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar);
-		if (ImGui::Button("New Scenario")) {
-			mainmenu_selection = 0;
-		}
-		if(ImGui::Button("Load Scenario")) {
-			mainmenu_selection = 1;
-		}
-		if (ImGui::Button("Save Scenario")) {
-			mainmenu_selection = 2;
-		}
-		if (ImGui::Button("Size Map")) {
-			mainmenu_selection = 3;
-		}
-		if (ImGui::Button("Add Game Object")) {
-			mainmenu_selection = 4;
-		}
-		if (ImGui::Button("Scenario Options")) {
-			mainmenu_selection = 5;
-		}
-		if (ImGui::Button("AI Options")) {
-			mainmenu_selection = 6;
-		}
-		if (ImGui::Button("Play Scenario")) {
-			mainmenu_selection = 7;
-		}
-	ImGui::End();
-}
-
-
 /***************************************************************************
  * MapEditClass::Main_Menu -- main menu processor for map editor           *
  *                                                                         *
@@ -1562,17 +1525,12 @@ void MapEditClass::Main_Menu(void)
 	bool process;						// menu stays up while true
 	int rc;
 
-	Imgui_Dialog_Function = Imgui_MapEdit_MainMenu;
-	mainmenu_selection = -1;
-	mainmenu_x = UserInput.Mouse.X;
-	mainmenu_y = UserInput.Mouse.Y;
-
 	/*
 	**	Main Menu loop
 	*/
 	Override_Mouse_Shape(MOUSE_NORMAL);	// display default mouse cursor
 	process = true;
-	while (process) {
+	{
 
 		/*
 		**	Invoke game callback, to update music
@@ -1583,7 +1541,7 @@ void MapEditClass::Main_Menu(void)
 		**	Invoke menu
 		*/
 		Hide_Mouse();		// Do_Menu assumes the mouse is already hidden
-		selection = mainmenu_selection;
+		selection = editorSidebar.mainmenu_selection;
 
 		g_globalKeyNumType = KN_NONE;
 		g_globalKeyFlags = 0;
@@ -1592,16 +1550,6 @@ void MapEditClass::Main_Menu(void)
 		Device_Present();
 
 		Show_Mouse();
-
-		if (UnknownKey==KN_ESC || g_globalKeyNumType == KN_RMOUSE) {
-// jmarshall - consume the RMOUSE DOWN so it doesn't bring up the context menu again.
-			Buttons->Input();
-// jmarshall end
-			break;
-		}
-
-		if (selection == -1)
-			continue;
 
 		/*
 		**	Process selection
@@ -1732,12 +1680,7 @@ void MapEditClass::Main_Menu(void)
 				Start_Scenario(Scen.ScenarioName);
 				return;
 		}
-
-		mainmenu_selection = selection = -1;
-		break;
 	}
-
-	Imgui_Dialog_Function = nullptr;
 
 	/*
 	**	Restore the display:

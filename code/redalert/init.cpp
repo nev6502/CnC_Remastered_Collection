@@ -3052,6 +3052,10 @@ static void Init_Bootstrap_Mixfiles(void)
 	bool ok = MFCD::Cache("LOCAL.MIX");
 	assert(ok);
 
+	new MFCD("edhi.mix", &FastKey);
+	ok = MFCD::Cache("edhi.mix");
+	assert(ok);
+
 #if 1
 	new MFCD("HIRES.MIX", &FastKey);
 	ok = MFCD::Cache("HIRES.MIX");
