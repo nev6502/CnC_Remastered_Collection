@@ -71,7 +71,7 @@ void ImGui_Placement_Editor(void) {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
 	ImGui::SetNextWindowSize(ImVec2(480, 220));
-	ImGui::SetNextWindowPos(ImVec2(0, 0));
+	ImGui::SetNextWindowPos(ImVec2((ScreenWidth / 2) - 240, (ScreenHeight / 2) - 110));
 	ImGui::Begin("Place Object", &toolActive, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground*/);
 		ImGui::Columns(3, "outer", true);
 		ImGui::LabelText("Test", "Object Name");
@@ -456,7 +456,7 @@ int MapEditClass::Placement_Dialog(void)
 			Change_Window((int)WINDOW_EDITOR);
 		//	Draw_Box(D_PICTURE_X, D_PICTURE_Y, D_PICTURE_W, D_PICTURE_H, BOXSTYLE_DOWN, false);
 			GL_ForceForegroundRender(true);
-			curobj->Display((WinW/2) + 10, (WinH>>1) + 30, WINDOW_EDITOR, LastHouse);
+			curobj->Display((ScreenWidth / 2) - 160, (ScreenHeight / 2) - 30, WINDOW_EDITOR, LastHouse);
 			GL_ForceForegroundRender(false);
 //			curobj->Display(WinW<<2, WinH>>1, WINDOW_EDITOR, LastHouse);
 			
