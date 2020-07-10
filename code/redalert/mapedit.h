@@ -47,6 +47,7 @@
 
 #include	"function.h"
 #include <vector>
+#include "sidebareditor.h"
 
 /*
 **	This is the maximum # of ObjectTypeClasses the editor has to deal with.
@@ -312,6 +313,8 @@ class MapEditClass : public MouseClass
 		static char HealthBuf[20];
 		GaugeClass *BaseGauge;
 		TextLabelClass *BaseLabel;
+
+		SidebarEditor editorSidebar;
 public:
 		static MissionType MapEditMissions[];
 };
