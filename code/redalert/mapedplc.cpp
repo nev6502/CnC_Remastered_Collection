@@ -1038,12 +1038,16 @@ int MapEditClass::Place_Object(void)
 	**	sub-position closest to the mouse & put him there
 	*/
 	if (PendingObject->What_Am_I() == RTTI_INFANTRYTYPE) {
+		int isoMouseX, isoMouseY;
+		isoMouseX = Get_Mouse_X();
+		isoMouseY = Get_Mouse_Y();
+		CellClass::ConvertIsoCoordsToScreen(isoMouseX, isoMouseY);
 
 		/*
 		**	Find cell sub-position
 		*/
-		if (Is_Spot_Free(Pixel_To_Coord(Get_Mouse_X(), Get_Mouse_Y()))) {
-			obj_coord = Closest_Free_Spot(Pixel_To_Coord(Get_Mouse_X(), Get_Mouse_Y()));
+		if (Is_Spot_Free(Pixel_To_Coord(isoMouseX, isoMouseY))) {
+			obj_coord = Closest_Free_Spot(Pixel_To_Coord(isoMouseX, isoMouseY));
 		} else {
 			obj_coord = NULL;
 		}
