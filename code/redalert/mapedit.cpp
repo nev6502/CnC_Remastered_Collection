@@ -107,6 +107,7 @@ MapEditClass::MapEditClass(void)
 //	ScenVar = SCEN_VAR_A;
 	LastHouse = HOUSE_GOOD;
 	GrabbedObject = 0;
+	GrabbedLight = nullptr;
 	Scen.Waypoint[WAYPT_HOME] = 0;
 	CurrentCell = 0;
 	CurTeam = NULL;
@@ -545,25 +546,33 @@ void MapEditClass::AI(KeyNumType & input, int x, int y)
 
 	rc = Mouse_Moved();
 	if (Keyboard->Down(KN_LMOUSE) && rc) {
-
-		/*
-		**	"Paint" mode: place current object, and restart placement
-		*/
-		if (PendingObject) {
-			Flag_To_Redraw(true);
-			if (Place_Object() == 0) {
-				Changed = 1;
-				Start_Placement();
-			}
-		} else {
-
+		if (GrabbedLight)
+		{
+			GrabbedLight->PlaceLight(Get_Mouse_X(), Get_Mouse_Y());
+			GrabbedLight = nullptr;
+		}
+		else
+		{
 			/*
-			**	Move the currently-grabbed object
+			**	"Paint" mode: place current object, and restart placement
 			*/
-			if (GrabbedObject) {
-				GrabbedObject->Mark(MARK_CHANGE);
-				if (Move_Grabbed_Object() == 0) {
+			if (PendingObject) {
+				Flag_To_Redraw(true);
+				if (Place_Object() == 0) {
 					Changed = 1;
+					Start_Placement();
+				}
+			}
+			else {
+
+				/*
+				**	Move the currently-grabbed object
+				*/
+				if (GrabbedObject) {
+					GrabbedObject->Mark(MARK_CHANGE);
+					if (Move_Grabbed_Object() == 0) {
+						Changed = 1;
+					}
 				}
 			}
 		}
@@ -1466,26 +1475,39 @@ bool MapEditClass::Mouse_Moved(void)
 	const ObjectTypeClass * objtype = NULL;
 	bool retcode = false;
 
-	/*
-	**	Return if no motion
-	*/
-	if (old_mx == Get_Mouse_X() && old_my == Get_Mouse_Y()) {
-		return(false);
+	if (GrabbedLight != NULL)
+	{
+		GL_RenderImage(lightManager.GetLightEditorIcon(), Get_Mouse_X(), Get_Mouse_Y(), 32, 32);
+		old_mx = Get_Mouse_X();
+		old_my = Get_Mouse_Y();
+		old_zonecell = ZoneCell;
+		return true;
 	}
-
-	/*
-	**	Get a ptr to ObjectTypeClass
-	*/
-	if (PendingObject) {
-		objtype = PendingObject;
-	} else {
-		if (GrabbedObject) {
-			objtype = &GrabbedObject->Class_Of();
-		} else {
-			old_mx = Get_Mouse_X();
-			old_my = Get_Mouse_Y();
-			old_zonecell = ZoneCell;
+	else
+	{
+		/*
+		**	Return if no motion
+		*/
+		if (old_mx == Get_Mouse_X() && old_my == Get_Mouse_Y()) {
 			return(false);
+		}
+
+		/*
+		**	Get a ptr to ObjectTypeClass
+		*/
+		if (PendingObject) {
+			objtype = PendingObject;
+		}
+		else {
+			if (GrabbedObject) {
+				objtype = &GrabbedObject->Class_Of();
+			}
+			else {
+				old_mx = Get_Mouse_X();
+				old_my = Get_Mouse_Y();
+				old_zonecell = ZoneCell;
+				return(false);
+			}
 		}
 	}
 
@@ -1657,6 +1679,11 @@ void MapEditClass::Main_Menu(void)
 			case 6:
 				AI_Menu();
 				process = false;
+				break;
+
+			case 8:
+				GrabbedLight = lightManager.PlaceLight(NULL, 0, 0, 1.0f, 1.0f, 1.0f, 100, LIGHT_POINT);
+				GrabbedLight->isPending = true;
 				break;
 
 			/*

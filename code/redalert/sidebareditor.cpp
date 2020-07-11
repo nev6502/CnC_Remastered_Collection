@@ -57,11 +57,19 @@ void SidebarEditor::draw_it(void) {
 			if (ImGui::MenuItem("Scenario Options")) { mainmenu_selection = 5; }
 			if (ImGui::MenuItem("AI Options")) { mainmenu_selection = 6; }
 			ImGui::EndMenu();
-		}
+		}		
+
 		if (ImGui::BeginMenu("Objects"))
 		{
 			Debug_LockScroll = true;
 			if (ImGui::MenuItem("Add Game Object")) { mainmenu_selection = 4; }
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Lights"))
+		{
+			Debug_LockScroll = true;
+			if (ImGui::MenuItem("Add Light")) { mainmenu_selection = 8; }
 			ImGui::EndMenu();
 		}
 

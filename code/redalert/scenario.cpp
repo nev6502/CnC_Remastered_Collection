@@ -820,6 +820,8 @@ void Clear_Scenario(void)
 {
 // TCTCTC -- possibly just use in-place new of scenario object?
 
+	lightManager.FreeAllLights();
+
 	Scen.MissionTimer = 0;
 	Scen.MissionTimer.Stop();
 	Scen.Timer = 0;
@@ -2289,6 +2291,8 @@ bool Read_Scenario_INI(char * fname, bool )
 	Scen.IsMoneyTiberium = ini.Get_Bool(BASIC, "FillSilos", Scen.IsMoneyTiberium);
 	Scen.Percent = ini.Get_Int(BASIC, "Percent", Scen.Percent);
 
+	lightManager.Read_Scenerio_Lights(&ini);
+
 	/*
 	**	Read in the specific information for each of the house types.  This creates
 	**	the houses of different types.
@@ -2659,6 +2663,7 @@ void Write_Scenario_INI(char * fname)
 	ini.Put_Bool(BASIC, "TruckCrate", Scen.IsTruckCrate);
 	ini.Put_Int(BASIC, "Percent", Scen.Percent);
 
+	lightManager.Write_Scenerio_Lights(&ini);
 	HouseClass::Write_INI(ini);
 	TeamTypeClass::Write_INI(ini);
 	TriggerTypeClass::Write_INI(ini);

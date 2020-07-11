@@ -2230,6 +2230,8 @@ ObjectClass * DisplayClass::Cell_Object(CELL cell, int x, int y) const
 			HidPage.Unlock();
 		}
 
+		lightManager.RenderLights();
+
 #ifndef WIN32
 		/*
 		**	Once the icons are drawn, duplicate the bottom line of the screen into the phantom

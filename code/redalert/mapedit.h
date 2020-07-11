@@ -49,6 +49,8 @@
 #include <vector>
 #include "sidebareditor.h"
 
+class Light_t;
+
 /*
 **	This is the maximum # of ObjectTypeClasses the editor has to deal with.
 */
@@ -269,6 +271,8 @@ class MapEditClass : public MouseClass
 		*/
 		//int LastChoice;						// index of item user picked last
 		HousesType LastHouse;				// house of last item picked
+
+		Light_t *GrabbedLight;
 
 		/*
 		**	Variables for grabbing/moving objects

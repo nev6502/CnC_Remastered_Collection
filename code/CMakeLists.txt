@@ -631,7 +631,7 @@ set(src_redalert
 	./redalert/mapscript.cpp
 	./redalert/txtprnt.cpp
 	./redalert/tilesetxml.cpp
- "redalert/sidebareditor.cpp")
+ "redalert/sidebareditor.cpp" "redalert/light.cpp")
 
 set(src_external
 	#glew
@@ -731,7 +731,7 @@ if (UNIX)
 add_definitions(-D RA_AF -DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DTRUE_FALSE_DEFINED -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 endif(UNIX)
 
-add_executable(RedAlert ${src_io} ${src_win32lib} ${src_redalert} ${src_external})
+add_executable(RedAlert ${src_io} ${src_win32lib} ${src_redalert} ${src_external} "redalert/light.cpp")
 
 if (MSVC)
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../" )

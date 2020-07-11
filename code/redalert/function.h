@@ -234,6 +234,7 @@ struct NoInitClass {
 #include	"crcstraw.h"
 #include	"shastraw.h"
 #include	"rndstraw.h"
+#include    "light.h"
 
 // Should be part of WWLIB.H. This is used in JSHELL.CPP.
 typedef struct {

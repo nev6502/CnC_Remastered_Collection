@@ -859,6 +859,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 	io.Fonts->AddFontFromFileTTF("fonts/Arial.ttf", 16.0f);
 
 	ImGui_NewFrame();
+
+	lightManager.Init();
 }
 
 
