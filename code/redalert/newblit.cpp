@@ -19,7 +19,7 @@ static void GL_SetRenderTextureCallback(const ImDrawList* parent_list, const ImD
 	}
 	else {
 		renderTexture->MakeCurrent();
-		glClearColor(0.5, 0.5, 0.5, 1.0);
+		glClearColor(0.45, 0.45, 0.45, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 }
@@ -31,9 +31,13 @@ static void GL_EnableBlendCallback(const ImDrawList* parent_list, const ImDrawCm
 		glBlendEquation(GL_FUNC_ADD);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
-	else {
+	else if(blendType == GL_BLEND_ADD) {
 		glBlendEquation(GL_ADD);
 		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+	}
+	else {
+		glBlendEquation(GL_MULT);
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
 	}
 }
 

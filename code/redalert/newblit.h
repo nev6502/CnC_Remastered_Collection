@@ -6,7 +6,8 @@ class RenderTexture;
 
 enum GLBlendType {
 	GL_BLEND_NONE = 0,
-	GL_BLEND_MULT
+	GL_BLEND_MULT,
+	GL_BLEND_ADD
 };
 
 void GL_RenderImage(Image_t* image, int x, int y, int width, int height, int colorRemap = 0, int shapeId = 0);

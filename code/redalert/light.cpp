@@ -68,7 +68,7 @@ void LightManager::RenderLights(void) {
 
 	GL_SetRenderTexture(NULL);
 
-	GL_EnableBlend(GL_BLEND_MULT);
+	GL_EnableBlend(GL_BLEND_ADD);
 		GL_RenderImage(hdrLightBufferTexture, 0, 0, ScreenWidth, ScreenHeight);
 	GL_EnableBlend(GL_BLEND_NONE);
 }
