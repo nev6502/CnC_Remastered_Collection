@@ -30,9 +30,29 @@ LightManager::LightManager() {
 void LightManager::Init(void) {
 	lightEditorIcon = Image_LoadImage("ui/edwin/lightbulb.png");
 	pointLightAttenImage0 = Image_LoadImage("ui/lights/light_point_atten.png");
+
+	hdrLightBufferTexture = Image_CreateBlankImage("hdrRenderTexture", ScreenWidth, ScreenHeight);
+	hdrRenderTexture = new RenderTexture(hdrLightBufferTexture, NULL);
+	hdrRenderTexture->InitRenderTexture();
 }
 
 void LightManager::RenderLights(void) {
+	if(Debug_Map) {
+		for (int i = 0; i < MAX_WORLD_LIGHTS; i++) {
+			if (!lights[i].active) {
+				continue;
+			}
+
+			if (!lights[i].isPending) {
+				int screenx, screeny;
+				lights[i].GetRenderPosition(screenx, screeny);
+				GL_RenderImage(lightEditorIcon, screenx, screeny, 30, 30);
+			}
+		}
+	}
+
+	GL_SetRenderTexture(hdrRenderTexture);
+
 	for (int i = 0; i < MAX_WORLD_LIGHTS; i++) {
 		if (!lights[i].active) {
 			continue;
@@ -41,9 +61,16 @@ void LightManager::RenderLights(void) {
 		if (!lights[i].isPending) {
 			int screenx, screeny;
 			lights[i].GetRenderPosition(screenx, screeny);
-			GL_RenderImage(lightEditorIcon, screenx, screeny, 30, 30);
+			int halfRadius = lights[i].radius / 2;
+			GL_RenderImage(pointLightAttenImage0, screenx - halfRadius, ScreenHeight - (screeny + halfRadius), lights[i].radius, lights[i].radius);
 		}
 	}
+
+	GL_SetRenderTexture(NULL);
+
+	GL_EnableBlend(GL_BLEND_MULT);
+		GL_RenderImage(hdrLightBufferTexture, 0, 0, ScreenWidth, ScreenHeight);
+	GL_EnableBlend(GL_BLEND_NONE);
 }
 
 void LightManager::FreeAllLights(void) {
@@ -76,12 +103,12 @@ Light_t *LightManager::PlaceLight(char *name, int x, int y, float r, float g, fl
 	else {
 		strcpy(light->name, name);
 	}
+	light->position = XYP_Coord(x, y);
 	light->color.x = r;
 	light->color.y = g;
 	light->color.z = b;
 	light->radius = radius;
-	light->type = type;
-	light->PlaceLight(x, y);
+	light->type = type;	
 
 	return light;
 }

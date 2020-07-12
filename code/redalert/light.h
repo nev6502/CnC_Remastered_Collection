@@ -5,6 +5,7 @@
 #include "vectormath.h"
 
 class CCINIClass;
+class RenderTexture;
 struct Image_t;
 
 #define MAX_WORLD_LIGHTS			6556
@@ -55,6 +56,9 @@ private:
 	int							numLights;
 	Image_t*					lightEditorIcon;
 	Image_t*					pointLightAttenImage0;
+
+	Image_t*					hdrLightBufferTexture;
+	RenderTexture*				hdrRenderTexture;
 };
 
 extern LightManager lightManager;

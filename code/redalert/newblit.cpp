@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include "FUNCTION.H"
 #include "Image.h"
+#include "gl/glew.h"
 
 extern byte backbuffer_palette[768];
 extern uint8_t g_ColorXlat[16];
@@ -11,9 +12,38 @@ extern uint8_t g_ColorXlat[16];
 bool forceForgegroundRender = false;
 int32_t g_currentColor;
 
-//void GL_SetRenderTarget(void *renderTarget) {
-//	//ImGui::GetBackgroundDrawList()->AddCallback()
-//}
+static void GL_SetRenderTextureCallback(const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+	RenderTexture* renderTexture = (RenderTexture*)cmd->UserCallbackData;
+	if(renderTexture == NULL) {
+		RenderTexture::BindNull();
+	}
+	else {
+		renderTexture->MakeCurrent();
+		glClearColor(0.5, 0.5, 0.5, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+}
+
+static void GL_EnableBlendCallback(const ImDrawList* parent_list, const ImDrawCmd* cmd) {
+	GLBlendType blendType = (GLBlendType)(int64_t)cmd->UserCallbackData;
+	glEnable(GL_BLEND);
+	if(blendType == GL_BLEND_NONE) {		
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	else {
+		glBlendEquation(GL_ADD);
+		glBlendFunc(GL_DST_COLOR, GL_SRC_COLOR);
+	}
+}
+
+void GL_EnableBlend(GLBlendType blendType) {
+	ImGui::GetBackgroundDrawList()->AddCallback(GL_EnableBlendCallback, (void *)blendType);
+}
+
+void GL_SetRenderTexture(RenderTexture *renderTexture) {
+	ImGui::GetBackgroundDrawList()->AddCallback(GL_SetRenderTextureCallback, renderTexture);
+}
 
 void GL_ForceForegroundRender(bool force) {
 	forceForgegroundRender = force;

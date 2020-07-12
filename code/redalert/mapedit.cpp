@@ -1682,7 +1682,7 @@ void MapEditClass::Main_Menu(void)
 				break;
 
 			case 8:
-				GrabbedLight = lightManager.PlaceLight(NULL, 0, 0, 1.0f, 1.0f, 1.0f, 100, LIGHT_POINT);
+				GrabbedLight = lightManager.PlaceLight(NULL, 0, 0, 1.0f, 1.0f, 1.0f, 75, LIGHT_POINT);
 				GrabbedLight->isPending = true;
 				break;
 
