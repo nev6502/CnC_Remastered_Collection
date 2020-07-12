@@ -3088,10 +3088,13 @@ bool TechnoClass::Electric_Zap(COORDINATE target_coord, int which, WindowNumberT
 				// Electric zap coordinates are always tactical, so don't use the partial window if passed - SKY
 				x += _xadd[facing][lastfacing];
 				y += _yadd[facing][lastfacing];
+				int xx = x;
+				int yy = y;
+				CellClass::ConvertCoordsToIsometric(xx, yy);
 				if (remap != NULL) {
-					CC_Draw_Shape(this, "LITNING", LightningShapes, _shape[facing]+(shots ? 4 : 0), x, y, (window != WINDOW_PARTIAL) ? window : WINDOW_TACTICAL, SHAPE_FADING|SHAPE_CENTER|SHAPE_WIN_REL, remap);
+					CC_Draw_Shape(this, "LITNING", LightningShapes, _shape[facing]+(shots ? 4 : 0), xx, yy, (window != WINDOW_PARTIAL) ? window : WINDOW_TACTICAL, SHAPE_FADING|SHAPE_CENTER|SHAPE_WIN_REL, remap);
 				} else {
-					CC_Draw_Shape(this, "LITNING", LightningShapes, _shape[facing]+(shots ? 4 : 0), x, y, (window != WINDOW_PARTIAL) ? window : WINDOW_TACTICAL, SHAPE_CENTER|SHAPE_WIN_REL);
+					CC_Draw_Shape(this, "LITNING", LightningShapes, _shape[facing]+(shots ? 4 : 0), xx, yy, (window != WINDOW_PARTIAL) ? window : WINDOW_TACTICAL, SHAPE_CENTER|SHAPE_WIN_REL);
 				}
 				lastfacing = facing;
 			}
