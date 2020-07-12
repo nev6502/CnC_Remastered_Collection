@@ -11,6 +11,10 @@ extern uint8_t g_ColorXlat[16];
 bool forceForgegroundRender = false;
 int32_t g_currentColor;
 
+//void GL_SetRenderTarget(void *renderTarget) {
+//	//ImGui::GetBackgroundDrawList()->AddCallback()
+//}
+
 void GL_ForceForegroundRender(bool force) {
 	forceForgegroundRender = force;
 }

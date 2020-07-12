@@ -29,15 +29,16 @@ LightManager::LightManager() {
 
 void LightManager::Init(void) {
 	lightEditorIcon = Image_LoadImage("ui/edwin/lightbulb.png");
+	pointLightAttenImage0 = Image_LoadImage("ui/lights/light_point_atten.png");
 }
 
 void LightManager::RenderLights(void) {
-	for(int i = 0; i < MAX_WORLD_LIGHTS; i++) {
+	for (int i = 0; i < MAX_WORLD_LIGHTS; i++) {
 		if (!lights[i].active) {
 			continue;
 		}
 
-		if(!lights[i].isPending) {
+		if (!lights[i].isPending) {
 			int screenx, screeny;
 			lights[i].GetRenderPosition(screenx, screeny);
 			GL_RenderImage(lightEditorIcon, screenx, screeny, 30, 30);
@@ -75,12 +76,12 @@ Light_t *LightManager::PlaceLight(char *name, int x, int y, float r, float g, fl
 	else {
 		strcpy(light->name, name);
 	}
-	light->position = XYP_Coord(x, y);
 	light->color.x = r;
 	light->color.y = g;
 	light->color.z = b;
 	light->radius = radius;
 	light->type = type;
+	light->PlaceLight(x, y);
 
 	return light;
 }

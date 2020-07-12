@@ -631,7 +631,10 @@ set(src_redalert
 	./redalert/mapscript.cpp
 	./redalert/txtprnt.cpp
 	./redalert/tilesetxml.cpp
- "redalert/sidebareditor.cpp" "redalert/light.cpp")
+ 	"redalert/sidebareditor.cpp" 
+	"redalert/rendertexture.cpp"
+	"redalert/rendertexture.h"
+	"redalert/light.cpp")
 
 set(src_external
 	#glew

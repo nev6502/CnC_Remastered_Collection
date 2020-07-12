@@ -54,6 +54,7 @@ private:
 	Light_t						lights[MAX_WORLD_LIGHTS];
 	int							numLights;
 	Image_t*					lightEditorIcon;
+	Image_t*					pointLightAttenImage0;
 };
 
 extern LightManager lightManager;
