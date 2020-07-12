@@ -1191,7 +1191,10 @@ void CellClass::Draw_It(int x, int y, bool objects)
 			**	Redraw any smudge.
 			*/
 			if (Smudge != SMUDGE_NONE) {
-				SmudgeTypeClass::As_Reference(Smudge).Draw_It(x, y, SmudgeData);
+				int xx = x;
+				int yy = y;
+				ConvertCoordsToIsometric(xx, yy);
+				SmudgeTypeClass::As_Reference(Smudge).Draw_It(xx, yy, SmudgeData);
 			}
 
 			/*
