@@ -235,6 +235,49 @@ static TemplateTypeClass const Clear(
 	"CLEAR01",
 	TXT_CLEAR
 );
+static TemplateTypeClass const ClearA(
+	TEMPLATE_CLEAR1A,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01A",
+	TXT_CLEAR
+);
+static TemplateTypeClass const ClearB(
+	TEMPLATE_CLEAR1B,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01B",
+	TXT_CLEAR
+);
+static TemplateTypeClass const ClearC(
+	TEMPLATE_CLEAR1C,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01C",
+	TXT_CLEAR
+);
+static TemplateTypeClass const ClearD(
+	TEMPLATE_CLEAR1D,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01D",
+	TXT_CLEAR
+);
+static TemplateTypeClass const ClearE(
+	TEMPLATE_CLEAR1E,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01E",
+	TXT_CLEAR
+);
+static TemplateTypeClass const ClearF(
+	TEMPLATE_CLEAR1F,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01F",
+	TXT_CLEAR
+);
+static TemplateTypeClass const ClearG(
+	TEMPLATE_CLEAR1G,
+	THEATERF_TEMPERATE | THEATERF_SNOW | THEATERF_INTERIOR,
+	"CLEAR01G",
+	TXT_CLEAR
+);
+
 static TemplateTypeClass const Road01(
 	TEMPLATE_ROAD01,
 	THEATERF_TEMPERATE|THEATERF_SNOW,
@@ -2126,6 +2169,13 @@ void TemplateTypeClass::Init_Heap(void)
 	**	allocation block index serves double duty as the type number index.
 	*/
 	(void)new TemplateTypeClass(Clear);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearA);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearB);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearC);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearD);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearE);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearF);				// TEMPLATE_CLEAR1
+	(void)new TemplateTypeClass(ClearG);				// TEMPLATE_CLEAR1
 	(void)new TemplateTypeClass(Water);				// TEMPLATE_WATER
 	(void)new TemplateTypeClass(Water2);			// TEMPLATE_WATER2
 	(void)new TemplateTypeClass(PRoad01);

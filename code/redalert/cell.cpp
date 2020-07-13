@@ -1119,7 +1119,10 @@ void CellClass::Draw_It(int x, int y, bool objects)
 			ttype = &TemplateTypeClass::As_Reference(TType);
 			icon = TIcon;
 		} else {
-			ttype = &TemplateTypeClass::As_Reference(TEMPLATE_CLEAR1);
+// jmarshall - alternate between the clear tiles if no tile set.
+			int offset = ((celly % 2) == 1) ? 1 : 0;
+			ttype = &TemplateTypeClass::As_Reference((TemplateType)(TEMPLATE_CLEAR1 + ((cellx + offset) % TEMPLATE_CLEAR1F)));
+// jmarshall end
 			icon = Clear_Icon();
 		}
 
@@ -1168,11 +1171,12 @@ void CellClass::Draw_It(int x, int y, bool objects)
 				ConvertCoordsToIsometric(xx, yy);
 				lastRenderX = xx;
 				lastRenderY = yy;
+				int ticon = icon;
 				LogicPage->Draw_Stamp(ttype->Get_HDImage_Data(), icon, xx, yy, NULL, WINDOW_TACTICAL);
 // jmarshall end
-				if (remap) {
-					LogicPage->Remap(x+Map.TacPixelX, y+Map.TacPixelY, ICON_PIXEL_W, ICON_PIXEL_H, remap);
-				}
+				//if (remap) {
+				//	LogicPage->Remap(x+Map.TacPixelX, y+Map.TacPixelY, ICON_PIXEL_W, ICON_PIXEL_H, remap);
+				//}
 			}
 
 	#ifdef SCENARIO_EDITOR

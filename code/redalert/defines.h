@@ -1744,6 +1744,13 @@ typedef enum AircraftType : char {
 */
 typedef enum TemplateType : unsigned short {
 	TEMPLATE_CLEAR1,
+	TEMPLATE_CLEAR1A,
+	TEMPLATE_CLEAR1B,
+	TEMPLATE_CLEAR1C,
+	TEMPLATE_CLEAR1D,
+	TEMPLATE_CLEAR1E,
+	TEMPLATE_CLEAR1F,
+	TEMPLATE_CLEAR1G,
 	TEMPLATE_WATER,			// This must be the first non-clear template.
 	TEMPLATE_WATER2,
 	TEMPLATE_PROAD01,
