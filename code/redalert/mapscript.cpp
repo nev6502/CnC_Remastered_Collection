@@ -5431,8 +5431,19 @@ static int Script_CreateVehicle(lua_State* L) {
 
     int objectIndex = lua_tointeger(L, 1);
     int houseType = lua_tointeger(L, 2);
-    int in_x = lua_tointeger(L, 3);
-    int in_y = lua_tointeger(L, 4);
+	int in_x = 0;
+	int in_y = 0;
+
+	COORDINATE coord;
+	if (lua_gettop(L) == 3) {
+		CELL cell = lua_tointeger(L, 3);
+		coord = Cell_Coord(cell);
+	}
+	else {
+		in_x = lua_tointeger(L, 3);
+		in_y = lua_tointeger(L, 4);
+		coord = Cell_Coord(XY_Cell(in_x, in_y));
+	}
 
     HouseClass* this_house = Houses.Ptr(houseType);
 
@@ -5444,7 +5455,7 @@ static int Script_CreateVehicle(lua_State* L) {
 
             bool new_unit_placed = false;
 
-            if (new_unit->Unlimbo(Cell_Coord(XY_Cell(in_x, in_y)))) {
+            if (new_unit->Unlimbo(coord)) {
 
                 new_unit_placed = true;
             }
@@ -5454,7 +5465,7 @@ static int Script_CreateVehicle(lua_State* L) {
             **	placement at the given location.
             */
             if (!new_unit_placed) {
-                CELL cell = Map.Nearby_Location(Cell_Coord(XY_Cell(in_x, in_y)), new_unit->Class->Speed);
+                CELL cell = Map.Nearby_Location(coord, new_unit->Class->Speed);
                 if (new_unit->Unlimbo(::Cell_Coord(cell))) {
                     new_unit_placed = true;
                 }
@@ -5508,8 +5519,19 @@ static int Script_CreateInfantry(lua_State* L) {
 
     int objectIndex = lua_tointeger(L, 1);
     int houseType = lua_tointeger(L, 2);
-    int in_x = lua_tointeger(L, 3);
-    int in_y = lua_tointeger(L, 4);
+    int in_x = 0;
+    int in_y = 0;
+    
+    COORDINATE coord;
+	if (lua_gettop(L) == 3) {
+        CELL cell = lua_tointeger(L, 3);
+        coord = Cell_Coord(cell);
+	}
+    else {
+        in_x = lua_tointeger(L, 3);
+        in_y = lua_tointeger(L, 4);
+        coord = Cell_Coord(XY_Cell(in_x, in_y));
+    }
 
     HouseClass* this_house = Houses.Ptr(houseType);
 
@@ -5521,7 +5543,7 @@ static int Script_CreateInfantry(lua_State* L) {
 
             bool new_unit_placed = false;
 
-            if (new_unit->Unlimbo(Cell_Coord(XY_Cell(in_x, in_y)), DIR_S)) {
+            if (new_unit->Unlimbo(coord, DIR_S)) {
 
                 new_unit_placed = true;
             }
@@ -5531,7 +5553,7 @@ static int Script_CreateInfantry(lua_State* L) {
             **	placement at the given location.
             */
             if (!new_unit_placed) {
-                CELL cell = Map.Nearby_Location(Cell_Coord(XY_Cell(in_x, in_y)), new_unit->Class->Speed);
+                CELL cell = Map.Nearby_Location(coord, new_unit->Class->Speed);
                 if (new_unit->Unlimbo(::Cell_Coord(cell), DIR_S)) {
                     new_unit_placed = true;
                 }

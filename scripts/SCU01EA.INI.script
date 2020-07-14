@@ -1,0 +1,31 @@
+require("_Global")
+
+function map_briefing()
+	SetBriefingText("Welcome Comrade General! Here in Alaska we will be begin our glorous conquest!")
+end
+
+function map_start()
+
+end
+
+function map_frame()
+	local numTeslaTanks = 0
+	local numRadarDomes = 0
+
+	numRadarDomes = CountBuildings(BuildingTypes.DOME)
+	if numRadarDomes == 0 then
+		Lose(Houses.USSR)	
+	end
+
+	if numRadarDomes == 2 then
+		Win(Houses.USSR)
+	end
+
+	numTaslaTanks = CountUnits(VehicleTypes.TESLATANK)
+	if numTaslaTanks == 0 then
+		PlaySpeech(11) -- Reinforcements have arrived
+		CreateVehicle(VehicleTypes.TESLATANK,Houses.USSR,5833)
+		CreateVehicle(VehicleTypes.TESLATANK,Houses.USSR,5577)
+		CreateVehicle(VehicleTypes.TESLATANK,Houses.USSR,5706)
+	end
+end
