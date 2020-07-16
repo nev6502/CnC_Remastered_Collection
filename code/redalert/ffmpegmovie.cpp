@@ -252,7 +252,7 @@ idCinematic::ImageForTime
 cinData_t FfmpegMovie::ImageForTime(int milliseconds) {
 	cinData_t	cinData;
 
-	if (milliseconds <= 0)
+	//if (milliseconds <= 0)
 	{
 		milliseconds = Sys_Milliseconds();
 	}
