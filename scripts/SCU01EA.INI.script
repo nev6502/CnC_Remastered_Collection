@@ -27,5 +27,6 @@ function map_frame()
 		CreateVehicle(VehicleTypes.TESLATANK,Houses.USSR,5833)
 		CreateVehicle(VehicleTypes.TESLATANK,Houses.USSR,5577)
 		CreateVehicle(VehicleTypes.TESLATANK,Houses.USSR,5706)
+		CreateVehicle(VehicleTypes._4TNK,Houses.USSR,5831)
 	end
 end
