@@ -2910,10 +2910,10 @@ void Play_Movie(char const * name, ThemeType theme, bool clrscrn, bool immediate
 
 	if (name) {
 		char fullname[_MAX_FNAME+_MAX_EXT];
-		_makepath(fullname, NULL, NULL, name, ".mp4");
+		_makepath(fullname, NULL, NULL, name, "");
 		#ifdef WIN32
 		char palname [_MAX_FNAME+_MAX_EXT];
-		_makepath(palname , NULL, NULL, name, ".mp4");
+		_makepath(palname , NULL, NULL, name, "");
 		#endif	//WIN32
 		#ifdef CHEAT_KEYS
 		//			Mono_Set_Cursor(0, 0);Mono_Printf("[%s]", fullname);

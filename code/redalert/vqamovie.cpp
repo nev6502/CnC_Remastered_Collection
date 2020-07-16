@@ -31,10 +31,13 @@ long  VQA_Open(_VQAHandle *videoHandle, char const* filename)  {
 	int ret;
 	char fullpath[512];
 
-	sprintf(fullpath, "movies/%s", filename);
+	sprintf(fullpath, "movies/%s.mp4", filename);
 	if(!videoHandle->InitFromFile(fullpath, false)) {
 		return -1;
 	}
+
+	sprintf(fullpath, "movies/english/%s.wav", filename);
+	AudMix_PlayMovieAudio(fullpath);
 
 	return (0); 
 }
@@ -58,7 +61,8 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 		// Check for any new SDL events.
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_KEYDOWN) {
-				//delete raw_image_buffer;				
+				//delete raw_image_buffer;		
+				AudMix_StopMovieAudio();
 				return 0;
 			}
 		}
@@ -69,6 +73,7 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 			Image_UploadRaw(cin.image, cin.rawbuffer, false, NULL, false);
 		}
 		if(cin.image == NULL) {
+			AudMix_StopMovieAudio();
 			return 0;
 		}
 
@@ -76,6 +81,8 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 
 		Device_Present();
 	}
+
+	AudMix_StopMovieAudio();
 	
 	return (0); 
 }
