@@ -6,11 +6,13 @@
 #include "AUDIOMIX.H"
 #include <SDL.h>
 #include <ctime>
+#include "image.h"
 
 byte* raw_image_buffer = nullptr;
 int vqa_upscale_hack_width = 0;
 int vqa_upscale_hack_height = 0;
 byte* vqa_output_buffer = nullptr;
+Image_t* vqa_image = nullptr;
 
 byte* VQA_Dropsample(const byte* in, int inwidth, int inheight, int outwidth, int outheight) {
 	int		i, j, k;
@@ -80,9 +82,13 @@ long  VQA_Open(_VQAHandle *videoHandle, char const* filename)  {
 	smk_info_all(videoHandle->smacker_video, &frame, &videoHandle->frame_count, &usf);
 	smk_enable_all(videoHandle->smacker_video, 65536);
 	smk_info_audio(videoHandle->smacker_video, &videoHandle->track_mask, &videoHandle->channels[0], &videoHandle->bitdepth[0], &videoHandle->audio_rate[0]);
-	videoHandle->video_graphics_buffer = &VisiblePage;//new GraphicBufferClass();
 	if (vqa_output_buffer == nullptr)
-		vqa_output_buffer = new byte[ScreenWidth * ScreenHeight * 3];
+		vqa_output_buffer = new byte[ScreenWidth * ScreenHeight];
+
+	if (vqa_image == NULL)
+	{
+		vqa_image = Image_CreateBlankImage("_vqaimage", ScreenWidth, ScreenHeight);
+	}
 
 	//videoHandle->video_graphics_buffer->Init(videoHandle->width, videoHandle->height, NULL, 0, (GBC_Enum)(GBC_VISIBLE | GBC_VIDEOMEM));
 
@@ -125,24 +131,11 @@ long  VQA_Play(_VQAHandle* vqaHandle) {
 
 			shouldSampleAudio = false;
 		}
-		//// Grab the frame from the movie.
-		//VQA_ImageForTime(vqaHandle, Sys_Milliseconds() - vqaHandle->startTime);
-		//
-		////memcpy(raw_image_buffer, vqaHandle->image, vqaHandle->CIN_WIDTH * vqaHandle->CIN_HEIGHT * 4 * 2);
-		//for (int i = 0; i < vqaHandle->CIN_WIDTH * vqaHandle->CIN_HEIGHT; i++) {
-		//	raw_image_buffer[(i * 4) + 0] = vqaHandle->image[(i * 3) + 0];
-		//	raw_image_buffer[(i * 4) + 1] = vqaHandle->image[(i * 3) + 1];
-		//	raw_image_buffer[(i * 4) + 2] = vqaHandle->image[(i * 3) + 2];
-		//}
 
 		raw_image_buffer = smk_get_palette(vqaHandle->smacker_video);
-		Set_DD_Palette(raw_image_buffer, false);
-		vqaHandle->video_graphics_buffer->Lock();
-
 		VQA_Dropsample(smk_get_video(vqaHandle->smacker_video), vqaHandle->width, vqaHandle->height, ScreenWidth, ScreenHeight);
-
-		Buffer_To_Page(0, 0, ScreenWidth, ScreenHeight, vqa_output_buffer, *vqaHandle->video_graphics_buffer);
-		vqaHandle->video_graphics_buffer->Unlock();
+		Image_UploadRaw(vqa_image, vqa_output_buffer, true, raw_image_buffer);
+		GL_RenderImage(vqa_image, 0, 0, ScreenWidth, ScreenHeight);
 
 		Device_Present();
 		

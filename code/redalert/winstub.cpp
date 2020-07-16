@@ -332,9 +332,9 @@ void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t
 		for (int i = 0; i < image->width * image->height; i++) {
 			unsigned char c = data[i];
 			
-			unsigned char r = palette[(c * 3) + 0] << 2;
-			unsigned char g = palette[(c * 3) + 1] << 2;
-			unsigned char b = palette[(c * 3) + 2] << 2;
+			unsigned char r = palette[(c * 3) + 0];
+			unsigned char g = palette[(c * 3) + 1];
+			unsigned char b = palette[(c * 3) + 2];
 
 			image->ScratchBuffer[(i * 4) + 0] = r;
 			image->ScratchBuffer[(i * 4) + 1] = g;

@@ -21,8 +21,6 @@ struct _VQAHandle {
 	_VQAHandle();
 	~_VQAHandle();
 
-	GraphicBufferClass*		video_graphics_buffer;
-
 	unsigned long			width;
 	unsigned long			height;
 	unsigned long			frame_count;
