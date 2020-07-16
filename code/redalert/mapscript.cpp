@@ -312,8 +312,9 @@ static int Script_FireSale(lua_State* L) {
  *                                                                                             *
  *=============================================================================================*/
 static int Script_PlayMovie(lua_State* L) {
-    int ret = lua_tointeger(L, -1);
-    Play_Movie((VQType)ret);
+    //int ret = lua_tointeger(L, -1);
+    const char* movieName = lua_tostring(L, -1);
+    Play_Movie(movieName);
     return 1;
 }
 

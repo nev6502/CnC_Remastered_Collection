@@ -1,6 +1,7 @@
 require("_Global")
 
 function map_briefing()
+	PlayMovie("SOVIET1")
 	SetBriefingText("Welcome Comrade General! Here in Alaska we will be begin our glorous conquest!")
 end
 
