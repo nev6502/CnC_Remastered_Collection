@@ -31,7 +31,7 @@ void LightManager::Init(void) {
 	lightEditorIcon = Image_LoadImage("ui/edwin/lightbulb.png");
 	pointLightAttenImage0 = Image_LoadImage("ui/lights/light_point_atten.png");
 
-	hdrLightBufferTexture = Image_CreateBlankImage("hdrRenderTexture", ScreenWidth, ScreenHeight);
+	hdrLightBufferTexture = Image_CreateBlankImage("hdrRenderTexture", ScreenWidth, ScreenHeight, true);
 	hdrRenderTexture = new RenderTexture(hdrLightBufferTexture, NULL);
 	hdrRenderTexture->InitRenderTexture();
 }

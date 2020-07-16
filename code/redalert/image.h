@@ -54,8 +54,8 @@ Image_t* Find_Image(const char* name);
 void Image_Add8BitImage(Image_t* image, int HouseId, int ShapeID, int Width, int Height, unsigned char* data, unsigned char* remap, unsigned char* palette = NULL);
 bool Image_Add32BitImage(const char* name, Image_t* image, int HouseId, int ShapeID, int frameId);
 
-Image_t* Image_CreateBlankImage(const char* name, int width, int height);
-void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t *palette);
+Image_t* Image_CreateBlankImage(const char* name, int width, int height, bool hasAlpha);
+void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t *palette, bool hasAlpha);
 
 void Sys_SetOverlayImage(Image_t* image);
 

@@ -48,6 +48,7 @@
 #include	"il/ilu.h"
 #include	"image.h"
 #include    "texcache.h"
+#include    "vqamovie.h"
 
 #ifdef WINSOCK_IPX
 #include "WSProto.h"
@@ -284,7 +285,7 @@ static bool Image_loadHDImage(Image_t *image, const char* name, int houseid, int
 	return true;
 }
 
-Image_t* Image_CreateBlankImage(const char* name, int width, int height) {
+Image_t* Image_CreateBlankImage(const char* name, int width, int height, bool hasAlpha) {
 	int64_t hash = generateHashValue(name, strlen(name));
 
 	int image_table_size = loaded_images.size();
@@ -306,7 +307,14 @@ Image_t* Image_CreateBlankImage(const char* name, int width, int height) {
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	if (hasAlpha)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	}
+	else
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	}
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -323,7 +331,7 @@ Image_t* Image_CreateBlankImage(const char* name, int width, int height) {
 	return image;
 }
 
-void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t* palette) {
+void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t* palette, bool hasAlpha) {
 	if (image->ScratchBuffer == NULL && paletteRebuild) {
 		image->ScratchBuffer = new uint8_t[image->width * image->height * 4];
 	}
@@ -344,7 +352,29 @@ void Image_UploadRaw(Image_t* image, uint8_t* data, bool paletteRebuild, uint8_t
 	}
 
 	glBindTexture(GL_TEXTURE_2D, image->HouseImages[0].image[0][0]);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image->width, image->height, GL_RGBA, GL_UNSIGNED_BYTE, image->ScratchBuffer);
+
+	if (hasAlpha)
+	{
+		if (image->ScratchBuffer)
+		{
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image->width, image->height, GL_RGBA, GL_UNSIGNED_BYTE, image->ScratchBuffer);
+		}
+		else
+		{
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image->width, image->height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		}
+	}
+	else
+	{
+		if (image->ScratchBuffer)
+		{
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image->width, image->height, GL_RGB, GL_UNSIGNED_BYTE, image->ScratchBuffer);
+		}
+		else
+		{
+			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image->width, image->height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		}
+	}
 }
 
 Image_t* Image_LoadImage(const char* name, bool loadAnims, bool loadHouseColor) {
@@ -860,6 +890,8 @@ void Create_Main_Window ( HANDLE instance , int command_show , int width , int h
 
 	ImGui_NewFrame();
 
+	VQA_Init();
+
 	lightManager.Init();
 }
 
@@ -1332,4 +1364,23 @@ GraphicBufferClass* Read_PCX_File(char* name, char* palette, void *Buff, long Si
 
 	file_handle.Close();
 	return pic;
+}
+
+/*
+================
+Sys_Milliseconds
+================
+*/
+int Sys_Milliseconds(void) {
+	int sys_curtime;
+	static int sys_timeBase;
+	static bool	initialized = false;
+
+	if (!initialized) {
+		sys_timeBase = timeGetTime();
+		initialized = true;
+	}
+	sys_curtime = timeGetTime() - sys_timeBase;
+
+	return sys_curtime;
 }

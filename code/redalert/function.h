@@ -1197,6 +1197,7 @@ const char* Units_FindHDTexture(const char* shapeFileName, int shapeNum, int fra
 
 struct Image_t;
 void Sys_SetOverlayImage(Image_t* image);
+int Sys_Milliseconds(void);
 
 extern bool g_inMainMenu;
 extern KeyNumType	g_globalKeyNumType;
