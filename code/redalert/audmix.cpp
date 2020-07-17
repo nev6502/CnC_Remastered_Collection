@@ -388,9 +388,9 @@ void On_Sound_Effect(int sound_index, int variation, COORDINATE coord, int house
 // void On_Speech(int speech_index) // MBL 02.06.2020
 void On_Speech(int speech_index, HouseClass* house)
 {
-	if (house == NULL) {
+	//if (house == NULL) {
 		PlayAudio(speechPrecacheAudioTable[speech_index], true);
-	}
+	//}
 
 	// DLLExportClass::On_Speech(PlayerPtr, speech_index); // MBL 02.06.2020
 	//if (house == NULL) {
