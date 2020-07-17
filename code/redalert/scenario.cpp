@@ -64,6 +64,7 @@
 #include "tcpip.h"
 #include "ccdde.h"
 #include "audiomix.h"
+#include "image.h"
 
 extern bool SpawnedFromWChat;
 #endif
@@ -402,26 +403,7 @@ bool Start_Scenario(char * name, bool briefing)
 	*/
 	if (!Debug_SkipBriefing)
 	{
-		char buffer[25];
-		if (Scen.BriefMovie != VQ_NONE) {
-			sprintf(buffer, "%s.VQA", VQName[Scen.BriefMovie]);
-		}
-		if (Session.Type == GAME_NORMAL && (Scen.BriefMovie == VQ_NONE || !CCFileClass(buffer).Is_Available())) {
-			/*
-			** Make sure the mouse is visible before showing the restatement.
-			*/
-			while (Get_Mouse_State()) {
-				Show_Mouse();
-			}
-			Restate_Mission(Scen.ScenarioName, TXT_OK, TXT_NONE);
-		}
-
-		if (briefing) {
-			Hide_Mouse();
-			VisiblePage.Clear();
-			Show_Mouse();
-			Play_Movie(Scen.ActionMovie, Scen.TransitTheme);
-		}
+		RenderBriefing();
 	}	
 
 	if (Scen.TransitTheme == THEME_NONE) {

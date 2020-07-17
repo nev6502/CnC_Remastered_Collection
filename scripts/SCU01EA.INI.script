@@ -2,7 +2,7 @@ require("_Global")
 
 function map_briefing()
 	PlayMovie("SOVIET1")
-	SetBriefingText("Welcome Comrade General! Here in Alaska we will be begin our glorous conquest!")
+	SetBriefingText("Objective 1: Capture the allied communication center.\nObjective 2: Ensure your engineers dont die.\nObjective 3: Ensure your radar domes survive.\n")
 end
 
 function map_start()

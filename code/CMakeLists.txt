@@ -104,7 +104,7 @@ set(src_win32lib
 	./redalert/win32lib/wwstd.h
 	./redalert/win32lib/ww_win.h
 	./redalert/win32lib/_diptabl.cpp
- "redalert/ffmpegmovie.cpp")
+ "redalert/ffmpegmovie.cpp" "redalert/briefing.cpp")
 
 #Red Alert files
 set(src_redalert
@@ -730,7 +730,7 @@ if (UNIX)
 add_definitions(-D RA_AF -DCHEAT_KEYS -DIMGUI_IMPL_OPENGL_LOADER_GLEW -DSCENARIO_EDITOR -DTRUE_FALSE_DEFINED -DENGLISH -D_USRDLL -DREDALERT_EXPORTS)
 endif(UNIX)
 
-add_executable(RedAlert ${src_io} ${src_win32lib} ${src_redalert} ${src_external} "redalert/light.cpp")
+add_executable(RedAlert ${src_io} ${src_win32lib} ${src_redalert} ${src_external} "redalert/light.cpp" "redalert/briefing.cpp")
 
 if (MSVC)
 set_target_properties(RedAlert PROPERTIES OUTPUT_NAME "RedAlert" LINK_FLAGS "/PDB:\"RedAlert.pdb\" /SUBSYSTEM:WINDOWS" RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../" )

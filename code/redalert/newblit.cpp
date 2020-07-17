@@ -151,6 +151,14 @@ void GL_DrawText(int color, int x, int y, char* text) {
 	ImGui::GetBackgroundDrawList()->AddText(pos, ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 1)), text);
 }
 
+void GL_DrawText(int color, float fontsize, float r, float g, float b, int x, int y, char* text) {
+	ImVec2 pos(x, y);
+	float _r = r / 255.0f;
+	float _g = r / 255.0f;
+	float _b = r / 255.0f;
+	ImGui::GetBackgroundDrawList()->AddText(NULL, fontsize, pos, ImGui::ColorConvertFloat4ToU32(ImVec4(_r, _g, _b, 1)), text);
+}
+
 void GL_DrawForegroundText(int color, int x, int y, char* text) {
 	ImVec2 pos(x, y);
 	if (color == 0 || color == 160) { // This is a hack!

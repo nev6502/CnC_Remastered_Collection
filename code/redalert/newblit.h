@@ -23,3 +23,4 @@ void GL_DrawForegroundText(int color, int x, int y, char* text);
 void GL_SetColor(float r, float g, float b);
 void GL_SetRenderTexture(RenderTexture* renderTexture);
 void GL_EnableBlend(GLBlendType blendType);
+void GL_DrawText(int color, float fontsize, float r, float g, float b, int x, int y, char* text);

@@ -1199,6 +1199,8 @@ struct Image_t;
 void Sys_SetOverlayImage(Image_t* image);
 int Sys_Milliseconds(void);
 
+void RenderBriefing(void);
+
 extern bool g_inMainMenu;
 extern KeyNumType	g_globalKeyNumType;
 extern int			g_globalKeyFlags;
