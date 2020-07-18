@@ -72,6 +72,7 @@ extern bool Debug_Flag;
 extern bool Debug_Lose;
 extern bool Debug_SkipBriefing;
 extern bool Debug_Map;
+extern bool Debug_RenderEditorSplash;
 extern bool Debug_Win;
 extern bool Debug_Icon;
 extern bool Debug_Passable;

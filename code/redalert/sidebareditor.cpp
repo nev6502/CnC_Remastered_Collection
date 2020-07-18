@@ -38,6 +38,12 @@ void SidebarEditor::draw_it(void) {
 	ImGuiStyle& style = ImGui::GetStyle();
 	style.FramePadding = ImVec2(0, 0);
 
+	if (Debug_RenderEditorSplash)
+	{
+		static Image_t* edwinBackground = Image_LoadImage("ui/edwin/eng_edhi.png");
+		GL_RenderImage(edwinBackground, 0, 0, ScreenWidth, ScreenHeight);
+	}
+
 	Debug_LockScroll = false;
 	if (ImGui::BeginMainMenuBar())
 	{

@@ -1605,7 +1605,8 @@ void MapEditClass::Main_Menu(void)
 				if (New_Scenario()==0) {
 					Scen.CarryOverMoney = 0;
 					Changed = 1;
-				}
+					Debug_RenderEditorSplash = false;
+				}				
 				process = false;
 				break;
 
@@ -1629,7 +1630,8 @@ void MapEditClass::Main_Menu(void)
 				if (Load_Scenario()==0) {
 					Scen.CarryOverMoney = 0;
 					Changed = 0;
-				}
+					Debug_RenderEditorSplash = false;
+				}				
 				process = false;
 				break;
 
@@ -1637,8 +1639,11 @@ void MapEditClass::Main_Menu(void)
 			**	Save scenario
 			*/
 			case 2:
-				if (Save_Scenario() == 0) {
-					Changed = 0;
+				if (!Debug_RenderEditorSplash)
+				{
+					if (Save_Scenario() == 0) {
+						Changed = 0;
+					}
 				}
 				process = false;
 				break;

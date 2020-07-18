@@ -77,6 +77,9 @@ int MapEditClass::Select_Object(void)
 	**	Get cell for x,y
 	*/
 	cell = Click_Cell_Calc(x, y);
+	if(cell == -1) {
+		return -1;
+	}
 
 	/*
 	**	Convert x,y to offset from cell upper-left

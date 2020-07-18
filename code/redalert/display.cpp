@@ -567,16 +567,33 @@ void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 	if (height == -1) height = SeenBuff.Get_Height();
 	TacLeptonHeight = Pixel_To_Lepton(height - y) * 4;
 
+	// Set our min/max viewport rectangle.
+	TacViewportRect.Clear();
+	TacViewportRect.AddPoint(0, 0); // Top Corner
+	TacViewportRect.AddPoint(TacLeptonWidth, TacLeptonHeight / 4);
+	TacViewportRect.AddPoint(-TacLeptonWidth, TacLeptonHeight / 4);
+	TacViewportRect.AddPoint(0, TacLeptonHeight / 2);	
+	{
+		int iso_x_offset = (ScreenWidth / 2);
+		int iso_y_offset = (ScreenWidth / 4);
+		TacViewportRect.X -= Pixel_To_Lepton(iso_x_offset);
+		TacViewportRect.Y -= Pixel_To_Lepton(iso_y_offset);
+		TacViewportRect.X2 -= Pixel_To_Lepton(iso_x_offset);
+		TacViewportRect.Y2 -= Pixel_To_Lepton(iso_y_offset);
+	}
+
 	/*
 	**	Adjust the tactical cell if it is now in an invalid position
 	**	because of the changed dimensions.
 	*/
+// jmarshall - todo, this was a great feature, if the designer clampped the map and the starting point was outside, this essentially fixed that.
 	int xx = Coord_X(TacticalCoord) - (MapCellX * CELL_LEPTON_W);
 	int yy = Coord_Y(TacticalCoord) - (MapCellY * CELL_LEPTON_H);
-
-	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, MapCellWidth * CELL_LEPTON_W, MapCellHeight * CELL_LEPTON_H);
-
+	//
+	//Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, MapCellWidth * CELL_LEPTON_W, MapCellHeight * CELL_LEPTON_H);
+	//
 	Set_Tactical_Position(XY_Coord(xx + (MapCellX * CELL_LEPTON_W), yy + (MapCellY * CELL_LEPTON_H)));
+// jmarshall end
 
 	TacPixelX = x;
 	TacPixelY = y;
@@ -1224,7 +1241,11 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 	*/
 	int xx = (int)(short)Coord_X(coord) - (short)Cell_To_Lepton(MapCellX);
 	int yy = (int)(short)Coord_Y(coord) - (short)Cell_To_Lepton(MapCellY);
-	bool shifted = Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth)*1.25, Cell_To_Lepton(MapCellHeight)*1.25);
+	if (!TacViewportRect.ContainsPoint(xx, yy)) {
+		return false;
+	}
+
+	bool shifted = true; // Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) * 1.25, Cell_To_Lepton(MapCellHeight) * 1.25);	
 	if (xx < 0) {
 		xx = 0;
 		shifted = true;
@@ -4819,9 +4840,7 @@ void DisplayClass::Read_INI(CCINIClass & ini)
 	**	Set the starting position (do this after Init(), which clears the cells'
 	**	IsWaypoint flags).
 	*/
-	if (Scen.Waypoint[WAYPT_HOME] == -1) {
-		Scen.Waypoint[WAYPT_HOME] = XY_Cell(MapCellX + 5*RESFACTOR, MapCellY + 4*RESFACTOR);
-	}
+	Scen.Waypoint[WAYPT_HOME] = ini.Get_Int(name, "HomeCell");
 
 	Scen.Views[0] = Scen.Views[1] = Scen.Views[2] = Scen.Views[3] = Scen.Waypoint[WAYPT_HOME];
 	Set_Tactical_Position(Cell_Coord((Scen.Waypoint[WAYPT_HOME] - (MAP_CELL_W * 4 * RESFACTOR)) - (5*RESFACTOR)));
@@ -4889,6 +4908,7 @@ void DisplayClass::Write_INI(CCINIClass & ini)
 	ini.Put_Int(NAME, "Y", MapCellY);
 	ini.Put_Int(NAME, "Width", MapCellWidth);
 	ini.Put_Int(NAME, "Height", MapCellHeight);
+	ini.Put_Int(NAME, "HomeCell", Scen.Waypoint[WAYPT_HOME]);
 
 	/*
 	**	Save the Waypoint entries.

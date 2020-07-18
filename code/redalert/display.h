@@ -79,6 +79,8 @@ class DisplayClass: public MapClass
 		LEPTON TacLeptonWidth;
 		LEPTON TacLeptonHeight;
 
+		Rect TacViewportRect;
+
 		/*
 		**	These layer control elements are used to group the displayable objects
 		**	so that proper overlap can be obtained.
