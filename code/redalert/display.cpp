@@ -2917,15 +2917,11 @@ static bool should_exclude_from_selection(ObjectClass* obj)
 }
 
 void DisplayClass::Select_These(COORDINATE coord1, COORDINATE coord2, bool additive)
-{
-	COORDINATE tcoord = TacticalCoord;	//Cell_Coord(TacticalCell) & 0xFF00FF00L;
-
-	coord1 = Coord_Add(tcoord, coord1);
-	coord2 = Coord_Add(tcoord, coord2);
-	int x1 = Coord_X(coord1);
-	int x2 = Coord_X(coord2);
-	int y1 = Coord_Y(coord1);
-	int y2 = Coord_Y(coord2);
+{	
+	int x1 = Lepton_To_Pixel(Coord_X(coord1));
+	int x2 = Lepton_To_Pixel(Coord_X(coord2));
+	int y1 = Lepton_To_Pixel(Coord_Y(coord1));
+	int y2 = Lepton_To_Pixel(Coord_Y(coord2));
 
 	/*
 	**	Ensure that coordinate number one represents the upper left corner
@@ -2952,9 +2948,14 @@ void DisplayClass::Select_These(COORDINATE coord1, COORDINATE coord2, bool addit
 	AllowVoice = true;
 	for (int index = 0; index < Layer[LAYER_GROUND].Count(); index++) {
 		ObjectClass * obj = Layer[LAYER_GROUND][index];
-		COORDINATE ocoord = obj->Center_Coord();
-		int x = Coord_X(ocoord);
-		int y = Coord_Y(ocoord);
+		//COORDINATE ocoord = obj->Center_Coord();
+		int x = obj->GetRenderX();
+		int y = obj->GetRenderY();		
+
+		// Not on screen.
+		if (x == -1 && y == -1) {
+			continue;
+		}
 
 		/*
 		**	Only try to select objects that are allowed to be selected, and are within the bounding box.
@@ -3934,15 +3935,7 @@ void DisplayClass::Mouse_Left_Release(CELL cell, int x, int y, ObjectClass * obj
 
 		if (IsRubberBand) {
 			Refresh_Band();
-			int _BandX = BandX;
-			int _BandY = BandY;
-			int _x = x;
-			int _y = y;
-
-			CellClass::ConvertIsoCoordsToScreen(_BandX, _BandY);
-			CellClass::ConvertIsoCoordsToScreen(_x, _y);
-			Select_These(XYP_Coord(_BandX, _BandY), XYP_Coord(_x, _y));
-
+			Select_These(XYP_Coord(BandX, BandY), XYP_Coord(x, y));
 			Set_Default_Mouse(MOUSE_NORMAL, wsmall);
 			IsRubberBand = false;
 			IsTentative = false;

@@ -1450,6 +1450,7 @@ void CellClass::Draw_It(int x, int y, bool objects)
 			if (object->IsToDisplay && (!object->Is_Techno() || ((TechnoClass *)object)->Visual_Character() == VISUAL_NORMAL) && Map.Coord_To_Pixel(object->Render_Coord(), xx, yy)) {				
 				{
 					ConvertCoordsToIsometric(xx, yy);
+					object->SetRenderXY(xx, yy);
 					object->Draw_It(xx, yy, WINDOW_TACTICAL);
 					if (Debug_Map) {
 						object->IsToDisplay = true;

@@ -1491,7 +1491,7 @@ void RadarClass::Radar_Cursor(int forced)
 		y1-= _last_frame;
 		x2+= _last_frame;
 		y2+= _last_frame;
-
+		
 		/*
 		** Finally mark the map (actually remove the marks that indicate the radar cursor was there
 		*/

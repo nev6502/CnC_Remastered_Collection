@@ -141,6 +141,8 @@ ObjectClass::ObjectClass(RTTIType rtti, int id) :
 	Strength(255),
 	IsSelectedMask(0)		// Mask showing who has selected this object
 {
+	renderX = -1;
+	renderY = -1;
 }
 
 
@@ -1287,6 +1289,13 @@ bool ObjectClass::Select(bool allow_mixed)
 	return(true);
 }
 
+//
+// ObjectClass::SetRenderXY
+//
+void ObjectClass::SetRenderXY(int x, int y) {
+	renderX = x;
+	renderY = y;
+}
 
 /***********************************************************************************************
  * ObjectClass::Render -- Displays the object onto the map.                                    *
