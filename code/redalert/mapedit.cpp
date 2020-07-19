@@ -1606,6 +1606,7 @@ void MapEditClass::Main_Menu(void)
 					Scen.CarryOverMoney = 0;
 					Changed = 1;
 					Debug_RenderEditorSplash = false;
+					Set_View_Dimensions(0, 0);
 				}				
 				process = false;
 				break;
@@ -1631,6 +1632,7 @@ void MapEditClass::Main_Menu(void)
 					Scen.CarryOverMoney = 0;
 					Changed = 0;
 					Debug_RenderEditorSplash = false;
+					Set_View_Dimensions(0, 0);
 				}				
 				process = false;
 				break;
