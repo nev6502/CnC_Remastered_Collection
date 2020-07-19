@@ -118,7 +118,7 @@ void ScrollClass::AI(KeyNumType &input, int x, int y)
 			/*
 			**	Verify that the mouse is over a scroll region.
 			*/
-			if (Inertia || at_screen_edge) {
+			if (at_screen_edge) {
 				if (at_screen_edge) {
 
 					player_scrolled = true;

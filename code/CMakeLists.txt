@@ -306,6 +306,8 @@ set(src_redalert
 	./redalert/idata.cpp
 	./redalert/infantry.cpp
 	./redalert/infantry.h
+	./redalert/tacticalcoord.cpp
+	./redalert/tacticalcoord.h
 	./redalert/ini.cpp
 	./redalert/ini.h
 	./redalert/inibin.cpp

@@ -583,17 +583,17 @@ void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 
 	// Set our min/max viewport rectangle.
 	TacViewportRect.Clear();
+	int mapWidth = MapCellWidth * CELL_PIXEL_W;
+	int mapHeight = MapCellHeight * CELL_PIXEL_H;
 	TacViewportRect.AddPoint(0, 0); // Top Corner
-	TacViewportRect.AddPoint(TacLeptonWidth, TacLeptonHeight);
-	TacViewportRect.AddPoint(-TacLeptonWidth, TacLeptonHeight);
-	TacViewportRect.AddPoint(0, TacLeptonHeight);	
+	TacViewportRect.AddPoint(mapWidth, mapHeight / 2);
+	TacViewportRect.AddPoint(-mapWidth, mapHeight / 2);
+	TacViewportRect.AddPoint(0, mapHeight);
 	{
-		int iso_x_offset = (ScreenWidth / 2);
-		int iso_y_offset = (ScreenWidth / 4);
-		TacViewportRect.X -= Pixel_To_Lepton(iso_x_offset);
-		TacViewportRect.Y -= Pixel_To_Lepton(iso_y_offset);
-		TacViewportRect.X2 -= Pixel_To_Lepton(iso_x_offset);
-		TacViewportRect.Y2 -= Pixel_To_Lepton(iso_y_offset);
+		TacViewportRect.X += (MapCellX * CELL_PIXEL_W);
+		TacViewportRect.Y += (MapCellY * CELL_PIXEL_H);
+		TacViewportRect.X2 += (MapCellX * CELL_PIXEL_W);
+		TacViewportRect.Y2 += (MapCellY * CELL_PIXEL_H);
 	}
 
 	/*
@@ -1240,12 +1240,20 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 
 	int neighborCellX = weights[crude].x * (distance * 0.4f);
 	int neighbotCellY = weights[crude].y * (distance * 0.4f);
-	int tacx, tacy;
-	Map.Coord_To_Pixel(TacticalCoord, tacx, tacy);
-	COORDINATE coord = Map.Pixel_To_Coord(neighborCellX + tacx, neighbotCellY + tacx);
-	if (!TacViewportRect.ContainsPoint(Coord_X(coord), Coord_Y(coord))) {
+	DisplayTacticalCoord newCoord = TacticalCoord;
+	newCoord.x += Pixel_To_Lepton(neighborCellX);
+	newCoord.y += Pixel_To_Lepton(neighbotCellY);
+	
+	int sx = Lepton_To_Pixel(newCoord.x);
+	int sy = Lepton_To_Pixel(newCoord.y);
+	CellClass::ConvertCoordsToIsometric(sx, sy);
+	sy += (ScreenWidth / 4);
+	sy += ScreenHeight / 2;
+	if (!TacViewportRect.ContainsPoint(sx, sy)) {
 		return false;
 	}
+
+	COORDINATE coord = newCoord;
 
 
 	/*

@@ -37,6 +37,7 @@
 
 #include	"map.h"
 #include	"layer.h"
+#include    "tacticalcoord.h"
 
 struct Image_t;
 
@@ -60,17 +61,13 @@ struct Image_t;
 
 extern COORDINATE Coord_Add(COORDINATE coord1, COORDINATE coord2);
 
+
 class DisplayClass: public MapClass
 {
 	public:
 		friend class DLLExportClass;	// ST - 5/13/2019
 
-		/*
-		** The tactical map display position is indicated by the cell of the
-		**	upper left hand corner. These should not be altered directly. Use
-		**	the Set_Tactical_Position function instead.
-		*/
-		COORDINATE TacticalCoord;
+		DisplayTacticalCoord TacticalCoord;
 
 		/*
 		**	The dimensions (in cells) of the visible window onto the game map. This tactical
@@ -228,7 +225,7 @@ class DisplayClass: public MapClass
 		/*
 		**	This is the coordinate that the tactical map should be in at next available opportunity.
 		*/
-		COORDINATE DesiredTacticalCoord;
+		DisplayTacticalCoord DesiredTacticalCoord;
 
 		/*
 		**	If something in the tactical map is to be redrawn, this flag is set to true.
