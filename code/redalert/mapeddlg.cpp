@@ -175,7 +175,7 @@ int MapEditClass::New_Scenario(void)
 	**	Set the Home & Reinforcement Cells to the center of the map
 	*/
 	Scen.Waypoint[WAYPT_REINF] = XY_Cell(MapCellX + MapCellWidth / 2, MapCellY + MapCellHeight / 2);
-	Scen.Waypoint[WAYPT_HOME] = XY_Cell(MapCellX, MapCellY);
+	Scen.Waypoint[WAYPT_HOME] = XY_Cell(MapCellX - MapCellWidth / 2, MapCellY - MapCellHeight / 2);
 	TacticalCoord = Cell_Coord(Scen.Waypoint[WAYPT_HOME]);
 	(*this)[TacticalCoord].IsWaypoint = 1;
 	Flag_Cell(Coord_Cell(TacticalCoord));
