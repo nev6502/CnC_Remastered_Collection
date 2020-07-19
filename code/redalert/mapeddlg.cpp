@@ -166,10 +166,10 @@ int MapEditClass::New_Scenario(void)
 //	Init_Clear();
 	Fill_In_Data();
 
-	/*
-	**	Prompt for map size
-	*/
-	Size_Map(-1, -1, 30, 30);
+	MapCellX = 95 - 45 - 1;
+	MapCellY = 75 - 25 - 1;
+	MapCellWidth = 124 - 95 + 1;
+	MapCellHeight = 104 - 75 + 1;
 
 	/*
 	**	Set the Home & Reinforcement Cells to the center of the map
