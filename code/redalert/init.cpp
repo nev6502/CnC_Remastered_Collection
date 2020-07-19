@@ -882,17 +882,17 @@ bool Select_Game(bool fade)
 
 					if (!Special.IsFromInstall) {
 						if (AntsEnabled)  {
-							Scen.Set_Scenario_Name("SCA01EA.INI");
+							Scen.Set_Scenario_Name("SCA01EA.MAP");
 						} else {
 							switch (WWMessageBox().Process(TXT_CHOOSE, TXT_ALLIES, TXT_CANCEL, TXT_SOVIET)) {
 								case 2:
-									Scen.Set_Scenario_Name("SCU01EA.INI");
+									Scen.Set_Scenario_Name("SCU01EA.MAP");
 									break;
 								default:
 									selection = SEL_NONE;
 									continue;
 								case 0:
-									Scen.Set_Scenario_Name("SCG01EA.INI");
+									Scen.Set_Scenario_Name("SCG01EA.MAP");
 									break;
 
 							}
@@ -907,9 +907,9 @@ bool Select_Game(bool fade)
 						Hide_Mouse();
 
 						if (CurrentCD == 0) {
-							Scen.Set_Scenario_Name("SCG01EA.INI");
+							Scen.Set_Scenario_Name("SCG01EA.MAP");
 						} else {
-							Scen.Set_Scenario_Name("SCU01EA.INI");
+							Scen.Set_Scenario_Name("SCU01EA.MAP");
 						}
 					}
 

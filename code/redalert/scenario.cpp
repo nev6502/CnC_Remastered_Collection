@@ -1967,7 +1967,7 @@ void ScenarioClass::Set_Scenario_Name(int scenario, ScenarioPlayerType player, S
 		** Find which variations are available for this scenario
 		*/
 		for (i = SCEN_VAR_FIRST; i < SCEN_VAR_COUNT; i++) {
-			sprintf(fname, "SC%c%02d%c%c.INI", c_player, scenario, c_dir, 'A' + i);
+			sprintf(fname, "SC%c%02d%c%c.MAP", c_player, scenario, c_dir, 'A' + i);
 			if (!CCFileClass(fname).Is_Available()) {
 				break;
 			}
@@ -2010,7 +2010,7 @@ void ScenarioClass::Set_Scenario_Name(int scenario, ScenarioPlayerType player, S
 #ifdef FIXIT_CSII	//	checked - ajw 9/28/98
 //Mono_Printf("In set_scenario_name, scenario # = %d\n",scenario);Keyboard->Get();Keyboard->Get();
 	if (scenario < 100) {
-		sprintf(ScenarioName, "SC%c%02d%c%c.INI", c_player, scenario, c_dir, c_var);
+		sprintf(ScenarioName, "SC%c%02d%c%c.MAP", c_player, scenario, c_dir, c_var);
 	} else {
 		char first = (scenario / 36) + 'A';
 		char second = scenario % 36;
@@ -2021,10 +2021,10 @@ void ScenarioClass::Set_Scenario_Name(int scenario, ScenarioPlayerType player, S
 			second = (second - 10) + 'A';
 		}
 
-		sprintf(ScenarioName, "SC%c%c%c%c%c.INI", c_player, first, second, c_dir, c_var);
+		sprintf(ScenarioName, "SC%c%c%c%c%c.MAP", c_player, first, second, c_dir, c_var);
 	}
 #else
-	sprintf(ScenarioName, "SC%c%02d%c%c.INI", c_player, scenario, c_dir, c_var);
+	sprintf(ScenarioName, "SC%c%02d%c%c.MAP", c_player, scenario, c_dir, c_var);
 #endif
 }
 
