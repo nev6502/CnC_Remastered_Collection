@@ -89,6 +89,20 @@
 #include	"vortex.h"
 #include    "image.h"
 
+struct AdjancentWeight_t {
+	AdjancentWeight_t() {
+		x = 0;
+		y = 0;
+	}
+	void Set(int x, int y) {
+		this->x = x;
+		this->y = y;
+	}
+
+	int x;
+	int y;
+};
+
 /*
 **	These layer control elements are used to group the displayable objects
 **	so that proper overlap can be obtained.
@@ -570,9 +584,9 @@ void DisplayClass::Set_View_Dimensions(int x, int y, int width, int height)
 	// Set our min/max viewport rectangle.
 	TacViewportRect.Clear();
 	TacViewportRect.AddPoint(0, 0); // Top Corner
-	TacViewportRect.AddPoint(TacLeptonWidth, TacLeptonHeight / 4);
-	TacViewportRect.AddPoint(-TacLeptonWidth, TacLeptonHeight / 4);
-	TacViewportRect.AddPoint(0, TacLeptonHeight / 2);	
+	TacViewportRect.AddPoint(TacLeptonWidth, TacLeptonHeight);
+	TacViewportRect.AddPoint(-TacLeptonWidth, TacLeptonHeight);
+	TacViewportRect.AddPoint(0, TacLeptonHeight);	
 	{
 		int iso_x_offset = (ScreenWidth / 2);
 		int iso_y_offset = (ScreenWidth / 4);
@@ -1214,55 +1228,53 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 	if (distance == 0) return(false);
 	FacingType crude = Dir_Facing(facing);
 
-	if (Coord_X(TacticalCoord) == Cell_To_Lepton(MapCellX) && crude != FACING_W) {
-		if (crude == FACING_SW) facing = DIR_S;
-		if (crude == FACING_NW) facing = DIR_N;
-	}
-	if (Coord_Y(TacticalCoord) == Cell_To_Lepton(MapCellY) && crude != FACING_N) {
-		if (crude == FACING_NW) facing = DIR_W;
-		if (crude == FACING_NE) facing = DIR_E;
-	}
-	if (Coord_X(TacticalCoord) + TacLeptonWidth == Cell_To_Lepton(MapCellX+(MapCellWidth*1.25)) && crude != FACING_E) {
-		if (crude == FACING_NE) facing = DIR_N;
-		if (crude == FACING_SE) facing = DIR_S;
-	}
-	if (Coord_Y(TacticalCoord) + TacLeptonHeight == Cell_To_Lepton(MapCellY+(MapCellHeight*1.25)) && crude != FACING_S) {
-		if (crude == FACING_SE) facing = DIR_E;
-		if (crude == FACING_SW) facing = DIR_W;
-	}
-
 	/*
 	**	Determine the coordinate that it wants to scroll to.
 	*/
-	COORDINATE coord = Coord_Move(TacticalCoord, facing, distance);
+	//COORDINATE coord = Coord_Move(TacticalCoord, facing, distance);
+	static AdjancentWeight_t weights[FACING_COUNT];
+	weights[FACING_N].Set( -1, -1 );
+	weights[FACING_E].Set(1, -1);
+	weights[FACING_S].Set( 1, 1 );
+	weights[FACING_W].Set(-1, 1);
+
+	int neighborCellX = weights[crude].x * (distance * 0.4f);
+	int neighbotCellY = weights[crude].y * (distance * 0.4f);
+	int tacx, tacy;
+	Map.Coord_To_Pixel(TacticalCoord, tacx, tacy);
+	COORDINATE coord = Map.Pixel_To_Coord(neighborCellX + tacx, neighbotCellY + tacx);
+	if (!TacViewportRect.ContainsPoint(Coord_X(coord), Coord_Y(coord))) {
+		return false;
+	}
+
 
 	/*
 	**	Clip the new coordinate to the edges of the game world.
 	*/
-	int xx = (int)(short)Coord_X(coord) - (short)Cell_To_Lepton(MapCellX);
-	int yy = (int)(short)Coord_Y(coord) - (short)Cell_To_Lepton(MapCellY);
-	if (!TacViewportRect.ContainsPoint(xx, yy)) {
-		return false;
-	}
-
-	bool shifted = true; // Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) * 1.25, Cell_To_Lepton(MapCellHeight) * 1.25);	
-	if (xx < 0) {
-		xx = 0;
-		shifted = true;
-	}
-	if (yy < 0) {
-		yy = 0;
-		shifted = true;
-	}
-	coord = XY_Coord(xx + Cell_To_Lepton(MapCellX), yy + Cell_To_Lepton(MapCellY));
+	//int xx = (int)(short)Coord_X(coord) - (short)Cell_To_Lepton(MapCellX);
+	//int yy = (int)(short)Coord_Y(coord) - (short)Cell_To_Lepton(MapCellY);
+	////if (!TacViewportRect.ContainsPoint(xx, yy)) {
+	////	return false;
+	////}
+	//
+	//bool shifted = true; // Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) * 1.25, Cell_To_Lepton(MapCellHeight) * 1.25);	
+	//if (xx < 0) {
+	//	xx = 0;
+	//	shifted = true;
+	//}
+	//if (yy < 0) {
+	//	yy = 0;
+	//	shifted = true;
+	//}
+	//coord = XY_Coord(xx + Cell_To_Lepton(MapCellX), yy + Cell_To_Lepton(MapCellY));
 
 	/*
 	**	If the desired scroll was bound by the edge of the map, then adjust the distance to more accurately
 	**	reflect the actual distance moved.
 	*/
-	if (shifted) {
+	//if (shifted) {
 		distance = Distance(TacticalCoord, coord);
-	}
+	//}
 
 	/*
 	**	If the new coordinate is the same as the old, then no scrolling would occur.
@@ -1274,6 +1286,7 @@ bool DisplayClass::Scroll_Map(DirType facing, int & distance, bool really)
 	**	tactical map accordingly.
 	*/
 	if (really) {
+	//	Console_Printf("%d %d %d %d %d\n", neighborCellX, neighbotCellY, xx, yy, coord);
 		Set_Tactical_Position(coord);
 		IsToRedraw = true;
 		Flag_To_Redraw(false);
@@ -2631,10 +2644,10 @@ COORDINATE DisplayClass::Pixel_To_Coord(int x, int y) const
 	*/
 	// Possibly ignore the view constraints if we aren't using the internal renderer. ST - 8/6/2019 10:47AM
 	//if ((unsigned)x < TacLeptonWidth && (unsigned)y < TacLeptonHeight) {
-	if (IgnoreViewConstraints || ((unsigned)x < TacLeptonWidth && (unsigned)y < TacLeptonHeight)) {
+	//if (IgnoreViewConstraints || ((unsigned)x < TacLeptonWidth && (unsigned)y < TacLeptonHeight)) {
 		return(Coord_Add(TacticalCoord, XY_Coord(x, y)));
-	}
-	return(0);
+	//}
+	//return(0);
 }
 
 
@@ -4275,15 +4288,16 @@ extern int GlyphXClientSidebarWidthInLeptons;
  *=============================================================================================*/
 void DisplayClass::Set_Tactical_Position(COORDINATE coord)
 {
+	COORDINATE inCoord = coord;
 	/*
 	**	Bound the desired location to fit the legal map edges.
 	*/
-	int xx = (int)Coord_X(coord) - (int)Cell_To_Lepton(MapCellX);
-	int yy = (int)Coord_Y(coord) - (int)Cell_To_Lepton(MapCellY);
+	int xx = (int)Coord_X(coord); // - (int)Cell_To_Lepton(MapCellX);
+	int yy = (int)Coord_Y(coord); // - (int)Cell_To_Lepton(MapCellY);
 
 //	Confine_Rect(&xx, &yy, TacLeptonWidth, TacLeptonHeight, Cell_To_Lepton(MapCellWidth) + GlyphXClientSidebarWidthInLeptons, Cell_To_Lepton(MapCellHeight));		// Needed to accomodate Glyphx client sidebar. ST - 4/12/2019 5:29PM
 	//Confine_Rect(&xx, &yy, 0, 0, Cell_To_Lepton(MapCellWidth*2), Cell_To_Lepton(MapCellHeight*2));
-	coord = XY_Coord(xx + Cell_To_Lepton(MapCellX), yy + Cell_To_Lepton(MapCellY));
+	coord = XY_Coord(xx, yy);
 
 	if (ScenarioInit) {
 		TacticalCoord = coord;

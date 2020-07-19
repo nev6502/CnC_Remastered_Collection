@@ -123,24 +123,49 @@ void ScrollClass::AI(KeyNumType &input, int x, int y)
 
 					player_scrolled = true;
 
-					int half_screen_width = screen_width / 2;
-					int half_screen_height = screen_height / 2;
-
-					/*
-					**	Adjust the mouse coordinates to emphasize the
-					**	cardinal directions over the diagonals.
-					*/
-					int altx = x;
-					int alty = y;
-
-					if (alty == 0 || alty >= screen_height - 1){
-						if (altx != (half_screen_width)) { 
-							float offset_x = (half_screen_width - altx) * .7;
-							altx = altx + offset_x;
-						}
+					//int half_screen_width = screen_width / 2;
+					//int half_screen_height = screen_height / 2;
+					//
+					///*
+					//**	Adjust the mouse coordinates to emphasize the
+					//**	cardinal directions over the diagonals.
+					//*/
+					//int altx = x;
+					//int alty = y;
+					//
+					//if (alty == 0 || alty >= screen_height - 1){
+					//	if (altx != (half_screen_width)) { 
+					//		float offset_x = (half_screen_width - altx) * .7;
+					//		altx = altx + offset_x;
+					//	}
+					//}
+					//
+					//direction = (DirType)Desired_Facing256((half_screen_width), (half_screen_height), altx, alty);
+					if(x == 0 && y == 0) {
+						direction = DIR_NW;
 					}
-
-					direction = (DirType)Desired_Facing256((half_screen_width), (half_screen_height), altx, alty);
+					else if (x >= screen_width - 1 && y == 0) {
+						direction = DIR_NE;
+					}
+					else if (x == 0 && y >= screen_height - 1) {
+						direction = DIR_SW;
+					}
+					else if (x >= screen_width - 1 && y >= screen_height - 1) {
+						direction = DIR_SE;
+					}
+					else if(x == 0) 
+					{
+						direction = DIR_W;
+					}
+					else if(y == 0) {
+						direction = DIR_N;
+					}
+					else if(y >= screen_height - 1) {
+						direction = DIR_S;
+					}
+					else if(x >= screen_width - 1) {
+						direction = DIR_E;
+					}
 				}
 
 				int control = Dir_Facing(direction);
@@ -186,7 +211,7 @@ void ScrollClass::AI(KeyNumType &input, int x, int y)
 				**	one of the 8 facings, then adjust the direction value
 				**	accordingly.
 				*/
-				direction = Facing_Dir(Dir_Facing(direction)) - (1<<5);
+				//direction = Facing_Dir(Dir_Facing(direction)) - (1<<5);
 
 				int distance = _rate[rate]/2;
 
